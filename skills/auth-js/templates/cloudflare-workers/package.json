@@ -1,0 +1,23 @@
+{
+  "name": "cloudflare-worker-authjs",
+  "version": "1.0.0",
+  "description": "Cloudflare Workers with Auth.js and D1",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "d1:create": "wrangler d1 create auth_db",
+    "d1:migrate": "wrangler d1 execute auth_db --file=./schema.sql",
+    "d1:query": "wrangler d1 execute auth_db --command",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@auth/core": "^0.41.1",
+    "@auth/d1-adapter": "^1.11.1",
+    "hono": "^4.7.9"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20241029.0",
+    "wrangler": "^3.94.0",
+    "typescript": "^5.9.0"
+  }
+}

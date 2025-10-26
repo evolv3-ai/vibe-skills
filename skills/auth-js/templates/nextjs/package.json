@@ -1,0 +1,28 @@
+{
+  "name": "nextjs-authjs-example",
+  "version": "1.0.0",
+  "description": "Next.js project with Auth.js v5",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "next": "^15.3.1",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "next-auth": "^4.24.11",
+    "@auth/core": "^0.41.1",
+    "@auth/prisma-adapter": "^2.7.5",
+    "@prisma/client": "^7.3.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "typescript": "^5.9.0",
+    "prisma": "^7.3.0"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "name": "auth-worker",
+  "main": "src/index.ts",
+  "compatibility_date": "2025-10-26",
+
+  /**
+   * D1 Database Binding
+   *
+   * 1. Create database: npx wrangler d1 create auth_db
+   * 2. Copy the database_id from the output
+   * 3. Replace "your-database-id" below with the actual ID
+   * 4. Run migrations: npx wrangler d1 execute auth_db --file=./schema.sql
+   */
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "auth_db",
+      "database_id": "your-database-id"
+    }
+  ],
+
+  /**
+   * Environment Variables
+   *
+   * Add secrets with: npx wrangler secret put SECRET_NAME
+   *
+   * Required:
+   * - AUTH_SECRET (generate with: npx auth secret)
+   * - AUTH_GITHUB_ID (from GitHub OAuth app)
+   * - AUTH_GITHUB_SECRET (from GitHub OAuth app)
+   *
+   * Optional:
+   * - AUTH_GOOGLE_ID (from Google Cloud Console)
+   * - AUTH_GOOGLE_SECRET (from Google Cloud Console)
+   */
+  "vars": {
+    "ENVIRONMENT": "production"
+  },
+
+  /**
+   * Build configuration
+   */
+  "build": {
+    "command": "npm run build"
+  },
+
+  /**
+   * Node compatibility (if needed)
+   */
+  "node_compat": true,
+
+  /**
+   * Development configuration
+   */
+  "dev": {
+    "port": 8787
+  }
+}
