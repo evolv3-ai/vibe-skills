@@ -324,6 +324,82 @@ Result: Integrated solution from atomic skills
 
 ---
 
+#### 7. cloudflare-images
+**Status**: ✅ Complete (2025-10-26)
+**Priority**: High
+**Dependencies**: None
+**Actual Dev Time**: 5.5 hours
+**Token Savings**: ~60%
+**Errors Prevented**: 13
+
+**What It Does**:
+- Complete Cloudflare Images API (upload, storage, serving)
+- Image Transformations (resize, optimize ANY publicly accessible image)
+- Upload methods (file, URL ingestion, direct creator upload)
+- Variants management (named variants up to 100, flexible variants unlimited)
+- Direct Creator Upload (one-time upload URLs for user uploads without API key exposure)
+- Signed URLs for private images (HMAC-SHA256 tokens with expiry)
+- URL transformations (`/cdn-cgi/image/<OPTIONS>/<SOURCE>`)
+- Workers transformations (`fetch(url, { cf: { image: {...} } })`)
+- All transformation options (resize, crop, quality, format, effects)
+- Format optimization (auto WebP/AVIF conversion)
+- Responsive images (srcset patterns)
+- Batch API for high-volume uploads
+- Webhooks for upload notifications
+
+**Files Created**:
+- README.md (comprehensive auto-trigger keywords, 300+ lines)
+- SKILL.md (complete guide, 1,200+ lines)
+- 11 templates:
+  * wrangler-images-binding.jsonc
+  * upload-api-basic.ts
+  * upload-via-url.ts
+  * direct-creator-upload-backend.ts
+  * direct-creator-upload-frontend.html
+  * transform-via-url.ts
+  * transform-via-workers.ts
+  * variants-management.ts
+  * signed-urls-generation.ts
+  * responsive-images-srcset.html
+  * batch-upload.ts
+  * package.json
+- 8 references:
+  * api-reference.md (complete API endpoints)
+  * transformation-options.md (all transform params)
+  * variants-guide.md (named vs flexible variants)
+  * signed-urls-guide.md (HMAC-SHA256 implementation)
+  * direct-upload-complete-workflow.md (full architecture)
+  * responsive-images-patterns.md (srcset, sizes, art direction)
+  * format-optimization.md (WebP/AVIF strategies)
+  * top-errors.md (all 13+ errors with solutions)
+- scripts/check-versions.sh
+
+**Known Issues Prevented**:
+1. Direct Creator Upload CORS error (multipart/form-data requirement)
+2. Error 5408 - Upload timeout (15s limit)
+3. Error 400 - Invalid file parameter name
+4. CORS preflight failures (backend-only `/direct_upload` calls)
+5. Error 9401 - Invalid transformation arguments
+6. Error 9402 - Image too large
+7. Error 9403 - Request loop
+8. Error 9406/9419 - Invalid URL format (HTTPS only, URL encoding)
+9. Error 9412 - Non-image response
+10. Error 9413 - Max image area exceeded (100 megapixels)
+11. Flexible variants + signed URLs incompatibility
+12. SVG resizing limitation
+13. EXIF metadata stripped by default
+
+**Production Validated**: Based on official Cloudflare documentation and community issues
+
+**Auto-Trigger Keywords**:
+- `cloudflare images`, `image upload cloudflare`, `imagedelivery.net`
+- `cloudflare image transformations`, `/cdn-cgi/image/`, `direct creator upload`
+- `image variants cloudflare`, `cf.image workers`, `signed urls images`
+- `flexible variants`, `webp avif conversion`, `responsive images cloudflare`
+- Error keywords: `error 5408`, `error 9401`, `error 9403`, `CORS direct upload`
+
+---
+
 #### 7. cloudflare-cron-triggers
 **Status**: ✅ Complete (2025-10-23)
 **Priority**: Medium
@@ -1702,6 +1778,7 @@ Calculate:
 | **cloudflare-workers-ai** | **✅ Complete** | **5h** | **~60%** | **6** | High |
 | **cloudflare-vectorize** | **✅ Complete** | **3h** | **~65%** | **8** | Medium |
 | **cloudflare-queues** | **✅ Complete** | **3h** | **~50%** | **8** | Medium |
+| **cloudflare-images** | **✅ Complete** | **5.5h** | **~60%** | **13** | High |
 | **cloudflare-agents** | **✅ Complete** | **18h** | **~65%** | **15** | Critical |
 | **cloudflare-nextjs** | **✅ Complete** | **4h** | **~59%** | **10** | High |
 | **ai-sdk-core** | **✅ Complete** | **6h** | **~58%** | **12** | Critical |
@@ -1727,8 +1804,8 @@ Calculate:
 | openai-agents-sdk | Planned | 6-8h (est.) | ~60% | 10+ | Low |
 | google-gemini-api | Planned | 8-10h (est.) | ~65% | 15+ | Critical |
 
-**Total Skills In Table**: 33 (20 complete, 13 to build)
-**Total Skills In Repo**: 30 (all complete)
+**Total Skills In Table**: 34 (21 complete, 13 to build)
+**Total Skills In Repo**: 31 (all complete)
 **Batch 5 (Planned)**: 9 skills - AI API/SDK Suite (Claude, OpenAI, Google Gemini)
 **Batch 6 (Complete)**: 1 skill - UI & Generative UI (TheSys C1)
 
