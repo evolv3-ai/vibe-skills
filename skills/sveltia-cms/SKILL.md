@@ -19,8 +19,8 @@ allowed-tools: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep']
 metadata:
   token_savings: "60-65%"
   errors_prevented: 8
-  package_version: "0.113.3"
-  last_verified: "2025-10-24"
+  package_version: "0.113.5"
+  last_verified: "2025-10-29"
   frameworks: ["Hugo", "Jekyll", "11ty", "Gatsby", "Astro", "Next.js", "SvelteKit", "Framework-agnostic"]
   deployment: ["Cloudflare Workers", "Vercel", "Netlify", "GitHub Pages", "Cloudflare Pages"]
 ---
@@ -76,9 +76,9 @@ Complete skill for integrating Sveltia CMS into static site projects.
 
 ### Current Versions
 
-- **@sveltia/cms**: 0.113.3 (October 2025)
+- **@sveltia/cms**: 0.113.5 (October 2025)
 - **Status**: Public Beta (v1.0 expected early 2026)
-- **Maturity**: Production-ready (260+ issues solved from predecessor)
+- **Maturity**: Production-ready (265+ issues solved from predecessor)
 
 ---
 

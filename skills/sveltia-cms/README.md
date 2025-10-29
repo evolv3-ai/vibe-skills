@@ -252,11 +252,11 @@ bundle exec jekyll serve
 
 ## Package Versions
 
-- **@sveltia/cms**: 0.113.3 (October 2025)
+- **@sveltia/cms**: 0.113.5 (October 2025)
 - **Status**: Public Beta (v1.0 expected early 2026)
-- **Maturity**: Production-ready (260+ issues solved from Decap CMS)
+- **Maturity**: Production-ready (265+ issues solved from Decap CMS)
 
-**Last Verified**: 2025-10-24
+**Last Verified**: 2025-10-29
 
 ---
 
@@ -323,5 +323,5 @@ MIT
 
 ---
 
-**Skill Version**: 1.0.0
-**Last Updated**: 2025-10-24
+**Skill Version**: 1.0.1
+**Last Updated**: 2025-10-29
