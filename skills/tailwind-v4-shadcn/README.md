@@ -1,7 +1,7 @@
 # Tailwind v4 + shadcn/ui Skill
 
 **Status**: Production Ready ✅
-**Last Updated**: 2025-10-20
+**Last Updated**: 2025-10-29
 **Production Tested**: WordPress Auditor (https://wordpress-auditor.webfonts.workers.dev)
 
 ---
@@ -33,6 +33,10 @@ This skill should be invoked when user mentions ANY of:
 - `dark: variant not working`
 - `colors all black/white`
 - `bg-primary doesn't work`
+- `@import typography` (wrong v4 syntax)
+- `require @tailwindcss/typography` (v3 syntax in v4)
+- `prose class not working`
+- `@plugin directive`
 
 ---
 
@@ -60,6 +64,7 @@ Sets up **production-ready** Vite + React + Tailwind CSS v4 + shadcn/ui with:
 | Dark mode broken | No ThemeProvider or wrong setup | Full ThemeProvider template |
 | Wrong config | `tailwind.config.ts` used for theme | Empty config, CSS-only theme |
 | Double hsl() wrapping | Common pattern mistake | Correct variable usage |
+| Wrong plugin syntax | Using @import or require() for plugins | Correct @plugin directive documented |
 
 ---
 
@@ -88,7 +93,7 @@ Sets up **production-ready** Vite + React + Tailwind CSS v4 + shadcn/ui with:
 ```
 ~/.claude/skills/tailwind-v4-shadcn/
 ├── README.md                  # This file - auto-trigger keywords
-├── SKILL.md                   # Complete documentation (465 lines)
+├── SKILL.md                   # Complete documentation (623 lines)
 ├── templates/                 # Ready-to-copy file templates
 │   ├── index.css              # v4 CSS architecture
 │   ├── components.json        # shadcn/ui v4 config
@@ -194,6 +199,6 @@ last_tested: 2025-10-20
 
 ## Support
 
-- **Full Documentation**: See `SKILL.md` (465 lines)
+- **Full Documentation**: See `SKILL.md` (623 lines)
 - **Troubleshooting**: See `reference/common-gotchas.md`
 - **Official Docs**: https://ui.shadcn.com/docs/tailwind-v4

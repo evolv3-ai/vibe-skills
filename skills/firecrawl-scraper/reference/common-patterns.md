@@ -1,6 +1,6 @@
 # Firecrawl Common Patterns & Best Practices
 
-**Last Updated**: 2025-10-20
+**Last Updated**: 2025-10-24
 
 ---
 
@@ -479,55 +479,98 @@ async def save_to_r2(pages: list, bucket):
 
 ## Cloudflare Workers Integration
 
-### Complete Worker Example
+### ⚠️ Important: SDK Compatibility
+
+**The Firecrawl SDK cannot run in Cloudflare Workers** due to Node.js dependencies (`axios`).
+
+**Use direct REST API calls with `fetch` instead** (see example below).
+
+For a complete production-ready example, see `templates/firecrawl-worker-fetch.ts`.
+
+---
+
+### Complete Worker Example (Direct Fetch API)
 
 ```typescript
-import FirecrawlApp from 'firecrawl-js';
-
 interface Env {
   FIRECRAWL_API_KEY: string;
-  SCRAPED_CONTENT: KVNamespace;
+  SCRAPED_CONTENT?: KVNamespace;
+}
+
+interface FirecrawlScrapeResponse {
+  success: boolean;
+  data: {
+    markdown?: string;
+    html?: string;
+    metadata: {
+      title?: string;
+      description?: string;
+      sourceURL: string;
+    };
+  };
 }
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const app = new FirecrawlApp({
-      apiKey: env.FIRECRAWL_API_KEY
-    });
-
-    const { url } = await request.json();
-
-    // Check cache (KV)
-    const cached = await env.SCRAPED_CONTENT.get(url);
-    if (cached) {
-      return Response.json({
-        cached: true,
-        data: JSON.parse(cached)
-      });
+    if (request.method !== 'POST') {
+      return Response.json({ error: 'Method not allowed' }, { status: 405 });
     }
 
-    // Scrape
     try {
-      const result = await app.scrapeUrl(url, {
-        formats: ['markdown'],
-        onlyMainContent: true
+      const { url } = await request.json<{ url: string }>();
+
+      if (!url) {
+        return Response.json({ error: 'URL is required' }, { status: 400 });
+      }
+
+      // Check cache (KV)
+      if (env.SCRAPED_CONTENT) {
+        const cached = await env.SCRAPED_CONTENT.get(url, 'json');
+        if (cached) {
+          return Response.json({ cached: true, data: cached });
+        }
+      }
+
+      // Call Firecrawl API directly using fetch
+      const response = await fetch('https://api.firecrawl.dev/v2/scrape', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.FIRECRAWL_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          url: url,
+          formats: ['markdown'],
+          onlyMainContent: true,
+          removeBase64Images: true
+        })
       });
 
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Firecrawl API error (${response.status}): ${errorText}`);
+      }
+
+      const result = await response.json<FirecrawlScrapeResponse>();
+
       // Cache for 1 hour
-      await env.SCRAPED_CONTENT.put(
-        url,
-        JSON.stringify(result),
-        { expirationTtl: 3600 }
-      );
+      if (env.SCRAPED_CONTENT && result.success) {
+        await env.SCRAPED_CONTENT.put(
+          url,
+          JSON.stringify(result.data),
+          { expirationTtl: 3600 }
+        );
+      }
 
       return Response.json({
         cached: false,
-        data: result
+        data: result.data
       });
 
     } catch (error) {
+      console.error('Worker error:', error);
       return Response.json(
-        { error: error.message },
+        { error: error instanceof Error ? error.message : 'Unknown error' },
         { status: 500 }
       );
     }
@@ -535,32 +578,89 @@ export default {
 };
 ```
 
+**Setup**:
+```bash
+# Add API key
+npx wrangler secret put FIRECRAWL_API_KEY
+
+# Optional: Add KV binding to wrangler.jsonc
+{
+  "kv_namespaces": [
+    { "binding": "SCRAPED_CONTENT", "id": "your-kv-namespace-id" }
+  ]
+}
+```
+
 ### Scheduled Worker (Cron Job)
 
 ```typescript
+interface Env {
+  FIRECRAWL_API_KEY: string;
+  DB: D1Database;
+}
+
 export default {
   async scheduled(event: ScheduledEvent, env: Env): Promise<void> {
-    const app = new FirecrawlApp({
-      apiKey: env.FIRECRAWL_API_KEY
-    });
+    try {
+      // Call Firecrawl API directly
+      const response = await fetch('https://api.firecrawl.dev/v2/scrape', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${env.FIRECRAWL_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          url: 'https://news.example.com',
+          formats: ['markdown'],
+          onlyMainContent: true
+        })
+      });
 
-    // Scrape daily
-    const result = await app.scrapeUrl('https://news.example.com', {
-      formats: ['markdown'],
-      onlyMainContent: true
-    });
+      if (!response.ok) {
+        throw new Error(`Firecrawl API error: ${response.status}`);
+      }
 
-    // Store in D1
-    await env.DB.prepare(
-      `INSERT INTO daily_scrapes (url, content, scraped_at)
-       VALUES (?, ?, ?)`
-    ).bind(
-      'https://news.example.com',
-      result.markdown,
-      new Date().toISOString()
-    ).run();
+      const result = await response.json<{
+        success: boolean;
+        data: { markdown: string };
+      }>();
+
+      if (!result.success) {
+        throw new Error('Scraping failed');
+      }
+
+      // Store in D1
+      await env.DB.prepare(
+        `INSERT INTO daily_scrapes (url, content, scraped_at)
+         VALUES (?, ?, ?)`
+      ).bind(
+        'https://news.example.com',
+        result.data.markdown,
+        new Date().toISOString()
+      ).run();
+
+      console.log('Daily scrape completed successfully');
+    } catch (error) {
+      console.error('Scheduled scrape failed:', error);
+    }
   }
 };
+```
+
+**Add to wrangler.jsonc**:
+```jsonc
+{
+  "triggers": {
+    "crons": ["0 0 * * *"]  // Daily at midnight
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "my-database",
+      "database_id": "your-database-id"
+    }
+  ]
+}
 ```
 
 ---

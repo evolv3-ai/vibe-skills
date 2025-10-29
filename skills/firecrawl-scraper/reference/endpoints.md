@@ -2,7 +2,7 @@
 
 **API Version**: v2
 **Base URL**: `https://api.firecrawl.dev`
-**Last Updated**: 2025-10-20
+**Last Updated**: 2025-10-24
 
 ---
 
@@ -409,7 +409,12 @@ print(result)
 ### TypeScript Example (with Zod)
 
 ```typescript
+import FirecrawlApp from '@mendable/firecrawl-js';
 import { z } from 'zod';
+
+const app = new FirecrawlApp({
+  apiKey: process.env.FIRECRAWL_API_KEY
+});
 
 const schema = z.object({
   title: z.string(),

@@ -1,5 +1,5 @@
 ---
-name: Cloudflare R2 Object Storage
+name: cloudflare-r2
 description: |
   Complete knowledge domain for Cloudflare R2 - S3-compatible object storage on Cloudflare's edge network.
 
@@ -12,6 +12,7 @@ description: |
   s3 compatible, r2 cors, presigned urls, multipart upload, r2 api, r2 workers, file upload, asset storage,
   R2_ERROR, R2Bucket, r2 metadata, custom metadata, http metadata, content-type, cache-control,
   aws4fetch, s3 client, bulk delete, r2 list, storage class
+license: MIT
 ---
 
 # Cloudflare R2 Object Storage

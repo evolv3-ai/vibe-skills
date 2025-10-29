@@ -1,5 +1,5 @@
 ---
-name: Cloudflare Queues
+name: cloudflare-queues
 description: |
   Complete knowledge domain for Cloudflare Queues - flexible message queue for asynchronous processing
   and background tasks on Cloudflare Workers.
@@ -11,6 +11,7 @@ description: |
   Keywords: cloudflare queues, queues workers, message queue, queue bindings, async processing,
   background jobs, queue consumer, queue producer, batch processing, dead letter queue, dlq,
   message retry, queue ack, consumer concurrency, queue backlog, wrangler queues
+license: MIT
 ---
 
 # Cloudflare Queues

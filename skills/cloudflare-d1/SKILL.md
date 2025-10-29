@@ -1,5 +1,5 @@
 ---
-name: Cloudflare D1 Database
+name: cloudflare-d1
 description: |
   Complete knowledge domain for Cloudflare D1 - serverless SQLite database on Cloudflare's edge network.
 
@@ -11,6 +11,7 @@ description: |
   serverless database, edge database, d1 queries, sql cloudflare, prepared statements, batch queries,
   d1 api, wrangler migrations, D1_ERROR, D1_EXEC_ERROR, statement too long, database bindings,
   sqlite cloudflare, sql workers api, d1 indexes, query optimization, d1 schema
+license: MIT
 ---
 
 # Cloudflare D1 Database

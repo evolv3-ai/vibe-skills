@@ -35,7 +35,7 @@ const c1Stream = transformStream(llmStream, (chunk) => {
 curl -X POST https://api.thesys.dev/v1/embed/chat/completions \
   -H "Authorization: Bearer $THESYS_API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"model":"c1/openai/gpt-4","messages":[{"role":"user","content":"test"}]}'
+  -d '{"model":"c1/openai/gpt-5/v-20250930","messages":[{"role":"user","content":"test"}]}'
 ```
 
 ---
@@ -80,9 +80,7 @@ const messages = [
 
 | C1 API Version | @thesysai/genui-sdk | @crayonai/react-ui | @crayonai/react-core |
 |----------------|--------------------|--------------------|---------------------|
-| v-20250831     | ~0.6.32            | ~0.8.27            | ~0.7.6              |
-| v-20250815     | ~0.6.30            | ~0.8.24            | ~0.7.6              |
-| v-20250617     | ~0.6.27            | ~0.8.14            | ~0.7.6              |
+| v-20250930     | ~0.6.40            | ~0.8.42            | ~0.7.6              |
 
 **Solution**:
 
@@ -90,8 +88,8 @@ const messages = [
 # Check current versions
 npm list @thesysai/genui-sdk @crayonai/react-ui @crayonai/react-core
 
-# Update to compatible versions
-npm install @thesysai/genui-sdk@0.6.40 @crayonai/react-ui@0.8.27 @crayonai/react-core@0.7.6
+# Update to compatible versions (October 2025)
+npm install @thesysai/genui-sdk@0.6.40 @crayonai/react-ui@0.8.42 @crayonai/react-core@0.7.6
 ```
 
 ---
@@ -133,7 +131,7 @@ npm install @thesysai/genui-sdk@0.6.40 @crayonai/react-ui@0.8.27 @crayonai/react
 ```typescript
 // 1. Enable streaming in API call
 const stream = await client.chat.completions.create({
-  model: "c1/openai/gpt-4",
+  model: "c1/openai/gpt-5/v-20250930",
   messages: [...],
   stream: true, // ✅ IMPORTANT
 });
@@ -393,6 +391,70 @@ npx wrangler secret put THESYS_API_KEY
 if (!process.env.THESYS_API_KEY) {
   throw new Error("THESYS_API_KEY is not set");
 }
+```
+
+---
+
+## 13. Invalid Model ID Error
+
+**Symptom**: API returns 400 error: "Model not found" or "Invalid model ID".
+
+**Causes**:
+- Using outdated model version identifier
+- Typo in model name
+- Using deprecated model
+- Wrong prefix (`c1/` vs `c1-exp/`)
+
+**Solutions**:
+
+```typescript
+// ❌ Wrong - old version
+model: "c1/anthropic/claude-sonnet-4/v-20250617"
+
+// ✅ Correct - current stable version (as of Oct 2025)
+model: "c1/anthropic/claude-sonnet-4/v-20250930"
+
+// ❌ Wrong - non-existent models
+model: "c1/openai/gpt-5-mini"  // Doesn't exist
+model: "c1/openai/gpt-4o"      // Not available via C1
+
+// ✅ Correct - actual models
+model: "c1/openai/gpt-5/v-20250930"  // GPT 5 stable
+model: "c1-exp/openai/gpt-4.1/v-20250617"  // GPT 4.1 experimental
+
+// ❌ Wrong - deprecated
+model: "c1/anthropic/claude-sonnet-3-5"
+model: "c1/anthropic/claude-3.7-sonnet"
+
+// ✅ Correct - current stable
+model: "c1/anthropic/claude-sonnet-4/v-20250930"
+```
+
+**Current Stable Models** (October 2025):
+
+| Provider | Model ID | Status |
+|----------|----------|--------|
+| Anthropic | `c1/anthropic/claude-sonnet-4/v-20250930` | ✅ Stable |
+| OpenAI | `c1/openai/gpt-5/v-20250930` | ✅ Stable |
+| OpenAI | `c1-exp/openai/gpt-4.1/v-20250617` | ⚠️ Experimental |
+| Anthropic | `c1-exp/anthropic/claude-3.5-haiku/v-20250709` | ⚠️ Experimental |
+
+**How to Find Latest Models**:
+1. Visit [TheSys Playground](https://console.thesys.dev/playground)
+2. Check the model dropdown for current versions
+3. Look for `v-YYYYMMDD` format in the model ID
+4. Prefer stable (`c1/`) over experimental (`c1-exp/`) for production
+
+**Verification**:
+```bash
+# Test if model ID works
+curl -X POST https://api.thesys.dev/v1/embed/chat/completions \
+  -H "Authorization: Bearer $THESYS_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "c1/anthropic/claude-sonnet-4/v-20250930",
+    "messages": [{"role": "user", "content": "test"}]
+  }'
 ```
 
 ---

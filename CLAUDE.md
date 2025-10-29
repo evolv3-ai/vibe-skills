@@ -3,7 +3,8 @@
 **Repository**: https://github.com/jezweb/claude-skills
 **Purpose**: Production-ready skills for Claude Code CLI
 **Owner**: Jeremy Dawes (Jez) | Jezweb
-**Status**: Active Development | 27 Skills Complete
+**Status**: Active Development | 50 Skills Complete
+**Last Updated**: 2025-10-29
 
 ---
 
@@ -35,7 +36,7 @@ This repo aligns with **official Anthropic standards**:
 - **Our Standards Doc**: [planning/claude-code-skill-standards.md](planning/claude-code-skill-standards.md)
 - **Comparison**: [planning/STANDARDS_COMPARISON.md](planning/STANDARDS_COMPARISON.md)
 
-**Last Verified**: 2025-10-21
+**Last Verified**: 2025-10-29
 
 ---
 
@@ -54,18 +55,13 @@ claude-skills/
 ├── CHANGELOG.md                  # Version history
 ├── LICENSE                       # MIT License
 │
-├── skills/                       # ← All production skills (27 total)
+├── skills/                       # ← All production skills (51 total)
 │   ├── tailwind-v4-shadcn/       # Gold standard example
-│   ├── tinacms/                  # ← NEW: Git-backed CMS
-│   ├── cloudflare-worker-base/
-│   ├── cloudflare-d1/
-│   ├── cloudflare-r2/
-│   ├── cloudflare-kv/
-│   ├── cloudflare-workers-ai/
-│   ├── cloudflare-vectorize/
-│   ├── cloudflare-queues/
-│   ├── firecrawl-scraper/
-│   └── [22 more skills...]
+│   ├── cloudflare-worker-base/   # Foundation skill
+│   ├── ai-sdk-core/              # AI integration
+│   ├── openai-agents/            # OpenAI Agents SDK
+│   ├── project-planning/         # Planning automation
+│   └── [45 more skills...]       # Run ls skills/ for full list
 │
 ├── templates/                    # ← Templates for new skills
 │   ├── SKILL-TEMPLATE.md         # Copy-paste SKILL.md starter
@@ -97,47 +93,47 @@ claude-skills/
 
 ---
 
-## Current Status (2025-10-24)
+## Current Status (2025-10-29)
 
-### ✅ Completed Skills (27)
+### ✅ Completed Skills (51)
 
-**Recently Added**:
-- **tinacms** (2025-10-24) - Complete TinaCMS integration for Git-backed content management
-  - Supports: Next.js, Vite+React, Astro, Framework-agnostic
-  - 9 errors prevented, 68% token savings
-  - Self-hosting templates for Cloudflare Workers, Vercel, Netlify
+All 51 skills are production-ready and organized by domain:
 
-**Full Skill List** (run `ls skills/` to see all):
+**Cloudflare Platform** (26 skills):
+- cloudflare-worker-base, cloudflare-d1, cloudflare-r2, cloudflare-kv
+- cloudflare-workers-ai, cloudflare-vectorize, cloudflare-queues, cloudflare-workflows
+- cloudflare-durable-objects, cloudflare-agents, cloudflare-turnstile
+- cloudflare-nextjs, cloudflare-cron-triggers, cloudflare-email-routing
+- cloudflare-hyperdrive, cloudflare-images, cloudflare-browser-rendering
+- cloudflare-zero-trust-access, cloudflare-full-stack-scaffold, cloudflare-full-stack-integration
+- And 6 more...
 
-**Cloudflare Suite** (7 skills):
-1. **cloudflare-worker-base** - Hono + Vite + Static Assets foundation
-2. **cloudflare-d1** - D1 serverless SQL database
-3. **cloudflare-r2** - R2 object storage (S3-compatible)
-4. **cloudflare-kv** - KV key-value storage
-5. **cloudflare-workers-ai** - Workers AI model inference
-6. **cloudflare-vectorize** - Vector database for RAG/search
-7. **cloudflare-queues** - Message queues for async processing
+**AI & Machine Learning** (10 skills):
+- ai-sdk-core, ai-sdk-ui, openai-api, openai-agents, openai-assistants, openai-responses
+- google-gemini-api, google-gemini-embeddings, claude-api, claude-agent-sdk, thesys-generative-ui
 
-**UI/Tooling** (2 skills):
-8. **tailwind-v4-shadcn** - Tailwind v4 + shadcn/ui + Vite + React
-9. **firecrawl-scraper** - Firecrawl v2 web scraping API
+**Frontend & UI** (7 skills):
+- tailwind-v4-shadcn, react-hook-form-zod, tanstack-query, zustand-state-management
+- nextjs, hono-routing, firecrawl-scraper
 
-**All skills**:
-- ✅ Production-tested
-- ✅ Fully compliant with official standards
+**Auth & Security** (3 skills):
+- clerk-auth, auth-js, cloudflare-zero-trust-access
+
+**Content Management** (2 skills):
+- tinacms, sveltia-cms
+
+**Database & ORM** (4 skills):
+- drizzle-orm-d1, neon-vercel-postgres, vercel-kv, vercel-blob
+
+**Tooling & Planning** (4 skills):
+- typescript-mcp, fastmcp, project-planning, project-session-management
+
+**Quality Standards**:
+- ✅ All production-tested
+- ✅ Fully compliant with official Anthropic standards
 - ✅ Package versions verified current
-- ✅ Token savings: 50-70%
-- ✅ Known errors documented and prevented
-
-### 📋 Planned Skills (4)
-
-**Batch 2 - Auth & Frameworks**:
-1. **clerk-auth** - Clerk authentication patterns
-2. **hono-routing** - Hono routing best practices
-3. **react-hook-form-zod** - Forms + validation
-
-**Batch 3 - Data Management**:
-4. **tanstack-query** - Server state management
+- ✅ Average token savings: 60-70%
+- ✅ 380+ documented errors prevented across all skills
 
 ---
 
@@ -440,6 +436,6 @@ See [planning/COMMON_MISTAKES.md](planning/COMMON_MISTAKES.md) for detailed exam
 
 ---
 
-**Last Updated**: 2025-10-21
-**Next Review**: 2026-01-21 (Quarterly)
+**Last Updated**: 2025-10-29
+**Next Review**: 2026-01-29 (Quarterly)
 **Maintainer**: Jeremy Dawes | jeremy@jezweb.net | https://jezweb.com.au

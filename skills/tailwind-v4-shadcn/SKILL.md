@@ -1,5 +1,5 @@
 ---
-name: Tailwind v4 + shadcn/ui Stack
+name: tailwind-v4-shadcn
 description: |
   Production-tested setup for Tailwind CSS v4 with shadcn/ui, Vite, and React.
 
@@ -13,13 +13,16 @@ description: |
 
   Keywords: Tailwind v4, shadcn/ui, @tailwindcss/vite, @theme inline, dark mode,
   CSS variables, hsl() wrapper, components.json, React theming, theme switching,
-  colors not working, variables broken, theme not applying
+  colors not working, variables broken, theme not applying, @plugin directive,
+  typography plugin, forms plugin, prose class, @tailwindcss/typography,
+  @tailwindcss/forms
+license: MIT
 ---
 
 # Tailwind v4 + shadcn/ui Production Stack
 
 **Production-tested**: WordPress Auditor (https://wordpress-auditor.webfonts.workers.dev)
-**Last Updated**: 2025-10-20
+**Last Updated**: 2025-10-29
 **Status**: Production Ready ✅
 
 ---
@@ -59,6 +62,7 @@ Say: **"I'm setting up Tailwind v4 + shadcn/ui - check the tailwind-v4-shadcn sk
 2. **Duplicate @layer base blocks** (shadcn init adds its own)
 3. **Wrong template selection** (vanilla TS vs React)
 4. **Missing post-init cleanup** (incompatible CSS rules)
+5. **Wrong plugin syntax** (using @import or require() instead of @plugin directive)
 
 All of these are handled automatically when the skill is active.
 
@@ -468,10 +472,113 @@ See `reference/migration-guide.md` for complete v3 → v4 migration steps.
 # These packages will cause build errors:
 npm install tailwindcss-animate  # ❌ Deprecated
 npm install tw-animate-css      # ❌ Doesn't exist
-npm install @tailwindcss/typography  # ❌ Use native CSS instead
 ```
 
 **If you see import errors for these packages**, remove them and use native CSS animations or `@tailwindcss/motion` instead.
+
+---
+
+## Tailwind v4 Plugins
+
+Tailwind v4 supports official plugins using the `@plugin` directive in CSS.
+
+### Official Plugins (Tailwind Labs)
+
+#### Typography Plugin - Style Markdown/CMS Content
+
+**When to use:** Displaying blog posts, documentation, or any HTML from Markdown/CMS.
+
+**Installation:**
+```bash
+pnpm add -D @tailwindcss/typography
+```
+
+**Configuration (v4 syntax):**
+```css
+/* src/index.css */
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+```
+
+**Usage:**
+```html
+<article class="prose lg:prose-xl dark:prose-invert">
+  {{ markdown_content }}
+</article>
+```
+
+**Available classes:**
+- `prose` - Base typography styles
+- `prose-sm`, `prose-base`, `prose-lg`, `prose-xl`, `prose-2xl` - Size variants
+- `dark:prose-invert` - Dark mode styles
+
+---
+
+#### Forms Plugin - Reset Form Element Styles
+
+**When to use:** Building custom forms without shadcn/ui components, or need consistent cross-browser form styling.
+
+**Installation:**
+```bash
+pnpm add -D @tailwindcss/forms
+```
+
+**Configuration (v4 syntax):**
+```css
+/* src/index.css */
+@import "tailwindcss";
+@plugin "@tailwindcss/forms";
+```
+
+**What it does:**
+- Resets browser default form styles
+- Makes form elements styleable with Tailwind utilities
+- Fixes cross-browser inconsistencies for inputs, selects, checkboxes, radios
+
+**Note:** Less critical for shadcn/ui users (they have pre-styled form components), but still useful for basic forms.
+
+---
+
+### Common Plugin Errors
+
+These errors happen when using v3 syntax in v4 projects:
+
+**❌ WRONG (v3 config file syntax):**
+```js
+// tailwind.config.js
+module.exports = {
+  plugins: [require('@tailwindcss/typography')]
+}
+```
+
+**❌ WRONG (@import instead of @plugin):**
+```css
+@import "@tailwindcss/typography";  /* Doesn't work */
+```
+
+**✅ CORRECT (v4 @plugin directive):**
+```css
+/* src/index.css */
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+@plugin "@tailwindcss/forms";
+```
+
+---
+
+### Built-in Features (No Plugin Needed)
+
+**Container queries** are built into Tailwind v4 core - no plugin needed:
+
+```tsx
+<div className="@container">
+  <div className="@md:text-lg">
+    Responds to container width, not viewport
+  </div>
+</div>
+```
+
+**❌ Don't install:** `@tailwindcss/container-queries` (deprecated, now core feature)
 
 ---
 

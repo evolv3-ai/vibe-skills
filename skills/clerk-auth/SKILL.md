@@ -1,22 +1,22 @@
 ---
 name: clerk-auth
 description: |
-  This skill provides comprehensive knowledge for integrating Clerk authentication in React, Next.js, and Cloudflare Workers applications. It should be used when setting up user authentication, implementing protected routes, verifying JWT tokens, configuring Clerk middleware, integrating with shadcn/ui components, or troubleshooting Clerk authentication errors.
+  This skill provides comprehensive knowledge for integrating Clerk authentication in React, Next.js, and Cloudflare Workers applications. It should be used when setting up user authentication, implementing protected routes, verifying JWT tokens, creating custom JWT templates with user metadata and organization claims, configuring Clerk middleware, integrating with shadcn/ui components, testing authentication flows, or troubleshooting Clerk authentication errors.
 
-  Use when: adding Clerk to React/Vite projects, setting up Clerk in Next.js App Router, implementing Clerk authentication in Cloudflare Workers, configuring clerkMiddleware for route protection, creating custom JWT templates, verifying tokens with @clerk/backend, integrating Clerk with Hono, using Clerk shadcn/ui components, or encountering authentication errors.
+  Use when: adding Clerk to React/Vite projects, setting up Clerk in Next.js App Router, implementing Clerk authentication in Cloudflare Workers, configuring clerkMiddleware for route protection, creating custom JWT templates with shortcodes (user.id, user.email, user.public_metadata.role), accessing session claims for RBAC, integrating with Supabase/Grafbase, verifying tokens with @clerk/backend, integrating Clerk with Hono, using Clerk shadcn/ui components, writing E2E tests with Playwright, generating test session tokens, using test email addresses and phone numbers, or encountering authentication errors.
 
-  Prevents 10 documented issues: missing secret key errors, API key migration failures, JWKS cache race conditions, CSRF vulnerabilities from missing authorizedParties, import path errors after Core 2 upgrade, JWT size limit issues, deprecated API version warnings, ClerkProvider JSX component errors, async auth() helper confusion, and environment variable misconfiguration.
+  Prevents 11 documented issues: missing secret key errors, API key migration failures, JWKS cache race conditions, CSRF vulnerabilities from missing authorizedParties, import path errors after Core 2 upgrade, JWT size limit issues, deprecated API version warnings, ClerkProvider JSX component errors, async auth() helper confusion, environment variable misconfiguration, and Vite dev mode 431 header errors.
 
-  Keywords: clerk, clerk auth, clerk authentication, @clerk/nextjs, @clerk/backend, @clerk/clerk-react, clerkMiddleware, createRouteMatcher, verifyToken, useUser, useAuth, useClerk, JWT template, clerk webhook, clerk secret key, clerk publishable key, protected routes, Cloudflare Workers auth, Next.js auth, shadcn/ui auth, @hono/clerk-auth, "Missing Clerk Secret Key", "cannot be used as a JSX component", JWKS error, authorizedParties, clerk middleware, ClerkProvider, UserButton, SignIn, SignUp
+  Keywords: clerk, clerk auth, clerk authentication, @clerk/nextjs, @clerk/backend, @clerk/clerk-react, clerkMiddleware, createRouteMatcher, verifyToken, useUser, useAuth, useClerk, JWT template, JWT claims, JWT shortcodes, custom JWT, session claims, getToken template, user.public_metadata, org_id, org_slug, org_role, CustomJwtSessionClaims, sessionClaims metadata, clerk webhook, clerk secret key, clerk publishable key, protected routes, Cloudflare Workers auth, Next.js auth, shadcn/ui auth, @hono/clerk-auth, "Missing Clerk Secret Key", "cannot be used as a JSX component", JWKS error, authorizedParties, clerk middleware, ClerkProvider, UserButton, SignIn, SignUp, clerk testing, test emails, test phone numbers, +clerk_test, 424242 OTP, session token, testing token, @clerk/testing, playwright testing, E2E testing, clerk test mode, bot detection, generate session token, test users
 license: MIT
 ---
 
 # Clerk Authentication
 
 **Status**: Production Ready ✅
-**Last Updated**: 2025-10-22
+**Last Updated**: 2025-10-28
 **Dependencies**: None
-**Latest Versions**: @clerk/nextjs@6.33.3, @clerk/backend@2.17.2, @clerk/clerk-react@5.51.0
+**Latest Versions**: @clerk/nextjs@6.33.3, @clerk/backend@2.17.2, @clerk/clerk-react@5.51.0, @clerk/testing@1.4.4
 
 ---
 
@@ -353,9 +353,292 @@ export default app
 
 ---
 
+## JWT Templates & Custom Claims
+
+Clerk allows customizing JWT (JSON Web Token) structure using templates. This enables integration with third-party services, role-based access control, and multi-tenant applications.
+
+### Quick Start: Create a JWT Template
+
+**1. Navigate to Clerk Dashboard**:
+- Go to **Sessions** page
+- Click **Customize session token**
+- Click **Create template**
+
+**2. Define Template**:
+```json
+{
+  "user_id": "{{user.id}}",
+  "email": "{{user.primary_email_address}}",
+  "role": "{{user.public_metadata.role || 'user'}}"
+}
+```
+
+**3. Use Template in Code**:
+```typescript
+// Frontend (React/Next.js)
+const { getToken } = useAuth()
+const token = await getToken({ template: 'my-template' })
+
+// Backend (Cloudflare Workers)
+const sessionClaims = c.get('sessionClaims')
+const role = sessionClaims?.role
+```
+
+### Available Shortcodes
+
+| Category | Shortcodes | Example |
+|----------|-----------|---------|
+| **User ID & Name** | `{{user.id}}`, `{{user.first_name}}`, `{{user.last_name}}`, `{{user.full_name}}` | `"John Doe"` |
+| **Contact** | `{{user.primary_email_address}}`, `{{user.primary_phone_address}}` | `"john@example.com"` |
+| **Profile** | `{{user.image_url}}`, `{{user.username}}`, `{{user.created_at}}` | `"https://..."` |
+| **Verification** | `{{user.email_verified}}`, `{{user.phone_number_verified}}` | `true` |
+| **Metadata** | `{{user.public_metadata}}`, `{{user.public_metadata.FIELD}}` | `{"role": "admin"}` |
+| **Organization** | `org_id`, `org_slug`, `org_role` (in sessionClaims) | `"org:admin"` |
+
+### Advanced Features
+
+**String Interpolation**:
+```json
+{
+  "full_name": "{{user.last_name}} {{user.first_name}}",
+  "greeting": "Hello, {{user.first_name}}!"
+}
+```
+
+**Conditional Fallbacks**:
+```json
+{
+  "role": "{{user.public_metadata.role || 'user'}}",
+  "age": "{{user.public_metadata.age || 18}}",
+  "verified": "{{user.email_verified || user.phone_number_verified}}"
+}
+```
+
+**Nested Metadata with Dot Notation**:
+```json
+{
+  "interests": "{{user.public_metadata.profile.interests}}",
+  "department": "{{user.public_metadata.department}}"
+}
+```
+
+### Default Claims (Auto-Included)
+
+Every JWT includes these claims automatically (cannot be overridden):
+
+```json
+{
+  "azp": "http://localhost:3000",              // Authorized party
+  "exp": 1639398300,                            // Expiration time
+  "iat": 1639398272,                            // Issued at
+  "iss": "https://your-app.clerk.accounts.dev", // Issuer
+  "jti": "10db7f531a90cb2faea4",               // JWT ID
+  "nbf": 1639398220,                            // Not before
+  "sub": "user_1deJLArSTiWiF1YdsEWysnhJLLY"    // User ID
+}
+```
+
+### Size Limitation: 1.2KB for Custom Claims
+
+**Problem**: Browser cookies limited to 4KB. Clerk's default claims consume ~2.8KB, leaving **1.2KB for custom claims**.
+
+**⚠️ Development Note**: When testing custom claims in Vite dev mode, you may encounter **"431 Request Header Fields Too Large"** error. This is caused by Clerk's handshake token in the URL exceeding Vite's 8KB limit. See [Issue #11](#issue-11-431-request-header-fields-too-large-vite-dev-mode) for solution.
+
+**Solution**:
+```json
+// ✅ GOOD: Minimal claims
+{
+  "user_id": "{{user.id}}",
+  "email": "{{user.primary_email_address}}",
+  "role": "{{user.public_metadata.role}}"
+}
+
+// ❌ BAD: Exceeds limit
+{
+  "bio": "{{user.public_metadata.bio}}",  // 6KB field
+  "all_metadata": "{{user.public_metadata}}"  // Entire object
+}
+```
+
+**Best Practice**: Store large data in database, include only identifiers/roles in JWT.
+
+### TypeScript Type Safety
+
+Add global type declarations for auto-complete:
+
+**Create `types/globals.d.ts`**:
+```typescript
+export {}
+
+declare global {
+  interface CustomJwtSessionClaims {
+    metadata: {
+      role?: 'admin' | 'moderator' | 'user'
+      onboardingComplete?: boolean
+      organizationId?: string
+    }
+  }
+}
+```
+
+### Common Use Cases
+
+**Role-Based Access Control**:
+```json
+{
+  "email": "{{user.primary_email_address}}",
+  "role": "{{user.public_metadata.role || 'user'}}",
+  "permissions": "{{user.public_metadata.permissions}}"
+}
+```
+
+**Multi-Tenant Applications**:
+```json
+{
+  "user_id": "{{user.id}}",
+  "org_id": "{{user.public_metadata.org_id}}",
+  "org_role": "{{user.public_metadata.org_role}}"
+}
+```
+
+**Supabase Integration**:
+```json
+{
+  "email": "{{user.primary_email_address}}",
+  "app_metadata": {
+    "provider": "clerk"
+  },
+  "user_metadata": {
+    "full_name": "{{user.full_name}}"
+  }
+}
+```
+
+### See Also
+
+- **Complete Reference**: See `references/jwt-claims-guide.md` for comprehensive documentation
+- **Template Examples**: See `templates/jwt/` directory for working examples
+- **TypeScript Types**: See `templates/typescript/custom-jwt-types.d.ts`
+- **Official Docs**: https://clerk.com/docs/guides/sessions/jwt-templates
+
+---
+
+## Testing
+
+Clerk provides comprehensive testing tools for local development and CI/CD pipelines.
+
+### Quick Start: Test Credentials
+
+**Test Emails** (no emails sent, fixed OTP):
+```
+john+clerk_test@example.com
+jane+clerk_test@gmail.com
+```
+
+**Test Phone Numbers** (no SMS sent, fixed OTP):
+```
++12015550100
++19735550133
+```
+
+**Fixed OTP Code**: `424242` (works for all test credentials)
+
+### Generate Session Tokens
+
+For testing API endpoints, generate valid session tokens (60-second lifetime):
+
+```bash
+# Using the provided script
+CLERK_SECRET_KEY=sk_test_... node scripts/generate-session-token.js
+
+# Create new test user
+CLERK_SECRET_KEY=sk_test_... node scripts/generate-session-token.js --create-user
+
+# Auto-refresh token every 50 seconds
+CLERK_SECRET_KEY=sk_test_... node scripts/generate-session-token.js --refresh
+```
+
+**Manual Flow**:
+1. Create user: `POST /v1/users`
+2. Create session: `POST /v1/sessions`
+3. Generate token: `POST /v1/sessions/{session_id}/tokens`
+4. Use in header: `Authorization: Bearer <token>`
+
+### E2E Testing with Playwright
+
+Install `@clerk/testing` for automatic Testing Token management:
+
+```bash
+npm install -D @clerk/testing
+```
+
+**Global Setup** (`global.setup.ts`):
+```typescript
+import { clerkSetup } from '@clerk/testing/playwright'
+import { test as setup } from '@playwright/test'
+
+setup('global setup', async ({}) => {
+  await clerkSetup()
+})
+```
+
+**Test File** (`auth.spec.ts`):
+```typescript
+import { setupClerkTestingToken } from '@clerk/testing/playwright'
+import { test } from '@playwright/test'
+
+test('sign up', async ({ page }) => {
+  await setupClerkTestingToken({ page })
+
+  await page.goto('/sign-up')
+  await page.fill('input[name="emailAddress"]', 'test+clerk_test@example.com')
+  await page.fill('input[name="password"]', 'TestPassword123!')
+  await page.click('button[type="submit"]')
+
+  // Verify with fixed OTP
+  await page.fill('input[name="code"]', '424242')
+  await page.click('button[type="submit"]')
+
+  await expect(page).toHaveURL('/dashboard')
+})
+```
+
+### Testing Tokens (Bot Detection Bypass)
+
+Testing Tokens bypass bot detection in test suites.
+
+**Obtain Token**:
+```bash
+curl -X POST https://api.clerk.com/v1/testing_tokens \
+  -H "Authorization: Bearer sk_test_..."
+```
+
+**Use in Frontend API Requests**:
+```
+POST https://your-app.clerk.accounts.dev/v1/client/sign_ups?__clerk_testing_token=TOKEN
+```
+
+**Note**: `@clerk/testing` handles this automatically for Playwright/Cypress.
+
+### Production Limitations
+
+Testing Tokens work in both development and production, but:
+- ❌ Code-based auth (SMS/Email OTP) not supported in production
+- ✅ Email + password authentication supported
+- ✅ Magic links supported
+
+### See Also
+
+- **Complete Guide**: See `references/testing-guide.md` for comprehensive testing documentation
+- **Session Token Script**: See `scripts/generate-session-token.js`
+- **Demo Repository**: https://github.com/clerk/clerk-playwright-nextjs
+- **Official Docs**: https://clerk.com/docs/guides/development/testing/overview
+
+---
+
 ## Known Issues Prevention
 
-This skill prevents **10 documented issues**:
+This skill prevents **11 documented issues**:
 
 ### Issue #1: Missing Clerk Secret Key
 **Error**: "Missing Clerk Secret Key or API Key"
@@ -405,6 +688,27 @@ This skill prevents **10 documented issues**:
 ### Issue #10: Environment Variable Misconfiguration
 **Error**: "Missing Publishable Key" or secret leaked
 **Prevention**: Use correct prefixes (\`NEXT_PUBLIC_\`, \`VITE_\`), never commit secrets
+
+### Issue #11: 431 Request Header Fields Too Large (Vite Dev Mode)
+**Error**: "431 Request Header Fields Too Large" when signing in
+**Source**: Common in Vite dev mode when testing custom JWT claims
+**Cause**: Clerk's `__clerk_handshake` token in URL exceeds Vite's 8KB header limit
+**Prevention**:
+
+Add to `package.json`:
+\`\`\`json
+{
+  "scripts": {
+    "dev": "NODE_OPTIONS='--max-http-header-size=32768' vite"
+  }
+}
+\`\`\`
+
+**Temporary Workaround**: Clear browser cache, sign out, sign back in
+
+**Why**: Clerk dev tokens are larger than production; custom JWT claims increase handshake token size
+
+**Note**: This is different from Issue #6 (session token size). Issue #6 is about cookies (1.2KB), this is about URL parameters in dev mode (8KB → 32KB).
 
 ---
 

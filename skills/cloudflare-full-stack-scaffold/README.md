@@ -125,14 +125,17 @@ const result = await streamText({
 
 ### 2. Complete Service Examples
 
-Every Cloudflare service has **working routes** with examples:
-
+**Core Services** (always available):
 - **D1**: CRUD operations, migrations, typed queries
 - **KV**: Get/put/delete, TTL, bulk operations
 - **R2**: Upload/download, presigned URLs, streaming
 - **Workers AI**: Text generation, embeddings, image gen
-- **Vectorize**: RAG patterns, similarity search
-- **Queues**: Producer/consumer, batch processing
+
+**Optional Services** (enable with npm scripts):
+- **Vectorize** (optional): RAG patterns, similarity search
+- **Queues** (optional): Producer/consumer, batch processing
+- **Clerk Auth** (optional): JWT middleware, protected routes
+- **AI Chat** (optional): Streaming chat UI with AI SDK
 
 ### 3. Optional Authentication
 

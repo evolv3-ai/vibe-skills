@@ -1,5 +1,5 @@
 ---
-name: Cloudflare Vectorize
+name: cloudflare-vectorize
 description: |
   Complete knowledge domain for Cloudflare Vectorize - globally distributed vector database for building
   semantic search, RAG (Retrieval Augmented Generation), and AI-powered applications.
@@ -16,6 +16,7 @@ description: |
   insert vectors, upsert vectors, query vectors, delete vectors, metadata filtering, namespace filtering,
   topK search, cosine similarity, euclidean distance, dot product, wrangler vectorize, metadata index,
   create vectorize index, vectorize dimensions, vectorize metric, vectorize binding
+license: MIT
 ---
 
 # Cloudflare Vectorize

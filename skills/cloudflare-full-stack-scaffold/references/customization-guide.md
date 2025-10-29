@@ -106,10 +106,20 @@ npm run d1:local
 
 **Authentication**:
 ```bash
-./scripts/enable-auth.sh
+npm run enable-auth
 ```
 
 **AI Chat**:
 ```bash
-./scripts/enable-ai-chat.sh
+npm run enable-ai-chat
+```
+
+**Queues (Async Processing)**:
+```bash
+npm run enable-queues
+```
+
+**Vectorize (Vector Search & RAG)**:
+```bash
+npm run enable-vectorize
 ```

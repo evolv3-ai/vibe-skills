@@ -1,5 +1,5 @@
 ---
-name: Cloudflare Email Routing
+name: cloudflare-email-routing
 description: |
   Complete guide for Cloudflare Email Routing covering both Email Workers (receiving emails) and Send Email bindings (sending emails from Workers).
 

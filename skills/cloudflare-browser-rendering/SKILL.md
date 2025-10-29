@@ -1,5 +1,5 @@
 ---
-name: Cloudflare Browser Rendering
+name: cloudflare-browser-rendering
 description: |
   Complete knowledge domain for Cloudflare Browser Rendering - Headless Chrome automation
   with Puppeteer and Playwright on Cloudflare Workers for screenshots, PDFs, web scraping,

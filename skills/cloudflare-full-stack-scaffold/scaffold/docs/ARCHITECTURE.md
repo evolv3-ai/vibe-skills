@@ -9,14 +9,18 @@
 
 TODO: Describe your system architecture
 
-**Tech Stack**:
+**Core Services** (always available):
 - Frontend: React 19 + Vite + Tailwind v4
 - Backend: Cloudflare Workers + Hono
 - Database: D1 (SQL)
-- Storage: KV, R2
+- Storage: KV (key-value), R2 (object storage)
 - AI: Workers AI, AI SDK
-- Vector DB: Vectorize
-- Queues: Cloudflare Queues
+
+**Optional Services** (enable with npm scripts):
+- Vector DB: Vectorize (`npm run enable-vectorize`)
+- Queues: Cloudflare Queues (`npm run enable-queues`)
+- Auth: Clerk (`npm run enable-auth`)
+- AI Chat: AI SDK UI (`npm run enable-ai-chat`)
 
 ---
 

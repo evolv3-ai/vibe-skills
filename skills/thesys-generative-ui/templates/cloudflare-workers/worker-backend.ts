@@ -76,7 +76,7 @@ app.post("/api/chat", async (c) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "c1/openai/gpt-4",
+          model: "c1/openai/gpt-5/v-20250930",
           messages,
           stream: false, // Or handle streaming
           temperature: 0.7,
@@ -126,7 +126,7 @@ app.post("/api/chat/stream", async (c) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "c1/openai/gpt-4",
+          model: "c1/openai/gpt-5/v-20250930",
           messages: [
             { role: "system", content: "You are a helpful assistant." },
             { role: "user", content: prompt },
@@ -198,7 +198,7 @@ export default app;
  *       "Content-Type": "application/json",
  *     },
  *     body: JSON.stringify({
- *       model: "c1/openai/gpt-4",
+ *       model: "c1/openai/gpt-5/v-20250930",
  *       messages: [
  *         {
  *           role: "system",

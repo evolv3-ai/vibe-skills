@@ -1,5 +1,5 @@
 ---
-name: Cloudflare Cron Triggers
+name: cloudflare-cron-triggers
 description: |
   Complete knowledge domain for Cloudflare Cron Triggers - scheduled execution of Workers using
   cron expressions for periodic tasks, maintenance jobs, and automated workflows.

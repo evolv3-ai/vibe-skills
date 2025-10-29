@@ -1,5 +1,5 @@
 ---
-name: Cloudflare Worker Base Stack
+name: cloudflare-worker-base
 description: |
   Production-tested setup for Cloudflare Workers with Hono, Vite, and Static Assets.
 
@@ -15,6 +15,7 @@ description: |
   wrangler.jsonc, ES Module, run_worker_first, SPA fallback, API routes, serverless, edge computing,
   "Cannot read properties of undefined", "Static Assets 404", "A hanging Promise was canceled",
   "Handler does not export", deployment fails, routing not working, HMR crashes
+license: MIT
 ---
 
 # Cloudflare Worker Base Stack

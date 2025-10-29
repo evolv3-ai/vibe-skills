@@ -1,7 +1,7 @@
 # Firecrawl Web Scraper
 
 **Status**: ✅ Production Ready
-**Last Updated**: 2025-10-20
+**Last Updated**: 2025-10-24
 **API Version**: v2
 **Official Docs**: https://docs.firecrawl.dev
 
@@ -127,14 +127,15 @@ print(result.get("markdown"))
 
 ```bash
 # Install
-npm install firecrawl-js
+npm install @mendable/firecrawl-js
+# or: npm install firecrawl
 
 # Set API key
 export FIRECRAWL_API_KEY=fc-your-api-key
 ```
 
 ```typescript
-import FirecrawlApp from 'firecrawl-js';
+import FirecrawlApp from '@mendable/firecrawl-js';
 
 const app = new FirecrawlApp({
   apiKey: process.env.FIRECRAWL_API_KEY
@@ -150,6 +151,21 @@ console.log(result.markdown);
 ```
 
 **Full instructions**: See `SKILL.md`
+
+---
+
+## ⚠️ Cloudflare Workers Compatibility
+
+**Important**: The Firecrawl SDK uses Node.js dependencies (`axios`) and **cannot run in Cloudflare Workers**.
+
+**For Cloudflare Workers**, use one of these approaches:
+- ✅ **Direct REST API** with `fetch` (recommended - see `templates/firecrawl-worker-fetch.ts`)
+- ✅ **Self-hosted**: [workers-firecrawl](https://github.com/G4brym/workers-firecrawl) (requires Workers Paid Plan)
+
+**For other environments** (Node.js, serverless functions, Python):
+- ✅ Use the SDK normally as documented above
+
+See the **Cloudflare Workers Integration** section in `SKILL.md` for complete working examples.
 
 ---
 
@@ -169,8 +185,9 @@ firecrawl-scraper/
 ├── SKILL.md                           # Full instructions (read this first)
 ├── README.md                          # This file
 ├── templates/                         # Copy-ready code templates
-│   ├── firecrawl-scrape-python.py     # Basic Python scraping
-│   ├── firecrawl-scrape-typescript.ts # Basic TypeScript scraping
+│   ├── firecrawl-scrape-python.py     # Basic Python scraping (Node.js/Python)
+│   ├── firecrawl-scrape-typescript.ts # Basic TypeScript scraping (Node.js)
+│   ├── firecrawl-worker-fetch.ts      # Cloudflare Workers (fetch API)
 │   └── firecrawl-crawl-example.py     # Full crawl with storage
 └── reference/                         # Deep-dive documentation
     ├── endpoints.md                   # All 4 API endpoints explained
@@ -179,13 +196,15 @@ firecrawl-scraper/
 
 ---
 
-## Package Versions (Verified 2025-10-20)
+## Package Versions (Verified 2025-10-24)
 
 | Package | Version | Status |
 |---------|---------|--------|
 | firecrawl-py | 4.5.0+ | ✅ Latest stable |
-| firecrawl-js | 1.7.x+ | ✅ Latest stable |
+| @mendable/firecrawl-js (or firecrawl) | 4.4.1+ | ✅ Latest stable (Node.js >=22.0.0) |
 | API Version | v2 | ✅ Current |
+
+**Note**: Node.js SDK cannot run in Cloudflare Workers. Use direct REST API (see templates/firecrawl-worker-fetch.ts).
 
 ---
 

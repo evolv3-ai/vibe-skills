@@ -18,10 +18,11 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
-      "@/backend/*": ["./backend/*"]
+      "@/backend/*": ["./backend/*"],
+      "@/shared/*": ["./shared/*"]
     },
     "types": ["@cloudflare/workers-types", "vite/client"]
   },
-  "include": ["src", "backend"],
+  "include": ["src", "backend", "shared"],
   "exclude": ["node_modules", "dist"]
 }

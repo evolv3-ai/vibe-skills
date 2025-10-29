@@ -1,10 +1,14 @@
 /**
- * Firecrawl Basic Scraping Example (TypeScript)
+ * Firecrawl Basic Scraping Example (TypeScript - Node.js)
  *
- * This template demonstrates how to scrape a single webpage using Firecrawl API.
+ * This template demonstrates how to scrape a single webpage using Firecrawl SDK.
+ *
+ * ⚠️ NOTE: This example uses the Firecrawl SDK which requires Node.js runtime.
+ * For Cloudflare Workers, use firecrawl-worker-fetch.ts instead (direct fetch API).
  *
  * Requirements:
- *   npm install firecrawl-js
+ *   npm install @mendable/firecrawl-js
+ *   # or: npm install firecrawl
  *   npm install -D @types/node
  *
  * Environment Variables:
@@ -16,7 +20,7 @@
  *   tsc firecrawl-scrape-typescript.ts && node firecrawl-scrape-typescript.js
  */
 
-import FirecrawlApp from 'firecrawl-js';
+import FirecrawlApp from '@mendable/firecrawl-js';
 import fs from 'fs/promises';
 
 /**

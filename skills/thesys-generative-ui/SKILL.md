@@ -1,5 +1,5 @@
 ---
-name: TheSys Generative UI
+name: thesys-generative-ui
 description: |
   Production-ready skill for integrating TheSys C1 Generative UI API into React applications. This skill should be used when building AI-powered interfaces that stream interactive components (forms, charts, tables) instead of plain text responses. Covers complete integration patterns for Vite+React, Next.js, and Cloudflare Workers with OpenAI, Anthropic Claude, and Cloudflare Workers AI. Includes tool calling with Zod schemas, theming, thread management, and production deployment. Prevents 12+ common integration errors and provides working templates for chat interfaces, data visualization, and dynamic forms. Use this skill when implementing conversational UIs, AI assistants, search interfaces, or any application requiring real-time generative user interfaces with streaming LLM responses.
 license: MIT
@@ -194,7 +194,7 @@ app.post("/api/chat", async (req, res) => {
   const { prompt } = req.body;
 
   const stream = await client.chat.completions.create({
-    model: "c1/openai/gpt-4", // or any C1-compatible model
+    model: "c1/openai/gpt-5/v-20250930", // or any C1-compatible model
     messages: [
       { role: "system", content: "You are a helpful assistant." },
       { role: "user", content: prompt },
@@ -276,7 +276,7 @@ export async function POST(req: NextRequest) {
   const { prompt } = await req.json();
 
   const stream = await client.chat.completions.create({
-    model: "c1/openai/gpt-4",
+    model: "c1/openai/gpt-5/v-20250930",
     messages: [
       { role: "system", content: "You are a helpful AI assistant." },
       { role: "user", content: prompt },
@@ -330,7 +330,7 @@ app.post("/api/chat", async (c) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: "c1/openai/gpt-4",
+      model: "c1/openai/gpt-5/v-20250930",
       messages: [
         { role: "system", content: "You are a helpful assistant." },
         { role: "user", content: prompt },
@@ -607,24 +607,18 @@ const client = new OpenAI({
 TheSys supports OpenAI models through C1:
 
 ```typescript
-// GPT-4 Turbo
-model: "c1/openai/gpt-4"
+// GPT 5 (Stable - Recommended for Production)
+model: "c1/openai/gpt-5/v-20250930"
 
-// GPT-4o
-model: "c1/openai/gpt-4o"
-
-// GPT-5 (if available in your account)
-model: "c1/openai/gpt-5"
-
-// GPT-5 Mini
-model: "c1/openai/gpt-5-mini"
+// GPT 4.1 (Experimental)
+model: "c1-exp/openai/gpt-4.1/v-20250617"
 ```
 
 #### Complete Example
 
 ```typescript
 const response = await client.chat.completions.create({
-  model: "c1/openai/gpt-4",
+  model: "c1/openai/gpt-5/v-20250930",
   messages: [
     {
       role: "system",
@@ -661,21 +655,20 @@ const client = new OpenAI({
 #### Model Selection
 
 ```typescript
-// Claude Sonnet 4
-model: "c1/anthropic/claude-sonnet-4/v-20250617"
+// Claude Sonnet 4 (Stable - Recommended for Production)
+model: "c1/anthropic/claude-sonnet-4/v-20250930"
 
-// Claude Sonnet 3.5
-model: "c1/anthropic/claude-sonnet-3-5"
-
-// Claude Haiku
-model: "c1/anthropic/claude-haiku-4-5"
+// Claude 3.5 Haiku (Experimental)
+model: "c1-exp/anthropic/claude-3.5-haiku/v-20250709"
 ```
+
+> ⚠️ **Deprecated Models**: Claude 3.5 Sonnet and Claude 3.7 Sonnet are no longer recommended. Use the stable Claude Sonnet 4 version above.
 
 #### Example with Claude
 
 ```typescript
 const response = await client.chat.completions.create({
-  model: "c1/anthropic/claude-sonnet-4/v-20250617",
+  model: "c1/anthropic/claude-sonnet-4/v-20250930",
   messages: [
     {
       role: "system",
@@ -691,6 +684,27 @@ const response = await client.chat.completions.create({
   max_tokens: 4096,
 });
 ```
+
+---
+
+### Model Specifications & Pricing
+
+The table below shows the current stable and experimental models available via TheSys C1 API:
+
+| Model | Model ID | Input Price | Output Price | Context | Max Output |
+|-------|----------|-------------|--------------|---------|------------|
+| **Claude Sonnet 4** | `c1/anthropic/claude-sonnet-4/v-20250930` | $6.00/M | $18.00/M | 180K | 64K |
+| **GPT 5** | `c1/openai/gpt-5/v-20250930` | $2.50/M | $12.50/M | 380K | 128K |
+| GPT 4.1 (exp) | `c1-exp/openai/gpt-4.1/v-20250617` | $4.00/M | $10.00/M | 1M | 32K |
+| Claude 3.5 Haiku (exp) | `c1-exp/anthropic/claude-3.5-haiku/v-20250709` | $1.60/M | $5.00/M | 180K | 8K |
+
+**Pricing Notes**:
+- Costs are per million tokens (M)
+- Pricing is based on model name, regardless of endpoint type (embed or visualize)
+- Stable models (prefixed with `c1/`) are recommended for production
+- Experimental models (prefixed with `c1-exp/`) are for testing and may have different behavior
+
+> **Model Versions**: Model identifiers include version dates (e.g., `v-20250930`). Always check the [TheSys Playground](https://console.thesys.dev/playground) for the latest stable versions.
 
 ---
 
@@ -732,7 +746,7 @@ const c1Response = await fetch("https://api.thesys.dev/v1/embed/chat/completions
     "Content-Type": "application/json",
   },
   body: JSON.stringify({
-    model: "c1/openai/gpt-4",
+    model: "c1/openai/gpt-5/v-20250930",
     messages: [
       {
         role: "system",
@@ -749,6 +763,103 @@ const c1Response = await fetch("https://api.thesys.dev/v1/embed/chat/completions
 
 ---
 
+### Python Backend Integration
+
+TheSys provides a Python SDK for backend implementations with FastAPI, Flask, or Django.
+
+#### Setup
+
+```bash
+pip install thesys-genui-sdk openai
+```
+
+#### FastAPI Example
+
+```python
+from fastapi import FastAPI
+from fastapi.responses import StreamingResponse
+from thesys_genui_sdk import with_c1_response, write_content
+import openai
+import os
+
+app = FastAPI()
+
+client = openai.OpenAI(
+    base_url="https://api.thesys.dev/v1/embed",
+    api_key=os.getenv("THESYS_API_KEY")
+)
+
+@app.post("/api/chat")
+@with_c1_response  # Automatically handles streaming headers
+async def chat_endpoint(request: dict):
+    prompt = request.get("prompt")
+
+    stream = client.chat.completions.create(
+        model="c1/anthropic/claude-sonnet-4/v-20250930",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ],
+        stream=True
+    )
+
+    # Stream chunks to frontend
+    async def generate():
+        for chunk in stream:
+            content = chunk.choices[0].delta.content
+            if content:
+                yield write_content(content)
+
+    return StreamingResponse(generate(), media_type="text/event-stream")
+```
+
+#### Key Features
+
+- **`@with_c1_response` decorator**: Automatically sets proper response headers for streaming
+- **`write_content` helper**: Formats chunks for C1Component rendering
+- **Framework agnostic**: Works with FastAPI, Flask, Django, or any Python web framework
+
+#### Flask Example
+
+```python
+from flask import Flask, request, Response
+from thesys_genui_sdk import with_c1_response, write_content
+import openai
+import os
+
+app = Flask(__name__)
+
+client = openai.OpenAI(
+    base_url="https://api.thesys.dev/v1/embed",
+    api_key=os.getenv("THESYS_API_KEY")
+)
+
+@app.route("/api/chat", methods=["POST"])
+@with_c1_response
+def chat():
+    data = request.get_json()
+    prompt = data.get("prompt")
+
+    stream = client.chat.completions.create(
+        model="c1/openai/gpt-5/v-20250930",
+        messages=[
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": prompt}
+        ],
+        stream=True
+    )
+
+    def generate():
+        for chunk in stream:
+            content = chunk.choices[0].delta.content
+            if content:
+                yield write_content(content)
+
+    return Response(generate(), mimetype="text/event-stream")
+```
+
+---
+
 ### Universal Patterns (Any Provider)
 
 #### Error Handling
@@ -756,7 +867,7 @@ const c1Response = await fetch("https://api.thesys.dev/v1/embed/chat/completions
 ```typescript
 try {
   const response = await client.chat.completions.create({
-    model: "c1/openai/gpt-4",
+    model: "c1/openai/gpt-5/v-20250930",
     messages: [...],
     stream: true,
   });
@@ -783,7 +894,7 @@ try {
 import { transformStream } from "@crayonai/stream";
 
 const llmStream = await client.chat.completions.create({
-  model: "c1/openai/gpt-4",
+  model: "c1/openai/gpt-5/v-20250930",
   messages: [...],
   stream: true,
 });
@@ -939,7 +1050,7 @@ export async function POST(req: NextRequest) {
   const { prompt } = await req.json();
 
   const llmStream = await client.beta.chat.completions.runTools({
-    model: "c1/anthropic/claude-sonnet-4/v-20250617",
+    model: "c1/anthropic/claude-sonnet-4/v-20250930",
     messages: [
       {
         role: "system",
@@ -1130,7 +1241,7 @@ export async function POST(req: NextRequest) {
 
   // Update thinking state when calling tools
   const llmStream = await client.beta.chat.completions.runTools({
-    model: "c1/anthropic/claude-sonnet-4/v-20250617",
+    model: "c1/anthropic/claude-sonnet-4/v-20250930",
     messages: [...],
     tools: [
       getWebSearchTool(() => {
@@ -1439,12 +1550,11 @@ const messages = [
 
 | C1 Version | @thesysai/genui-sdk | @crayonai/react-ui | @crayonai/react-core |
 |------------|---------------------|-------------------|---------------------|
-| v-20250831 | ~0.6.32             | ~0.8.27           | ~0.7.6              |
-| v-20250617 | ~0.6.27             | ~0.8.14           | ~0.7.6              |
+| v-20250930 | ~0.6.40             | ~0.8.42           | ~0.7.6              |
 
 ```bash
 # Update to compatible versions
-npm install @thesysai/genui-sdk@0.6.40 @crayonai/react-ui@0.8.27 @crayonai/react-core@0.7.6
+npm install @thesysai/genui-sdk@0.6.40 @crayonai/react-ui@0.8.42 @crayonai/react-core@0.7.6
 ```
 
 ---
@@ -1478,7 +1588,7 @@ npm install @thesysai/genui-sdk@0.6.40 @crayonai/react-ui@0.8.27 @crayonai/react
 ```typescript
 // 1. Enable streaming in API call
 const stream = await client.chat.completions.create({
-  model: "c1/openai/gpt-4",
+  model: "c1/openai/gpt-5/v-20250930",
   messages: [...],
   stream: true, // ✅ IMPORTANT
 });

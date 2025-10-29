@@ -1,5 +1,5 @@
 ---
-name: AI SDK Core
+name: ai-sdk-core
 description: |
   Backend AI functionality with Vercel AI SDK v5 - text generation, structured output with Zod,
   tool calling, and agents. Multi-provider support for OpenAI, Anthropic, Google, and Cloudflare Workers AI.
@@ -29,9 +29,9 @@ Production-ready backend AI with Vercel AI SDK v5.
 npm install ai
 
 # Provider packages (install what you need)
-npm install @ai-sdk/openai       # OpenAI (GPT-4, GPT-3.5, gpt-5)
-npm install @ai-sdk/anthropic    # Anthropic (Claude 3.5 Sonnet, Opus, Haiku)
-npm install @ai-sdk/google       # Google (Gemini 2.5 Pro/Flash)
+npm install @ai-sdk/openai       # OpenAI (GPT-5, GPT-4, GPT-3.5)
+npm install @ai-sdk/anthropic    # Anthropic (Claude Sonnet 4.5, Opus 4, Haiku 4)
+npm install @ai-sdk/google       # Google (Gemini 2.5 Pro/Flash/Lite)
 npm install workers-ai-provider  # Cloudflare Workers AI
 
 # Schema validation
@@ -68,7 +68,7 @@ import { streamText } from 'ai';
 import { anthropic } from '@ai-sdk/anthropic';
 
 const stream = streamText({
-  model: anthropic('claude-3-5-sonnet-20241022'),
+  model: anthropic('claude-sonnet-4-5-20250929'),
   messages: [
     { role: 'user', content: 'Tell me a story' },
   ],
@@ -238,7 +238,7 @@ import { streamText } from 'ai';
 import { anthropic } from '@ai-sdk/anthropic';
 
 const stream = streamText({
-  model: anthropic('claude-3-5-sonnet-20241022'),
+  model: anthropic('claude-sonnet-4-5-20250929'),
   prompt: 'Write a poem about AI',
 });
 
@@ -325,6 +325,21 @@ export async function POST(request: Request) {
 **Error Handling:**
 
 ```typescript
+// Recommended: Use onError callback (added in v4.1.22)
+const stream = streamText({
+  model: openai('gpt-4-turbo'),
+  prompt: 'Hello',
+  onError({ error }) {
+    console.error('Stream error:', error);
+    // Custom error handling
+  },
+});
+
+for await (const chunk of stream.textStream) {
+  process.stdout.write(chunk);
+}
+
+// Alternative: Manual try-catch
 try {
   const stream = streamText({
     model: openai('gpt-4-turbo'),
@@ -335,8 +350,6 @@ try {
     process.stdout.write(chunk);
   }
 } catch (error) {
-  // Note: Stream errors may be swallowed by createDataStreamResponse
-  // Always check server logs for stream errors
   console.error('Stream error:', error);
 }
 ```
@@ -568,9 +581,9 @@ const model = openai('gpt-4', {
 });
 
 // Available models
+const gpt5 = openai('gpt-5');           // Latest (released August 2025)
 const gpt4 = openai('gpt-4-turbo');
 const gpt35 = openai('gpt-3.5-turbo');
-const gpt5 = openai('gpt-5');  // If available
 
 const result = await generateText({
   model: gpt4,
@@ -602,15 +615,20 @@ const result = await generateText({
 import { anthropic } from '@ai-sdk/anthropic';
 
 // ANTHROPIC_API_KEY=sk-ant-...
-const claude = anthropic('claude-3-5-sonnet-20241022');
+const claude = anthropic('claude-sonnet-4-5-20250929');
 
-// Available models
-const sonnet = anthropic('claude-3-5-sonnet-20241022');
-const opus = anthropic('claude-3-opus-20240229');
-const haiku = anthropic('claude-3-haiku-20240307');
+// Available models (Claude 4.x family, released 2025)
+const sonnet45 = anthropic('claude-sonnet-4-5-20250929');  // Latest, recommended
+const sonnet4 = anthropic('claude-sonnet-4-20250522');     // Released May 2025
+const opus4 = anthropic('claude-opus-4-20250522');         // Highest quality
+
+// Legacy models (Claude 3.x, deprecated)
+// const sonnet35 = anthropic('claude-3-5-sonnet-20241022');  // Use Claude 4.x instead
+// const opus3 = anthropic('claude-3-opus-20240229');
+// const haiku3 = anthropic('claude-3-haiku-20240307');
 
 const result = await generateText({
-  model: sonnet,
+  model: sonnet45,
   prompt: 'Explain quantum entanglement',
 });
 ```
@@ -622,9 +640,10 @@ const result = await generateText({
 
 **Best Practices:**
 - Claude excels at long-context tasks (200K+ tokens)
-- Use Sonnet for balance of speed/quality
-- Use Haiku for fast, simple tasks
-- Use Opus for highest quality reasoning
+- **Claude 4.x recommended**: Anthropic deprecated Claude 3.x in 2025
+- Use Sonnet 4.5 for balance of speed/quality (latest model)
+- Use Sonnet 4 for production stability (if avoiding latest)
+- Use Opus 4 for highest quality reasoning and complex tasks
 
 ---
 
@@ -636,10 +655,10 @@ import { google } from '@ai-sdk/google';
 // GOOGLE_GENERATIVE_AI_API_KEY=...
 const gemini = google('gemini-2.5-pro');
 
-// Available models
+// Available models (all GA since June-July 2025)
 const pro = google('gemini-2.5-pro');
 const flash = google('gemini-2.5-flash');
-const lite = google('gemini-2.5-flash-lite');  // If available
+const lite = google('gemini-2.5-flash-lite');
 
 const result = await generateText({
   model: pro,
@@ -798,7 +817,7 @@ import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
 
 const weatherAgent = new Agent({
-  model: anthropic('claude-3-5-sonnet-20241022'),
+  model: anthropic('claude-sonnet-4-5-20250929'),
   system: 'You are a weather assistant. Always convert temperatures to the user\'s preferred unit.',
   tools: {
     getWeather: tool({
@@ -1129,35 +1148,52 @@ export default {
 
 ### 4. streamText Fails Silently
 
-**Cause:** Stream errors swallowed by `createDataStreamResponse`.
+**Cause:** Stream errors can be swallowed by `createDataStreamResponse`.
 
-**Solution:**
+**Status:** ✅ **RESOLVED** - Fixed in ai@4.1.22 (February 2025)
+
+**Solution (Recommended):**
 ```typescript
-// Add explicit error handling
+// Use the onError callback (added in v4.1.22)
 const stream = streamText({
   model: openai('gpt-4'),
   prompt: 'Hello',
+  onError({ error }) {
+    console.error('Stream error:', error);
+    // Custom error logging and handling
+  },
 });
 
+// Stream safely
+for await (const chunk of stream.textStream) {
+  process.stdout.write(chunk);
+}
+```
+
+**Alternative (Manual try-catch):**
+```typescript
+// Fallback if not using onError callback
 try {
+  const stream = streamText({
+    model: openai('gpt-4'),
+    prompt: 'Hello',
+  });
+
   for await (const chunk of stream.textStream) {
     process.stdout.write(chunk);
   }
 } catch (error) {
   console.error('Stream error:', error);
-  // Check server logs - errors may not reach client
 }
-
-// In production, always log on server side
 ```
 
 **Prevention:**
-- Always check server logs for stream errors
+- **Use `onError` callback** for proper error capture (recommended)
 - Implement server-side error monitoring
 - Test stream error handling explicitly
-- Use try-catch around stream consumption
+- Always log on server side in production
 
-**GitHub Issue:** #4726
+**GitHub Issue:** #4726 (RESOLVED)
 
 ---
 
@@ -1673,10 +1709,10 @@ See Vercel's official deployment documentation: https://vercel.com/docs/function
 ```json
 {
   "dependencies": {
-    "ai": "^5.0.76",
-    "@ai-sdk/openai": "^2.0.53",
-    "@ai-sdk/anthropic": "^2.0.0",
-    "@ai-sdk/google": "^2.0.0",
+    "ai": "^5.0.81",
+    "@ai-sdk/openai": "^2.0.56",
+    "@ai-sdk/anthropic": "^2.0.38",
+    "@ai-sdk/google": "^2.0.24",
     "workers-ai-provider": "^2.0.0",
     "zod": "^3.23.8"
   },
@@ -1688,9 +1724,13 @@ See Vercel's official deployment documentation: https://vercel.com/docs/function
 ```
 
 **Version Notes:**
-- AI SDK v5.0.76+ (stable, focus on v5)
-- v6 is in beta (6.0.0-beta.66) - not covered in this skill
-- Zod 3.23.8+ required for schemas
+- AI SDK v5.0.81+ (stable, latest as of October 2025)
+- v6 is in beta - not covered in this skill
+- **Zod compatibility**: This skill uses Zod 3.x, but AI SDK 5 officially supports both Zod 3.x and Zod 4.x (4.1.12 latest)
+  - Zod 4 recommended for new projects (released August 2025)
+  - Zod 4 has breaking changes: error APIs, `.default()` behavior, `ZodError.errors` removed
+  - Some peer dependency warnings may occur with `zod-to-json-schema` when using Zod 4
+  - See https://zod.dev/v4/changelog for migration guide
 - Provider packages at 2.0+ for v5 compatibility
 
 **Check Latest Versions:**
@@ -1700,6 +1740,7 @@ npm view @ai-sdk/openai version
 npm view @ai-sdk/anthropic version
 npm view @ai-sdk/google version
 npm view workers-ai-provider version
+npm view zod version  # Check for Zod 4.x updates
 ```
 
 ---
@@ -1775,6 +1816,6 @@ All files are optimized for copy-paste into your project.
 
 ---
 
-**Last Updated:** 2025-10-21
-**Skill Version:** 1.0.0
-**AI SDK Version:** 5.0.76+
+**Last Updated:** 2025-10-29
+**Skill Version:** 1.1.0
+**AI SDK Version:** 5.0.81+

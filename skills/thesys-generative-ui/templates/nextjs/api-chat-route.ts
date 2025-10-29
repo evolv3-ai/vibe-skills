@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
 
     // Create streaming completion
     const stream = await client.chat.completions.create({
-      model: "c1/openai/gpt-4", // or gpt-5, claude-sonnet-4, etc.
+      model: "c1/openai/gpt-5/v-20250930", // or claude-sonnet-4/v-20250930
       messages,
       stream: true,
       temperature: 0.7,
@@ -162,7 +162,7 @@ export async function OPTIONS() {
  *   }));
  *
  *   const stream = await client.chat.completions.create({
- *     model: "c1/openai/gpt-4",
+ *     model: "c1/openai/gpt-5/v-20250930",
  *     messages: [{ role: "system", content: SYSTEM_PROMPT }, ...llmMessages],
  *     stream: true,
  *   });

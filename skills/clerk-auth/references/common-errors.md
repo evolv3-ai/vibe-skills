@@ -358,6 +358,109 @@ Warning: Secret key exposed to client
 
 ---
 
+## Error #11: 431 Request Header Fields Too Large (Vite Dev Mode)
+
+### Symptoms
+```
+431 Request Header Fields Too Large
+Failed to load resource: the server responded with a status of 431 ()
+```
+
+Happens when:
+- Signing in to your Vite app in development mode
+- After adding custom JWT claims
+- URL contains very long `__clerk_handshake=...` parameter
+
+### Why It Happens
+- Clerk's authentication handshake passes a JWT token in the URL as `__clerk_handshake=...`
+- Vite dev server (Node.js http) has default 8KB request header limit
+- Clerk development tokens are larger than production tokens
+- Custom JWT claims increase handshake token size
+- Long URLs with JWT tokens exceed Vite's header limit
+
+### Solutions
+
+**Solution 1: Increase Node.js Header Limit (Recommended)**
+
+Update `package.json`:
+```json
+{
+  "scripts": {
+    "dev": "NODE_OPTIONS='--max-http-header-size=32768' vite",
+    "build": "vite build"
+  }
+}
+```
+
+This increases the limit from 8KB to 32KB.
+
+**For Windows PowerShell**:
+```json
+{
+  "scripts": {
+    "dev": "cross-env NODE_OPTIONS=--max-http-header-size=32768 vite"
+  }
+}
+```
+
+Install `cross-env`: `npm install -D cross-env`
+
+**Solution 2: Temporary Workaround**
+
+Clear browser state:
+1. Open DevTools (F12)
+2. Right-click refresh button → "Empty Cache and Hard Reload"
+3. Or: Application tab → Clear all storage
+4. Sign out and sign back in
+
+This removes the problematic handshake token and forces Clerk to create a fresh one.
+
+### What DOESN'T Work
+
+❌ **This won't fix it**:
+```typescript
+// vite.config.ts
+export default defineConfig({
+  server: {
+    headers: {
+      'Cache-Control': 'no-cache', // Wrong - this sets RESPONSE headers
+    },
+  },
+})
+```
+
+The error is about REQUEST headers (incoming), not RESPONSE headers (outgoing).
+
+### Prevention
+- Expect this error when testing custom JWT claims in dev mode
+- Set `NODE_OPTIONS` in `package.json` from the start
+- Keep custom claims minimal during development
+- Production deployments (Cloudflare Workers, Vercel) don't have this issue
+
+### Difference from Error #6
+
+**Error #6** (JWT Size Limit Exceeded):
+- About session token size in cookies
+- 1.2KB limit for custom claims
+- Affects production
+- Browser cookie size limit
+
+**Error #11** (431 Header Error):
+- About handshake token size in URL parameters
+- 8KB default limit (increase to 32KB)
+- Only affects Vite dev mode
+- Node.js HTTP server limit
+
+### Why Production Isn't Affected
+- Production builds don't use Vite dev server
+- Cloudflare Workers, Vercel, Netlify have higher header limits
+- Production tokens are smaller (no dev overhead)
+- Handshake flow is optimized in production
+
+**Source**: Real-world developer experience with Vite + Clerk + Custom JWT claims
+
+---
+
 ## Quick Debugging Checklist
 
 When auth isn't working:
@@ -398,3 +501,142 @@ When auth isn't working:
 2. Search Clerk Discord: https://clerk.com/discord
 3. File GitHub issue: https://github.com/clerk/javascript/issues
 4. Check Clerk status: https://status.clerk.com
+
+---
+
+## Error #12: Deprecated Redirect URL Props
+
+### Symptoms
+```
+Clerk: The prop "afterSignInUrl" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead.
+Clerk: The prop "afterSignUpUrl" is deprecated and should be replaced with the new "fallbackRedirectUrl" or "forceRedirectUrl" props instead.
+```
+
+Appears in:
+- Browser console
+- Development mode
+- When using `<SignIn>` or `<SignUp>` components from `@clerk/clerk-react`
+
+### Why It Happens
+- Clerk updated redirect prop naming in v5.x for clarity
+- Old props: `afterSignInUrl`, `afterSignUpUrl`
+- New props: `fallbackRedirectUrl`, `forceRedirectUrl`
+- Old props still work but trigger deprecation warnings
+
+### Solution
+
+**Replace deprecated props:**
+
+❌ **Old (Deprecated)**:
+```tsx
+<SignIn
+  afterSignInUrl="/"
+  signUpUrl="/signup"
+/>
+
+<SignUp
+  afterSignUpUrl="/"
+  signInUrl="/login"
+/>
+```
+
+✅ **New (Recommended)**:
+```tsx
+<SignIn
+  fallbackRedirectUrl="/"
+  signUpUrl="/signup"
+/>
+
+<SignUp
+  fallbackRedirectUrl="/"
+  signInUrl="/login"
+/>
+```
+
+### Choosing Between fallbackRedirectUrl and forceRedirectUrl
+
+**Use `fallbackRedirectUrl`** (Most Common):
+- Used as a fallback if no redirect URL is in query params
+- Allows Clerk to use `redirect_url` from query string first
+- More flexible for return-to-previous-page flows
+- **Recommended for most use cases**
+
+**Use `forceRedirectUrl`** (Rare):
+- Always redirects here, ignoring query params
+- Used when you want strict control
+- Overrides any `redirect_url` in query string
+- Use only when you need to force a specific destination
+
+### Example: Complete Migration
+
+```tsx
+// LoginPage.tsx
+import { SignIn } from '@clerk/clerk-react';
+
+export function LoginPage() {
+  return (
+    <SignIn
+      routing="path"
+      path="/login"
+      signUpUrl="/signup"
+      fallbackRedirectUrl="/"  // ✅ Use this instead of afterSignInUrl
+      appearance={{
+        elements: {
+          rootBox: 'mx-auto',
+          card: 'shadow-lg',
+        },
+      }}
+    />
+  );
+}
+```
+
+```tsx
+// SignupPage.tsx
+import { SignUp } from '@clerk/clerk-react';
+
+export function SignupPage() {
+  return (
+    <SignUp
+      routing="path"
+      path="/signup"
+      signInUrl="/login"
+      fallbackRedirectUrl="/"  // ✅ Use this instead of afterSignUpUrl
+      appearance={{
+        elements: {
+          rootBox: 'mx-auto',
+          card: 'shadow-lg',
+        },
+      }}
+    />
+  );
+}
+```
+
+### Migration Checklist
+
+- [ ] Search codebase for `afterSignInUrl`
+- [ ] Replace with `fallbackRedirectUrl`
+- [ ] Search codebase for `afterSignUpUrl`
+- [ ] Replace with `fallbackRedirectUrl`
+- [ ] Test redirect flow after sign in
+- [ ] Test redirect flow after sign up
+- [ ] Verify no console warnings
+
+### Why This Matters
+
+**Clarity**: The new naming makes it clear these are fallback/default redirects
+**Future-Proofing**: Old props may be removed in future major versions
+**Best Practices**: Using current APIs ensures compatibility with new features
+
+**Source**: Clerk v5.x Changelog & Official Migration Guide
+**Reference**: https://clerk.com/docs/guides/custom-redirects#redirect-url-props
+
+---
+
+**Error #12** (Deprecated Redirect Props):
+- About redirect URL prop naming
+- Simple find-replace fix
+- Use `fallbackRedirectUrl` for most cases
+- Only affects React-based projects
+

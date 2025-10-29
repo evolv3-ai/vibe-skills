@@ -1,5 +1,5 @@
 ---
-name: Cloudflare Workers AI
+name: cloudflare-workers-ai
 description: |
   Complete knowledge domain for Cloudflare Workers AI - Run AI models on serverless GPUs across Cloudflare's global network.
 
@@ -14,6 +14,7 @@ description: |
   vision models ai, ai chat completion, AI_ERROR, rate limit ai, model not found, token limit exceeded,
   neurons exceeded, ai quota exceeded, streaming failed, model unavailable, workers ai hono,
   ai gateway workers, vercel ai sdk workers, openai compatible workers, workers ai vectorize
+license: MIT
 ---
 
 # Cloudflare Workers AI - Complete Reference

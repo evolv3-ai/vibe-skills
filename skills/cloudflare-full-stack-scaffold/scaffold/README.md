@@ -103,14 +103,28 @@ const result = await streamText({
 
 ```bash
 # Uncomments all Clerk auth patterns
-./scripts/enable-auth.sh
+npm run enable-auth
 ```
 
 ### Enable AI Chat Interface
 
 ```bash
 # Uncomments ChatInterface component and Chat page
-./scripts/enable-ai-chat.sh
+npm run enable-ai-chat
+```
+
+### Enable Queues (Async Processing)
+
+```bash
+# Uncomments Queues routes and bindings
+npm run enable-queues
+```
+
+### Enable Vectorize (Vector Search & RAG)
+
+```bash
+# Uncomments Vectorize routes and bindings
+npm run enable-vectorize
 ```
 
 ## Development

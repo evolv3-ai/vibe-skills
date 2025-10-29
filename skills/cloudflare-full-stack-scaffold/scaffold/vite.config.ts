@@ -26,28 +26,32 @@ export default defineConfig({
         },
 
         // KV namespace (use local for dev)
-        KV: {
+        MY_KV: {
           type: 'kv',
           id: 'local-kv',
         },
 
         // R2 bucket (use local for dev)
-        BUCKET: {
+        MY_BUCKET: {
           type: 'r2',
           bucketName: 'my-app-bucket',
         },
 
+        /* VECTORIZE START
         // Vectorize index (use local for dev)
-        VECTORIZE: {
+        MY_VECTORIZE: {
           type: 'vectorize',
           indexName: 'my-app-index',
         },
+        VECTORIZE END */
 
+        /* QUEUES START
         // Queue producer (use local for dev)
-        QUEUE: {
+        MY_QUEUE: {
           type: 'queue',
           queueName: 'my-app-queue',
         },
+        QUEUES END */
       },
     }),
   ],

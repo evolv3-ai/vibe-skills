@@ -1,5 +1,5 @@
 ---
-name: Auth.js v5 Authentication Stack
+name: auth-js
 description: |
   Production-ready Auth.js v5 setup for Next.js and Cloudflare Workers.
 

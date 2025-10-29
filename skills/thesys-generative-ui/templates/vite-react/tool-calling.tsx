@@ -258,7 +258,7 @@ export default function ToolCallingExample() {
  *   const { prompt } = await req.json();
  *
  *   const stream = await client.beta.chat.completions.runTools({
- *     model: "c1/openai/gpt-4",
+ *     model: "c1/openai/gpt-5/v-20250930",
  *     messages: [
  *       {
  *         role: "system",

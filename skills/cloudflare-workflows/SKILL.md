@@ -1,5 +1,5 @@
 ---
-name: Cloudflare Workflows
+name: cloudflare-workflows
 description: |
   Complete knowledge domain for Cloudflare Workflows - durable execution framework
   for building multi-step applications on Workers that automatically retry, persist

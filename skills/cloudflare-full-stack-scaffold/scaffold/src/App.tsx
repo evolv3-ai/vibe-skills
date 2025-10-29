@@ -1,27 +1,55 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
-// TODO: Use tailwind-v4-shadcn skill to add ThemeProvider
-// import { ThemeProvider } from '@/components/ThemeProvider'
+/**
+ * App Root Component
+ *
+ * Sets up:
+ * - ThemeProvider for dark mode
+ * - React Router for navigation
+ * - Optional Clerk authentication (commented by default)
+ */
+
+import { BrowserRouter, Routes, Route } from 'react-router'
+import { ThemeProvider } from '@/components/ThemeProvider'
+/* CLERK AUTH START
+import { ClerkProvider } from '@clerk/clerk-react'
+CLERK AUTH END */
+
+// Pages
+import { Home } from '@/pages/Home'
+import { Dashboard } from '@/pages/Dashboard'
+import { Profile } from '@/pages/Profile'
+/* AI CHAT START
+import { Chat } from '@/pages/Chat'
+AI CHAT END */
+
+/* CLERK AUTH START
+// Get Clerk publishable key from environment
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
+
+if (!PUBLISHABLE_KEY) {
+  console.warn('Missing Clerk publishable key. Set VITE_CLERK_PUBLISHABLE_KEY in .env')
+}
+CLERK AUTH END */
 
 function App() {
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="border-b">
-        <div className="container mx-auto px-4 py-4">
-          <h1 className="text-2xl font-bold">Cloudflare Full-Stack App</h1>
-        </div>
-      </header>
-
-      <main className="container mx-auto px-4 py-8">
-        <h2 className="text-xl mb-4">Welcome!</h2>
-        <p className="text-muted-foreground">
-          Scaffold is ready. Use these skills to add components and routes:
-        </p>
-        <ul className="list-disc pl-6 mt-4 space-y-2">
-          <li>tailwind-v4-shadcn - Add UI components</li>
-          <li>cloudflare-full-stack-integration - Add API routes</li>
-        </ul>
-      </main>
-    </div>
+    /* CLERK AUTH START
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+    CLERK AUTH END */
+      <ThemeProvider defaultTheme="system">
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+            {/* AI CHAT START
+            <Route path="/chat" element={<Chat />} />
+            AI CHAT END */}
+          </Routes>
+        </BrowserRouter>
+      </ThemeProvider>
+    /* CLERK AUTH START
+    </ClerkProvider>
+    CLERK AUTH END */
   )
 }
 

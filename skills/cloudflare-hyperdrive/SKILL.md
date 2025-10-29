@@ -1,5 +1,5 @@
 ---
-name: Cloudflare Hyperdrive
+name: cloudflare-hyperdrive
 description: |
   Complete knowledge domain for Cloudflare Hyperdrive - connecting Cloudflare Workers to existing PostgreSQL and MySQL databases with global connection pooling, query caching, and reduced latency.
 

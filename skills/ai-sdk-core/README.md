@@ -82,9 +82,17 @@ See `SKILL.md` for comprehensive documentation and examples.
 
 ## Version
 
-- **Skill Version**: 1.0.0
-- **AI SDK Version**: 5.0.76+
-- **Last Updated**: 2025-10-21
+- **Skill Version**: 1.1.0
+- **AI SDK Version**: 5.0.81+
+- **Last Updated**: 2025-10-29
+
+## Recent Updates (v1.1.0)
+
+- **Updated Model Names**: Claude 4.x (Sonnet 4.5, Opus 4), GPT-5, Gemini 2.5 models now GA
+- **Updated Package Versions**: AI SDK 5.0.81, @ai-sdk/anthropic 2.0.38, @ai-sdk/openai 2.0.56, @ai-sdk/google 2.0.24
+- **Zod 4 Support Documented**: AI SDK 5 supports both Zod 3.x and 4.x (4.1.12 latest)
+- **Issue #4726 Resolved**: streamText now has onError callback (fixed in v4.1.22)
+- **Deprecated Claude 3.x**: Anthropic deprecated Claude 3.x models in favor of Claude 4.x family
 
 ## License
 

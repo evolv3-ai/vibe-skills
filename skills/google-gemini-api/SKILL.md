@@ -1,5 +1,5 @@
 ---
-name: Google Gemini API
+name: google-gemini-api
 description: |
   Complete guide for Google Gemini API using the CORRECT current SDK (@google/genai v1.27+, NOT the
   deprecated @google/generative-ai). Covers text generation, multimodal inputs (text + images + video +
@@ -172,8 +172,7 @@ console.log(data.candidates[0].content.parts[0].text);
 - **Context**: 1,048,576 input tokens / 65,536 output tokens
 - **Description**: Cost-optimized, fastest 2.5 model
 - **Best for**: High throughput, cost-sensitive applications
-- **Features**: Thinking mode (default on), multimodal, streaming
-- **⚠️ Limitations**: **NO function calling support**
+- **Features**: Thinking mode (default on), function calling, multimodal, streaming
 - **Knowledge cutoff**: January 2025
 
 ### Model Feature Matrix
@@ -181,7 +180,7 @@ console.log(data.candidates[0].content.parts[0].text);
 | Feature | Pro | Flash | Flash-Lite |
 |---------|-----|-------|------------|
 | Thinking Mode | ✅ Default ON | ✅ Default ON | ✅ Default ON |
-| Function Calling | ✅ | ✅ | ❌ **NOT SUPPORTED** |
+| Function Calling | ✅ | ✅ | ✅ |
 | Multimodal | ✅ | ✅ | ✅ |
 | Streaming | ✅ | ✅ | ✅ |
 | System Instructions | ✅ | ✅ | ✅ |
@@ -585,8 +584,6 @@ const response = await ai.models.generateContent({
 ## Function Calling
 
 Gemini supports function calling (tool use) to connect models with external APIs and systems.
-
-**⚠️ Important**: Gemini 2.5 Flash-Lite does **NOT** support function calling!
 
 ### Basic Function Calling (SDK)
 
@@ -1500,9 +1497,9 @@ for (const part of response.candidates[0].content.parts) {
 - Use for deterministic computations, not for general programming
 
 **Important:**
-- Code Execution is NOT available on `gemini-2.5-flash-lite`
-- Only works with Gemini 2.5 models (Pro, Flash)
+- Available on all Gemini 2.5 models (Pro, Flash, Flash-Lite)
 - Code runs in isolated sandbox for security
+- Supports Python with standard library and common data science packages
 
 ---
 
@@ -1874,19 +1871,57 @@ async function generateWithRetry(request, maxRetries = 3) {
 ## Rate Limits
 
 ### Free Tier (Gemini API)
-- **Requests per minute**: 15 RPM
-- **Tokens per minute**: 1 million TPM
-- **Requests per day**: 1,500 RPD
 
-### Paid Tier
-- **Requests per minute**: 360 RPM
-- **Tokens per minute**: 4 million TPM
-- **Requests per day**: Unlimited
+Rate limits vary by model:
+
+**Gemini 2.5 Pro**:
+- Requests per minute: 5 RPM
+- Tokens per minute: 125,000 TPM
+- Requests per day: 100 RPD
+
+**Gemini 2.5 Flash**:
+- Requests per minute: 10 RPM
+- Tokens per minute: 250,000 TPM
+- Requests per day: 250 RPD
+
+**Gemini 2.5 Flash-Lite**:
+- Requests per minute: 15 RPM
+- Tokens per minute: 250,000 TPM
+- Requests per day: 1,000 RPD
+
+### Paid Tier (Tier 1)
+
+Requires billing account linked to your Google Cloud project.
+
+**Gemini 2.5 Pro**:
+- Requests per minute: 150 RPM
+- Tokens per minute: 2,000,000 TPM
+- Requests per day: 10,000 RPD
+
+**Gemini 2.5 Flash**:
+- Requests per minute: 1,000 RPM
+- Tokens per minute: 1,000,000 TPM
+- Requests per day: 10,000 RPD
+
+**Gemini 2.5 Flash-Lite**:
+- Requests per minute: 4,000 RPM
+- Tokens per minute: 4,000,000 TPM
+- Requests per day: Not specified
+
+### Higher Tiers (Tier 2 & 3)
+
+**Tier 2** (requires $250+ spending and 30-day wait):
+- Even higher limits available
+
+**Tier 3** (requires $1,000+ spending and 30-day wait):
+- Maximum limits available
 
 **Tips:**
 - Implement rate limit handling with exponential backoff
 - Use batch processing for high-volume tasks
 - Monitor usage in Google AI Studio
+- Choose the right model based on your rate limit needs
+- Official rate limits: https://ai.google.dev/gemini-api/docs/rate-limits
 
 ---
 
@@ -1987,7 +2022,7 @@ const response = await chat.sendMessage(message);
 ✅ **Use environment variables** for API keys (never hardcode)
 ✅ **Validate inputs** before sending to API (save costs)
 ✅ **Use streaming** for better UX on long responses
-✅ **Check model capabilities** (Flash-Lite has no function calling)
+✅ **Choose the right model** based on your needs (Pro for complex reasoning, Flash for balance, Flash-Lite for speed)
 ✅ **Handle errors gracefully** with try-catch
 ✅ **Monitor token usage** for cost control
 ✅ **Use correct model names**: gemini-2.5-pro/flash/flash-lite
@@ -1999,7 +2034,7 @@ const response = await chat.sendMessage(message);
 ❌ **Never claim 2M context** for Gemini 2.5 (it's 1,048,576 input tokens)
 ❌ **Never expose API keys** in client-side code
 ❌ **Never skip error handling** (always try-catch)
-❌ **Never use Flash-Lite** for function calling (not supported)
+❌ **Never use generic rate limits** (each model has different limits - check official docs)
 ❌ **Never send PII** without user consent
 ❌ **Never trust user input** without validation
 ❌ **Never ignore rate limits** (will get 429 errors)
@@ -2043,9 +2078,9 @@ export GEMINI_API_KEY="..."
 ```
 
 ### Models (2025)
-- `gemini-2.5-pro` (1,048,576 in / 65,536 out)
-- `gemini-2.5-flash` (1,048,576 in / 65,536 out)
-- `gemini-2.5-flash-lite` (1,048,576 in / 65,536 out, NO function calling)
+- `gemini-2.5-pro` (1,048,576 in / 65,536 out) - Best for complex reasoning
+- `gemini-2.5-flash` (1,048,576 in / 65,536 out) - Best price-performance balance
+- `gemini-2.5-flash-lite` (1,048,576 in / 65,536 out) - Fastest, most cost-effective
 
 ### Basic Generation
 ```typescript

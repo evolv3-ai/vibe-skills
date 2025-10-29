@@ -11,7 +11,7 @@
  * const tools = [webSearchTool, createOrderTool];
  *
  * await client.beta.chat.completions.runTools({
- *   model: "c1/openai/gpt-4",
+ *   model: "c1/openai/gpt-5/v-20250930",
  *   messages: [...],
  *   tools,
  * });

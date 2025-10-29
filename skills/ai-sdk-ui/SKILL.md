@@ -1,5 +1,5 @@
 ---
-name: AI SDK UI
+name: ai-sdk-ui
 description: |
   Frontend React hooks for AI-powered chat interfaces, completions, and streaming UIs with Vercel AI SDK v5.
   Includes useChat, useCompletion, and useObject hooks for building interactive AI applications.

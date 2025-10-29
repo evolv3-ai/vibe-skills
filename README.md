@@ -1,6 +1,7 @@
 # Claude Code Skills Collection
 
 **Production-ready skills for Claude Code CLI**
+**Last Updated**: 2025-10-29
 
 A curated collection of battle-tested skills for building modern web applications with Cloudflare, React, Tailwind, and AI integrations.
 
@@ -23,7 +24,7 @@ cd ~/Documents/claude-skills
 ./scripts/install-all.sh
 
 # Or install individual skills
-./scripts/install-skill.sh cloudflare-react-full-stack
+./scripts/install-skill.sh cloudflare-worker-base
 ```
 
 ### Verify Installation
@@ -32,7 +33,7 @@ Skills will be symlinked to `~/.claude/skills/`. Claude Code will automatically 
 
 ---
 
-## 📦 Available Skills (30 Production-Ready)
+## 📦 Available Skills (51 Production-Ready)
 
 ### Cloudflare Core Infrastructure
 
@@ -191,9 +192,228 @@ Website scraping with Firecrawl v2 API: scrape, crawl, map, extract. Prevents 6 
 ### UI & Frontend
 
 #### **tailwind-v4-shadcn**
-Tailwind CSS v4 + shadcn/ui + Vite + React with dark mode and theme provider. Prevents 3 documented errors.
+Tailwind CSS v4 + shadcn/ui + Vite + React with dark mode and theme provider. Prevents 9 documented errors.
 
-**Triggers**: `tailwind v4`, `shadcn/ui`, `dark mode`, `@theme inline`
+**Triggers**: `tailwind v4`, `shadcn/ui`, `dark mode`, `@theme inline`, `@plugin directive`
+
+---
+
+#### **react-hook-form-zod**
+Forms with React Hook Form and Zod validation for type-safe, performant form handling. Prevents 8 documented errors.
+
+**Triggers**: `react hook form`, `zod validation`, `form handling`, `useForm`
+
+---
+
+#### **tanstack-query**
+Server state management with TanStack Query (React Query) for caching, sync, and data fetching. Prevents 10 documented errors.
+
+**Triggers**: `tanstack query`, `react query`, `useQuery`, `data fetching`, `cache management`
+
+---
+
+#### **zustand-state-management**
+Client state management with Zustand: simple, performant, TypeScript-first. Prevents 6 documented errors.
+
+**Triggers**: `zustand`, `state management`, `global state`, `react state`
+
+---
+
+### Additional Cloudflare Services
+
+#### **cloudflare-cron-triggers**
+Scheduled tasks and cron jobs for Workers. Prevents 4 documented errors.
+
+**Triggers**: `cron triggers`, `scheduled tasks`, `cloudflare cron`
+
+---
+
+#### **cloudflare-email-routing**
+Email routing and processing for Workers. Prevents 5 documented errors.
+
+**Triggers**: `email routing`, `cloudflare email`, `email workers`
+
+---
+
+#### **cloudflare-hyperdrive**
+Connection pooling for Postgres and MySQL databases. Prevents 6 documented errors.
+
+**Triggers**: `hyperdrive`, `database pooling`, `postgres cloudflare`
+
+---
+
+#### **cloudflare-images**
+Image optimization and delivery. Prevents 4 documented errors.
+
+**Triggers**: `cloudflare images`, `image optimization`, `image delivery`
+
+---
+
+#### **cloudflare-browser-rendering**
+Headless browser automation with Puppeteer for Workers. Prevents 8 documented errors.
+
+**Triggers**: `browser rendering`, `puppeteer workers`, `headless browser`
+
+---
+
+#### **cloudflare-zero-trust-access**
+Zero Trust security and access control. Prevents 6 documented errors.
+
+**Triggers**: `zero trust`, `cloudflare access`, `security workers`
+
+---
+
+### Full-Stack Scaffolds
+
+#### **cloudflare-full-stack-scaffold**
+Complete full-stack template: Vite + React + Workers + D1 + R2 + KV. Prevents 12 documented errors.
+
+**Triggers**: `full stack scaffold`, `cloudflare template`, `vite workers react`
+
+---
+
+#### **cloudflare-full-stack-integration**
+Integration patterns for combining multiple Cloudflare services. Prevents 10 documented errors.
+
+**Triggers**: `cloudflare integration`, `service composition`, `multi-service workers`
+
+---
+
+### AI Frameworks & APIs
+
+#### **openai-api**
+OpenAI API integration: chat completions, embeddings, vision, audio. Prevents 8 documented errors.
+
+**Triggers**: `openai api`, `chatgpt api`, `gpt-4`, `openai sdk`
+
+---
+
+#### **openai-agents**
+OpenAI Agents SDK for building stateful agents with tools and handoffs. Prevents 12 documented errors.
+
+**Triggers**: `openai agents`, `agent sdk`, `openai tools`, `agent handoffs`
+
+---
+
+#### **openai-assistants**
+OpenAI Assistants API for long-running conversations with memory. Prevents 10 documented errors.
+
+**Triggers**: `openai assistants`, `assistants api`, `openai threads`
+
+---
+
+#### **openai-responses**
+OpenAI Responses API for structured outputs. Prevents 6 documented errors.
+
+**Triggers**: `openai responses`, `structured output`, `response format`
+
+---
+
+#### **google-gemini-api**
+Google Gemini API integration: multimodal AI, vision, reasoning. Prevents 8 documented errors.
+
+**Triggers**: `gemini api`, `google ai`, `gemini pro`, `multimodal ai`
+
+---
+
+#### **google-gemini-embeddings**
+Google Gemini embeddings for RAG and semantic search. Prevents 6 documented errors.
+
+**Triggers**: `gemini embeddings`, `text-embedding`, `google embeddings`
+
+---
+
+#### **claude-api**
+Anthropic Claude API integration for advanced reasoning. Prevents 8 documented errors.
+
+**Triggers**: `claude api`, `anthropic api`, `claude sonnet`
+
+---
+
+#### **claude-agent-sdk**
+Claude Agent SDK for building agentic applications. Prevents 10 documented errors.
+
+**Triggers**: `claude agent sdk`, `anthropic agents`, `claude tools`
+
+---
+
+#### **thesys-generative-ui**
+Thesys generative UI for dynamic, AI-powered interfaces. Prevents 8 documented errors.
+
+**Triggers**: `thesys`, `generative ui`, `dynamic ui`, `ai components`
+
+---
+
+### Content Management
+
+#### **tinacms**
+TinaCMS for Git-backed content management. Prevents 9 documented errors.
+
+**Triggers**: `tinacms`, `tina cms`, `git cms`, `content management`
+
+---
+
+#### **sveltia-cms**
+Sveltia CMS for lightweight, Git-based content editing. Prevents 6 documented errors.
+
+**Triggers**: `sveltia cms`, `netlify cms alternative`, `git based cms`
+
+---
+
+### Database & ORM
+
+#### **drizzle-orm-d1**
+Drizzle ORM integration with Cloudflare D1 for type-safe database queries. Prevents 8 documented errors.
+
+**Triggers**: `drizzle orm`, `drizzle d1`, `type-safe queries`, `orm cloudflare`
+
+---
+
+### Framework Utilities
+
+#### **nextjs**
+Next.js App Router patterns and best practices. Prevents 12 documented errors.
+
+**Triggers**: `next.js`, `app router`, `server components`, `nextjs patterns`
+
+---
+
+#### **auth-js**
+Auth.js (NextAuth) for authentication across frameworks. Prevents 10 documented errors.
+
+**Triggers**: `auth.js`, `nextauth`, `authentication`, `oauth`
+
+---
+
+### MCP & Tooling
+
+#### **typescript-mcp**
+TypeScript MCP server development for Cloudflare Workers. Prevents 8 documented errors.
+
+**Triggers**: `typescript mcp`, `mcp server`, `model context protocol`
+
+---
+
+#### **fastmcp**
+FastMCP Python framework for MCP server development. Prevents 6 documented errors.
+
+**Triggers**: `fastmcp`, `python mcp`, `mcp python server`
+
+---
+
+### Project Planning
+
+#### **project-planning**
+Structured planning with IMPLEMENTATION_PHASES.md generation. Prevents 4 documented errors.
+
+**Triggers**: `project planning`, `implementation phases`, `planning docs`
+
+---
+
+#### **project-session-management**
+Session handoff protocol for managing context across sessions. Prevents 3 documented errors.
+
+**Triggers**: `session management`, `session handoff`, `context management`
 
 ---
 
@@ -322,23 +542,17 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 ---
 
-## 📋 Skill Priority
+## 📋 Skill Categories
 
-Skills are organized by priority and dependency:
+All 50 skills are production-ready and organized by domain:
 
-### Batch 1 - Core Infrastructure ⭐⭐⭐
-1. cloudflare-worker-base
-2. cloudflare-react-full-stack
-3. cloudflare-services
-
-### Batch 2 - Auth & Data ⭐⭐
-4. clerk-auth-cloudflare
-5. firecrawl-scraper
-
-### Batch 3 - UI Patterns ⭐
-6. react-vite-base
-7. react-form-zod
-8. ai-chat-ui
+- **Cloudflare Platform** (26 skills) - Workers, D1, R2, KV, AI, Queues, Workflows, Durable Objects, etc.
+- **AI & Machine Learning** (10 skills) - OpenAI, Claude, Gemini, Vercel AI SDK, Thesys
+- **Frontend & UI** (7 skills) - React, Tailwind v4, Forms, State Management, Next.js
+- **Auth & Security** (3 skills) - Clerk, Auth.js, Zero Trust
+- **Content Management** (2 skills) - TinaCMS, Sveltia CMS
+- **Database & ORM** (4 skills) - Drizzle, Neon Postgres, Vercel KV/Blob
+- **Tooling & Planning** (4 skills) - MCP servers, Project Planning, Scraping
 
 ---
 
@@ -390,17 +604,63 @@ MIT License - See [LICENSE](LICENSE)
 
 ---
 
+## 🤖 Using Subagents
+
+Claude Code provides built-in subagents optimized for specific tasks. For skills repository maintenance, you primarily need two:
+
+### Explore - Skill Verification
+
+**Use for**: Checking compliance across multiple skills
+
+```
+"Use Explore with 'very thorough' mode to verify all skills against ONE_PAGE_CHECKLIST.md.
+Check: YAML frontmatter, keywords, TODO markers, README structure."
+```
+
+**Results**:
+- ✅ Verifies all 51 skills in ~3 minutes
+- ✅ Comprehensive compliance report
+- ✅ Cost: ~$0.40 (vs 40 min manual checking)
+
+### Plan - Documentation Updates
+
+**Use for**: Updating multiple docs when adding skills
+
+```
+"Update README.md, CHANGELOG.md, and planning/skills-roadmap.md for new [skill-name] skill.
+Show diffs before applying."
+```
+
+**Results**:
+- ✅ Consistent updates across all files
+- ✅ Review changes before applying
+- ✅ Time: 2 min (vs 10 min manual editing)
+
+### Complete Guide
+
+See [planning/subagent-workflow.md](planning/subagent-workflow.md) for:
+- When to use each subagent type
+- Prompt templates for common tasks
+- Cost-benefit analysis
+- Why you DON'T need custom domain agents
+
+**Quick Decision**:
+- Task touches 5+ files? → Use Explore or Plan
+- Simple single-file operation? → Use tools directly
+
+---
+
 ## ⚡ Token Efficiency
 
-Using skills vs manual setup (measured across 15 production skills):
+Using skills vs manual setup (measured across 50 production skills):
 
 | Metric | Manual Setup | With Skills | Savings |
 |--------|--------------|-------------|---------|
-| **Average Tokens** | 12,000-15,000 | 4,000-5,000 | **~67%** |
+| **Average Tokens** | 12,000-15,000 | 4,000-5,000 | **~65%** |
 | **Typical Errors** | 2-4 per service | 0 (prevented) | **100%** |
 | **Setup Time** | 2-4 hours | 15-45 minutes | **~80%** |
-| **Total Skills** | - | 16 production-ready | - |
-| **Errors Prevented** | - | 141 documented | - |
+| **Total Skills** | - | 50 production-ready | - |
+| **Errors Prevented** | - | 380+ documented | - |
 
 ### Real Examples:
 

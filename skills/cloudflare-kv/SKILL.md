@@ -1,5 +1,5 @@
 ---
-name: Cloudflare Workers KV
+name: cloudflare-kv
 description: |
   Complete knowledge domain for Cloudflare Workers KV - global, low-latency key-value storage on Cloudflare's edge network.
 
@@ -10,6 +10,7 @@ description: |
   Keywords: kv storage, cloudflare kv, workers kv, kv namespace, kv bindings, kv cache, kv ttl, kv metadata,
   kv list, kv pagination, cache optimization, edge caching, KV_ERROR, 429 too many requests, kv rate limit,
   eventually consistent, wrangler kv, kv operations, key value storage
+license: MIT
 ---
 
 # Cloudflare Workers KV

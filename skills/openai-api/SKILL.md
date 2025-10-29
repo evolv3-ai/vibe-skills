@@ -1,5 +1,5 @@
 ---
-name: OpenAI API
+name: openai-api
 description: |
   Complete guide for OpenAI's traditional/stateless APIs: Chat Completions (GPT-5, GPT-4o), Embeddings,
   Images (DALL-E 3), Audio (Whisper + TTS), and Moderation. Includes both Node.js SDK and fetch-based

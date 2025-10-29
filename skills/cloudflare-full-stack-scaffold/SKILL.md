@@ -1,9 +1,9 @@
 ---
-name: Cloudflare Full-Stack Scaffold
+name: cloudflare-full-stack-scaffold
 description: |
-  Production-ready starter project for React + Cloudflare Workers + Hono with ALL services
-  pre-configured (D1, KV, R2, Workers AI, Vectorize, Queues) and AI SDK Core/UI integration.
-  Complete with planning docs, session handoff protocol, and optional Clerk authentication.
+  Production-ready starter project for React + Cloudflare Workers + Hono with core services
+  (D1, KV, R2, Workers AI) and optional advanced features (Clerk Auth, AI Chat, Queues, Vectorize).
+  Complete with planning docs, session handoff protocol, and enable scripts for opt-in features.
 
   Use when: starting new full-stack project, creating Cloudflare app, scaffolding web app,
   AI-powered application, chat interface, RAG application, need complete starter, avoid setup time,
@@ -22,15 +22,17 @@ metadata:
   version: 1.0.0
   last_updated: 2025-10-23
   packages:
-    - "react: 19.2.0"
-    - "hono: 4.10.2"
-    - "@cloudflare/vite-plugin: 1.13.14"
-    - "ai: 5.0.76"
-    - "@ai-sdk/openai: 1.0.0"
-    - "workers-ai-provider: 2.0.0"
-    - "@ai-sdk/react: 1.0.0"
-    - "@clerk/clerk-react: 5.53.3"
-    - "tailwindcss: 4.1.14"
+    - "react: ^19.2.0"
+    - "react-router-dom: ^7.1.3"
+    - "hono: ^4.10.2"
+    - "@cloudflare/vite-plugin: ^1.13.14"
+    - "ai: ^5.0.76"
+    - "@ai-sdk/openai: ^1.0.0"
+    - "@ai-sdk/anthropic: ^1.0.0"
+    - "workers-ai-provider: ^2.0.0"
+    - "@ai-sdk/react: ^2.0.76"
+    - "@clerk/clerk-react: ^5.53.3"
+    - "tailwindcss: ^4.1.14"
   production_tested: true
   token_savings: "75-80%"
   errors_prevented: "12+ setup and configuration errors"
@@ -46,11 +48,12 @@ Use this skill when you need to:
 
 - **Start a new full-stack Cloudflare project** in minutes instead of hours
 - **Build AI-powered applications** with chat interfaces, RAG, or tool calling
-- **Have all Cloudflare services ready** (D1, KV, R2, Workers AI, Vectorize, Queues)
+- **Have core Cloudflare services ready** (D1, KV, R2, Workers AI)
+- **Opt-in to advanced features** (Clerk Auth, AI Chat, Queues, Vectorize)
 - **Use modern best practices** (Tailwind v4, shadcn/ui, AI SDK, React 19)
 - **Include planning docs and session handoff** from the start
 - **Choose your AI provider** (Workers AI, OpenAI, Anthropic, Gemini)
-- **Optional authentication** with Clerk (uncomment to enable)
+- **Enable features only when needed** with simple npm scripts
 - **Avoid configuration errors** and integration issues
 
 ## What This Skill Provides
@@ -64,8 +67,14 @@ A fully working application you can **copy, customize, and deploy** immediately:
 cp -r scaffold/ my-new-app/
 cd my-new-app/
 
-# Initialize
-./scripts/setup-project.sh
+# Install dependencies
+npm install
+
+# Initialize core services (D1, KV, R2)
+./scripts/init-services.sh
+
+# Create database tables
+npm run d1:local
 
 # Start developing
 npm run dev
@@ -73,12 +82,15 @@ npm run dev
 
 **Result**: Full-stack app running in ~5 minutes with:
 - ✅ Frontend and backend connected
-- ✅ All Cloudflare services configured
+- ✅ Core Cloudflare services configured (D1, KV, R2, Workers AI)
 - ✅ AI SDK ready with multiple providers
 - ✅ Planning docs and session handoff protocol
 - ✅ Dark mode, theming, UI components
-- ✅ Optional auth (1 script to enable)
-- ✅ Optional AI chat UI (1 script to enable)
+- ✅ Optional features (1 script each to enable):
+  - Clerk Auth (`npm run enable-auth`)
+  - AI Chat UI (`npm run enable-ai-chat`)
+  - Queues (`npm run enable-queues`)
+  - Vectorize (`npm run enable-vectorize`)
 
 ### Scaffold Structure
 
@@ -156,9 +168,8 @@ scaffold/
 - Creates D1 database via wrangler
 - Creates KV namespace
 - Creates R2 bucket
-- Creates Vectorize index
-- Creates Queue
 - Updates wrangler.jsonc with IDs
+- (Queues and Vectorize created when enabled)
 
 **`scripts/enable-auth.sh`**:
 - Uncomments all Clerk auth patterns
@@ -173,6 +184,18 @@ scaffold/
 - Enables AI SDK UI patterns
 - Adds chat route to App.tsx
 - Prompts for AI provider API keys
+
+**`scripts/enable-queues.sh`**:
+- Uncomments Queues routes and bindings
+- Enables async message processing
+- Provides queue creation instructions
+- Updates backend and config files
+
+**`scripts/enable-vectorize.sh`**:
+- Uncomments Vectorize routes and bindings
+- Enables vector search and RAG
+- Provides index creation instructions
+- Configures embedding dimensions
 
 ### Reference Documentation
 
@@ -239,17 +262,119 @@ const result = await streamText({
 })
 ```
 
-**AI SDK UI - Chat Interface** (COMMENTED, enable with script):
+**AI SDK v5 UI - Chat Interface** (COMMENTED, enable with script):
 ```tsx
 import { useChat } from '@ai-sdk/react'
+import { DefaultChatTransport } from 'ai'
+import { useState } from 'react'
 
 function ChatInterface() {
-  const { messages, input, handleInputChange, handleSubmit } = useChat()
-  return (/* chat UI */)
+  const [input, setInput] = useState('')
+  const { messages, sendMessage, status } = useChat({
+    transport: new DefaultChatTransport({
+      api: '/api/ai-sdk/chat',
+    }),
+  })
+
+  // Send message on Enter key
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && status === 'ready' && input.trim()) {
+      sendMessage({ text: input })
+      setInput('')
+    }
+  }
+
+  // Render messages (v5 uses message.parts[])
+  return (
+    <div>
+      {messages.map(m => (
+        <div key={m.id}>
+          {m.parts.map(part => {
+            if (part.type === 'text') return <div>{part.text}</div>
+          })}
+        </div>
+      ))}
+      <input
+        value={input}
+        onChange={e => setInput(e.target.value)}
+        onKeyDown={handleKeyDown}
+        disabled={status !== 'ready'}
+      />
+    </div>
+  )
 }
 ```
 
-### 2. All Cloudflare Services Pre-Configured
+### 2. Forms & Data Fetching (React Hook Form + Zod + TanStack Query)
+
+**Industry-Standard Libraries for Production Apps**:
+
+**React Hook Form** - Performant form state management:
+```tsx
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+
+const form = useForm({
+  resolver: zodResolver(userSchema), // Zod validation
+})
+
+<input {...register('name')} />
+{errors.name && <span>{errors.name.message}</span>}
+```
+
+**Zod v4** - TypeScript-first schema validation:
+```typescript
+// Define schema once
+const userSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  age: z.number().int().positive().optional(),
+})
+
+// Infer TypeScript type
+type User = z.infer<typeof userSchema>
+
+// Use in frontend (React Hook Form)
+resolver: zodResolver(userSchema)
+
+// Use in backend (same schema!)
+const validated = userSchema.parse(requestBody)
+```
+
+**TanStack Query v5** - Smart data fetching & caching:
+```typescript
+// Fetch data with automatic caching
+const { data, isLoading } = useQuery({
+  queryKey: ['users'],
+  queryFn: () => apiClient.get('/api/users'),
+})
+
+// Update data with mutations
+const mutation = useMutation({
+  mutationFn: (newUser) => apiClient.post('/api/users', newUser),
+  onSuccess: () => {
+    queryClient.invalidateQueries({ queryKey: ['users'] })
+  },
+})
+```
+
+**Full-Stack Validation Pattern**:
+- ✅ Define schema in `shared/schemas/` (single source of truth)
+- ✅ Frontend validates instantly (React Hook Form + Zod)
+- ✅ Backend validates securely (same Zod schema)
+- ✅ TypeScript types inferred automatically
+- ✅ Update validation once, applies everywhere
+
+**Complete Working Examples**:
+- Profile page with form: `/profile` route
+- Dashboard with queries: `/dashboard` route
+- Form component: `src/components/UserProfileForm.tsx`
+- Backend validation: `backend/routes/forms.ts`
+- Shared schemas: `shared/schemas/userSchema.ts`
+
+See `references/supporting-libraries-guide.md` for comprehensive guide.
+
+### 3. All Cloudflare Services Pre-Configured
 
 **Database (D1)**:
 - Schema file with example tables
