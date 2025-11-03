@@ -50,6 +50,27 @@ await kv.setex('session:abc', 3600, { userId: 123 });
 
 ---
 
+## Production Templates
+
+Ready-to-use patterns for common Vercel KV use cases:
+
+### Core Patterns
+- **`templates/session-management.ts`** - Complete session handling (create, get, refresh, destroy) with auto-renewal, multi-device support, and security best practices
+- **`templates/simple-rate-limiting.ts`** - Fixed window and sliding window rate limiters, middleware integration, view counters, and tiered limits
+
+### Configuration
+- **`templates/package.json`** - Dependencies and versions for Vercel KV + Next.js
+
+All templates include:
+- ✅ TypeScript types
+- ✅ Error handling
+- ✅ TTL management
+- ✅ Security best practices
+- ✅ Next.js integration examples
+- ✅ Production-tested patterns
+
+---
+
 ## Errors Prevented (10 Total)
 
 1. Missing environment variables
