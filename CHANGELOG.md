@@ -9,6 +9,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Enhanced - better-chatbot Skill v2.1.0 ✅
+
+**Date**: 2025-11-04
+
+**Incremental Enhancement**: Added Extension Points Reference and UX Patterns documentation.
+
+#### better-chatbot v2.1.0 (Skill #52 - Enhanced Again)
+- **New Content**: Extension points reference table, UX patterns & @mention system
+- **Token Savings**: ~60% (maintained)
+- **Errors Prevented**: 8 (maintained)
+- **Lines Added**: ~250 lines of quick reference and UX guidance
+
+**What's New in v2.1**:
+- ✅ **Extension Points Reference**: Quick lookup table for "I want to add X → Modify Y file"
+  - 15 common extension scenarios (tools, routes, DB tables, components, etc.)
+  - 3 end-to-end development flows (feature, tool, workflow node)
+- ✅ **UX Patterns & @Mention System**: Understanding the user-facing philosophy
+  - Three types of @mentions (@tool, @mcp, @workflow)
+  - Tool Choice Modes (Auto, Manual, None) with use cases
+  - Preset system explained
+  - User journey examples (beginner → intermediate → advanced)
+  - Design patterns developers should follow
+
+**New Keywords Added** (4):
+- "@mention system", "tool choice mode", "preset configuration", "extension points"
+
+**Enhancement Goal**: Provide quick reference for common development tasks and explain the UX philosophy behind the @mention system.
+
+---
+
 ### Enhanced - better-chatbot Skill v2.0.0 ✅
 
 **Date**: 2025-11-04

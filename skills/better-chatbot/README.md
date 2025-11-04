@@ -1,7 +1,7 @@
 # better-chatbot
 
 **Status**: Production Ready ✅
-**Last Updated**: 2025-11-04 (v2.0.0 - Enhanced with architecture deep-dive)
+**Last Updated**: 2025-11-04 (v2.1.0 - Added extension points + UX patterns)
 **Production Tested**: https://betterchatbot.vercel.app
 
 ---
@@ -54,6 +54,10 @@ Claude Code automatically discovers this skill when you mention:
 - "database query optimization"
 - "component composition pattern"
 - "tool rendering separation"
+- "@mention system"
+- "tool choice mode"
+- "preset configuration"
+- "extension points"
 
 ---
 
