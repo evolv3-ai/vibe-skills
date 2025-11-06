@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": []
+  "keywords": ["Cloudflare Access","Zero Trust","Cloudflare Zero Trust Access","Access authentication","JWT validation","access jwt","service tokens","hono cloudflare access","hono-cloudflare-access middleware","workers authentication","protect worker routes","admin authentication","access policy","identity providers","azure ad access"]
 }

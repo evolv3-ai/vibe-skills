@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": []
+  "keywords": ["project planning","planning documentation","IMPLEMENTATION_PHASES.md","DATABASE_SCHEMA.md","API_ENDPOINTS.md","ARCHITECTURE.md","UI_COMPONENTS.md","TESTING.md","AGENTS_CONFIG.md","phased development","context-safe phases","verification criteria","exit criteria","planning docs generator","web app planning"]
 }

@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": []
+  "keywords": ["OpenAI Agents SDK","@openai/agents","@openai/agents-realtime","openai agents javascript","openai agents typescript","text agents","voice agents","realtime agents","multi-agent workflows","agent handoffs","agent tools","zod schemas agents","structured outputs agents","agent streaming","agent guardrails"]
 }

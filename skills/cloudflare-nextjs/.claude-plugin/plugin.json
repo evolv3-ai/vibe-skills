@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": []
+  "keywords": ["Cloudflare Next.js","OpenNext Cloudflare","@opennextjs/cloudflare","Next.js Workers","Next.js App Router Cloudflare","Next.js Pages Router Cloudflare","Next.js SSR Cloudflare","Next.js ISR","server components cloudflare","server actions cloudflare","Next.js middleware workers","nextjs d1","nextjs r2","nextjs kv","Next.js deployment"]
 }

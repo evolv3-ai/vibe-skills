@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": []
+  "keywords": ["ElevenLabs Agents","ElevenLabs voice agents","AI voice agents","conversational AI","@elevenlabs/react","@elevenlabs/client","@elevenlabs/react-native","@elevenlabs/elevenlabs-js","@elevenlabs/agents-cli","elevenlabs SDK","voice AI","TTS","text-to-speech","ASR","speech recognition"]
 }

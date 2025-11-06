@@ -1,20 +1,21 @@
 ---
 name: hugo
 description: |
-  This skill provides comprehensive knowledge for building static websites with Hugo static site generator. It should be used when setting up Hugo projects (blogs, documentation sites, landing pages, portfolios), integrating headless CMS systems (Sveltia CMS or TinaCMS), deploying to Cloudflare Workers with Static Assets, configuring themes and templates, and preventing common Hugo setup errors.
+  This skill provides comprehensive knowledge for building static websites with Hugo static site generator. It should be used when setting up Hugo projects (blogs, documentation sites, landing pages, portfolios), integrating Tailwind CSS v4 for custom styling, integrating headless CMS systems (Sveltia CMS or TinaCMS), deploying to Cloudflare Workers with Static Assets, configuring themes and templates, and preventing common Hugo setup errors.
 
-  Use this skill when encountering these scenarios: scaffolding new Hugo sites, choosing between Hugo Extended and Standard editions, configuring hugo.yaml or hugo.toml files, integrating PaperMod or other themes via Git submodules, setting up Sveltia CMS or TinaCMS for content management, deploying to Cloudflare Workers or Pages, troubleshooting baseURL configuration, resolving theme installation errors, fixing frontmatter format issues (YAML vs TOML), preventing date-related build failures, or setting up CI/CD with GitHub Actions.
+  Use this skill when encountering these scenarios: scaffolding new Hugo sites, choosing between Hugo Extended and Standard editions, integrating Tailwind CSS v4 with Hugo Pipes, configuring hugo.yaml or hugo.toml files, integrating PaperMod or other themes via Git submodules, setting up Sveltia CMS or TinaCMS for content management, deploying to Cloudflare Workers or Pages, troubleshooting baseURL configuration, resolving theme installation errors, fixing frontmatter format issues (YAML vs TOML), preventing date-related build failures, setting up PostCSS with Hugo, or setting up CI/CD with GitHub Actions.
 
-  Keywords: hugo, hugo-extended, static-site-generator, ssg, go-templates, papermod, goldmark, markdown, blog, documentation, docs-site, landing-page, sveltia-cms, tina-cms, headless-cms, cloudflare-workers, workers-static-assets, wrangler, hugo-server, hugo-build, frontmatter, yaml-frontmatter, toml-config, hugo-themes, hugo-modules, multilingual, i18n, github-actions, version-mismatch, baseurl-error, theme-not-found
+  Keywords: hugo, hugo-extended, static-site-generator, ssg, go-templates, papermod, goldmark, markdown, blog, documentation, docs-site, landing-page, sveltia-cms, tina-cms, headless-cms, cloudflare-workers, workers-static-assets, wrangler, hugo-server, hugo-build, frontmatter, yaml-frontmatter, toml-config, hugo-themes, hugo-modules, multilingual, i18n, github-actions, version-mismatch, baseurl-error, theme-not-found, tailwind, tailwind-v4, tailwind-css, hugo-pipes, postcss, css-framework, utility-css, hugo-tailwind, tailwind-integration, hugo-assets
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "2.0.0"
   hugo_version: "0.152.2"
+  tailwind_version: "4.1.16"
   last_verified: "2025-11-04"
   production_tested: true
   token_savings: "60-65%"
-  errors_prevented: 9
-  templates_included: 4
+  errors_prevented: 15
+  templates_included: 6
 ---
 
 # Hugo Static Site Generator
@@ -854,6 +855,152 @@ Only consider TinaCMS if:
 - Need Tina-specific features
 
 See bundled reference: `references/tinacms-integration-guide.md` (warning: not recommended)
+
+---
+
+## Tailwind CSS v4 Integration
+
+Hugo supports Tailwind CSS v4 through Hugo Pipes and the Tailwind CLI. This approach is fundamentally different from Vite-based React projects.
+
+### When to Use Tailwind vs Themes
+
+**Use Tailwind with Hugo when:**
+- Building custom designs without relying on themes
+- Need utility-first CSS workflow
+- Want complete styling control
+- Prefer Tailwind over SCSS/Sass
+
+**Use themes (PaperMod, Book, etc.) when:**
+- Want proven, production-ready designs
+- Need fast setup without custom CSS
+- Happy with theme customization options
+- Don't need pixel-perfect custom design
+
+### Key Differences from Vite + React
+
+**CRITICAL:** Do NOT try to use the `tailwind-v4-shadcn` skill patterns with Hugo. That skill is for Vite + React projects and is incompatible with Hugo's asset pipeline.
+
+| Aspect | Vite + React | Hugo |
+|--------|-------------|------|
+| **Build System** | JavaScript (Node.js) | Go (Hugo binary) |
+| **Tailwind Integration** | `@tailwindcss/vite` plugin | Tailwind CLI + PostCSS |
+| **Config File** | `vite.config.ts` | `hugo.yaml` |
+| **Content Scanning** | `content: []` globs | `hugo_stats.json` |
+| **Dev Server** | Vite (port 5173) | Hugo (port 1313) |
+| **Dark Mode** | React ThemeProvider | CSS classes or Alpine.js |
+
+### Quick Start (10 Minutes)
+
+1. **Install Dependencies**
+
+```bash
+npm install -D tailwindcss postcss autoprefixer
+npx tailwindcss init
+```
+
+2. **Configure Hugo** (`hugo.yaml`)
+
+```yaml
+build:
+  writeStats: true  # Generates hugo_stats.json for Tailwind
+
+module:
+  mounts:
+    - source: assets
+      target: assets
+    - source: hugo_stats.json
+      target: assets/watching/hugo_stats.json
+```
+
+3. **Configure Tailwind** (`tailwind.config.js`)
+
+```javascript
+module.exports = {
+  content: [
+    './hugo_stats.json',
+    './layouts/**/*.html',
+    './content/**/*.{html,md}',
+  ],
+  darkMode: 'class',
+  theme: {
+    extend: {
+      colors: {
+        primary: '#0066cc',
+      },
+    },
+  },
+  plugins: [],
+}
+```
+
+4. **Configure PostCSS** (`postcss.config.js`)
+
+```javascript
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+```
+
+5. **Create CSS Entry File** (`assets/css/main.css`)
+
+```css
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100;
+  }
+}
+```
+
+6. **Process CSS in Template** (`layouts/_default/baseof.html`)
+
+```html
+<head>
+  {{ $style := resources.Get "css/main.css" | resources.PostCSS }}
+  {{ if hugo.IsProduction }}
+    {{ $style = $style | minify | fingerprint }}
+  {{ end }}
+  <link rel="stylesheet" href="{{ $style.RelPermalink }}">
+</head>
+```
+
+7. **Start Development**
+
+```bash
+hugo server
+```
+
+### Complete Integration Guide
+
+For full Tailwind v4 + Hugo setup including:
+- Dark mode implementation (CSS-only and Alpine.js)
+- Typography plugin setup
+- Forms plugin setup
+- Template integration patterns
+- Common issues and solutions
+- Production build optimization
+
+**See bundled resources:**
+- **Reference Guide**: `references/tailwind-v4-integration.md` (comprehensive documentation)
+- **Minimal Template**: `templates/hugo-tailwind-minimal/` (starting point)
+- **Blog Template**: `templates/hugo-tailwind-blog/` (complete blog with Tailwind)
+
+### Tailwind-Specific Issues
+
+Common issues when using Tailwind with Hugo (all documented with solutions in reference guide):
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| **CSS not processing** | PostCSS not configured | Verify `resources.PostCSS` in template |
+| **Classes not purging** | `hugo_stats.json` not generated | Enable `writeStats: true` in `hugo.yaml` |
+| **Dark mode broken** | Wrong config | Use `darkMode: 'class'` in `tailwind.config.js` |
+| **Asset fingerprinting fails** | Incorrect Hugo Pipes usage | Use `RelPermalink` not `Permalink` |
+| **Hugo template syntax in CSS** | Can't use `{{ }}` in CSS | Apply classes in templates, not CSS |
+| **Version mismatch** | CLI vs PostCSS plugin | Update all to same version |
 
 ---
 

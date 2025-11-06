@@ -9,6 +9,8 @@ description: |
   issues, module resolution problems, schema configuration errors, Docker binding
   issues, and deployment problems. Self-hosting options for Cloudflare Workers,
   Vercel Functions, and Netlify Functions included.
+
+  Keywords: TinaCMS, Tina CMS, Git-backed CMS, visual editing CMS, content management, Next.js CMS, App Router TinaCMS, Pages Router TinaCMS, Vite React TinaCMS, Astro TinaCMS, framework-agnostic CMS, TinaCloud, self-hosted TinaCMS, blog CMS, documentation site CMS, marketing site CMS, GraphQL CMS, tina schema, tina collections, tina templates, tinacli, @tinacms/cli, ESbuild compilation error, module resolution tina, schema configuration, Docker binding issues, Cloudflare Workers TinaCMS, Vercel Functions TinaCMS, Netlify Functions TinaCMS
 license: MIT
 allowed-tools: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep']
 metadata:
