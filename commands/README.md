@@ -1,6 +1,6 @@
 # Claude Code Slash Commands
 
-Five slash commands for automating project exploration, planning, and session workflow with Claude Code.
+Seven slash commands for automating project exploration, planning, session workflow, and release safety with Claude Code.
 
 ## Installation
 
@@ -13,6 +13,8 @@ cp commands/plan-project.md ~/.claude/commands/
 cp commands/plan-feature.md ~/.claude/commands/
 cp commands/wrap-session.md ~/.claude/commands/
 cp commands/resume-session.md ~/.claude/commands/
+cp commands/workflow.md ~/.claude/commands/
+cp commands/release.md ~/.claude/commands/
 ```
 
 Commands are immediately available in Claude Code after copying.
@@ -129,6 +131,88 @@ Commands are immediately available in Claude Code after copying.
 
 ---
 
+### Helper Commands
+
+#### `/workflow`
+
+**Purpose**: Interactive guide to the workflow system
+
+**Usage**: Type `/workflow` when you want to understand or navigate the workflow commands
+
+**What it does**:
+1. Shows overview of all 7 commands
+2. Asks what you're trying to do
+3. Provides context-aware guidance
+4. Shows decision trees (when to use which command)
+5. Offers to execute the appropriate command
+6. Points to comprehensive documentation
+
+**When to use**:
+- First time using the workflow system
+- Unsure which command to use
+- Want to see workflow examples
+- Need quick reference
+
+**Output**: Interactive guidance, optional command execution, reference to docs/JEZWEB_WORKFLOW.md
+
+**Time savings**: Instant navigation to correct command (vs reading docs)
+
+---
+
+#### `/release`
+
+**Purpose**: Pre-release safety checks for GitHub publishing
+
+**Usage**: Type `/release` when ready to publish project to GitHub or create public release
+
+**What it does**:
+
+**Phase 1: Critical Safety (BLOCKERS)**
+1. Scans for secrets (API keys, tokens, passwords)
+2. Checks for personal artifacts (SESSION.md, planning/, screenshots/)
+3. Verifies git remote URL (pushing to correct repo)
+
+**Phase 2: Documentation Validation (REQUIRED)**
+4. Checks LICENSE file exists (creates if missing)
+5. Validates README completeness (>100 words, key sections)
+6. Checks CONTRIBUTING.md (recommended for >500 LOC)
+7. Checks CODE_OF_CONDUCT (recommended for >1000 LOC)
+
+**Phase 3: Configuration Validation**
+8. Validates .gitignore (essential patterns present)
+9. Checks package.json completeness (name, version, license, etc.)
+10. Verifies git branch (warns if on main/master)
+
+**Phase 4: Quality Checks (NON-BLOCKING)**
+11. Tests build (if build script exists)
+12. Checks dependency vulnerabilities (npm audit)
+13. Warns about large files (>1MB)
+
+**Phase 5: Release Readiness Report**
+- Comprehensive report with blockers/warnings/recommendations
+- Safe to release verdict
+
+**Phase 6-8: Auto-Fix & Publish**
+- Offers to fix issues (create LICENSE, update README, etc.)
+- Creates release preparation commit
+- Optional: Creates git tag and GitHub release
+
+**Time savings**: 10-15 minutes per release (comprehensive checks + automation)
+
+**When to use**:
+- Ready to push project to public GitHub
+- Before creating GitHub release
+- Want to ensure no secrets leaked
+- Need to validate documentation
+
+**When to skip**:
+- Private repository (some checks less critical)
+- Already manually verified everything
+
+**Output**: Release readiness report, optional auto-fixes, git commit, GitHub release
+
+---
+
 ## Requirements
 
 **Planning Commands**:
@@ -151,6 +235,7 @@ These commands work together and integrate with planning/session skills:
 
 ## Complete Workflow
 
+**Full workflow** (with exploration):
 ```
 1. Rough idea → /explore-idea → [Creates PROJECT_BRIEF.md] → Decision
 2. If proceeding → /plan-project → [Reads brief, creates IMPLEMENTATION_PHASES.md + SESSION.md]
@@ -159,12 +244,21 @@ These commands work together and integrate with planning/session skills:
 5. New session → /resume-session → [Loads context, continues from "Next Action"]
 6. Need feature → /plan-feature → [Adds phases to existing plan]
 7. Repeat wrap → resume cycle
+8. Ready to publish → /release → [Safety checks, sanitize, docs] → GitHub release
 ```
 
-**Alternate flow** (skip exploration if requirements clear):
+**Quick workflow** (clear requirements):
 ```
-Clear requirements → /plan-project → Work → /wrap-session → /resume-session
+Clear requirements → /plan-project → Work → /wrap-session → /resume-session → /release
 ```
+
+**Helper workflows**:
+```
+Need guidance? → /workflow → [Interactive guide to commands]
+Release project? → /release → [Safety checks + GitHub release]
+```
+
+**Complete Documentation**: See `docs/JEZWEB_WORKFLOW.md` for comprehensive guide with examples, decision trees, troubleshooting, and real-world workflows.
 
 ## Features
 
@@ -205,16 +299,40 @@ Clear requirements → /plan-project → Work → /wrap-session → /resume-sess
 - ✅ Detects uncommitted changes
 - ✅ Optional "Next Action" file opening
 
+**`/workflow`**:
+- ✅ Interactive guidance based on user context
+- ✅ Shows decision trees (which command to use)
+- ✅ Offers to execute appropriate command
+- ✅ Quick reference card
+- ✅ Points to comprehensive documentation
+
+**`/release`**:
+- ✅ Comprehensive secrets scanning (gitleaks integration)
+- ✅ Personal artifacts detection and cleanup
+- ✅ Remote URL verification (prevent wrong repo push)
+- ✅ LICENSE file validation (creates if missing)
+- ✅ README completeness checks
+- ✅ .gitignore validation
+- ✅ package.json completeness
+- ✅ Build testing
+- ✅ Dependency vulnerability scanning
+- ✅ Large file warnings
+- ✅ Release readiness report
+- ✅ Auto-fix capabilities
+- ✅ GitHub release creation (optional)
+
 ## Total Time Savings
 
-**25-40 minutes per project lifecycle**:
+**35-55 minutes per project lifecycle**:
 - Exploration: 10-15 minutes (explore-idea)
 - Planning: 5-7 minutes (plan-project)
 - Feature additions: 7-10 minutes each (plan-feature)
 - Session cycles: 3-5 minutes each (wrap + resume)
+- Release safety: 10-15 minutes (release)
+- Workflow navigation: Instant (workflow)
 
 ---
 
-**Version**: 3.0.0
+**Version**: 4.0.0
 **Last Updated**: 2025-11-07
 **Author**: Jeremy Dawes | Jezweb

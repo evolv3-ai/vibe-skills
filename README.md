@@ -469,7 +469,18 @@ Session handoff protocol for managing context across sessions. Prevents 3 docume
 
 ### 🚀 Complete Planning & Session Workflow
 
-**Five slash commands work together for complete project lifecycle automation**:
+**Seven slash commands work together for complete project lifecycle automation**:
+
+**Core Workflow Commands**:
+- `/explore-idea` - Pre-planning exploration, research, validation (10-15 min saved)
+- `/plan-project` - Generate planning docs for NEW projects (5-7 min saved)
+- `/plan-feature` - Add features to existing projects (7-10 min saved)
+- `/wrap-session` - Checkpoint progress at end of session (2-3 min saved)
+- `/resume-session` - Load context at start of session (1-2 min saved)
+
+**Helper Commands**:
+- `/workflow` - Interactive guide to the workflow system
+- `/release` - Pre-release safety checks for GitHub publishing
 
 **Full workflow** (with exploration):
 ```
@@ -481,9 +492,16 @@ Rough idea → /explore-idea → [PROJECT_BRIEF.md] → /plan-project → Work �
 Clear requirements → /plan-project → Work → /wrap-session → /resume-session
 ```
 
+**Release workflow**:
+```
+Ready to publish → /release → [Safety checks, sanitize, docs validation] → GitHub release
+```
+
 **Total time savings**: 25-40 minutes per project lifecycle (exploration + planning + session management)
 
-See: `commands/README.md` for installation and usage details
+**Complete Documentation**: See `docs/JEZWEB_WORKFLOW.md` for comprehensive guide with examples, decision trees, and troubleshooting
+
+**Quick Reference**: See `commands/README.md` for installation and usage details
 
 ---
 
