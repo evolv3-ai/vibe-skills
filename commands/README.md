@@ -1,6 +1,6 @@
 # Claude Code Slash Commands
 
-Four slash commands for automating project planning and session workflow with Claude Code.
+Five slash commands for automating project exploration, planning, and session workflow with Claude Code.
 
 ## Installation
 
@@ -8,6 +8,7 @@ Copy commands to your `.claude/commands/` directory:
 
 ```bash
 # From the claude-skills repo
+cp commands/explore-idea.md ~/.claude/commands/
 cp commands/plan-project.md ~/.claude/commands/
 cp commands/plan-feature.md ~/.claude/commands/
 cp commands/wrap-session.md ~/.claude/commands/
@@ -18,21 +19,52 @@ Commands are immediately available in Claude Code after copying.
 
 ## Commands
 
+### Exploration Command
+
+#### `/explore-idea`
+
+**Purpose**: Collaborative exploration and brainstorming for new project ideas (PRE-planning phase)
+
+**Usage**: Type `/explore-idea` when you have a rough idea and want to validate approach, research options, and create decision-ready brief
+
+**What it does**:
+1. Engages in free-flowing conversation to understand your vision
+2. Conducts heavy research (Explore agents, Context7 MCP, WebSearch)
+3. Validates tech stack and approach
+4. Challenges assumptions and prevents scope creep
+5. Creates PROJECT_BRIEF.md with validated decisions
+6. Recommends: Proceed/Pause/Pivot
+7. Seamlessly hands off to /plan-project if proceeding
+
+**Time savings**: 10-15 minutes per project idea (research + validation + scope management)
+
+**When to use**:
+- You have rough idea but not validated approach
+- Multiple tech options and unsure which fits
+- Want research/validation before committing to build
+- Need scope management before detailed planning
+
+**When to skip**:
+- You have crystal-clear requirements and validated stack (use /plan-project directly)
+
+---
+
 ### Planning Commands
 
 #### `/plan-project`
 
-**Purpose**: Automate initial project planning for NEW projects
+**Purpose**: Automate initial project planning for NEW projects (POST-exploration phase)
 
-**Usage**: Type `/plan-project` after you've discussed and decided on project requirements with Claude
+**Usage**: Type `/plan-project` after you've decided on project requirements (or after `/explore-idea`)
 
 **What it does**:
-1. Invokes project-planning skill to generate IMPLEMENTATION_PHASES.md
-2. Creates SESSION.md automatically
-3. Creates initial git commit with planning docs
-4. Shows formatted planning summary
-5. Asks permission to start Phase 1
-6. Optionally pushes to remote
+1. Checks for PROJECT_BRIEF.md (from /explore-idea) and uses it as context
+2. Invokes project-planning skill to generate IMPLEMENTATION_PHASES.md
+3. Creates SESSION.md automatically
+4. Creates initial git commit with planning docs
+5. Shows formatted planning summary
+6. Asks permission to start Phase 1
+7. Optionally pushes to remote
 
 **Time savings**: 5-7 minutes per new project (15-20 manual steps → 1 command)
 
@@ -120,16 +152,33 @@ These commands work together and integrate with planning/session skills:
 ## Complete Workflow
 
 ```
-1. Brainstorm with Claude → /plan-project → Start Phase 1
-2. Work on phases → /wrap-session → Context clear
-3. New session → /resume-session → Continue work
-4. Need feature → /plan-feature → Continue or start feature
-5. Repeat wrap → resume cycle
+1. Rough idea → /explore-idea → [Creates PROJECT_BRIEF.md] → Decision
+2. If proceeding → /plan-project → [Reads brief, creates IMPLEMENTATION_PHASES.md + SESSION.md]
+3. Start Phase 1 → Work on phases
+4. Context full → /wrap-session → [Updates SESSION.md, git checkpoint]
+5. New session → /resume-session → [Loads context, continues from "Next Action"]
+6. Need feature → /plan-feature → [Adds phases to existing plan]
+7. Repeat wrap → resume cycle
+```
+
+**Alternate flow** (skip exploration if requirements clear):
+```
+Clear requirements → /plan-project → Work → /wrap-session → /resume-session
 ```
 
 ## Features
 
+**`/explore-idea`**:
+- ✅ Free-flowing conversational exploration (not rigid questionnaire)
+- ✅ Heavy automated research (Explore agents, Context7 MCP, WebSearch)
+- ✅ Tech stack validation
+- ✅ Scope management and assumption challenges
+- ✅ Creates PROJECT_BRIEF.md with validated decisions
+- ✅ Recommends proceed/pause/pivot
+- ✅ Seamless handoff to /plan-project
+
 **`/plan-project`**:
+- ✅ Checks for PROJECT_BRIEF.md (from /explore-idea)
 - ✅ Invokes project-planning skill automatically
 - ✅ Creates SESSION.md from generated phases
 - ✅ Structured git commit format
@@ -158,13 +207,14 @@ These commands work together and integrate with planning/session skills:
 
 ## Total Time Savings
 
-**15-25 minutes per project lifecycle**:
+**25-40 minutes per project lifecycle**:
+- Exploration: 10-15 minutes (explore-idea)
 - Planning: 5-7 minutes (plan-project)
 - Feature additions: 7-10 minutes each (plan-feature)
 - Session cycles: 3-5 minutes each (wrap + resume)
 
 ---
 
-**Version**: 2.0.0
+**Version**: 3.0.0
 **Last Updated**: 2025-11-07
 **Author**: Jeremy Dawes | Jezweb

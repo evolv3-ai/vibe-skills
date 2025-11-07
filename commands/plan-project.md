@@ -8,6 +8,26 @@ Automate initial project planning: gather requirements, generate planning docs, 
 
 Follow these steps to take a project from description to ready-to-code state.
 
+### 0. Check for PROJECT_BRIEF.md (Optional)
+
+**If PROJECT_BRIEF.md exists** in project root or planning/ directory:
+
+```bash
+ls PROJECT_BRIEF.md planning/PROJECT_BRIEF.md 2>/dev/null
+```
+
+**If found:**
+- Read PROJECT_BRIEF.md first
+- Extract validated scope, tech stack, and constraints
+- Use as context for project-planning skill invocation
+- Skip redundant questions (tech stack and scope decisions already validated in brief)
+
+**Note**: PROJECT_BRIEF.md is created by the `/explore-idea` command during pre-planning exploration. It contains research findings and validated decisions that streamline the planning process.
+
+**If not found:**
+- Continue normally to step 1
+- project-planning skill will handle all requirements gathering
+
 ### 1. Invoke project-planning Skill
 
 **If project description is vague or incomplete**, ask 1-2 clarifying questions first:

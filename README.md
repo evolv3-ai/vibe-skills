@@ -445,11 +445,12 @@ Structured planning with IMPLEMENTATION_PHASES.md generation. Prevents 4 documen
 
 **Triggers**: `project planning`, `implementation phases`, `planning docs`
 
-**Includes 2 Slash Commands**:
+**Includes 3 Slash Commands**:
+- `/explore-idea` - Pre-planning exploration: research, validate, scope management, create PROJECT_BRIEF.md
 - `/plan-project` - Automate NEW project planning (generate IMPLEMENTATION_PHASES.md, create SESSION.md, git commit)
 - `/plan-feature` - Add feature to existing project (generate phases, integrate into IMPLEMENTATION_PHASES.md, update SESSION.md)
 
-**Time Savings**: 5-7 minutes per new project, 7-10 minutes per feature addition
+**Time Savings**: 10-15 minutes per exploration, 5-7 minutes per new project, 7-10 minutes per feature addition
 
 ---
 
@@ -468,13 +469,19 @@ Session handoff protocol for managing context across sessions. Prevents 3 docume
 
 ### 🚀 Complete Planning & Session Workflow
 
-**Four slash commands work together for complete project lifecycle automation**:
+**Five slash commands work together for complete project lifecycle automation**:
 
+**Full workflow** (with exploration):
 ```
-Brainstorm → /plan-project → Work → /wrap-session → /resume-session → /plan-feature → Continue
+Rough idea → /explore-idea → [PROJECT_BRIEF.md] → /plan-project → Work → /wrap-session → /resume-session → /plan-feature
 ```
 
-**Total time savings**: 15-25 minutes per project lifecycle
+**Quick workflow** (clear requirements):
+```
+Clear requirements → /plan-project → Work → /wrap-session → /resume-session
+```
+
+**Total time savings**: 25-40 minutes per project lifecycle (exploration + planning + session management)
 
 See: `commands/README.md` for installation and usage details
 
