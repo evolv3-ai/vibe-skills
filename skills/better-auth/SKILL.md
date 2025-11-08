@@ -63,7 +63,7 @@ better-auth **DOES NOT** have a direct `d1Adapter()`. You **MUST** use either:
 - Implementing multi-tenant SaaS with organizations/teams
 - Require advanced features: 2FA, passkeys, RBAC, social auth, rate limiting
 
-**Package**: `better-auth@1.3.34` (latest verified 2025-11-08)
+**Package**: `better-auth@1.3.34` (latest stable verified 2025-11-08)
 
 ---
 
@@ -82,9 +82,9 @@ pnpm add better-auth drizzle-orm drizzle-kit
 **Option 2: Kysely**
 
 ```bash
-npm install better-auth kysely @noxharmonium/kysely-d1
+npm install better-auth kysely kysely-d1
 # or
-pnpm add better-auth kysely @noxharmonium/kysely-d1
+pnpm add better-auth kysely kysely-d1
 ```
 
 ### Additional Dependencies
@@ -463,7 +463,7 @@ If you prefer Kysely over Drizzle:
 ```typescript
 import { betterAuth } from "better-auth";
 import { Kysely, CamelCasePlugin } from "kysely";
-import { D1Dialect } from "@noxharmonium/kysely-d1";
+import { D1Dialect } from "kysely-d1";
 
 type Env = {
   DB: D1Database;
@@ -735,7 +735,7 @@ database: drizzleAdapter(db, { provider: "sqlite" })
 
 // ✅ CORRECT - Use Kysely
 import { Kysely } from 'kysely'
-import { D1Dialect } from '@noxharmonium/kysely-d1'
+import { D1Dialect } from 'kysely-d1'
 database: {
   db: new Kysely({ dialect: new D1Dialect({ database: env.DB }) }),
   type: "sqlite"
@@ -894,7 +894,7 @@ npm install better-auth drizzle-orm drizzle-kit @cloudflare/workers-types
 
 **For Kysely approach**:
 ```bash
-npm install better-auth kysely @noxharmonium/kysely-d1 @cloudflare/workers-types
+npm install better-auth kysely kysely-d1 @cloudflare/workers-types
 ```
 
 ---
@@ -1247,10 +1247,10 @@ Use `Read` tool to access these files when needed.
 
 **Tested with**:
 - `better-auth@1.3.34`
-- `drizzle-orm@0.36.0`
-- `drizzle-kit@0.28.0`
-- `kysely@0.27.0`
-- `@noxharmonium/kysely-d1@2.3.0`
+- `drizzle-orm@0.44.7`
+- `drizzle-kit@0.31.6`
+- `kysely@0.28.8`
+- `kysely-d1@0.4.0`
 - `@cloudflare/workers-types@latest`
 - `hono@4.0.0`
 - Node.js 18+, Bun 1.0+

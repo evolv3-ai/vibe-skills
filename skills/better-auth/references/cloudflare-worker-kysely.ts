@@ -17,7 +17,7 @@ import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { betterAuth } from "better-auth";
 import { Kysely, CamelCasePlugin } from "kysely";
-import { D1Dialect } from "@noxharmonium/kysely-d1";
+import { D1Dialect } from "kysely-d1";
 
 // ═══════════════════════════════════════════════════════════════
 // Environment bindings
@@ -184,7 +184,7 @@ export default app;
  * ═══════════════════════════════════════════════════════════════
  *
  * 1. Install dependencies:
- *    npm install better-auth kysely @noxharmonium/kysely-d1 hono
+ *    npm install better-auth kysely kysely-d1 hono
  *
  * 2. Create D1 database:
  *    wrangler d1 create my-app-db

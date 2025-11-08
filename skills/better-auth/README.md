@@ -212,8 +212,8 @@ npm install pg drizzle-orm
 
 - **Skill Version**: 2.0.0 (Breaking Change - Corrected D1 adapter patterns)
 - **Package Version**: better-auth@1.3.34
-- **Drizzle ORM**: drizzle-orm@0.36.0, drizzle-kit@0.28.0
-- **Kysely**: kysely@0.27.0, @noxharmonium/kysely-d1@2.3.0
+- **Drizzle ORM**: drizzle-orm@0.44.7, drizzle-kit@0.31.6
+- **Kysely**: kysely@0.28.8, kysely-d1@0.4.0
 - **Last Verified**: 2025-11-08
 - **Compatibility**: Node.js 18+, Bun 1.0+, Cloudflare Workers
 
