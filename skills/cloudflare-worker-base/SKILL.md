@@ -51,7 +51,7 @@ npm create cloudflare@latest my-worker -- \
 ```bash
 cd my-worker
 npm install hono@4.10.1
-npm install -D @cloudflare/vite-plugin@1.13.13 vite@latest
+npm install -D @cloudflare/vite-plugin@1.13.13 vite@^7.0.0
 ```
 
 **Version Notes:**
@@ -68,7 +68,7 @@ Create or update `wrangler.jsonc`:
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "my-worker",
   "main": "src/index.ts",
-  "account_id": "YOUR_ACCOUNT_ID",
+  "account_id": "YOUR_ACCOUNT_ID", // Find this in your Cloudflare dashboard (Workers & Pages -> Overview).
   "compatibility_date": "2025-10-11",
   "observability": {
     "enabled": true
@@ -322,7 +322,7 @@ export default {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "my-worker",
   "main": "src/index.ts",
-  "account_id": "YOUR_ACCOUNT_ID",
+  "account_id": "YOUR_ACCOUNT_ID", // Find this in your Cloudflare dashboard (Workers & Pages -> Overview).
   "compatibility_date": "2025-10-11",
   "observability": {
     "enabled": true
