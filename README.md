@@ -50,9 +50,9 @@ Skills will be available in Claude Code and automatically suggested when relevan
 
 ---
 
-## 📦 Available Skills (60 Production-Ready)
+## 📦 Available Skills (62 Production-Ready)
 
-**📋 Full Catalog**: See [MARKETPLACE.md](MARKETPLACE.md) for the complete organized list of all 60 skills by category.
+**📋 Full Catalog**: See [MARKETPLACE.md](MARKETPLACE.md) for the complete organized list of all 62 skills by category.
 
 **Below**: Featured skills with detailed descriptions and trigger keywords.
 
@@ -648,15 +648,15 @@ See [tools/statusline/README.md](tools/statusline/README.md) for full documentat
 
 ## 📋 Skill Categories
 
-All 60 skills are production-ready and organized by domain:
+All 62 skills are production-ready and organized by domain:
 
 - **Cloudflare Platform** (22 skills) - Workers, D1, R2, KV, AI, Queues, Workflows, Durable Objects, MCP, etc.
-- **AI & Machine Learning** (13 skills) - OpenAI, Claude, Gemini, ElevenLabs, Vercel AI SDK, Thesys
+- **AI & Machine Learning** (14 skills) - OpenAI, Claude, Gemini, ElevenLabs, Vercel AI SDK, Thesys
 - **Frontend & UI** (7 skills) - React, Tailwind v4, Forms, State Management, Next.js, Hono
 - **Auth & Security** (3 skills) - Clerk, Auth.js, Better Auth
 - **Content Management** (3 skills) - TinaCMS, Sveltia CMS, WordPress
 - **Database & ORM** (4 skills) - Drizzle, Neon Postgres, Vercel KV/Blob
-- **Tooling & Planning** (8 skills) - MCP servers, FastMCP, Hugo, Project Planning, GitHub, Open Source, Firecrawl
+- **Tooling & Planning** (10 skills) - MCP servers, FastMCP, Hugo, Project Planning, Workflow, Gemini CLI, GitHub, Open Source, Firecrawl
 
 ---
 

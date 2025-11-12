@@ -1,6 +1,6 @@
 # Claude Skills Marketplace
 
-Welcome to the **claude-skills** marketplace - a curated collection of 60 production-ready skills for Claude Code CLI.
+Welcome to the **claude-skills** marketplace - a curated collection of 62 production-ready skills for Claude Code CLI.
 
 ## Quick Start
 
@@ -33,7 +33,7 @@ Claude: [Automatically uses cloudflare-worker-base skill]
 
 ---
 
-## Available Skills (60)
+## Available Skills (62)
 
 ### Cloudflare Platform (22 skills)
 
@@ -64,7 +64,7 @@ Core infrastructure and services for edge computing:
 | `cloudflare-full-stack-integration` | Integrate multiple CF services |
 | `cloudflare-sandbox` | Testing and development environment |
 
-### AI & Machine Learning (13 skills)
+### AI & Machine Learning (14 skills)
 
 LLM integrations, agents, and AI frameworks:
 
@@ -78,6 +78,7 @@ LLM integrations, agents, and AI frameworks:
 | `openai-responses` | Conversational AI applications |
 | `google-gemini-api` | Google Gemini multimodal models |
 | `google-gemini-embeddings` | Gemini embeddings for search |
+| `google-gemini-file-search` | Managed RAG with File Search API |
 | `claude-api` | Anthropic Claude API integration |
 | `claude-agent-sdk` | Claude autonomous agents |
 | `thesys-generative-ui` | LLM-powered dynamic UI |
@@ -129,7 +130,7 @@ ORMs and serverless databases:
 | `vercel-kv` | Vercel KV Redis storage |
 | `vercel-blob` | Vercel Blob file storage |
 
-### Tooling & Planning (9 skills)
+### Tooling & Planning (10 skills)
 
 Development tools and workflow automation:
 
@@ -138,6 +139,7 @@ Development tools and workflow automation:
 | `project-workflow` | Complete project lifecycle with 7 slash commands |
 | `project-planning` | Generate planning docs |
 | `project-session-management` | Session handoff protocol |
+| `gemini-cli` | Use Gemini CLI for second opinions and code review |
 | `typescript-mcp` | Build MCP servers with TypeScript |
 | `fastmcp` | FastMCP Python framework |
 | `firecrawl-scraper` | Web scraping API integration |
@@ -256,7 +258,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**Last Updated**: 2025-11-07
+**Last Updated**: 2025-11-13
 **Marketplace Version**: 1.0.0
-**Skills**: 60
+**Skills**: 62
 **Maintainer**: Jeremy Dawes | Jezweb
