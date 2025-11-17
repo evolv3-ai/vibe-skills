@@ -9,6 +9,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Removed - Deprecated Full-Stack Skills 🗑️
+
+**Date**: 2025-11-17
+
+**Change**: Removed `cloudflare-full-stack-scaffold` and `cloudflare-full-stack-integration` skills
+
+**Rationale**:
+- Both skills violated the atomic skills principle (one skill = one domain)
+- `cloudflare-full-stack-scaffold` was a mega-scaffold with 774 lines and 50+ files to maintain
+- Existing atomic skills already cover these patterns via composition:
+  - `cloudflare-worker-base` - Basic Worker + Vite + React setup
+  - `clerk-auth` - Authentication patterns
+  - `ai-sdk-core` - AI SDK integration
+  - `hono-routing` - Routing and middleware
+  - `project-planning` - Planning docs generation
+- Claude automatically composes these skills when needed (better UX)
+
+**Impact**:
+- Skills: 65 → 63
+- Easier maintenance (no 19+ dependencies to track)
+- Cleaner, more focused skill collection
+- Users get exactly what they need via composition
+
+**Files Deleted**:
+- `skills/cloudflare-full-stack-scaffold/`
+- `skills/cloudflare-full-stack-integration/`
+
+---
+
 ### Enhanced - `/release` Command with GitHub Repo Creation 🚀
 
 **Date**: 2025-11-17

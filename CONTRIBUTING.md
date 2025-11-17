@@ -326,10 +326,57 @@ We prefer:
 
 ### Maintenance
 
-- Update skills when dependencies change
+Skills require regular maintenance to stay current. We provide automated tools to help.
+
+#### Version Checking Scripts
+
+The repository includes comprehensive version checking tools in `scripts/`:
+
+**Quick Check (Recommended)**:
+```bash
+# Check all skills for outdated dependencies
+./scripts/check-all-versions.sh
+
+# Check specific skill
+./scripts/check-all-versions.sh cloudflare-worker-base
+
+# Generates: VERSIONS_REPORT.md with actionable recommendations
+```
+
+**Individual Checkers**:
+```bash
+# NPM packages (with breaking change detection)
+./scripts/check-npm-versions.sh [skill-name]
+
+# GitHub releases
+./scripts/check-github-releases.sh [skill-name]
+
+# YAML metadata validation
+./scripts/check-metadata.sh [skill-name]
+
+# AI model references
+./scripts/check-ai-models.sh [skill-name]
+```
+
+**Maintenance Schedule**:
+- **Weekly**: Check for deprecated AI models
+- **Monthly**: Update minor/patch package versions
+- **Quarterly**: Run full audit with `check-all-versions.sh`
+- **Before major updates**: Test in isolation, review breaking changes
+
+**When Updates Are Needed**:
+1. Review `VERSIONS_REPORT.md` for breaking changes
+2. Update `templates/package.json` files
+3. Update version references in `SKILL.md`
+4. Update `metadata.last_verified` dates
+5. Test updated skills in example projects
+6. Commit changes with detailed changelog
+
+**General Maintenance**:
 - Respond to issues promptly
-- Document breaking changes
+- Document breaking changes in skill metadata
 - Test with latest Claude Code versions
+- Keep README auto-trigger keywords current
 
 ---
 

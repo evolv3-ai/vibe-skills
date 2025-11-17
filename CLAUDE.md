@@ -3,8 +3,8 @@
 **Repository**: https://github.com/jezweb/claude-skills
 **Purpose**: Production-ready skills for Claude Code CLI
 **Owner**: Jeremy Dawes (Jez) | Jezweb
-**Status**: Active Development | 65 Skills Complete
-**Last Updated**: 2025-11-07
+**Status**: Active Development | 63 Skills Complete
+**Last Updated**: 2025-11-17
 
 ---
 
@@ -55,13 +55,13 @@ claude-skills/
 ├── CHANGELOG.md                  # Version history
 ├── LICENSE                       # MIT License
 │
-├── skills/                       # ← All production skills (65 total)
+├── skills/                       # ← All production skills (63 total)
 │   ├── tailwind-v4-shadcn/       # Gold standard example
 │   ├── cloudflare-worker-base/   # Foundation skill
 │   ├── ai-sdk-core/              # AI integration
 │   ├── openai-agents/            # OpenAI Agents SDK
 │   ├── project-planning/         # Planning automation
-│   └── [45 more skills...]       # Run ls skills/ for full list
+│   └── [58 more skills...]       # Run ls skills/ for full list
 │
 ├── templates/                    # ← Templates for new skills
 │   ├── SKILL-TEMPLATE.md         # Copy-paste SKILL.md starter
@@ -85,7 +85,12 @@ claude-skills/
 ├── scripts/                      # Automation scripts
 │   ├── install-skill.sh          # Symlink skill to ~/.claude/skills/
 │   ├── install-all.sh            # Install all skills
-│   └── check-versions.sh         # Verify package versions
+│   ├── check-npm-versions.sh     # NPM package version checker
+│   ├── check-github-releases.sh  # GitHub release tracker
+│   ├── check-metadata.sh         # YAML metadata validator
+│   ├── check-ai-models.sh        # AI model reference checker
+│   ├── check-all-versions.sh     # Comprehensive checker (runs all)
+│   └── check-versions.sh         # Legacy checker (deprecated)
 │
 └── examples/                     # Working example projects
     └── cloudflare-worker-base-test/
@@ -93,20 +98,20 @@ claude-skills/
 
 ---
 
-## Current Status (2025-11-07)
+## Current Status (2025-11-17)
 
-### ✅ Completed Skills (65)
+### ✅ Completed Skills (63)
 
-All 65 skills are production-ready and organized by domain:
+All 63 skills are production-ready and organized by domain:
 
-**Cloudflare Platform** (27 skills):
+**Cloudflare Platform** (25 skills):
 - cloudflare-worker-base, cloudflare-d1, cloudflare-r2, cloudflare-kv
 - cloudflare-workers-ai, cloudflare-vectorize, cloudflare-queues, cloudflare-workflows
 - cloudflare-durable-objects, cloudflare-agents, cloudflare-mcp-server, cloudflare-turnstile
 - cloudflare-nextjs, cloudflare-cron-triggers, cloudflare-email-routing
 - cloudflare-hyperdrive, cloudflare-images, cloudflare-browser-rendering
-- cloudflare-zero-trust-access, cloudflare-full-stack-scaffold, cloudflare-full-stack-integration
-- And 6 more...
+- cloudflare-zero-trust-access, cloudflare-sandbox
+- And 5 more...
 
 **AI & Machine Learning** (10 skills):
 - ai-sdk-core, ai-sdk-ui, openai-api, openai-agents, openai-assistants, openai-responses
@@ -162,7 +167,7 @@ All 65 skills are production-ready and organized by domain:
 4. VERIFY
    • Check ONE_PAGE_CHECKLIST.md
    • Compare with planning/claude-code-skill-standards.md
-   • Run check-versions.sh if applicable
+   • Run check-all-versions.sh if skill has dependencies
 
 5. COMMIT
    • git add skills/new-skill
@@ -246,8 +251,15 @@ ls -la ~/.claude/skills/
 ### Development
 
 ```bash
-# Check package versions
-./scripts/check-versions.sh skills/cloudflare-worker-base/
+# Check all versions (npm, GitHub, metadata, AI models)
+./scripts/check-all-versions.sh                    # All skills
+./scripts/check-all-versions.sh cloudflare-worker-base  # Specific skill
+
+# Or run individual checkers
+./scripts/check-npm-versions.sh [skill-name]       # NPM packages only
+./scripts/check-github-releases.sh [skill-name]    # GitHub releases only
+./scripts/check-metadata.sh [skill-name]           # Metadata only
+./scripts/check-ai-models.sh [skill-name]          # AI models only
 
 # Create new skill from template
 cp -r templates/skill-skeleton/ skills/new-skill-name/
@@ -368,17 +380,30 @@ See [planning/COMMON_MISTAKES.md](planning/COMMON_MISTAKES.md) for detailed exam
 
 ### Regular Tasks
 
+**Weekly**:
+- Check for deprecated AI models: `./scripts/check-ai-models.sh`
+- Review and update model references in skills
+
+**Monthly**:
+- Update minor/patch versions: `./scripts/check-npm-versions.sh`
+- Update GitHub releases: `./scripts/check-github-releases.sh`
+- Update templates as needed
+
 **Quarterly** (Every 3 months):
-- Check package versions: `scripts/check-versions.sh`
+- Full audit: `./scripts/check-all-versions.sh`
+- Review `VERSIONS_REPORT.md` for action items
 - Update to latest stable versions
 - Re-test all skills
-- Update "Last Verified" dates
+- Update `metadata.last_verified` dates
 
 **When Package Updates**:
-- Check breaking changes in changelog
-- Update skill templates
-- Test thoroughly
-- Document migration if needed
+1. Review `VERSIONS_REPORT.md` for breaking changes
+2. Check breaking changes in changelogs
+3. Update `templates/package.json` files
+4. Update version references in `SKILL.md`
+5. Test thoroughly in example projects
+6. Document migration if needed
+7. Commit with detailed changelog
 
 **When Standards Change**:
 - Review official Anthropic skills repo
