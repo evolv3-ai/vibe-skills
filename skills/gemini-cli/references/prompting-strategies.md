@@ -1,6 +1,6 @@
 # AI-to-AI Prompting Best Practices
 
-All gemini-coach commands use AI-to-AI prompting format (based on systematic testing)
+The Gemini CLI skill uses AI-to-AI prompting format for effective collaboration (based on systematic testing)
 
 ---
 

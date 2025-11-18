@@ -24,8 +24,8 @@ Based on systematic testing (2025-11-08)
 
 **Example**:
 ```bash
-gemini-coach review src/auth.ts
-gemini-coach debug "Error message here"
+cat src/auth.ts | gemini -p "Review this code"
+echo "Error message here" | gemini -p "Help debug this error"
 ```
 
 ---
@@ -48,8 +48,8 @@ gemini-coach debug "Error message here"
 
 **Example**:
 ```bash
-gemini-coach architect "Should I use D1 or KV?" .
-gemini-coach security-scan ./src/api
+gemini -m gemini-2.5-pro -p "Should I use D1 or KV for session storage? Explain trade-offs."
+cat ./src/api/* | gemini -m gemini-2.5-pro -p "Perform a security audit on this code"
 ```
 
 ---
@@ -84,8 +84,8 @@ Model exists in Gemini API but returns 404 error when accessed via CLI. Do not u
 2. For performance-sensitive apps → Consider Flash's perspective
 3. For major architectural choices → Get both viewpoints:
    ```bash
-   gemini-coach quick "Question?"  # Flash
-   GEMINI_MODEL=gemini-2.5-pro gemini-coach architect "Same question" .  # Pro
+   gemini -p "Question?"  # Flash (default)
+   gemini -m gemini-2.5-pro -p "Same question"  # Pro
    ```
 
 ---
@@ -122,12 +122,12 @@ Based on testing with same question ("D1 vs KV for sessions"):
 
 ```bash
 # Use Pro for single command
-GEMINI_MODEL=gemini-2.5-pro gemini-coach review src/auth.ts
+gemini -m gemini-2.5-pro -p "Review this code" < src/auth.ts
 
-# Use Pro for all commands in session
+# Or set as environment variable for all commands in session
 export GEMINI_MODEL=gemini-2.5-pro
-gemini-coach review src/auth.ts
-gemini-coach architect "Question" .
+gemini -p "Review this code" < src/auth.ts
+gemini -p "Architecture question here"
 ```
 
 ---
