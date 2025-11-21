@@ -1,7 +1,9 @@
 ---
 name: cloudflare-agents
 description: |
-  Build AI agents on Workers + Durable Objects. CRITICAL: Explains Agents SDK (infrastructure) vs AI SDK (simpler). Use when: deciding SDK choice, building WebSocket agents with state, RAG with Vectorize, MCP servers, multi-agent orchestration, or troubleshooting "Agent class must extend", "new_sqlite_classes", binding errors.
+  Build AI agents with Cloudflare Agents SDK on Workers + Durable Objects. Includes critical guidance on choosing between Agents SDK (infrastructure/state) vs AI SDK (simpler flows).
+
+  Use when: deciding SDK choice, building WebSocket agents with state, RAG with Vectorize, MCP servers, multi-agent orchestration, or troubleshooting "Agent class must extend", "new_sqlite_classes", binding errors.
 license: MIT
 metadata:
   keywords:

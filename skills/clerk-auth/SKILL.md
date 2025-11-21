@@ -1,7 +1,9 @@
 ---
 name: clerk-auth
 description: |
-  Add Clerk authentication to React, Next.js, Cloudflare Workers with JWT templates, protected routes, shadcn/ui integration. Use when: setting up auth, custom JWT claims, middleware, E2E testing, or troubleshooting "Missing Clerk Secret Key", JWKS errors, Core 2 migration, authorizedParties.
+  Add Clerk authentication to React, Next.js, and Cloudflare Workers. Features: JWT templates, protected routes, shadcn/ui integration, E2E testing support.
+
+  Use when: setting up auth, configuring custom JWT claims/middleware, or troubleshooting "Missing Clerk Secret Key", JWKS errors, Core 2 migration, authorizedParties issues.
 license: MIT
 metadata:
   keywords:
