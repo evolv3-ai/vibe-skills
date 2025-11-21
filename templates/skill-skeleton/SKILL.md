@@ -1,12 +1,14 @@
 ---
 name: [TODO: lowercase-hyphen-case-name]
 description: |
-  [TODO: Write comprehensive description in third-person. Start with "This skill provides..." or "This skill should be used when..."]
+  [TODO: Action verb + what you build with technology. 250-350 chars total. Example: "Build type-safe APIs with Hono - fast routing for Cloudflare Workers. Includes middleware, validation (Zod), and RPC with full type inference."]
 
-  [TODO: Add "Use when" scenarios - specific situations where Claude should use this skill]
+  Use when: [TODO: 3-5 specific scenarios], or troubleshooting [TODO: 2-3 distinctive errors].
 
-  [TODO: Add keywords - technologies, use cases, error messages that should trigger this skill]
+  [GUIDELINES: Active voice (NOT "This skill provides..."). Two-paragraph format. Cap features at 5 max. Preserve USPs. No meta-commentary. See planning/claude-code-skill-standards.md "Description Optimization Guidelines"]
 license: MIT
+metadata:
+  keywords: [TODO: technology-name, use-case, error-keyword]
 ---
 
 # [TODO: Skill Display Name]
