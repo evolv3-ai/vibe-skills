@@ -1,17 +1,11 @@
 ---
 name: ai-sdk-ui
 description: |
-  Frontend React hooks for AI-powered chat interfaces, completions, and streaming UIs with Vercel AI SDK v5.
-  Includes useChat, useCompletion, and useObject hooks for building interactive AI applications.
+  Build React chat interfaces and AI-powered UIs with Vercel AI SDK v5. Provides useChat, useCompletion,
+  and useObject hooks for streaming responses, managing conversation state, and handling file attachments.
 
-  Use when: building React chat interfaces, implementing AI completions in UI, streaming AI responses to frontend,
-  handling chat message state, building Next.js AI apps, managing file attachments with AI, or encountering
-  errors like "useChat failed to parse stream", "useChat no response", unclosed streams, or streaming issues.
-
-  Keywords: ai sdk ui, useChat hook, useCompletion hook, useObject hook, react ai chat, ai chat interface,
-  streaming ai ui, nextjs ai chat, vercel ai ui, react streaming, ai sdk react, chat message state,
-  ai file attachments, message persistence, useChat error, streaming failed ui, parse stream error,
-  useChat no response, react ai hooks, nextjs app router ai, nextjs pages router ai
+  Use when: implementing chat interfaces, streaming AI completions, managing message state in Next.js apps,
+  or troubleshooting "useChat failed to parse stream" or "useChat no response" errors.
 license: MIT
 metadata:
   version: 1.0.1
@@ -19,6 +13,31 @@ metadata:
   ai_sdk_version: 5.0.95+
   breaking_changes: false
   production_tested: true
+  keywords:
+    - ai sdk ui
+    - vercel ai sdk ui
+    - useChat hook
+    - useCompletion hook
+    - useObject hook
+    - react ai chat
+    - ai chat interface
+    - streaming ai ui
+    - nextjs ai chat
+    - react streaming
+    - ai sdk react
+    - chat message state
+    - ai file attachments
+    - message persistence
+    - useChat error
+    - streaming failed ui
+    - parse stream error
+    - useChat no response
+    - react ai hooks
+    - nextjs app router ai
+    - nextjs pages router ai
+    - ai chat component
+    - streaming response react
+    - react ai completion
 ---
 
 # AI SDK UI - Frontend React Hooks
