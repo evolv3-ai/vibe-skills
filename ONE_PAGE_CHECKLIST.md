@@ -44,6 +44,17 @@ Research completed before building:
 - [ ] **description**: Includes "Use when" scenarios
 - [ ] **description**: Includes keywords (technologies, use cases, error messages)
 - [ ] **license**: Present (e.g., `MIT` or `Complete terms in LICENSE.txt`)
+
+**Description Quality:**
+- [ ] Target: 250-350 chars (sweet spot for detail vs brevity)
+- [ ] Structure: Action verb opening + "Use when:" section
+- [ ] Two-paragraph format if complex (warnings, USPs)
+- [ ] No passive voice ("This skill provides...")
+- [ ] No meta-commentary ("INCLUDES CRITICAL...")
+- [ ] Keywords moved to metadata.keywords (not inline)
+- [ ] Readable aloud without running out of breath
+- [ ] Preserves unique selling points ("only", "official")
+- [ ] Critical warnings naturalized (not "CRITICAL:")
 - [ ] **allowed-tools** (optional): Included if pre-approving tools
 - [ ] **metadata** (optional): Used if custom fields needed
 

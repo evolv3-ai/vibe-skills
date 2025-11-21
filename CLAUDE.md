@@ -46,6 +46,7 @@ This repo aligns with **official Anthropic standards**:
 claude-skills/
 ├── START_HERE.md                 # ← Read this first!
 ├── CLAUDE.md                     # ← You are here
+├── GEMINI_GUIDE.md               # AI agent onboarding guide
 ├── ONE_PAGE_CHECKLIST.md         # Quick verification
 ├── QUICK_WORKFLOW.md             # 5-minute skill creation
 ├── README.md                     # Public-facing overview
@@ -233,9 +234,36 @@ git add skills/my-skill/.claude-plugin/ && git commit -m "Add marketplace manife
 - See [planning/STANDARDS_COMPARISON.md](planning/STANDARDS_COMPARISON.md)
 
 ### 4. Progressive Disclosure
-- **Metadata** (name + description): Always in context (~100 words)
+- **Metadata** (name + description): Always in context (target: 250-350 chars, ~40-55 tokens)
 - **SKILL.md body**: Loaded when skill triggers (<5k words)
 - **Bundled resources**: Loaded as needed by Claude
+
+#### Description Best Practices
+
+After optimizing 20+ skills, these patterns work best:
+
+**Length:** 250-350 characters is the sweet spot
+- Below 200: Often too terse, loses context
+- 200-400: Target range
+- Above 400: Usually has redundancy to trim
+
+**Structure:** Two-paragraph format for clarity
+- Paragraph 1: What you can build + key features
+- Paragraph 2: When to use + error keywords
+
+**Discoverability:** Balance specificity with brevity
+- Include technology names explicitly
+- Preserve unique selling points
+- Add 2-3 distinctive error keywords
+- Move comprehensive keywords to metadata.keywords
+
+**Avoid:**
+- Dense comma-separated lists
+- Passive voice constructions
+- Meta-commentary about the skill
+- Over-compression that hurts readability
+
+**Examples:** See ai-sdk-core, auto-animate, cloudflare-mcp-server
 
 ---
 

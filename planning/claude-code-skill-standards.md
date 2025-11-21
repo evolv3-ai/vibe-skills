@@ -223,9 +223,71 @@ description: |
 
 ---
 
-## Best Practices
+## Description Optimization Guidelines
 
-### Description Field
+After optimizing 20+ production skills, these patterns consistently deliver the best results:
+
+### Target Metrics
+
+- **Length**: 250-350 characters (sweet spot, not strict 200 minimum)
+- **Structure**: Two-paragraph format for complex skills
+- **Token efficiency**: 60-80% reduction typical
+
+### Proven Pattern
+
+```yaml
+description: |
+  [Action verb] [what you build] with [technology]. [Key features/USP in one sentence].
+
+  Use when: [3-5 specific scenarios], or troubleshooting [2-3 distinctive errors].
+```
+
+### What to Remove
+
+- Passive voice ("This skill provides...", "Should be used when...")
+- Inline keywords (move to metadata.keywords)
+- Exhaustive feature lists (keep 3-5 key ones)
+- Error count enumerations ("Prevents 13 errors including...")
+- Meta-commentary ("INCLUDES CRITICAL GUIDANCE:")
+
+### What to Preserve
+
+- Core technology names
+- Unique selling points ("only platform", "official support")
+- Critical architectural warnings (naturalize them)
+- Distinctive error keywords (2-3 most common)
+- Framework/language specificity
+
+### Two-Paragraph Format (for complex skills)
+
+```yaml
+description: |
+  [Main description with features/capabilities].
+
+  [Critical warning OR unique selling point].
+
+  Use when: [scenarios and errors].
+```
+
+### Quality Criteria
+
+- Can read aloud without running out of breath
+- No comma-heavy run-on lists
+- Proper sentence structure and punctuation
+- Keywords discoverable but not overwhelming
+
+### Examples to Reference
+
+- ✅ **Good**: ai-sdk-core, auto-animate, cloudflare-d1
+- ⚠️ **Revised**: clerk-auth (was too compressed), cloudflare-agents (warning naturalized)
+
+### Before/After Example
+
+❌ **Bad**:
+```yaml
+description: "Cloudflare Workers skill"
+```
+
 ✅ **Good**:
 ```yaml
 description: |
@@ -233,14 +295,9 @@ description: |
 
   Use when: creating new CF Workers projects, adding Vite to existing Workers,
   or encountering "Static Assets 404" errors.
-
-  Keywords: Cloudflare Workers, CF Workers, Hono, wrangler, Vite, Static Assets
 ```
 
-❌ **Bad**:
-```yaml
-description: "Cloudflare Workers skill"
-```
+## Best Practices
 
 ### Instructions
 ✅ **Good**: Step-by-step with code examples
