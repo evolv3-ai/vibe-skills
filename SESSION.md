@@ -750,6 +750,133 @@ issues, or updating to latest models.
 
 ---
 
+## AI SDK UI Skill Audit ✅
+
+**Analysis Date**: 2025-11-22
+**Skill Size**: 1,075 lines (~3,580 tokens)
+**Status**: **COMPLETE** - Trimmed to 510 lines (~1,700 tokens)
+**Actual Savings**: **53%** (~1,880 tokens)
+
+### Research Phase Findings ✅
+
+**AI SDK UI Updates (Post-Dec 2024):**
+1. **AI SDK 6 Beta** (Nov 2025) - **MISSING from skill!**
+   - Latest: ai@6.0.0-beta.108 (Nov 22, 2025)
+   - Stable: ai@5.0.99 (skill showed 5.0.95 - outdated)
+   - Minimal breaking changes from v5 → v6
+   - New UI features:
+     - Agent integration: Type-safe messaging with `InferAgentUIMessage<typeof agent>`
+     - Tool approval workflows: Human-in-the-loop with `addToolApprovalResponse`
+     - Auto-submit capability: `sendAutomaticallyWhen` conditions
+     - Structured output in chat: Previously only in separate hooks
+
+2. **useAssistant Hook** - **NOT IN SKILL!**
+   - Facilitates OpenAI-compatible assistant APIs
+   - Manages UI state with automatic streaming updates
+   - Part of core AI SDK UI hooks alongside useChat, useCompletion, useObject
+
+3. **New Return Values in v5**
+   - `status` parameter (replaces `isLoading`)
+   - `regenerate()` with options
+   - `resumeStream()` for interrupted responses
+   - `clearError()` for error handling
+
+**Research Sources:**
+- AI SDK 6 Beta: https://v6.ai-sdk.dev/docs/announcing-ai-sdk-6-beta
+- npm view ai@latest: 5.0.99 (Nov 2025)
+- npm view ai@beta: 6.0.0-beta.108 (Nov 22, 2025)
+- Official docs: https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-chat
+- Official docs: https://ai-sdk.dev/docs/reference/ai-sdk-ui/use-assistant
+
+### Content Removed (~565 lines)
+
+**Basic Examples** (~470 lines):
+- ✅ useChat basic usage example (well-documented elsewhere)
+- ✅ useCompletion basic usage (standard pattern)
+- ✅ useObject basic usage (standard pattern)
+- ✅ Tool calling UI rendering (generic pattern)
+- ✅ File attachments example (standard implementation)
+- ✅ Message persistence localStorage pattern
+- ✅ Full Next.js App Router example
+- ✅ Full Next.js Pages Router example
+
+**Verbose API References** (~95 lines):
+- ✅ useChat full API reference (duplicates official docs)
+- ✅ useCompletion API reference (duplicates official docs)
+- ✅ useObject API reference (duplicates official docs)
+
+**Why Removed**: All pre-Jan 2025 content well-covered by LLM training + official docs
+
+### Content Retained (100%)
+
+**Knowledge Gaps:**
+- ✅ **AI SDK 6 Beta** (~100 lines) - Agent integration, tool approval, auto-submit, structured output in chat
+- ✅ **useAssistant Hook** (~50 lines) - OpenAI assistant integration with UI state management
+- ✅ **v4→v5 Migration** (~35 lines) - Breaking changes (input state removed, append→sendMessage, onResponse→onFinish, maxSteps removed, isLoading→status)
+
+**Error Prevention:**
+- ✅ **Top UI Errors** (~87 lines) - 12 errors with exact error messages + solutions
+  - Error 1: useChat failed to parse stream (SyntaxError)
+  - Error 2: useChat no response (incorrect streaming)
+  - Error 3: Streaming not working when deployed
+  - Error 4: Stale body values (body captured at first render)
+  - Error 5: React maximum update depth (infinite useEffect loop)
+  - Plus 7 more errors with solutions
+  - Reference: references/top-ui-errors.md (12 total)
+
+**Best Practices:**
+- ✅ **Streaming Best Practices** (~40 lines) - Performance patterns, UX patterns
+
+**Other:**
+- ✅ **When to Use / Package Versions / Links / Templates** (~90 lines)
+
+### Updated Description
+
+**Before** (172 chars):
+```
+Build React chat interfaces and AI-powered UIs with Vercel AI SDK v5. Provides useChat, useCompletion,
+and useObject hooks for streaming responses, managing conversation state, and handling file attachments.
+
+Use when: implementing chat interfaces, streaming AI completions, managing message state in Next.js apps,
+or troubleshooting "useChat failed to parse stream" or "useChat no response" errors.
+```
+
+**After** (249 chars):
+```
+Build React chat interfaces with Vercel AI SDK v5/v6. Covers v6 beta (agent integration, tool approval,
+auto-submit), v4→v5 migration (breaking changes), useChat/useCompletion/useObject/useAssistant hooks,
+and 12 UI error solutions (stream parsing, stale body values, React update depth).
+
+Use when: implementing AI SDK v5/v6 chat UIs, migrating v4→v5, troubleshooting "useChat failed to parse
+stream", "useChat no response", or "stale body values" errors, or integrating OpenAI assistants.
+```
+
+### Metadata Updates
+
+- **Version:** 1.0.1 → 1.1.0
+- **Last verified:** 2025-11-19 → 2025-11-22
+- **AI SDK:** 5.0.95+ → 5.0.99 stable / 6.0.0-beta.108
+- **Breaking changes:** false → true (v4→v5 migration guide included)
+- **Keywords added:** ai sdk v6 beta, ai sdk 6, agent integration, tool approval workflow, human in the loop ui, useAssistant hook, openai assistant ui, stale body values, react maximum update depth
+
+### Key Learnings
+
+**Skill now exclusively focuses on:**
+1. AI SDK 6 Beta UI features (agent integration, tool approval, auto-submit, structured output)
+2. useAssistant hook for OpenAI assistants
+3. v4→v5 migration breaking changes
+4. 12 UI errors with exact error messages + solutions
+5. Streaming best practices (performance + UX)
+
+**All basics removed** - users can reference official AI SDK docs for usage patterns.
+
+**Before**: 1,075 lines (~3,580 tokens)
+**After**: 510 lines (~1,700 tokens)
+**Removed**: 565 lines (~1,880 tokens)
+**Savings**: **53%**
+
+---
+
 ## Phase 2 Summary So Far
 
 **Skills Completed:**
@@ -757,18 +884,19 @@ issues, or updating to latest models.
 2. ✅ cloudflare-vectorize (613→387 lines, 37% reduction, V2 knowledge gaps added)
 3. ✅ nextjs (2,414→1,383 lines, 43% reduction)
 4. ✅ ai-sdk-core (1,850→849 lines, 54% reduction, AI SDK 6 beta added)
+5. ✅ ai-sdk-ui (1,075→510 lines, 53% reduction, AI SDK 6 beta UI features + useAssistant added)
 
 **Documents Created:**
 1. ✅ KNOWLEDGE_GAP_AUDIT_CHECKLIST.md (comprehensive 12-step process)
 
 **Cumulative Impact:**
-- Skills audited: 4 of 59 (7%)
-- Lines removed: ~2,261 lines
-- Tokens saved: ~7,530 tokens per invocation (across these 4 skills)
-- Average reduction: 45% (excluding new skill)
-- Annual savings (5 uses/month): ~452,000 tokens across these 4 skills
+- Skills audited: 5 of 59 (8%)
+- Lines removed: ~2,826 lines
+- Tokens saved: ~9,410 tokens per invocation (across these 5 skills)
+- Average reduction: 47% (excluding new skill)
+- Annual savings (5 uses/month): ~565,000 tokens across these 5 skills
 
-**Next:** Continue A-Z systematic audit (next: ai-sdk-ui)
+**Next:** Continue A-Z systematic audit (next: auto-animate)
 
 ---
 
@@ -783,12 +911,14 @@ issues, or updating to latest models.
 6. ✅ Created KNOWLEDGE_GAP_AUDIT_CHECKLIST.md
 7. ✅ Audited ai-sdk-core (research phase + trim)
 8. ✅ Trimmed ai-sdk-core (849 lines, 54% reduction, AI SDK 6 beta added)
+9. ✅ Audited ai-sdk-ui (research phase + trim)
+10. ✅ Trimmed ai-sdk-ui (510 lines, 53% reduction, AI SDK 6 beta UI + useAssistant added)
 
 **Next Session:**
-1. Continue A-Z systematic audit (next: ai-sdk-ui)
+1. Continue A-Z systematic audit (next: auto-animate)
 2. Follow KNOWLEDGE_GAP_AUDIT_CHECKLIST.md process
 3. Research → Audit → Trim → Commit (one skill per session)
-4. Pattern validated: ~45% average reduction possible
+4. Pattern validated: ~47% average reduction possible (excluding new skill)
 
 **Long Term:**
 - Audit remaining 55 skills alphabetically
@@ -801,7 +931,7 @@ issues, or updating to latest models.
 ## Last Checkpoint
 
 **Date**: 2025-11-22
-**Commit**: 44336e0
-**Message**: "refactor(ai-sdk-core): Knowledge-gap audit - Add AI SDK 6 beta, latest models (GPT-5, Claude 4)"
+**Commit**: 2c5d591
+**Message**: "refactor(ai-sdk-ui): Knowledge-gap audit - Add AI SDK 6 beta, useAssistant hook, trim basics"
 
-**Status**: Phase 2 in progress - 4 skills complete (ai-sdk-core 54%, vectorize 37%, nextjs 43%, react-native-expo NEW), audit process documented, A-Z systematic audits in progress
+**Status**: Phase 2 in progress - 5 skills complete (ai-sdk-ui 53%, ai-sdk-core 54%, vectorize 37%, nextjs 43%, react-native-expo NEW), audit process documented, A-Z systematic audits in progress
