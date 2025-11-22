@@ -1,6 +1,6 @@
 {
   "name": "openai-api",
-  "description": "Complete guide for OpenAIs traditional/stateless APIs: Chat Completions (GPT-5, GPT-4o), Embeddings, Images (DALL-E 3), Audio (Whisper + TTS), and Moderation. Includes both Node.js SDK and fetch-based approaches for maximum compatibility. Use when: integrating OpenAI APIs, implementing chat completions with GPT-5/GPT-4o, generating text with streaming, using function calling/tools, creating structured outputs with JSON schemas, implementing embeddings for RAG, generating images with DALL-E 3, tr",
+  "description": "Build with OpenAIs stateless APIs - Chat Completions (GPT-5, GPT-4o), Embeddings, Images (DALL-E 3), Audio (Whisper + TTS), and Moderation. Includes Node.js SDK and fetch-based approaches for Cloudflare Workers. Use when: implementing chat completions with GPT-5/GPT-4o, streaming responses with SSE, using function calling/tools, creating structured outputs with JSON schemas, generating embeddings for RAG (text-embedding-3-small/large), generating images with DALL-E 3, editing images with GPT-Ima",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": ["openai api","chat completions","gpt-5","gpt-5-mini","gpt-5-nano","gpt-4o","gpt-4-turbo","openai sdk","openai streaming","function calling","structured output","json schema","openai embeddings","text-embedding-3","dall-e-3"]
+  "keywords": []
 }

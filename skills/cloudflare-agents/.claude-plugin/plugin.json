@@ -1,6 +1,6 @@
 {
   "name": "cloudflare-agents",
-  "description": "Comprehensive guide for the Cloudflare Agents SDK - build AI-powered autonomous agents on Workers + Durable Objects. INCLUDES CRITICAL ARCHITECTURAL GUIDANCE: explains when to use Agents SDK vs when to just use AI SDK (simpler), what Agents SDK provides (infrastructure, NOT AI), and how to combine with Vercel AI SDK or Workers AI. Use when: deciding if you need Agents SDK infrastructure, building AI agents with WebSockets + state, creating stateful agents with Durable Objects, implementing chat ",
+  "description": "Build AI agents with Cloudflare Agents SDK on Workers + Durable Objects. Includes critical guidance on choosing between Agents SDK (infrastructure/state) vs AI SDK (simpler flows). Use when: deciding SDK choice, building WebSocket agents with state, RAG with Vectorize, MCP servers, multi-agent orchestration, or troubleshooting Agent class must extend, new_sqlite_classes, binding errors.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": ["Cloudflare Agents","agents sdk","cloudflare agents sdk","Agent class","Durable Objects agents","stateful agents","WebSocket agents","this.setState","this.sql","this.schedule","schedule tasks","cron agents","run workflows","agent workflows","browse web"]
+  "keywords": []
 }

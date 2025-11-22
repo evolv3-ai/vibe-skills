@@ -1,6 +1,6 @@
 {
   "name": "cloudflare-kv",
-  "description": "Complete knowledge domain for Cloudflare Workers KV - global, low-latency key-value storage on Cloudflares edge network. Use when: creating KV namespaces, storing configuration data, caching API responses, managing user preferences, implementing TTL expiration, handling KV metadata, or encountering KV_ERROR, 429 too many requests, kv rate limit, cacheTtl errors, or eventual consistency issues.",
+  "description": "Store key-value data globally with Cloudflare KVs edge network. Use when: caching API responses, storing configuration, managing user preferences, handling TTL expiration, or troubleshooting KV_ERROR, 429 rate limits, eventual consistency, or cacheTtl errors.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": ["kv storage","cloudflare kv","workers kv","kv namespace","kv bindings","kv cache","kv ttl","kv metadata","kv list","kv pagination","cache optimization","edge caching","KV_ERROR","429 too many requests","kv rate limit"]
+  "keywords": []
 }

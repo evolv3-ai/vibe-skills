@@ -1,6 +1,6 @@
 {
   "name": "tailwind-v4-shadcn",
-  "description": "Production-tested setup for Tailwind CSS v4 with shadcn/ui, Vite, and React. Use when: initializing React projects with Tailwind v4, setting up shadcn/ui, implementing dark mode, debugging CSS variable issues, fixing theme switching, migrating from Tailwind v3, or encountering color/theming problems. Covers: @theme inline pattern, CSS variable architecture, dark mode with ThemeProvider, component composition, vite.config setup, common v4 gotchas, and production-tested patterns.",
+  "description": "Set up Tailwind v4 with shadcn/ui using @theme inline pattern and CSS variable architecture. Four-step mandatory pattern: define CSS variables at root, map to Tailwind utilities, apply base styles, get automatic dark mode. Use when: initializing React projects with Tailwind v4, setting up shadcn/ui dark mode, or fixing colors not working, theme not applying, CSS variables broken, tw-animate-css errors, or migrating from v3.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": ["Tailwind v4","shadcn/ui","@tailwindcss/vite","@theme inline","dark mode","CSS variables","hsl() wrapper","components.json","React theming","theme switching","colors not working","variables broken","theme not applying","@plugin directive","typography plugin"]
+  "keywords": []
 }

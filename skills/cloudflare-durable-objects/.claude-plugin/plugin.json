@@ -1,6 +1,6 @@
 {
   "name": "cloudflare-durable-objects",
-  "description": "Comprehensive guide for Cloudflare Durable Objects - globally unique, stateful objects for coordination, real-time communication, and persistent state management. Use when: building real-time applications, creating WebSocket servers with hibernation, implementing chat rooms or multiplayer games, coordinating between multiple clients, managing per-user or per-room state, implementing rate limiting or session management, scheduling tasks with alarms, building queues or workflows, or encountering d",
+  "description": "Build stateful Durable Objects for real-time apps, WebSocket servers, coordination, and persistent state. Use when: implementing chat rooms, multiplayer games, rate limiting, session management, WebSocket hibernation, or troubleshooting class export, migration, WebSocket state loss, or binding errors.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": ["durable objects","cloudflare do","DurableObject class","do bindings","websocket hibernation","do state api","ctx.storage.sql","ctx.acceptWebSocket","webSocketMessage","alarm() handler","storage.setAlarm","idFromName","newUniqueId","getByName","DurableObjectStub"]
+  "keywords": []
 }

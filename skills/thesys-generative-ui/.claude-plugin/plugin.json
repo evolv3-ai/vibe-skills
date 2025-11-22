@@ -1,6 +1,6 @@
 {
   "name": "thesys-generative-ui",
-  "description": "Production-ready skill for integrating TheSys C1 Generative UI API into React applications. This skill should be used when building AI-powered interfaces that stream interactive components (forms, charts, tables) instead of plain text responses. Covers complete integration patterns for Vite+React, Next.js, and Cloudflare Workers with OpenAI, Anthropic Claude, and Cloudflare Workers AI. Includes tool calling with Zod schemas, theming, thread management, and production deployment. Prevents 12+ com",
+  "description": "Integrate TheSys C1 Generative UI API to stream interactive React components (forms, charts, tables) from LLM responses. Supports Vite+React, Next.js, and Cloudflare Workers with OpenAI, Anthropic Claude, and Workers AI. Use when building conversational UIs, AI assistants with rich interactions, or troubleshooting empty responses, theme application failures, streaming issues, or tool calling errors.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": ["TheSys C1","TheSys Generative UI","@thesysai/genui-sdk","generative UI","AI UI","streaming UI components","interactive components","AI forms","AI charts","AI tables","conversational UI","AI assistants UI","React generative UI","Vite generative UI","Next.js generative UI"]
+  "keywords": []
 }

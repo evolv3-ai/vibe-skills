@@ -1,6 +1,6 @@
 {
   "name": "ai-sdk-core",
-  "description": "Backend AI functionality with Vercel AI SDK v5 - text generation, structured output with Zod, tool calling, and agents. Multi-provider support for OpenAI, Anthropic, Google, and Cloudflare Workers AI. Use when: implementing server-side AI features, generating text/chat completions, creating structured AI outputs with Zod schemas, building AI agents with tools, streaming AI responses, integrating OpenAI/Anthropic/Google/Cloudflare providers, or encountering AI SDK errors like AI_APICallError, AI_",
+  "description": "Build backend AI features with Vercel AI SDK v5: text generation, structured output (Zod schemas), tool calling, and agents. Multi-provider support (OpenAI, Anthropic, Google, Cloudflare). Use when: implementing server-side AI, generating text/structured data, building AI agents, streaming responses, or troubleshooting AI_APICallError, AI_NoObjectGeneratedError.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": ["ai sdk core","vercel ai sdk","generateText","streamText","generateObject","streamObject","ai sdk node","ai sdk server","zod ai schema","ai tools calling","ai agent class","openai sdk","anthropic sdk","google gemini sdk","workers-ai-provider"]
+  "keywords": []
 }

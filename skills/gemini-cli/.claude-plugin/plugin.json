@@ -1,6 +1,6 @@
 {
   "name": "gemini-cli",
-  "description": "Use Google Gemini CLI directly from Claude Code for second opinions, architectural advice, debugging help, code reviews, and security audits. Leverage Geminis 1M+ context window for comprehensive code analysis using the official gemini command-line tool. Use when: Need second opinion on architectural decisions, stuck debugging after 2+ attempts, writing security-sensitive code (auth, payments, data handling), planning large refactors (5+ files), approaching 70%+ context capacity, unfamiliar with",
+  "description": "Consult Google Gemini CLI for second opinions on architecture, debugging, and security audits. Use Geminis 1M+ context window for comprehensive code analysis. Compare Flash (fast) vs Pro (thorough) vs 3-Pro-Preview (cutting-edge). Use when: need second opinion on architectural decisions, stuck debugging after 2+ attempts, writing security- sensitive code, planning refactors (5+ files), approaching 70%+ context capacity, unfamiliar with tech stack, need peer review, or want Flash vs Pro vs 3-Pro-",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",

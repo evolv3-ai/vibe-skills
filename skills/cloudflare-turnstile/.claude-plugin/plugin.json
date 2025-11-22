@@ -1,6 +1,6 @@
 {
   "name": "cloudflare-turnstile",
-  "description": "This skill provides comprehensive knowledge for implementing Cloudflare Turnstile, the CAPTCHA-alternative bot protection system. It should be used when integrating bot protection into forms, login pages, signup flows, or any user-facing feature requiring spam/bot prevention. Turnstile runs invisible challenges in the background, maintaining excellent user experience while blocking automated traffic. Use when: Adding bot protection to forms, implementing login security, protecting API endpoints ",
+  "description": "Add bot protection with Turnstile (CAPTCHA alternative). Use when: protecting forms, securing login/signup, preventing spam, migrating from reCAPTCHA, integrating with React/Next.js/Hono, implementing E2E tests, or debugging CSP errors, token validation failures, or error codes 100*/300*/600*.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": ["turnstile","captcha","bot protection","cloudflare challenge","siteverify","recaptcha alternative","spam prevention","form protection","cf-turnstile","turnstile widget","token validation","managed challenge","invisible challenge","@marsidev/react-turnstile","hono turnstile"]
+  "keywords": []
 }

@@ -163,17 +163,334 @@ None - all quality issues resolved
 
 ---
 
-## Next Phase
+---
 
-**Phase 1 is now complete.** All 58 skills have been optimized for token efficiency.
+## Phase 2: Knowledge-Gap-Focused Skills & Content Audit 🔄
 
-**Recommended next steps** (not started):
-1. Monitor skill discoverability after deployment
-2. Gather user feedback on description effectiveness
-3. Re-verify skills quarterly (check for package updates, API changes)
-4. Apply learnings to new skills as they're added
+**Status**: In Progress
+**Started**: 2025-11-22
+**Focus**: Remove "obvious knowledge" from skills, keep only knowledge gaps (post-Jan 2025) and error prevention
 
-**Maintenance**:
-- Review skill descriptions when major package updates occur
-- Update if discovery issues reported
-- Keep within 250-350 char guideline for all new skills
+### Objective
+
+With LLM knowledge cutoff at January 2025, optimize skills to contain ONLY:
+1. **Knowledge Gaps** - Information from Dec 2024 onward (not in LLM training)
+2. **Error Prevention** - Exact error messages with solutions (prevents trial-and-error)
+
+Remove "obvious knowledge" that LLMs with Jan 2025 cutoff already know.
+
+### Progress
+
+**✅ Completed:**
+1. Created `react-native-expo` skill (59th skill) - **Knowledge-gap-focused from the start**
+   - Only covers React Native 0.76-0.82+ updates (Oct 2024 - Oct 2025)
+   - Only covers React 19 changes (Dec 2024+)
+   - Only covers Expo SDK 52+ changes
+   - Total: ~3,500 lines, all knowledge-gap content
+   - Token efficiency: ~80% (15k → 3k tokens)
+   - Errors prevented: 12 documented issues
+
+**🔍 In Progress:**
+2. Audited `nextjs` skill for "obvious knowledge" removal
+   - **Current:** 2,414 lines (~8,000 tokens)
+   - **After trim:** ~1,244 lines (~4,100 tokens)
+   - **Token savings:** ~48% additional reduction
+   - **See detailed findings below**
+
+**⏸️ Pending:**
+3. Apply learnings to remaining 57 skills
+4. Document content audit process
+5. Update skill creation guidelines
+
+---
+
+## Next.js Skill Audit - Detailed Findings
+
+**Analysis Date**: 2025-11-22
+**Current Size**: 2,414 lines (~8,000 tokens)
+**Target Size**: ~1,244 lines (~4,100 tokens)
+**Estimated Savings**: ~48% (3,900 tokens)
+
+### Content Categorization
+
+#### ✅ KEEP (Knowledge Gaps - Post-Dec 2024)
+
+**1. Next.js 16 Breaking Changes (266 lines)** - **100% KEEP**
+- **Released:** October 2025 (pure knowledge gap)
+- Async route parameters (breaking change)
+- Middleware → Proxy migration
+- Parallel routes require default.js
+- Removed features (AMP, lint, PPR flag)
+- Node.js 20.9+ requirement
+- Image defaults changed
+- **Value:** Critical migration info not in LLM training
+
+**2. Cache Components & Caching APIs (268 lines)** - **100% KEEP**
+- **New in:** Next.js 16 (October 2025)
+- `"use cache"` directive (NEW)
+- `revalidateTag()` breaking change (requires 2nd arg)
+- `updateTag()` NEW API (read-your-writes)
+- `refresh()` NEW API
+- Partial Prerendering with opt-in caching
+- **Value:** Complete API redesign, pure knowledge gap
+
+**3. React 19.2 Features (117 lines)** - **100% KEEP**
+- **Released:** December 2024 (knowledge gap)
+- View Transitions
+- `useEffectEvent()` experimental
+- React Compiler stable
+- **Value:** New APIs not in training data
+
+**4. Turbopack Stable (30 lines estimate)** - **KEEP**
+- **New in:** Next.js 16 (stable, default bundler)
+- Performance metrics (2-5× faster builds)
+- How to enable/disable
+- **Value:** Major change from Webpack default
+
+**5. Proxy vs Middleware (60 lines)** - **100% KEEP**
+- **Breaking in:** Next.js 16
+- Migration guide (middleware.ts → proxy.ts)
+- Runtime differences
+- **Value:** Breaking change migration
+
+**6. Common Errors & Solutions (391 lines)** - **100% KEEP**
+- **Value Type:** Error prevention (not knowledge gap)
+- 18 documented errors with exact messages
+- Next.js 16-specific errors
+- Prevents trial-and-error debugging
+- **Value:** High-impact troubleshooting
+
+**Total KEEP:** ~1,132 lines of knowledge gaps + error prevention
+
+---
+
+#### ❌ REMOVE (Obvious Knowledge - Pre-Jan 2025)
+
+**1. Server Components Basics (~200 lines)** - **REMOVE**
+- **Established:** Next.js 13 (November 2022)
+- What Server Components are
+- Basic async/await patterns
+- Data fetching basics
+- Streaming with Suspense
+- Server vs Client component rules
+- **Verdict:** LLMs know this cold (3+ years old)
+
+**2. Server Actions Basics (~235 lines)** - **REMOVE**
+- **Established:** Next.js 13.4 (May 2023)
+- What Server Actions are
+- Basic form handling
+- `useFormStatus` (React 18)
+- Error handling patterns
+- Optimistic updates patterns
+- **Verdict:** Well-established patterns (1.5+ years)
+
+**3. Route Handlers (~130 lines, trim to ~50)** - **REMOVE 80%**
+- **Established:** Next.js 13 (November 2022)
+- What Route Handlers are
+- Basic CRUD patterns
+- Search params handling
+- Webhook patterns
+- **Keep only:** Async params reminder (Next.js 16 breaking change)
+- **Verdict:** Basics obvious, only new async behavior matters
+
+**4. Metadata API (~100 lines)** - **REMOVE**
+- **Established:** Next.js 13 (November 2022)
+- Static metadata
+- `generateMetadata()`
+- Sitemap generation
+- **Verdict:** Well-documented, LLMs know this
+- **Note:** Image defaults change already covered in breaking changes
+
+**5. Image & Font Optimization (~95 lines)** - **REMOVE**
+- **Established:** next/image (2020), next/font (2022)
+- Basic `next/image` usage
+- Basic `next/font` usage
+- Remote patterns config
+- **Verdict:** Fundamentals well-known
+- **Note:** Image defaults change already in breaking changes section
+
+**6. Parallel Routes & Route Groups (~95 lines, trim to ~25)** - **REMOVE 75%**
+- **Established:** Next.js 13 (November 2022)
+- What parallel routes are
+- What route groups are
+- Basic patterns
+- **Keep only:** default.js requirement (Next.js 16 breaking change)
+- **Verdict:** Concepts established, only breaking change matters
+
+**7. TypeScript Configuration (~65 lines)** - **REMOVE**
+- **Established:** Long-standing TypeScript patterns
+- Strict mode config
+- Path aliases
+- Type-safe routing
+- **Verdict:** General TypeScript knowledge
+
+**8. Performance Patterns (~106 lines, trim to ~30)** - **REMOVE 70%**
+- **Established:** Long-standing Next.js patterns
+- Lazy loading (well-known)
+- Code splitting (automatic)
+- **Keep only:** Turbopack stable in Next.js 16 (already extracted)
+- **Verdict:** Basics obvious
+
+**9. Templates/Resources Listing (~148 lines)** - **CONDENSE to ~40**
+- Verbose template listings
+- **Keep:** Brief reference list only
+- **Remove:** Detailed descriptions (templates are self-documenting)
+
+**Total REMOVE:** ~1,170 lines of obvious/pre-2025 content
+
+---
+
+### Token Impact Summary
+
+| Content Type | Lines | Tokens | Keep/Remove |
+|--------------|-------|--------|-------------|
+| **Knowledge Gaps (Dec 2024+)** | 741 | ~2,450 | ✅ KEEP |
+| **Error Prevention** | 391 | ~1,290 | ✅ KEEP |
+| **Condensed References** | 112 | ~370 | ⚠️ CONDENSE |
+| **Obvious Pre-2025 Content** | 1,170 | ~3,860 | ❌ REMOVE |
+| **TOTALS** | | | |
+| Before | 2,414 | ~8,000 | |
+| After | 1,244 | ~4,110 | |
+| **Savings** | **1,170** | **~3,890** | **48%** |
+
+---
+
+### Revised Next.js Skill Structure (Proposed)
+
+```markdown
+# Next.js 16 App Router (Knowledge-Gap Focused)
+
+## When to Use This Skill
+[Focus on Next.js 16 specific scenarios]
+
+## ✅ Next.js 16 Breaking Changes (KEEP ALL - 266 lines)
+- Async route parameters
+- Middleware → Proxy migration
+- Parallel routes require default.js
+- Removed features (AMP, lint, PPR, etc.)
+- Version requirements (Node 20.9+, React 19.2+)
+- Image defaults changed
+
+## ✅ Cache Components & Caching APIs (KEEP ALL - 268 lines)
+- "use cache" directive (opt-in caching)
+- revalidateTag() updated API (2nd arg required)
+- updateTag() NEW API (immediate refresh)
+- refresh() NEW API (uncached data only)
+- Partial Prerendering patterns
+
+## ✅ Proxy vs Middleware (KEEP ALL - 60 lines)
+- Why the change (Edge → Node.js runtime)
+- Migration guide (middleware.ts → proxy.ts)
+- Pattern differences
+
+## ✅ Parallel Routes Breaking Change (KEEP - 25 lines)
+- default.js now required
+- Why it breaks (soft navigation changes)
+- Migration pattern
+
+## ✅ React 19.2 Features (KEEP ALL - 117 lines)
+- View Transitions
+- useEffectEvent() experimental
+- React Compiler stable
+
+## ✅ Turbopack Stable (KEEP - 30 lines)
+- Now default bundler in Next.js 16
+- Performance improvements (2-5× faster)
+- How to opt-out if needed
+
+## ✅ Common Errors & Solutions (KEEP ALL - 391 lines)
+- 18 documented errors with exact messages
+- Next.js 16-specific troubleshooting
+- Prevents trial-and-error
+
+## ⚠️ Templates Reference (CONDENSE - 40 lines)
+- Brief list with purposes
+- Link to templates/ directory
+
+## ⚠️ Additional Resources (CONDENSE - 40 lines)
+- External documentation links
+- Context7 reference
+```
+
+**New Total:** ~1,244 lines (~4,110 tokens)
+
+---
+
+### Key Insights for Future Audits
+
+**What Defines "Obvious Knowledge":**
+1. **Age:** Established 2+ years ago (pre-2023)
+2. **Stability:** Hasn't changed significantly
+3. **Documentation:** Well-documented in official sources
+4. **LLM Coverage:** Would be in training data before Jan 2025
+
+**What Defines "Knowledge Gap":**
+1. **Timing:** December 2024 or later
+2. **Breaking Changes:** Recent API changes/removals
+3. **New Features:** APIs that didn't exist in training data
+4. **Version-Specific:** Requires knowing exact version behavior
+
+**What Defines "Error Prevention" (Always Keep):**
+1. **Exact Error Messages:** Copy-pasteable error text
+2. **Root Cause:** Why it happens
+3. **Solution:** Specific fix with code
+4. **Source:** Link to GitHub issue/docs
+
+---
+
+### Recommended Audit Process for Other Skills
+
+**Step 1: Identify Knowledge Cutoff Boundary**
+- LLM training cutoff: January 2025
+- Knowledge gap threshold: December 2024 onward
+
+**Step 2: Categorize Content**
+- ✅ Keep: Post-Dec 2024 changes
+- ✅ Keep: Exact error messages with solutions
+- ❌ Remove: Well-established patterns (pre-2023)
+- ❌ Remove: Basic concepts (framework fundamentals)
+- ❌ Remove: General best practices (unless version-specific)
+
+**Step 3: Calculate Impact**
+- Lines removed
+- Token savings
+- Content quality preservation
+
+**Step 4: Document Findings**
+- What was removed and why
+- What was kept and why
+- Token impact
+
+---
+
+## Next Actions
+
+**Immediate (This Session):**
+1. ✅ Created react-native-expo skill (knowledge-gap focused)
+2. ✅ Audited nextjs skill (documented findings above)
+3. ⏸️ Commit plugin manifest updates
+4. ⏸️ Document audit process for future skills
+
+**Next Session:**
+1. Trim nextjs skill based on findings above
+2. Create audit checklist/process document
+3. Identify next 3-5 skills to audit (prioritize by size/age)
+4. Apply audit process systematically
+
+**Long Term:**
+- Audit all 59 skills for obvious content removal
+- Update skill creation guidelines with "knowledge gap test"
+- Establish quarterly review process for skills
+- Target: 50-70% additional token savings across all skills
+
+---
+
+## Last Checkpoint
+
+**Date**: 2025-11-22
+**Commit**: f0a7a3d
+**Message**: "feat: Add react-native-expo skill for RN 0.76-0.82+ / Expo SDK 52+"
+
+**Uncommitted Changes**: 57 plugin.json files (manifest regeneration)
+
+**Status**: Phase 2 in progress - react-native-expo complete, nextjs audited

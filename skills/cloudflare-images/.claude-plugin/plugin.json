@@ -1,6 +1,6 @@
 {
   "name": "cloudflare-images",
-  "description": "This skill provides comprehensive knowledge for Cloudflare Images, covering both the Images API (upload/storage) and Image Transformations (optimize any image). It should be used when uploading images to Cloudflare, resizing images, optimizing image delivery, implementing direct creator uploads, creating image variants, generating signed URLs for private images, transforming images via Workers, or encountering image upload/transformation errors. Use when: setting up Cloudflare Images storage, im",
+  "description": "Store and transform images with Cloudflare Images API and transformations. Use when: uploading images, implementing direct creator uploads, creating variants, generating signed URLs, optimizing formats (WebP/AVIF), transforming via Workers, or debugging CORS, multipart, or error codes 9401-9413.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": ["cloudflare images","image upload cloudflare","imagedelivery.net","cloudflare image transformations","/cdn-cgi/image/","direct creator upload","image variants","cf.image workers","signed urls images","flexible variants","webp avif conversion","responsive images cloudflare","error 5408","error 9401","error 9403"]
+  "keywords": []
 }

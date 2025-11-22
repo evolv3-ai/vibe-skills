@@ -1,6 +1,6 @@
 {
   "name": "skill-review",
-  "description": "Comprehensive deep-dive documentation review process for claude-skills repository. Use this skill when investigating suspected issues in a skill, major package version updates detected (e.g., better-auth 1.x → 2.x), skill last verified >3 months ago, before marketplace submission, or when examples seem outdated. Performs systematic 9-phase audit: pre-review setup, standards compliance, official docs verification (Context7/WebFetch), code examples audit, cross-file consistency, dependency versi",
+  "description": "Audit claude-skills repository documentation with systematic 9-phase review: standards compliance, official docs verification via Context7/WebFetch, code examples accuracy, cross-file consistency, and version drift detection. Auto-fixes unambiguous issues with severity classification. Use when: investigating skill issues, major package updates detected (e.g., v1.x → v2.x), skill not verified >90 days, before marketplace submission, or troubleshooting outdated API patterns, contradictory exampl",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": ["skill review","skill audit","documentation review","version check","api verification","package updates","skill maintenance","quality assurance","standards compliance","breaking changes","github verification","official docs check","context7 verification","skill-review","audit-skill"]
+  "keywords": []
 }

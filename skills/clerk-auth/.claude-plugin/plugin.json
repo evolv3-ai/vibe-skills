@@ -1,6 +1,6 @@
 {
   "name": "clerk-auth",
-  "description": "This skill provides comprehensive knowledge for integrating Clerk authentication in React, Next.js, and Cloudflare Workers applications. It should be used when setting up user authentication, implementing protected routes, verifying JWT tokens, creating custom JWT templates with user metadata and organization claims, configuring Clerk middleware, integrating with shadcn/ui components, testing authentication flows, or troubleshooting Clerk authentication errors. Use when: adding Clerk to React/Vi",
+  "description": "Add Clerk authentication to React, Next.js, and Cloudflare Workers. Features: JWT templates, protected routes, shadcn/ui integration, E2E testing support. Use when: setting up auth, configuring custom JWT claims/middleware, or troubleshooting Missing Clerk Secret Key, JWKS errors, Core 2 migration, authorizedParties issues.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": ["clerk","clerk auth","clerk authentication","@clerk/nextjs","@clerk/backend","@clerk/clerk-react","clerkMiddleware","createRouteMatcher","verifyToken","useUser","useAuth","useClerk","JWT template","JWT claims","JWT shortcodes"]
+  "keywords": []
 }

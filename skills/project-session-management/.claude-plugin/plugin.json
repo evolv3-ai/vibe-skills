@@ -1,6 +1,6 @@
 {
   "name": "project-session-management",
-  "description": "Manages session state and context handoffs for multi-session projects using the Session Handoff Protocol. Creates and maintains SESSION.md to track phase progress, git checkpoints, and next actions across context clears. Integrates with project-planning skill to convert IMPLEMENTATION_PHASES.md into trackable session state. Use when starting new projects after planning, resuming work after context clear, or managing complex multi-phase implementations.",
+  "description": "Track progress across work sessions using SESSION.md with git checkpoints and concrete next actions. Converts IMPLEMENTATION_PHASES.md into trackable session state with phase status, progress markers, and recovery points. Use when: starting projects after planning phase, resuming work after context clears, managing multi-phase implementations, or troubleshooting lost context, missing progress tracking, or unclear next steps.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": ["session management","SESSION.md","session handoff protocol","context handoff","multi-session projects","phase tracking","git checkpoints","session state tracking","resume work","context clear","phase progress tracking","implementation phases","verification stage","debugging stage","next action tracking"]
+  "keywords": []
 }

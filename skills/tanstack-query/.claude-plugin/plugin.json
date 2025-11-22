@@ -1,6 +1,6 @@
 {
   "name": "tanstack-query",
-  "description": "This skill provides comprehensive knowledge for TanStack Query v5 (React Query) server state management in React applications. It should be used when setting up data fetching with useQuery, implementing mutations with useMutation, configuring QueryClient, managing caching strategies, migrating from v4 to v5, implementing optimistic updates, using infinite queries, or encountering query/mutation errors. Use when: initializing TanStack Query in React projects, configuring QueryClient settings, cre",
+  "description": "Manage server state in React with TanStack Query v5. Set up queries with useQuery, mutations with useMutation, configure QueryClient caching strategies, implement optimistic updates, and handle infinite scroll with useInfiniteQuery. Use when: setting up data fetching in React projects, migrating from v4 to v5, or fixing object syntax required errors, query callbacks removed issues, cacheTime renamed to gcTime, isPending vs isLoading confusion, keepPreviousData removed problems.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": ["TanStack Query","React Query","useQuery","useMutation","useInfiniteQuery","useSuspenseQuery","QueryClient","QueryClientProvider","data fetching","server state","caching","staleTime","gcTime","query invalidation","prefetching"]
+  "keywords": []
 }

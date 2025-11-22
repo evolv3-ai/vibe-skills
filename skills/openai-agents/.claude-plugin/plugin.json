@@ -1,6 +1,6 @@
 {
   "name": "openai-agents",
-  "description": "Use this skill when building AI applications with OpenAI Agents SDK for JavaScript/TypeScript. The skill covers both text-based agents and realtime voice agents, including multi-agent workflows (handoffs), tools with Zod schemas, input/output guardrails, structured outputs, streaming, human-in-the-loop patterns, and framework integrations for Cloudflare Workers, Next.js, and React. It prevents 9+ common errors including Zod schema type errors, MCP tracing failures, infinite loops, tool call fail",
+  "description": "Build AI applications with OpenAI Agents SDK - text agents, voice agents (realtime), multi-agent workflows with handoffs, tools with Zod schemas, input/output guardrails, structured outputs, and streaming. Deploy to Cloudflare Workers, Next.js, or React with human-in-the-loop patterns. Use when: building text-based agents with tools and Zod schemas, creating realtime voice agents with WebRTC/WebSocket, implementing multi-agent workflows with handoffs between specialists, setting up input/output ",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": ["OpenAI Agents SDK","@openai/agents","@openai/agents-realtime","openai agents javascript","openai agents typescript","text agents","voice agents","realtime agents","multi-agent workflows","agent handoffs","agent tools","zod schemas agents","structured outputs agents","agent streaming","agent guardrails"]
+  "keywords": []
 }
