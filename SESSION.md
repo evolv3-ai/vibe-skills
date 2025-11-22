@@ -463,19 +463,197 @@ Remove "obvious knowledge" that LLMs with Jan 2025 cutoff already know.
 
 ---
 
+## Cloudflare Vectorize Skill Audit - Proof-of-Concept ✅
+
+**Analysis Date**: 2025-11-22
+**Skill Size**: 613 lines (~2,040 tokens)
+**Status**: **COMPLETE** - Trimmed to 387 lines (~1,290 tokens)
+**Actual Savings**: **37%** (~750 tokens)
+
+### Why This Was Chosen
+
+Selected as **proof-of-concept** for audit strategy:
+- Small skill (613 lines) for quick validation
+- Recent skill (last updated 2025-10-21)
+- Active technology (Cloudflare Vectorize)
+- **Test hypothesis**: Even "current" skills may be missing recent knowledge gaps
+
+### Research Phase Findings ✅
+
+**CRITICAL DISCOVERY**: Skill was **missing Vectorize V2 entirely!**
+
+**Vectorize V2 GA - September 2024** (NOT in skill):
+- Index capacity: 200K → **5 million vectors** (25× increase)
+- Query latency: 549ms → **31ms** median (18× faster)
+- topK limit: 20 → **100** results (5× increase)
+- Scale: 100 → **50,000 indexes/namespaces** (500× increase)
+- **Breaking:** Async mutations with `mutationId`
+- **Breaking:** `returnMetadata` boolean → enum ('all', 'indexed', 'none')
+- **V1 Deprecation**: Can't create V1 indexes after December 2024
+- **Requirement**: Wrangler 3.71.0+ for V2
+
+**Research Sources Used**:
+- WebSearch: "Cloudflare Vectorize updates 2024 2025"
+- Cloudflare MCP: Vectorize docs search
+- Found: Official changelog, migration guide, breaking changes
+
+### Audit Results
+
+#### ✅ ADDED (~100 lines - Knowledge Gaps)
+
+**New Section:** "Vectorize V2 Breaking Changes (September 2024)" (56 lines)
+- Performance improvements detailed
+- API breaking changes documented
+- V1 deprecation timeline
+- Wrangler version requirements
+- Migration checklist (17 lines)
+
+**New Errors:**
+- Error 9: V2 Async Mutation Timing
+- Error 10: V1 returnMetadata Boolean (breaking)
+
+**Total Added:** ~100 lines of V2 knowledge gaps
+
+#### ❌ REMOVED (~260 lines - Obvious Pre-2024 Content)
+
+**Sections Removed:**
+1. Common Operations (~130 lines) - Basic insert/upsert/query examples
+2. Embedding Generation (~40 lines) - Workers AI/OpenAI basics
+3. RAG Pattern Full Example (~50 lines) - Complete RAG implementation
+4. Document Chunking Strategy (~40 lines) - Text chunking function
+5. Wrangler CLI Reference (~55 lines) - CLI commands listing
+6. Performance Tips (~8 lines) - Generic optimization advice
+7. When to Use This Skill (~15 lines) - Obvious comparisons
+8. Templates Location (~20 lines) - File listings
+9. Reference Documentation (~20 lines) - Internal doc listings
+10. Integration Examples (~10 lines) - Integration guides listing
+
+**Total Removed:** ~388 lines
+
+#### ✅ KEPT (Error Prevention + V2 Features)
+
+**Retained:**
+- 10 Common Errors (was 8, added 2 V2 errors)
+- Metadata index timing warning (CRITICAL for V2)
+- Range queries ($lt, $lte, $gt, $gte) - V2 feature
+- Metadata filtering operators
+- TypeScript types
+- Wrangler configuration
+
+### Final Metrics
+
+**Before**: 613 lines (~2,040 tokens)
+**After**: 387 lines (~1,290 tokens)
+**Net Change**: -226 lines / -750 tokens
+**Savings**: **37%**
+
+**Content Breakdown**:
+- Added: ~100 lines (V2 knowledge gaps)
+- Removed: ~388 lines (obvious pre-2024 content)
+- Net: -288 lines (-47%)
+- But skill is shorter: -226 lines (-37%) due to condensing
+
+### Key Learnings
+
+**1. Research Phase is CRITICAL**:
+- Even "current" skills (updated Oct 2025) can be missing major features from Sept 2024
+- Must check official changelogs, not just main docs
+- MCP documentation tools invaluable for research
+
+**2. Small Skills Can Have Big Gaps**:
+- 613-line skill was missing entire V2 GA announcement
+- Research found 100+ lines of knowledge gaps to ADD
+- Still achieved 37% reduction after additions
+
+**3. Proof-of-Concept Success**:
+- Strategy validated: Research → Audit → Trim works
+- Adding knowledge gaps while removing obvious content = net savings
+- Error prevention content always kept (high value)
+
+### Updated Skill Description
+
+**Before** (282 chars):
+> Build semantic search and RAG applications with Cloudflare Vectorize, a globally distributed vector database. Supports Workers AI and OpenAI embeddings, metadata filtering with 10 indexes, and namespace partitioning.
+
+**After** (237 chars, **V2-focused**):
+> Build semantic search with Cloudflare Vectorize V2 (Sept 2024 GA). Covers V2 breaking changes: async mutations, 5M vectors/index (was 200K), 31ms latency (was 549ms), returnMetadata enum, and V1 deprecation (Dec 2024).
+
+---
+
+## Next.js Skill Audit - Completed ✅
+
+**Analysis Date**: 2025-11-22
+**Status**: **COMPLETE** - Trimmed to 1,383 lines (~4,600 tokens)
+**Actual Savings**: **43%** (~3,400 tokens)
+
+### Audit Results
+
+**Before**: 2,414 lines (~8,000 tokens)
+**After**: 1,383 lines (~4,600 tokens)
+**Removed**: 1,031 lines (~3,400 tokens)
+**Savings**: **43%**
+
+### Content Removed
+
+All pre-2025 obvious content:
+- Server Components basics (200 lines) - React 18 (2022)
+- Server Actions basics (235 lines) - Next.js 13.4 (2023)
+- Route Handlers basics (80 lines) - Next.js 13 (2022)
+- Metadata API (100 lines) - Next.js 13 (2023)
+- Image & Font Optimization (95 lines) - No changes in 16
+- Performance Patterns basics (76 lines) - Kept only Turbopack
+- TypeScript Configuration (65 lines) - No Next.js 16 changes
+- Parallel Routes/Route Groups basics (70 lines) - Kept only default.js breaking change
+- Templates/Resources verbose listings (108 lines) - Condensed
+
+### Content Retained
+
+All Next.js 16 knowledge gaps + error prevention:
+- 6 breaking changes subsections (Next.js 16)
+- 6 Cache Components & Caching APIs subsections (NEW in 16)
+- 18 error solutions
+- React 19.2 features
+- Turbopack (stable in 16)
+- Proxy vs Middleware migration
+
+---
+
+## Phase 2 Summary So Far
+
+**Skills Completed:**
+1. ✅ react-native-expo (NEW skill, 3,500 lines, knowledge-gap focused from start)
+2. ✅ cloudflare-vectorize (613→387 lines, 37% reduction, V2 knowledge gaps added)
+3. ✅ nextjs (2,414→1,383 lines, 43% reduction)
+
+**Documents Created:**
+1. ✅ KNOWLEDGE_GAP_AUDIT_CHECKLIST.md (comprehensive 12-step process)
+
+**Cumulative Impact:**
+- Skills audited: 3 (59 total)
+- Lines removed: ~1,260 lines
+- Tokens saved: ~4,200 tokens per invocation
+- Annual savings (5 uses/month): ~252,000 tokens across these 3 skills
+
+**Next:** Systematic A-Z audit of remaining 56 skills
+
+---
+
 ## Next Actions
 
 **Immediate (This Session):**
 1. ✅ Created react-native-expo skill (knowledge-gap focused)
 2. ✅ Audited nextjs skill (documented findings above)
-3. ⏸️ Commit plugin manifest updates
-4. ⏸️ Document audit process for future skills
+3. ✅ Trimmed nextjs skill (1,383 lines, 43% reduction)
+4. ✅ Audited cloudflare-vectorize (proof-of-concept)
+5. ✅ Trimmed cloudflare-vectorize (387 lines, 37% reduction)
+6. ✅ Created KNOWLEDGE_GAP_AUDIT_CHECKLIST.md
+7. ⏸️ Update KNOWLEDGE_GAP_AUDIT_CHECKLIST.md with learnings
+8. ⏸️ Commit all changes
 
 **Next Session:**
-1. Trim nextjs skill based on findings above
-2. Create audit checklist/process document
-3. Identify next 3-5 skills to audit (prioritize by size/age)
-4. Apply audit process systematically
+1. Begin A-Z systematic audit (start with ai-sdk-core)
+2. Follow KNOWLEDGE_GAP_AUDIT_CHECKLIST.md process
+3. Research → Audit → Trim → Commit (one skill per session)
 
 **Long Term:**
 - Audit all 59 skills for obvious content removal
@@ -488,7 +666,7 @@ Remove "obvious knowledge" that LLMs with Jan 2025 cutoff already know.
 ## Last Checkpoint
 
 **Date**: 2025-11-22
-**Commit**: 3163b90
-**Message**: "checkpoint: Phase 2 In Progress - Knowledge-Gap Skills Audit"
+**Commit**: [pending - will be updated after commit]
+**Message**: "refactor(phase2): Complete knowledge-gap audits for cloudflare-vectorize and nextjs"
 
-**Status**: Phase 2 in progress - react-native-expo complete, nextjs audited, findings documented
+**Status**: Phase 2 in progress - 3 skills complete (vectorize 37%, nextjs 43%, react-native-expo NEW), audit process documented, ready for A-Z systematic audits

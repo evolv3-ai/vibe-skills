@@ -34,43 +34,32 @@ allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 2. [When NOT to Use This Skill](#when-not-to-use-this-skill)
 3. [Next.js 16 Breaking Changes](#nextjs-16-breaking-changes)
 4. [Cache Components & Caching APIs](#cache-components--caching-apis)
-5. [Server Components](#server-components)
-6. [Server Actions](#server-actions)
-7. [Route Handlers](#route-handlers)
-8. [Proxy vs Middleware](#proxy-vs-middleware)
-9. [Parallel Routes & Route Groups](#parallel-routes--route-groups)
-10. [React 19.2 Features](#react-192-features)
-11. [Metadata API](#metadata-api)
-12. [Image & Font Optimization](#image--font-optimization)
-13. [Performance Patterns](#performance-patterns)
-14. [TypeScript Configuration](#typescript-configuration)
-15. [Common Errors & Solutions](#common-errors--solutions)
-16. [Templates Reference](#templates-reference)
-17. [Additional Resources](#additional-resources)
+5. [Route Handlers (Next.js 16 Updates)](#route-handlers-nextjs-16-updates)
+6. [Proxy vs Middleware](#proxy-vs-middleware)
+7. [Parallel Routes - default.js Required](#parallel-routes---defaultjs-required-breaking)
+8. [React 19.2 Features](#react-192-features)
+9. [Turbopack (Stable in Next.js 16)](#turbopack-stable-in-nextjs-16)
+10. [Common Errors & Solutions](#common-errors--solutions)
+11. [Templates & Resources](#templates--resources)
 
 ---
 
 ## When to Use This Skill
 
+**Focus**: Next.js 16 breaking changes and knowledge gaps (December 2024+).
+
 Use this skill when you need:
 
-- **Next.js 16 App Router patterns** (layouts, loading, error boundaries, routing)
-- **Server Components** best practices (data fetching, composition, streaming)
-- **Server Actions** patterns (forms, mutations, revalidation, error handling)
+- **Next.js 16 breaking changes** (async params, proxy.ts, parallel routes default.js, removed features)
 - **Cache Components** with `"use cache"` directive (NEW in Next.js 16)
 - **New caching APIs**: `revalidateTag()`, `updateTag()`, `refresh()` (Updated in Next.js 16)
-- **Migration from Next.js 15 to 16** (async params, proxy.ts, parallel routes)
-- **Route Handlers** (API endpoints, webhooks, streaming responses)
-- **Proxy patterns** (`proxy.ts` replaces `middleware.ts` in Next.js 16)
+- **Migration from Next.js 15 to 16** (avoid breaking change errors)
 - **Async route params** (`params`, `searchParams`, `cookies()`, `headers()` now async)
-- **Parallel routes with default.js** (breaking change in Next.js 16)
+- **Parallel routes with default.js** (REQUIRED in Next.js 16)
 - **React 19.2 features** (View Transitions, `useEffectEvent()`, React Compiler)
-- **Metadata API** (SEO, Open Graph, Twitter Cards, sitemaps)
-- **Image optimization** (`next/image` with updated defaults in Next.js 16)
-- **Font optimization** (`next/font` patterns)
-- **Turbopack configuration** (stable and default in Next.js 16)
-- **Performance optimization** (lazy loading, code splitting, PPR, ISR)
-- **TypeScript configuration** (strict mode, path aliases)
+- **Turbopack** (stable and default in Next.js 16)
+- **Image defaults changed** (TTL, sizes, qualities in Next.js 16)
+- **Error prevention** (18+ documented Next.js 16 errors with solutions)
 
 ---
 
@@ -635,579 +624,34 @@ export async function refreshDashboard() {
 
 ---
 
-## Server Components
+---
 
-Server Components are React components that render on the server. They enable efficient data fetching, reduce client bundle size, and improve performance.
+## Route Handlers (Next.js 16 Updates)
 
-### 1. Server Component Basics
+### Async Params in Route Handlers (BREAKING)
 
-**Default Behavior**: All components in the App Router are Server Components by default (unless marked with `'use client'`).
+**IMPORTANT**: `params` and `headers()` are now async in Next.js 16 route handlers.
 
 **Example**:
 ```typescript
-// app/posts/page.tsx (Server Component by default)
-export default async function PostsPage() {
-  const posts = await fetch('https://api.example.com/posts').then(r => r.json())
-
-  return (
-    <div>
-      {posts.map((post: { id: string; title: string }) => (
-        <article key={post.id}>
-          <h2>{post.title}</h2>
-        </article>
-      ))}
-    </div>
-  )
-}
-```
-
-**Rules**:
-- ✅ Can `await` promises directly in component body
-- ✅ Can access `cookies()`, `headers()`, `draftMode()` (with `await`)
-- ✅ Can use Node.js APIs (fs, path, etc.)
-- ❌ Cannot use browser APIs (window, document, localStorage)
-- ❌ Cannot use React hooks (`useState`, `useEffect`, etc.)
-- ❌ Cannot use event handlers (`onClick`, `onChange`, etc.)
-
----
-
-### 2. Data Fetching in Server Components
-
-**Pattern**: Use `async/await` directly in component body.
-
-```typescript
-// app/products/[id]/page.tsx
-export default async function ProductPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-
-  // Fetch data directly in component
-  const product = await fetch(`https://api.example.com/products/${id}`)
-    .then(r => r.json())
-
-  return (
-    <div>
-      <h1>{product.name}</h1>
-      <p>{product.description}</p>
-      <p>${product.price}</p>
-    </div>
-  )
-}
-```
-
-**Parallel Data Fetching**:
-```typescript
-export default async function Dashboard() {
-  // Fetch in parallel with Promise.all
-  const [user, posts, comments] = await Promise.all([
-    fetch('/api/user').then(r => r.json()),
-    fetch('/api/posts').then(r => r.json()),
-    fetch('/api/comments').then(r => r.json()),
-  ])
-
-  return (
-    <div>
-      <UserInfo user={user} />
-      <PostsList posts={posts} />
-      <CommentsList comments={comments} />
-    </div>
-  )
-}
-```
-
-**Sequential Data Fetching** (when needed):
-```typescript
-export default async function UserPosts({ params }: { params: Promise<{ userId: string }> }) {
-  const { userId } = await params
-
-  // Fetch user first
-  const user = await fetch(`/api/users/${userId}`).then(r => r.json())
-
-  // Then fetch user's posts (depends on user data)
-  const posts = await fetch(`/api/posts?userId=${user.id}`).then(r => r.json())
-
-  return (
-    <div>
-      <h1>{user.name}'s Posts</h1>
-      <ul>
-        {posts.map((post: { id: string; title: string }) => (
-          <li key={post.id}>{post.title}</li>
-        ))}
-      </ul>
-    </div>
-  )
-}
-```
-
-**See Template**: `templates/server-component-streaming.tsx`
-
----
-
-### 3. Streaming with Suspense
-
-**Pattern**: Wrap slow components in `<Suspense>` to stream content as it loads.
-
-```typescript
-import { Suspense } from 'react'
-
-// Fast component (loads immediately)
-async function Header() {
-  return <header>My App</header>
-}
-
-// Slow component (takes 2 seconds)
-async function SlowData() {
-  await new Promise(resolve => setTimeout(resolve, 2000))
-  const data = await fetch('/api/slow-data').then(r => r.json())
-  return <div>{data.content}</div>
-}
-
-// Page streams content
-export default function Page() {
-  return (
-    <div>
-      <Header /> {/* Loads immediately */}
-
-      <Suspense fallback={<div>Loading...</div>}>
-        <SlowData /> {/* Streams when ready */}
-      </Suspense>
-    </div>
-  )
-}
-```
-
-**When to Use Streaming**:
-- Page has slow API calls
-- Want to show UI immediately (don't wait for all data)
-- Improve perceived performance
-
-**See Reference**: `references/server-components-patterns.md`
-
----
-
-### 4. Server vs Client Components
-
-**When to Use Server Components** (default):
-- Fetch data from APIs/databases
-- Access backend resources (files, environment variables)
-- Keep large dependencies on server (reduce bundle size)
-- Render static content
-
-**When to Use Client Components** (`'use client'`):
-- Need React hooks (`useState`, `useEffect`, `useContext`)
-- Need event handlers (`onClick`, `onChange`, `onSubmit`)
-- Need browser APIs (`window`, `localStorage`, `navigator`)
-- Need third-party libraries that use browser APIs (charts, maps, etc.)
-
-**Pattern**: Use Server Components by default, add `'use client'` only when needed.
-
-```typescript
-// app/components/interactive-button.tsx
-'use client' // Client Component
-
-import { useState } from 'react'
-
-export function InteractiveButton() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <button onClick={() => setCount(count + 1)}>
-      Clicked {count} times
-    </button>
-  )
-}
-
-// app/page.tsx (Server Component)
-import { InteractiveButton } from './components/interactive-button'
-
-export default async function Page() {
-  const data = await fetch('/api/data').then(r => r.json())
-
-  return (
-    <div>
-      <h1>{data.title}</h1>
-      <InteractiveButton /> {/* Client Component inside Server Component */}
-    </div>
-  )
-}
-```
-
-**Composition Rules**:
-- ✅ Server Component can import Client Component
-- ✅ Client Component can import Client Component
-- ✅ Client Component can render Server Component as children (via props)
-- ❌ Client Component cannot import Server Component directly
-
-**See Reference**: `references/server-components-patterns.md`
-
----
-
-## Server Actions
-
-Server Actions are asynchronous functions that run on the server. They enable server-side mutations, form handling, and data revalidation.
-
-### 1. Server Action Basics
-
-**Definition**: Add `'use server'` directive to create a Server Action.
-
-**File-level Server Actions**:
-```typescript
-// app/actions.ts
-'use server'
-
-export async function createPost(formData: FormData) {
-  const title = formData.get('title') as string
-  const content = formData.get('content') as string
-
-  // Mutate database
-  await db.posts.create({ title, content })
-
-  // Revalidate cache
-  revalidateTag('posts', 'max')
-}
-```
-
-**Inline Server Actions**:
-```typescript
-// app/posts/new/page.tsx
-export default function NewPostPage() {
-  async function createPost(formData: FormData) {
-    'use server'
-
-    const title = formData.get('title') as string
-    const content = formData.get('content') as string
-
-    await db.posts.create({ title, content })
-    revalidateTag('posts', 'max')
-  }
-
-  return (
-    <form action={createPost}>
-      <input name="title" />
-      <textarea name="content" />
-      <button type="submit">Create Post</button>
-    </form>
-  )
-}
-```
-
-**See Template**: `templates/server-actions-form.tsx`
-
----
-
-### 2. Form Handling
-
-**Basic Form**:
-```typescript
-// app/components/create-post-form.tsx
-import { createPost } from '@/app/actions'
-
-export function CreatePostForm() {
-  return (
-    <form action={createPost}>
-      <label>
-        Title:
-        <input type="text" name="title" required />
-      </label>
-
-      <label>
-        Content:
-        <textarea name="content" required />
-      </label>
-
-      <button type="submit">Create Post</button>
-    </form>
-  )
-}
-```
-
-**With Loading State** (useFormStatus):
-```typescript
-'use client'
-
-import { useFormStatus } from 'react-dom'
-import { createPost } from '@/app/actions'
-
-function SubmitButton() {
-  const { pending } = useFormStatus()
-
-  return (
-    <button type="submit" disabled={pending}>
-      {pending ? 'Creating...' : 'Create Post'}
-    </button>
-  )
-}
-
-export function CreatePostForm() {
-  return (
-    <form action={createPost}>
-      <input type="text" name="title" required />
-      <textarea name="content" required />
-      <SubmitButton />
-    </form>
-  )
-}
-```
-
-**With Validation**:
-```typescript
-// app/actions.ts
-'use server'
-
-import { z } from 'zod'
-import { redirect } from 'next/navigation'
-
-const PostSchema = z.object({
-  title: z.string().min(3, 'Title must be at least 3 characters'),
-  content: z.string().min(10, 'Content must be at least 10 characters'),
-})
-
-export async function createPost(formData: FormData) {
-  const rawData = {
-    title: formData.get('title'),
-    content: formData.get('content'),
-  }
-
-  // Validate
-  const parsed = PostSchema.safeParse(rawData)
-
-  if (!parsed.success) {
-    return {
-      errors: parsed.error.flatten().fieldErrors,
-    }
-  }
-
-  // Mutate
-  await db.posts.create(parsed.data)
-
-  // Revalidate and redirect
-  revalidateTag('posts', 'max')
-  redirect('/posts')
-}
-```
-
-**See Template**: `templates/server-actions-form.tsx`
-**See Reference**: `references/server-actions-guide.md`
-
----
-
-### 3. Error Handling
-
-**Pattern**: Return error objects from Server Actions, handle in Client Components.
-
-**Server Action**:
-```typescript
-// app/actions.ts
-'use server'
-
-export async function deletePost(id: string) {
-  try {
-    await db.posts.delete({ where: { id } })
-    revalidateTag('posts', 'max')
-    return { success: true }
-  } catch (error) {
-    return {
-      success: false,
-      error: 'Failed to delete post. Please try again.'
-    }
-  }
-}
-```
-
-**Client Component**:
-```typescript
-'use client'
-
-import { useState } from 'react'
-import { deletePost } from '@/app/actions'
-
-export function DeleteButton({ postId }: { postId: string }) {
-  const [error, setError] = useState<string | null>(null)
-
-  async function handleDelete() {
-    const result = await deletePost(postId)
-
-    if (!result.success) {
-      setError(result.error)
-    }
-  }
-
-  return (
-    <div>
-      <button onClick={handleDelete}>Delete Post</button>
-      {error && <p className="error">{error}</p>}
-    </div>
-  )
-}
-```
-
----
-
-### 4. Optimistic Updates
-
-**Pattern**: Show UI update immediately, then sync with server.
-
-```typescript
-'use client'
-
-import { useOptimistic } from 'react'
-import { likePost } from '@/app/actions'
-
-export function LikeButton({ postId, initialLikes }: { postId: string; initialLikes: number }) {
-  const [optimisticLikes, addOptimisticLike] = useOptimistic(
-    initialLikes,
-    (state, amount: number) => state + amount
-  )
-
-  async function handleLike() {
-    // Update UI immediately
-    addOptimisticLike(1)
-
-    // Sync with server
-    await likePost(postId)
-  }
-
-  return (
-    <button onClick={handleLike}>
-      ❤️ {optimisticLikes} likes
-    </button>
-  )
-}
-```
-
-**See Reference**: `references/server-actions-guide.md`
-
----
-
-## Route Handlers
-
-Route Handlers are server-side API endpoints in the App Router. They replace API Routes from the Pages Router.
-
-### 1. Basic Route Handler
-
-**File**: `app/api/hello/route.ts`
-
-```typescript
+// app/api/posts/[id]/route.ts
 import { NextResponse } from 'next/server'
-
-export async function GET() {
-  return NextResponse.json({ message: 'Hello, World!' })
-}
-
-export async function POST(request: Request) {
-  const body = await request.json()
-
-  return NextResponse.json({
-    message: 'Post created',
-    data: body
-  })
-}
-```
-
-**Supported Methods**: `GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `HEAD`, `OPTIONS`
-
-**See Template**: `templates/route-handler-api.ts`
-
----
-
-### 2. Dynamic Routes
-
-**File**: `app/api/posts/[id]/route.ts`
-
-```typescript
-import { NextResponse } from 'next/server'
+import { headers } from 'next/headers'
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params // ✅ Await params in Next.js 16
+  const headersList = await headers() // ✅ Await headers in Next.js 16
 
   const post = await db.posts.findUnique({ where: { id } })
 
-  if (!post) {
-    return NextResponse.json(
-      { error: 'Post not found' },
-      { status: 404 }
-    )
-  }
-
   return NextResponse.json(post)
-}
-
-export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params
-
-  await db.posts.delete({ where: { id } })
-
-  return NextResponse.json({ message: 'Post deleted' })
-}
-```
-
----
-
-### 3. Search Params
-
-**URL**: `/api/posts?tag=javascript&limit=10`
-
-```typescript
-import { NextResponse } from 'next/server'
-
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url)
-  const tag = searchParams.get('tag')
-  const limit = parseInt(searchParams.get('limit') || '10')
-
-  const posts = await db.posts.findMany({
-    where: { tags: { has: tag } },
-    take: limit,
-  })
-
-  return NextResponse.json(posts)
-}
-```
-
----
-
-### 4. Webhooks
-
-**Pattern**: Handle incoming webhooks from third-party services.
-
-```typescript
-// app/api/webhooks/stripe/route.ts
-import { NextResponse } from 'next/server'
-import { headers } from 'next/headers'
-
-export async function POST(request: Request) {
-  const body = await request.text()
-  const headersList = await headers() // ✅ Await headers in Next.js 16
-  const signature = headersList.get('stripe-signature')
-
-  // Verify webhook signature
-  const event = stripe.webhooks.constructEvent(
-    body,
-    signature!,
-    process.env.STRIPE_WEBHOOK_SECRET!
-  )
-
-  // Handle event
-  switch (event.type) {
-    case 'payment_intent.succeeded':
-      await handlePaymentSuccess(event.data.object)
-      break
-    case 'payment_intent.failed':
-      await handlePaymentFailure(event.data.object)
-      break
-  }
-
-  return NextResponse.json({ received: true })
 }
 ```
 
 **See Template**: `templates/route-handler-api.ts`
-**See Reference**: `references/route-handlers-reference.md`
 
 ---
 
@@ -1273,102 +717,33 @@ export const config = {
 
 ---
 
-## Parallel Routes & Route Groups
+## Parallel Routes - default.js Required (BREAKING)
 
-### 1. Parallel Routes
-
-**Use Case**: Render multiple pages in the same layout (e.g., modal + main content, dashboard panels).
+**Breaking Change in Next.js 16**: Parallel routes now **require** explicit `default.js` files.
 
 **Structure**:
 ```
 app/
 ├── @modal/
-│   ├── login/
-│   │   └── page.tsx
+│   ├── login/page.tsx
 │   └── default.tsx  ← REQUIRED in Next.js 16
 ├── @feed/
-│   ├── trending/
-│   │   └── page.tsx
+│   ├── trending/page.tsx
 │   └── default.tsx  ← REQUIRED in Next.js 16
 └── layout.tsx
-```
-
-**Layout**:
-```typescript
-// app/layout.tsx
-export default function Layout({
-  children,
-  modal,
-  feed,
-}: {
-  children: React.ReactNode
-  modal: React.ReactNode
-  feed: React.ReactNode
-}) {
-  return (
-    <html>
-      <body>
-        {modal}
-        <main>
-          {children}
-          <aside>{feed}</aside>
-        </main>
-      </body>
-    </html>
-  )
-}
 ```
 
 **Default Files (REQUIRED)**:
 ```typescript
 // app/@modal/default.tsx
 export default function ModalDefault() {
-  return null
-}
-
-// app/@feed/default.tsx
-export default function FeedDefault() {
-  return <div>Default Feed</div>
+  return null // or <Skeleton /> or redirect
 }
 ```
+
+**Why Required**: Next.js 16 changed soft navigation handling. Without `default.js`, unmatched slots error during client-side navigation.
 
 **See Template**: `templates/parallel-routes-with-default.tsx`
-
----
-
-### 2. Route Groups
-
-**Use Case**: Organize routes without affecting URL structure.
-
-**Structure**:
-```
-app/
-├── (marketing)/
-│   ├── about/
-│   │   └── page.tsx       → /about
-│   └── contact/
-│       └── page.tsx       → /contact
-├── (shop)/
-│   ├── products/
-│   │   └── page.tsx       → /products
-│   └── cart/
-│       └── page.tsx       → /cart
-└── layout.tsx
-```
-
-**Different Layouts per Group**:
-```
-app/
-├── (marketing)/
-│   ├── layout.tsx          ← Marketing layout
-│   └── about/page.tsx
-├── (shop)/
-│   ├── layout.tsx          ← Shop layout
-│   └── products/page.tsx
-└── layout.tsx              ← Root layout
-```
-
-**See Reference**: `references/app-router-fundamentals.md`
 
 ---
 
@@ -1492,297 +867,20 @@ export function ExpensiveList({ items }: { items: string[] }) {
 
 ---
 
-## Metadata API
+## Turbopack (Stable in Next.js 16)
 
-The Metadata API provides type-safe SEO and social sharing metadata.
+**NEW**: Turbopack is now the **default bundler** in Next.js 16.
 
-### 1. Static Metadata
-
-**Pattern**: Export `metadata` object from page or layout.
-
-```typescript
-// app/page.tsx
-import type { Metadata } from 'next'
-
-export const metadata: Metadata = {
-  title: 'My App',
-  description: 'Welcome to my app',
-  openGraph: {
-    title: 'My App',
-    description: 'Welcome to my app',
-    images: ['/og-image.jpg'],
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'My App',
-    description: 'Welcome to my app',
-    images: ['/twitter-image.jpg'],
-  },
-}
-
-export default function Page() {
-  return <h1>Home</h1>
-}
-```
-
----
-
-### 2. Dynamic Metadata
-
-**Pattern**: Export `generateMetadata` async function.
-
-```typescript
-// app/posts/[id]/page.tsx
-import type { Metadata } from 'next'
-
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
-  const { id } = await params
-  const post = await fetch(`/api/posts/${id}`).then(r => r.json())
-
-  return {
-    title: post.title,
-    description: post.excerpt,
-    openGraph: {
-      title: post.title,
-      description: post.excerpt,
-      images: [post.coverImage],
-    },
-  }
-}
-
-export default async function PostPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params
-  const post = await fetch(`/api/posts/${id}`).then(r => r.json())
-
-  return <article>{post.content}</article>
-}
-```
-
----
-
-### 3. Sitemap
-
-**File**: `app/sitemap.ts`
-
-```typescript
-import type { MetadataRoute } from 'next'
-
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const posts = await fetch('/api/posts').then(r => r.json())
-
-  const postUrls = posts.map((post: { id: string; updatedAt: string }) => ({
-    url: `https://example.com/posts/${post.id}`,
-    lastModified: post.updatedAt,
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }))
-
-  return [
-    {
-      url: 'https://example.com',
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    ...postUrls,
-  ]
-}
-```
-
-**See Template**: `templates/metadata-config.ts`
-**See Reference**: `references/metadata-api-guide.md`
-
----
-
-## Image & Font Optimization
-
-### 1. next/image
-
-**Basic Usage**:
-```typescript
-import Image from 'next/image'
-
-export function MyImage() {
-  return (
-    <Image
-      src="/hero.jpg"
-      alt="Hero image"
-      width={1200}
-      height={600}
-      priority // Load above the fold
-    />
-  )
-}
-```
-
-**Responsive Images**:
-```typescript
-<Image
-  src="/hero.jpg"
-  alt="Hero"
-  fill
-  style={{ objectFit: 'cover' }}
-  sizes="(max-width: 768px) 100vw, 50vw"
-/>
-```
-
-**Remote Images** (configure in next.config.ts):
-```typescript
-import type { NextConfig } from 'next'
-
-const config: NextConfig = {
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'cdn.example.com',
-        pathname: '/images/**',
-      },
-    ],
-  },
-}
-
-export default config
-```
-
-**See Template**: `templates/image-optimization.tsx`
-
----
-
-### 2. next/font
-
-**Google Fonts**:
-```typescript
-// app/layout.tsx
-import { Inter, Roboto_Mono } from 'next/font/google'
-
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-})
-
-const robotoMono = Roboto_Mono({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-roboto-mono',
-})
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" className={`${inter.variable} ${robotoMono.variable}`}>
-      <body>{children}</body>
-    </html>
-  )
-}
-```
-
-**Local Fonts**:
-```typescript
-import localFont from 'next/font/local'
-
-const myFont = localFont({
-  src: './fonts/my-font.woff2',
-  display: 'swap',
-  variable: '--font-my-font',
-})
-```
-
-**See Template**: `templates/font-optimization.tsx`
-
----
-
-## Performance Patterns
-
-### 1. Lazy Loading
-
-**Component Lazy Loading**:
-```typescript
-import dynamic from 'next/dynamic'
-
-const HeavyComponent = dynamic(() => import('./heavy-component'), {
-  loading: () => <div>Loading...</div>,
-  ssr: false, // Disable SSR for client-only components
-})
-
-export default function Page() {
-  return (
-    <div>
-      <h1>My Page</h1>
-      <HeavyComponent />
-    </div>
-  )
-}
-```
-
-**Conditional Loading**:
-```typescript
-'use client'
-
-import { useState } from 'react'
-import dynamic from 'next/dynamic'
-
-const Chart = dynamic(() => import('./chart'), { ssr: false })
-
-export function Dashboard() {
-  const [showChart, setShowChart] = useState(false)
-
-  return (
-    <div>
-      <button onClick={() => setShowChart(true)}>Show Chart</button>
-      {showChart && <Chart />}
-    </div>
-  )
-}
-```
-
----
-
-### 2. Code Splitting
-
-**Route-level Splitting** (automatic):
-```
-app/
-├── page.tsx       → Bundles: /, shared
-├── about/
-│   └── page.tsx   → Bundles: /about, shared
-└── products/
-    └── page.tsx   → Bundles: /products, shared
-```
-
-**Component-level Splitting** (with dynamic import):
-```typescript
-const Analytics = dynamic(() => import('./analytics'))
-const Comments = dynamic(() => import('./comments'))
-
-export default function BlogPost() {
-  return (
-    <article>
-      <h1>Post Title</h1>
-      <p>Content...</p>
-      <Analytics /> {/* Separate bundle */}
-      <Comments />  {/* Separate bundle */}
-    </article>
-  )
-}
-```
-
----
-
-### 3. Turbopack (Stable in Next.js 16)
-
-**Default**: Turbopack is now the default bundler in Next.js 16.
-
-**Metrics**:
-- **2–5× faster production builds**
-- **Up to 10× faster Fast Refresh**
+**Performance Improvements**:
+- 2–5× faster production builds
+- Up to 10× faster Fast Refresh
 
 **Opt-out** (if needed):
 ```bash
 npm run build -- --webpack
 ```
 
-**Enable File System Caching** (beta):
+**Enable File System Caching** (experimental):
 ```typescript
 // next.config.ts
 import type { NextConfig } from 'next'
@@ -1797,74 +895,6 @@ const config: NextConfig = {
 
 export default config
 ```
-
-**See Reference**: `references/performance-optimization.md`
-
----
-
-## TypeScript Configuration
-
-### 1. Strict Mode
-
-**Enable strict mode** in `tsconfig.json`:
-```json
-{
-  "compilerOptions": {
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true
-  }
-}
-```
-
----
-
-### 2. Path Aliases
-
-**Configure in tsconfig.json**:
-```json
-{
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./app/*"],
-      "@/components/*": ["./app/components/*"],
-      "@/lib/*": ["./lib/*"],
-      "@/styles/*": ["./styles/*"]
-    }
-  }
-}
-```
-
-**Usage**:
-```typescript
-// Instead of: import { Button } from '../../../components/button'
-import { Button } from '@/components/button'
-```
-
----
-
-### 3. Type-Safe Routing
-
-**Generate types from routes**:
-```bash
-npm run build
-```
-
-**Usage**:
-```typescript
-import { useRouter } from 'next/navigation'
-
-const router = useRouter()
-
-// Type-safe routing
-router.push('/posts/123') // ✅ Valid route
-router.push('/invalid')   // ❌ Type error if route doesn't exist
-```
-
-**See Reference**: `references/typescript-configuration.md`
 
 ---
 
@@ -2263,90 +1293,30 @@ export async function createPost(formData: FormData) {
 
 ---
 
-## Templates Reference
+## Templates & Resources
 
-The following templates are available in `templates/`:
-
-**App Router Fundamentals**:
-- `app-router-async-params.tsx` - Async params, searchParams patterns (Next.js 16)
-- `parallel-routes-with-default.tsx` - Parallel routes with required default.js
-- `route-groups-example.tsx` - Route groups organization
-
-**Cache Components (Next.js 16)**:
+**Next.js 16-Specific Templates** (in `templates/`):
+- `app-router-async-params.tsx` - Async params migration patterns
+- `parallel-routes-with-default.tsx` - Required default.js files
 - `cache-component-use-cache.tsx` - Cache Components with `"use cache"`
-- `partial-prerendering.tsx` - PPR with static + dynamic parts
-- `revalidate-tag-cache-life.ts` - Updated `revalidateTag()` API
+- `revalidate-tag-cache-life.ts` - Updated `revalidateTag()` with cacheLife
 - `server-action-update-tag.ts` - `updateTag()` for read-your-writes
-
-**Server Components**:
-- `server-component-data-fetching.tsx` - Data fetching patterns
-- `server-component-streaming.tsx` - Streaming with Suspense
-- `server-component-composition.tsx` - Server + Client component composition
-
-**Server Actions**:
-- `server-actions-form.tsx` - Form handling with Server Actions
-- `server-actions-validation.ts` - Server Action validation with Zod
-- `server-actions-optimistic.tsx` - Optimistic updates
-
-**Route Handlers**:
-- `route-handler-api.ts` - Basic CRUD API
-- `route-handler-webhook.ts` - Webhook handling
-- `route-handler-streaming.ts` - Streaming responses
-
-**Proxy & Middleware**:
 - `proxy-migration.ts` - Migrate from middleware.ts to proxy.ts
-- `proxy-auth.ts` - Auth with proxy.ts
-
-**React 19.2**:
-- `view-transitions-react-19.tsx` - View Transitions API
-- `use-effect-event.tsx` - `useEffectEvent()` pattern
-- `react-compiler-example.tsx` - React Compiler usage
-
-**Metadata**:
-- `metadata-config.ts` - Static and dynamic metadata
-- `sitemap.ts` - Sitemap generation
-- `robots.ts` - robots.txt generation
-
-**Optimization**:
-- `image-optimization.tsx` - next/image patterns
-- `font-optimization.tsx` - next/font patterns
-- `lazy-loading.tsx` - Dynamic imports and lazy loading
-- `code-splitting.tsx` - Code splitting strategies
-
-**TypeScript**:
-- `typescript-config.json` - Recommended TypeScript configuration
-- `path-aliases.tsx` - Path alias usage
-
-**Configuration**:
-- `next.config.ts` - Full Next.js configuration
-- `package.json` - Recommended dependencies for Next.js 16
-
----
-
-## Additional Resources
+- `view-transitions-react-19.tsx` - React 19.2 View Transitions
+- `next.config.ts` - Next.js 16 configuration
 
 **Bundled References** (in `references/`):
-- `next-16-migration-guide.md` - Complete migration from Next.js 15 to 16
+- `next-16-migration-guide.md` - Complete Next.js 15→16 migration guide
 - `cache-components-guide.md` - Cache Components deep dive
-- `proxy-vs-middleware.md` - Proxy.ts vs middleware.ts comparison
-- `async-route-params.md` - Async params, searchParams, cookies(), headers()
-- `app-router-fundamentals.md` - App Router concepts and patterns
-- `server-components-patterns.md` - Server Components best practices
-- `server-actions-guide.md` - Server Actions patterns and validation
-- `route-handlers-reference.md` - Route Handlers API reference
-- `metadata-api-guide.md` - Metadata API complete guide
-- `performance-optimization.md` - Performance patterns and Turbopack
-- `react-19-integration.md` - React 19.2 features in Next.js
-- `top-errors.md` - 18+ common errors and solutions
-
-**Scripts**:
-- `scripts/check-versions.sh` - Verify Next.js and dependency versions
+- `proxy-vs-middleware.md` - Proxy.ts vs middleware.ts
+- `async-route-params.md` - Async params breaking change details
+- `react-19-integration.md` - React 19.2 features in Next.js 16
+- `top-errors.md` - 18+ common errors with solutions
 
 **External Documentation**:
 - **Next.js 16 Blog**: https://nextjs.org/blog/next-16
 - **Next.js Docs**: https://nextjs.org/docs
-- **React Docs**: https://react.dev
-- **Context7 MCP**: Use `/websites/nextjs` for latest Next.js reference
+- **Context7 MCP**: `/websites/nextjs` for latest reference
 
 ---
 
