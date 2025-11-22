@@ -1,86 +1,49 @@
 ---
 name: auto-animate
 description: |
-  Add zero-config automatic animations to React UIs with AutoAnimate (@formkit/auto-animate).
-  Lightweight (2kb) with built-in accessibility support. Smooth transitions for DOM changes
-  (add/remove/move) without animation code.
+  Zero-config animations for React, Vue, Solid, Svelte, Preact with @formkit/auto-animate (3.28kb).
+  Prevents 10+ documented errors: SSR/Next.js imports, conditional parents, missing keys, flexbox width,
+  table display, Jest/esbuild config, CSS position conflicts, Vue/Nuxt registration, Angular ESM.
 
-  Use when: animating dynamic lists, building accordions, implementing toast notifications,
-  adding form validation messages, or encountering SSR errors with animation libraries.
+  Use when: animating lists/accordions/toasts/forms, troubleshooting SSR animation errors, need
+  accessible animations (auto prefers-reduced-motion), or want drop-in transitions without Motion overhead.
 license: MIT
 metadata:
+  version: 1.1.0
+  last_verified: 2025-11-22
+  package_version: 0.9.0
+  framework_support: React, Vue, Solid, Svelte, Preact
   keywords:
     - auto-animate
     - "@formkit/auto-animate"
     - formkit
     - zero-config-animation
-    - automatic-animations
-    - drop-in-animation
-    - list-animations
-    - accordion-animation
-    - toast-animation
-    - form-validation-animation
-    - lightweight-animation
-    - 2kb-animation
+    - solid support
+    - preact support
+    - ssr animation errors
+    - conditional parent error
+    - missing keys animation
+    - flexbox width animation
+    - table row animation
+    - jest auto-animate
+    - esbuild auto-animate
+    - vue nuxt auto-animate
+    - angular esm auto-animate
     - prefers-reduced-motion
     - accessible-animations
-    - vite-react-animation
     - cloudflare-workers-animation
-    - ssr-safe-animation
-    - react-animations
-    - vite-animations
-    - tailwind-animations
+    - nextjs-animation-ssr
 ---
 
-# AutoAnimate
+# AutoAnimate - Error Prevention Guide
 
-**Status**: Production Ready ✅
-**Last Updated**: 2025-11-07
-**Dependencies**: None (works with any React setup)
-**Latest Versions**: @formkit/auto-animate@0.9.0
+**Package**: @formkit/auto-animate@0.9.0 (Sept 2025)
+**Frameworks**: React, Vue, Solid, Svelte, Preact
+**Last Updated**: 2025-11-22
 
 ---
 
-## Quick Start (2 Minutes)
-
-### 1. Install AutoAnimate
-
-```bash
-pnpm add @formkit/auto-animate
-```
-
-**Why this matters:**
-- Only 3.28 KB gzipped (vs 22 KB for Motion)
-- Zero dependencies
-- Framework-agnostic (React, Vue, Svelte, vanilla JS)
-
-### 2. Add to Your Component
-
-```tsx
-import { useAutoAnimate } from "@formkit/auto-animate/react";
-
-export function MyList() {
-  const [parent] = useAutoAnimate(); // 1. Get ref
-
-  return (
-    <ul ref={parent}> {/* 2. Attach to parent */}
-      {items.map(item => (
-        <li key={item.id}>{item.text}</li> {/* 3. That's it! */}
-      ))}
-    </ul>
-  );
-}
-```
-
-**CRITICAL:**
-- ✅ Always use unique, stable keys for list items
-- ✅ Parent element must always be rendered (not conditional)
-- ✅ AutoAnimate respects `prefers-reduced-motion` automatically
-- ✅ Works on add, remove, AND reorder operations
-
-### 3. Use in Production (SSR-Safe)
-
-For Cloudflare Workers or Next.js:
+## SSR-Safe Pattern (Critical for Cloudflare Workers/Next.js)
 
 ```tsx
 // Use client-only import to prevent SSR errors
@@ -101,9 +64,11 @@ export function useAutoAnimateSafe<T extends HTMLElement>() {
 }
 ```
 
+**Why this matters**: Prevents Issue #1 (SSR/Next.js import errors). AutoAnimate uses DOM APIs not available on server.
+
 ---
 
-## Known Issues Prevention
+## Known Issues Prevention (10 Documented Errors)
 
 This skill prevents **10+** documented issues:
 
@@ -176,33 +141,7 @@ This skill prevents **10+** documented issues:
 
 ---
 
-## When to Use AutoAnimate vs Motion
-
-### Use AutoAnimate When:
-- ✅ Simple list transitions (add/remove/sort)
-- ✅ Accordion expand/collapse
-- ✅ Toast notifications fade in/out
-- ✅ Form validation messages appear/disappear
-- ✅ Zero configuration preferred
-- ✅ Small bundle size critical (3.28 KB)
-- ✅ Applying to existing/3rd-party code
-- ✅ "Good enough" animations acceptable
-
-### Use Motion When:
-- ✅ Complex choreographed animations
-- ✅ Gesture controls (drag, swipe, hover)
-- ✅ Scroll-based animations
-- ✅ Spring physics animations
-- ✅ SVG path animations
-- ✅ Keyframe control needed
-- ✅ Animation variants/orchestration
-- ✅ Custom easing curves
-
-**Rule of Thumb**: Use AutoAnimate for 90% of cases, Motion for hero/interactive animations.
-
----
-
-## Critical Rules
+## Critical Rules (Error Prevention)
 
 ### Always Do
 
@@ -224,85 +163,23 @@ This skill prevents **10+** documented issues:
 ❌ **Skip unique keys** - Required for proper animation
 ❌ **Complex animations** - Use Motion instead
 
----
-
-## Configuration
-
-AutoAnimate is zero-config by default. Optional customization:
-
-```tsx
-import { useAutoAnimate } from "@formkit/auto-animate/react";
-
-const [parent] = useAutoAnimate({
-  duration: 250, // milliseconds (default: 250)
-  easing: "ease-in-out", // CSS easing (default: "ease-in-out")
-  // disrespectUserMotionPreference: false, // Keep false!
-});
-```
-
-**Recommendation**: Use defaults unless you have specific design requirements.
+**Note**: AutoAnimate respects `prefers-reduced-motion` automatically (never disable this).
 
 ---
 
-## Using Bundled Resources
+## Package Versions
 
-### Templates (templates/)
+**Latest**: @formkit/auto-animate@0.9.0 (Sept 5, 2025)
 
-Copy-paste ready examples:
-
-- `react-basic.tsx` - Simple list with add/remove/shuffle
-- `react-typescript.tsx` - Typed setup with custom config
-- `filter-sort-list.tsx` - Animated filtering and sorting
-- `accordion.tsx` - Expandable sections
-- `toast-notifications.tsx` - Fade in/out messages
-- `form-validation.tsx` - Error messages animation
-- `vite-ssr-safe.tsx` - Cloudflare Workers/SSR pattern
-
-### References (references/)
-
-- `auto-animate-vs-motion.md` - Decision guide for which to use
-- `css-conflicts.md` - Flexbox, table, and position gotchas
-- `ssr-patterns.md` - Next.js, Nuxt, Workers workarounds
-
-### Scripts (scripts/)
-
-- `init-auto-animate.sh` - Automated setup script
-
----
-
-## Cloudflare Workers Compatibility
-
-AutoAnimate works perfectly with Cloudflare Workers Static Assets:
-
-✅ **Client-side only** - Runs in browser, not Worker runtime
-✅ **No Node.js deps** - Pure browser code
-✅ **Edge-friendly** - 3.28 KB gzipped
-✅ **SSR-safe** - Use dynamic imports (see templates/)
-
-**Vite Config**:
-```typescript
-export default defineConfig({
-  plugins: [react(), cloudflare()],
-  ssr: {
-    external: ["@formkit/auto-animate"],
-  },
-});
-```
-
----
-
-## Accessibility
-
-AutoAnimate respects `prefers-reduced-motion` **automatically**:
-
-```css
-/* User's system preference */
-@media (prefers-reduced-motion: reduce) {
-  /* AutoAnimate disables animations automatically */
+```json
+{
+  "dependencies": {
+    "@formkit/auto-animate": "^0.9.0"
+  }
 }
 ```
 
-**Critical**: Never set `disrespectUserMotionPreference: true` - this breaks accessibility.
+**Framework Compatibility**: React 18+, Vue 3+, Solid, Svelte, Preact
 
 ---
 
@@ -312,99 +189,11 @@ AutoAnimate respects `prefers-reduced-motion` **automatically**:
 - **GitHub**: https://github.com/formkit/auto-animate
 - **npm**: https://www.npmjs.com/package/@formkit/auto-animate
 - **React Docs**: https://auto-animate.formkit.com/react
-- **Video Tutorial**: Laracasts video (see README)
 
 ---
 
-## Package Versions (Verified 2025-11-07)
+## Templates & References
 
-```json
-{
-  "dependencies": {
-    "@formkit/auto-animate": "^0.9.0"
-  },
-  "devDependencies": {
-    "react": "^19.2.0",
-    "vite": "^6.0.0"
-  }
-}
-```
-
----
-
-## Production Example
-
-This skill is based on production testing:
-
-- **Bundle Size**: 3.28 KB gzipped
-- **Setup Time**: 2 minutes (vs 15 min with Motion)
-- **Errors**: 0 (all 10 known issues prevented)
-- **Validation**: ✅ Works with Vite, Tailwind v4, Cloudflare Workers, React 19
-
-**Tested Scenarios:**
-- ✅ Filter/sort lists
-- ✅ Accordion components
-- ✅ Toast notifications
-- ✅ Form validation messages
-- ✅ SSR/Cloudflare Workers
-- ✅ Accessibility (prefers-reduced-motion)
-
----
-
-## Troubleshooting
-
-### Problem: Animations not working
-**Solution**: Check these common issues:
-1. Is parent element always in DOM? (not conditional)
-2. Do items have unique, stable keys?
-3. Is ref attached to immediate parent of animated children?
-
-### Problem: SSR/Next.js errors
-**Solution**: Use dynamic import:
-```tsx
-useEffect(() => {
-  if (typeof window !== "undefined") {
-    import("@formkit/auto-animate").then(({ default: autoAnimate }) => {
-      autoAnimate(parent);
-    });
-  }
-}, [parent]);
-```
-
-### Problem: Items flash instead of animating
-**Solution**: Add unique keys: `key={item.id}` not `key={index}`
-
-### Problem: Flexbox width issues
-**Solution**: Use explicit width instead of `flex-grow: 1`
-
-### Problem: Table rows don't animate
-**Solution**: Apply ref to `<tbody>`, not individual `<tr>` elements
-
----
-
-## Complete Setup Checklist
-
-- [ ] Installed `@formkit/auto-animate@0.9.0`
-- [ ] Using React 19+ (or Vue/Svelte)
-- [ ] Added ref to parent element
-- [ ] Parent element always rendered (not conditional)
-- [ ] List items have unique, stable keys
-- [ ] Tested with `prefers-reduced-motion`
-- [ ] SSR-safe if using Cloudflare Workers/Next.js
-- [ ] No flexbox width issues
-- [ ] Dev server runs without errors
-- [ ] Production build succeeds
-
----
-
-**Questions? Issues?**
-
-1. Check `templates/` for working examples
-2. Check `references/auto-animate-vs-motion.md` for library comparison
-3. Check `references/ssr-patterns.md` for SSR workarounds
-4. Check official docs: https://auto-animate.formkit.com
-5. Check GitHub issues: https://github.com/formkit/auto-animate/issues
-
----
-
-**Production Ready?** ✅ Yes - 13.6k stars, actively maintained, zero dependencies.
+See bundled resources:
+- `templates/` - Copy-paste examples (SSR-safe, accordion, toast, forms)
+- `references/` - CSS conflicts, SSR patterns, library comparisons
