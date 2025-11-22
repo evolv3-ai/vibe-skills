@@ -618,23 +618,157 @@ All Next.js 16 knowledge gaps + error prevention:
 
 ---
 
+## AI SDK Core Skill Audit ✅
+
+**Analysis Date**: 2025-11-22
+**Skill Size**: 1,850 lines (~6,160 tokens)
+**Status**: **COMPLETE** - Trimmed to 849 lines (~2,830 tokens)
+**Actual Savings**: **54%** (~3,330 tokens)
+
+### Research Phase Findings ✅
+
+**AI SDK Updates (Post-Dec 2024):**
+1. **AI SDK 6 Beta** (Nov 2025) - **MISSING from skill!**
+   - Agent abstraction with ToolLoopAgent class
+   - Tool execution approval (human-in-the-loop)
+   - Reranking support (Cohere, Bedrock, Together.ai)
+   - Structured output now stable
+   - Stable release planned: End of 2025
+   - NO major breaking changes (unlike v4→v5)
+
+2. **Latest Versions:**
+   - Stable: ai@5.0.98 (Nov 20, 2025)
+   - Beta: ai@6.0.0-beta.107 (Nov 22, 2025)
+
+**Model Updates (All Post-Dec 2024):**
+1. **OpenAI GPT-5** (Aug 7, 2025) + **GPT-5.1** (Nov 13, 2025)
+   - 45% less hallucination than GPT-4o
+   - Significantly improved at math, coding, visual perception
+
+2. **Anthropic Claude 4** (May-Oct 2025):
+   - Opus 4 (May 22), Sonnet 4 (May 22)
+   - **Opus 4.1** (Aug 5) - Enhanced agentic tasks
+   - **Sonnet 4.5** (Sept 29) - Most capable for coding
+   - **Haiku 4.5** (Oct 15) - Small, fast model
+
+3. **Google Gemini 2.5** (Mar-Sept 2025):
+   - Pro (March 2025), Flash (May 2025), Flash-Lite (Sept 2025)
+   - ⚠️ Skill said "June-July 2025" - corrected to "Mar-Sept 2025"
+
+### Knowledge Gaps ADDED (~100 lines)
+
+1. **AI SDK 6 Beta section** (~50 lines) - Completely new
+2. **Latest Models section** (~50 lines):
+   - GPT-5/5.1 release dates and key features
+   - Claude Opus 4.1, Sonnet 4.5, Haiku 4.5
+   - Gemini 2.5 timeline correction
+
+### Content REMOVED (~1,001 lines)
+
+**Basic Function Examples** (~430 lines):
+- generateText() usage, signatures, examples
+- streamText() streaming patterns
+- generateObject() Zod schemas
+- streamObject() partial updates
+- **Rationale:** Well-established v5 patterns, fully documented in official docs
+
+**Provider Setup Basics** (~150 lines):
+- OpenAI configuration and rate limiting
+- Anthropic setup and best practices
+- Google Gemini configuration
+- **Rationale:** Standard setup patterns unchanged since v5 release
+
+**Tool Calling Basics** (~170 lines):
+- Tool definition examples
+- Agent class examples
+- Multi-step execution patterns
+- **Rationale:** v5 patterns established, moved to official docs
+
+**Production Best Practices** (~190 lines):
+- Generic performance tips
+- Cost optimization strategies
+- Next.js/Vercel integration patterns
+- **Rationale:** Standard practices, not AI SDK specific
+
+**Other** (~70 lines):
+- Quick Start section
+- Verbose documentation links
+
+### Content RETAINED (100%)
+
+- ✅ **AI SDK 6 Beta** (~50 lines) - Knowledge gap
+- ✅ **Latest Models** (~50 lines) - Knowledge gap
+- ✅ **v4→v5 Migration** (~106 lines) - Breaking changes guide
+- ✅ **All 12 Errors** (~448 lines) - Error prevention content
+- ✅ **Workers Startup Fix** (~22 lines) - Specific v5+Zod issue
+- ✅ **v5 Tool Changes** (~12 lines) - API changes
+- ✅ **Zod 3.x/4.x Compatibility** - Version compatibility
+
+### Updated Description
+
+**Before** (143 chars):
+```
+Build backend AI features with Vercel AI SDK v5: text generation, structured output (Zod schemas),
+tool calling, and agents. Multi-provider support (OpenAI, Anthropic, Google, Cloudflare).
+
+Use when: implementing server-side AI, generating text/structured data, building AI agents, streaming
+responses, or troubleshooting AI_APICallError, AI_NoObjectGeneratedError.
+```
+
+**After** (183 chars):
+```
+Build backend AI with Vercel AI SDK v5/v6. Covers v6 beta (Agent abstraction, tool approval, reranking),
+v4→v5 migration (breaking changes), latest models (GPT-5/5.1, Claude 4.x, Gemini 2.5), Workers startup
+fix, and 12 error solutions (AI_APICallError, AI_NoObjectGeneratedError, streamText silent errors).
+
+Use when: implementing AI SDK v5/v6, migrating v4→v5, troubleshooting errors, fixing Workers startup
+issues, or updating to latest models.
+```
+
+### Metadata Updates
+
+- **Version:** 1.1.1 → 1.2.0
+- **Last verified:** 2025-11-19 → 2025-11-22
+- **AI SDK:** 5.0.95+ → 5.0.98 stable / 6.0.0-beta.107
+- **Keywords added:** AI SDK 6, agent abstraction, tool approval, reranking, GPT-5, GPT-5.1, Claude 4, Claude Sonnet 4.5, Gemini 2.5
+
+### Key Learnings
+
+**Skill now exclusively focuses on:**
+1. AI SDK 6 Beta new features (agent abstraction, tool approval, reranking)
+2. v4→v5 migration breaking changes
+3. Latest 2025 AI models (GPT-5/5.1, Claude 4.x, Gemini 2.5)
+4. Cloudflare Workers startup optimization (v5+Zod issue)
+5. 12 documented error solutions with exact error messages
+
+**All basics removed** - users can reference official AI SDK docs for usage patterns.
+
+**Before**: 1,850 lines (~6,160 tokens)
+**After**: 849 lines (~2,830 tokens)
+**Removed**: 1,001 lines (~3,330 tokens)
+**Savings**: **54%**
+
+---
+
 ## Phase 2 Summary So Far
 
 **Skills Completed:**
 1. ✅ react-native-expo (NEW skill, 3,500 lines, knowledge-gap focused from start)
 2. ✅ cloudflare-vectorize (613→387 lines, 37% reduction, V2 knowledge gaps added)
 3. ✅ nextjs (2,414→1,383 lines, 43% reduction)
+4. ✅ ai-sdk-core (1,850→849 lines, 54% reduction, AI SDK 6 beta added)
 
 **Documents Created:**
 1. ✅ KNOWLEDGE_GAP_AUDIT_CHECKLIST.md (comprehensive 12-step process)
 
 **Cumulative Impact:**
-- Skills audited: 3 (59 total)
-- Lines removed: ~1,260 lines
-- Tokens saved: ~4,200 tokens per invocation
-- Annual savings (5 uses/month): ~252,000 tokens across these 3 skills
+- Skills audited: 4 of 59 (7%)
+- Lines removed: ~2,261 lines
+- Tokens saved: ~7,530 tokens per invocation (across these 4 skills)
+- Average reduction: 45% (excluding new skill)
+- Annual savings (5 uses/month): ~452,000 tokens across these 4 skills
 
-**Next:** Systematic A-Z audit of remaining 56 skills
+**Next:** Continue A-Z systematic audit (next: ai-sdk-ui)
 
 ---
 
@@ -647,16 +781,17 @@ All Next.js 16 knowledge gaps + error prevention:
 4. ✅ Audited cloudflare-vectorize (proof-of-concept)
 5. ✅ Trimmed cloudflare-vectorize (387 lines, 37% reduction)
 6. ✅ Created KNOWLEDGE_GAP_AUDIT_CHECKLIST.md
-7. ⏸️ Update KNOWLEDGE_GAP_AUDIT_CHECKLIST.md with learnings
-8. ⏸️ Commit all changes
+7. ✅ Audited ai-sdk-core (research phase + trim)
+8. ✅ Trimmed ai-sdk-core (849 lines, 54% reduction, AI SDK 6 beta added)
 
 **Next Session:**
-1. Begin A-Z systematic audit (start with ai-sdk-core)
+1. Continue A-Z systematic audit (next: ai-sdk-ui)
 2. Follow KNOWLEDGE_GAP_AUDIT_CHECKLIST.md process
 3. Research → Audit → Trim → Commit (one skill per session)
+4. Pattern validated: ~45% average reduction possible
 
 **Long Term:**
-- Audit all 59 skills for obvious content removal
+- Audit remaining 55 skills alphabetically
 - Update skill creation guidelines with "knowledge gap test"
 - Establish quarterly review process for skills
 - Target: 50-70% additional token savings across all skills
@@ -666,7 +801,7 @@ All Next.js 16 knowledge gaps + error prevention:
 ## Last Checkpoint
 
 **Date**: 2025-11-22
-**Commit**: ebc6fd8
-**Message**: "refactor(phase2): Complete knowledge-gap audits for cloudflare-vectorize and nextjs"
+**Commit**: 44336e0
+**Message**: "refactor(ai-sdk-core): Knowledge-gap audit - Add AI SDK 6 beta, latest models (GPT-5, Claude 4)"
 
-**Status**: Phase 2 in progress - 3 skills complete (vectorize 37%, nextjs 43%, react-native-expo NEW), audit process documented, ready for A-Z systematic audits
+**Status**: Phase 2 in progress - 4 skills complete (ai-sdk-core 54%, vectorize 37%, nextjs 43%, react-native-expo NEW), audit process documented, A-Z systematic audits in progress
