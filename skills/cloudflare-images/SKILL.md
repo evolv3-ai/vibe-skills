@@ -8,571 +8,105 @@ license: MIT
 # Cloudflare Images
 
 **Status**: Production Ready ✅
-**Last Updated**: 2025-10-26
+**Last Updated**: 2025-11-23
 **Dependencies**: Cloudflare account with Images enabled
-**Latest Versions**: Cloudflare Images API v2
+**Latest Versions**: Cloudflare Images API v2, @cloudflare/workers-types@4.20251121.0
+
+**Recent Updates (2025)**:
+- **August 2025**: AI Face Cropping GA (`gravity=face` with `zoom` control, GPU-based RetinaFace, 99.4% precision)
+- **May 2025**: Media Transformations origin restrictions (default: same-domain only, configurable via dashboard)
+- **Upcoming**: Background removal, generative upscale (planned features)
 
 ---
 
 ## Overview
 
-Cloudflare Images provides two powerful features:
-
-1. **Images API**: Upload, store, and serve images with automatic optimization and variants
-2. **Image Transformations**: Resize, optimize, and transform any publicly accessible image
-
-**Key Benefits**:
-- Global CDN delivery
-- Automatic WebP/AVIF conversion
-- Variants for different use cases (up to 100)
-- Direct creator upload (user uploads without API keys)
-- Signed URLs for private images
-- Transform any image via URL or Workers
+Two features: **Images API** (upload/store with variants) and **Image Transformations** (resize any image via URL or Workers).
 
 ---
 
-## Quick Start (5 Minutes)
+## Quick Start
 
-### 1. Enable Cloudflare Images
+**1. Enable**: Dashboard → Images → Get Account ID + API token (Cloudflare Images: Edit permission)
 
-Log into Cloudflare dashboard → **Images** → Enable for your account.
-
-Get your Account ID and create an API token with **Cloudflare Images: Edit** permissions.
-
-**Why this matters:**
-- Account ID and API token are required for all API operations
-- Images Free plan includes limited transformations
-
-### 2. Upload Your First Image
-
+**2. Upload**:
 ```bash
-curl --request POST \
-  --url https://api.cloudflare.com/client/v4/accounts/<ACCOUNT_ID>/images/v1 \
-  --header 'Authorization: Bearer <API_TOKEN>' \
-  --header 'Content-Type: multipart/form-data' \
-  --form 'file=@./image.jpg'
+curl -X POST https://api.cloudflare.com/client/v4/accounts/<ACCOUNT_ID>/images/v1 \
+  -H 'Authorization: Bearer <API_TOKEN>' \
+  -H 'Content-Type: multipart/form-data' \
+  -F 'file=@./image.jpg'
 ```
 
-Response includes:
-- `id`: Image ID for serving
-- `variants`: Array of delivery URLs
+**3. Serve**: `https://imagedelivery.net/<ACCOUNT_HASH>/<IMAGE_ID>/public`
 
-**CRITICAL:**
-- Use `multipart/form-data` encoding (NOT `application/json`)
-- Image ID is automatically generated (or use custom ID)
-
-### 3. Serve the Image
-
-```html
-<img src="https://imagedelivery.net/<ACCOUNT_HASH>/<IMAGE_ID>/public" />
-```
-
-Default `public` variant serves the image. Replace with your own variant names.
-
-### 4. Enable Image Transformations
-
-Dashboard → **Images** → **Transformations** → Select your zone → **Enable for zone**
-
-Now you can transform ANY image:
-
+**4. Transform** (optional): Dashboard → Images → Transformations → Enable for zone
 ```html
 <img src="/cdn-cgi/image/width=800,quality=85/uploads/photo.jpg" />
 ```
 
-**Why this matters:**
-- Works on images stored OUTSIDE Cloudflare Images
-- Automatic caching on Cloudflare's global network
-- No additional storage costs
-
-### 5. Transform via Workers (Advanced)
-
-```typescript
-export default {
-  async fetch(request: Request): Promise<Response> {
-    const imageURL = "https://example.com/image.jpg";
-
-    return fetch(imageURL, {
-      cf: {
-        image: {
-          width: 800,
-          quality: 85,
-          format: "auto" // WebP/AVIF for supporting browsers
-        }
-      }
-    });
-  }
-};
-```
-
 ---
 
-## The 3-Feature System
+## Upload Methods
 
-### Feature 1: Images API (Upload & Storage)
+**1. File Upload**: POST to `/images/v1` with `file` (multipart/form-data), optional `id`, `requireSignedURLs`, `metadata`
 
-Store images on Cloudflare's network and serve them globally.
+**2. Upload via URL**: POST with `url=https://example.com/image.jpg` (supports HTTP basic auth)
 
-**Upload Methods**:
-1. **File Upload** - Upload files directly from your server
-2. **Upload via URL** - Ingest images from external URLs
-3. **Direct Creator Upload** - Generate one-time upload URLs for user uploads
+**3. Direct Creator Upload** (one-time URLs, no API key exposure):
 
-**Serving Options**:
-- Default domain: `imagedelivery.net`
-- Custom domains: `/cdn-cgi/imagedelivery/...`
-- Signed URLs: Private images with expiry tokens
-
-**See**: `templates/upload-api-basic.ts`, `templates/direct-creator-upload-backend.ts`
-
-### Feature 2: Image Transformations
-
-Optimize and resize ANY image (stored in Images or external).
-
-**Two Methods**:
-1. **URL Transformations** - Special URL format
-2. **Workers Transformations** - Programmatic control via fetch
-
-**Common Transformations**:
-- Resize: `width=800,height=600,fit=cover`
-- Optimize: `quality=85,format=auto`
-- Effects: `blur=10,sharpen=3`
-- Crop: `gravity=face,zoom=0.5`
-
-**See**: `templates/transform-via-url.ts`, `templates/transform-via-workers.ts`
-
-### Feature 3: Variants
-
-Predefined image sizes for different use cases.
-
-**Named Variants** (up to 100):
-- Create once, use everywhere
-- Example: `thumbnail`, `avatar`, `hero`
-- Consistent transformations
-
-**Flexible Variants** (dynamic):
-- Enable per account
-- Use transformation params in URL
-- Example: `w=400,sharpen=3`
-- **Cannot use with signed URLs**
-
-**See**: `templates/variants-management.ts`, `references/variants-guide.md`
-
----
-
-## Images API - Upload Methods
-
-### Method 1: File Upload (Basic)
-
-```bash
-curl --request POST \
-  https://api.cloudflare.com/client/v4/accounts/{account_id}/images/v1 \
-  --header "Authorization: Bearer <API_TOKEN>" \
-  --header "Content-Type: multipart/form-data" \
-  --form 'file=@./image.jpg' \
-  --form 'requireSignedURLs=false' \
-  --form 'metadata={"key":"value"}'
-```
-
-**Key Options**:
-- `file`: Image file (required)
-- `id`: Custom ID (optional, default auto-generated)
-- `requireSignedURLs`: `true` for private images (default: `false`)
-- `metadata`: JSON object (max 1024 bytes, not visible to end users)
-
-**Response**:
-```json
-{
-  "result": {
-    "id": "2cdc28f0-017a-49c4-9ed7-87056c83901",
-    "filename": "image.jpg",
-    "uploaded": "2022-01-31T16:39:28.458Z",
-    "requireSignedURLs": false,
-    "variants": [
-      "https://imagedelivery.net/Vi7wi5KSItxGFsWRG2Us6Q/2cdc28f0.../public"
-    ]
-  }
-}
-```
-
-**See**: `templates/upload-api-basic.ts`
-
-### Method 2: Upload via URL
-
-Ingest images from external sources without downloading first.
-
-```bash
-curl --request POST \
-  https://api.cloudflare.com/client/v4/accounts/{account_id}/images/v1 \
-  --header "Authorization: Bearer <API_TOKEN>" \
-  --form 'url=https://example.com/image.jpg' \
-  --form 'metadata={"source":"external"}'
-```
-
-**When to use**:
-- Migrating images from another service
-- Ingesting user-provided URLs
-- Backing up images from external sources
-
-**CRITICAL:**
-- URL must be publicly accessible or authenticated
-- Supports HTTP basic auth: `https://user:password@example.com/image.jpg`
-- Cannot use both `file` and `url` in same request
-
-**See**: `templates/upload-via-url.ts`
-
-### Method 3: Direct Creator Upload ⭐
-
-Generate one-time upload URLs for users to upload directly to Cloudflare (no API key exposure).
-
-**Backend Endpoint** (generate upload URL):
-```typescript
-const response = await fetch(
-  `https://api.cloudflare.com/client/v4/accounts/${accountId}/images/v2/direct_upload`,
-  {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiToken}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      requireSignedURLs: true,
-      metadata: { userId: '12345' },
-      expiry: '2025-10-26T18:00:00Z' // Optional: default 30min, max 6hr
-    })
-  }
-);
-
-const { uploadURL, id } = await response.json();
-// Return uploadURL to frontend
-```
-
-**Frontend Upload** (HTML + JavaScript):
-```html
-<form id="upload-form">
-  <input type="file" id="file-input" accept="image/*" />
-  <button type="submit">Upload</button>
-</form>
-
-<script>
-document.getElementById('upload-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-
-  const fileInput = document.getElementById('file-input');
-  const formData = new FormData();
-  formData.append('file', fileInput.files[0]); // MUST be named 'file'
-
-  const uploadURL = 'UPLOAD_URL_FROM_BACKEND'; // Get from backend
-
-  const response = await fetch(uploadURL, {
-    method: 'POST',
-    body: formData // NO Content-Type header, browser sets multipart/form-data
-  });
-
-  if (response.ok) {
-    console.log('Upload successful!');
-  }
-});
-</script>
-```
-
-**Why this matters:**
-- No API key exposure to browser
-- Users upload directly to Cloudflare (faster, no intermediary server)
-- One-time URL expires after use or timeout
-- Webhooks available for upload success/failure notifications
+Backend: POST to `/images/v2/direct_upload` → returns `uploadURL`
+Frontend: POST file to `uploadURL` with FormData
 
 **CRITICAL CORS FIX**:
-- ✅ **DO**: Use `multipart/form-data` encoding (let browser set header)
-- ✅ **DO**: Name field `file` (NOT `image` or other names)
-- ✅ **DO**: Call `/direct_upload` API from backend only
-- ❌ **DON'T**: Set `Content-Type: application/json` or `image/jpeg`
-- ❌ **DON'T**: Call `/direct_upload` from browser (CORS will fail)
-
-**See**: `templates/direct-creator-upload-backend.ts`, `templates/direct-creator-upload-frontend.html`, `references/direct-upload-complete-workflow.md`
+- ✅ Use `multipart/form-data` (let browser set header)
+- ✅ Name field `file` (NOT `image`)
+- ✅ Call `/direct_upload` from backend only
+- ❌ Don't set `Content-Type: application/json`
+- ❌ Don't call `/direct_upload` from browser
 
 ---
 
 ## Image Transformations
 
-### URL Transformations
+**URL**: `/cdn-cgi/image/<OPTIONS>/<SOURCE>`
+- Sizing: `width=800,height=600,fit=cover`
+- Quality: `quality=85` (1-100)
+- Format: `format=auto` (WebP/AVIF auto-detection)
+- **Cropping**: `gravity=auto` (smart crop), **`gravity=face`** (AI face detection, Aug 2025 GA), `gravity=center`, **`zoom=0.5`** (0-1 range, face crop tightness)
+- Effects: `blur=10,sharpen=3,brightness=1.2`
+- Fit: `scale-down`, `contain`, `cover`, `crop`, `pad`
 
-Transform images using a special URL format.
-
-**URL Pattern**:
-```
-https://<ZONE>/cdn-cgi/image/<OPTIONS>/<SOURCE-IMAGE>
-```
-
-**Example**:
-```html
-<img src="/cdn-cgi/image/width=800,quality=85,format=auto/uploads/photo.jpg" />
-```
-
-**Common Options**:
-- **Sizing**: `width=800`, `height=600`, `fit=cover`
-- **Quality**: `quality=85` (1-100)
-- **Format**: `format=auto` (WebP/AVIF auto-detection), `format=webp`, `format=jpeg`
-- **Cropping**: `gravity=auto` (smart crop), `gravity=face`, `trim=10`
-- **Effects**: `blur=10`, `sharpen=3`, `brightness=1.2`, `contrast=1.1`
-- **Rotation**: `rotate=90`, `flip=h` (horizontal), `flip=v` (vertical)
-
-**Fit Options**:
-- `scale-down`: Shrink to fit (never enlarge)
-- `contain`: Resize to fit within dimensions (preserve aspect ratio)
-- `cover`: Resize to fill dimensions (may crop)
-- `crop`: Crop to exact dimensions
-- `pad`: Resize and add padding (use with `background` option)
-
-**Format Auto-Detection**:
-```html
-<img src="/cdn-cgi/image/format=auto/image.jpg" />
-```
-
-Cloudflare serves:
-- AVIF to browsers that support it (Chrome, Edge)
-- WebP to browsers without AVIF support (Safari, Firefox)
-- Original format (JPEG) as fallback
-
-**See**: `templates/transform-via-url.ts`, `references/transformation-options.md`
-
-### Workers Transformations
-
-Programmatic image transformations with custom URL schemes.
-
-**Basic Pattern**:
+**Workers**: Use `cf.image` object in fetch
 ```typescript
-export default {
-  async fetch(request: Request): Promise<Response> {
-    const url = new URL(request.url);
-
-    // Custom URL scheme: /images/thumbnail/photo.jpg
-    if (url.pathname.startsWith('/images/thumbnail/')) {
-      const imagePath = url.pathname.replace('/images/thumbnail/', '');
-      const imageURL = `https://storage.example.com/${imagePath}`;
-
-      return fetch(imageURL, {
-        cf: {
-          image: {
-            width: 300,
-            height: 300,
-            fit: 'cover',
-            quality: 85
-          }
-        }
-      });
-    }
-
-    return new Response('Not found', { status: 404 });
-  }
-};
-```
-
-**Advanced: Content Negotiation**:
-```typescript
-const accept = request.headers.get('accept') || '';
-
-let format: 'avif' | 'webp' | 'auto' = 'auto';
-if (/image\/avif/.test(accept)) {
-  format = 'avif';
-} else if (/image\/webp/.test(accept)) {
-  format = 'webp';
-}
-
-return fetch(imageURL, {
+fetch(imageURL, {
   cf: {
-    image: {
-      format,
-      width: 800,
-      quality: 85
-    }
+    image: { width: 800, quality: 85, format: 'auto', gravity: 'face', zoom: 0.8 }
   }
 });
 ```
 
-**Why Workers Transformations:**
-- **Custom URL schemes**: Hide image storage location
-- **Preset names**: Use `thumbnail`, `avatar`, `large` instead of pixel values
-- **Content negotiation**: Serve optimal format based on browser
-- **Access control**: Check authentication before serving
-- **Dynamic sizing**: Calculate dimensions based on device type
+---
 
-**See**: `templates/transform-via-workers.ts`, `references/transformation-options.md`
+## Variants
+
+**Named Variants** (up to 100): Predefined transformations (e.g., `avatar`, `thumbnail`)
+- Create: POST to `/images/v1/variants` with `id`, `options`
+- Use: `imagedelivery.net/<HASH>/<ID>/avatar`
+- Works with signed URLs
+
+**Flexible Variants**: Dynamic params in URL (`w=400,sharpen=3`)
+- Enable: PATCH `/images/v1/config` with `{"flexible_variants": true}`
+- ❌ **Cannot use with signed URLs** (use named variants instead)
 
 ---
 
-## Variants Management
+## Signed URLs
 
-### Named Variants (Up to 100)
+Generate HMAC-SHA256 tokens for private images (URL format: `?exp=<TIMESTAMP>&sig=<HMAC>`).
 
-Create predefined transformations for different use cases.
+**Algorithm**: `HMAC-SHA256(signingKey, imageId + variant + expiry)` → hex signature
 
-**Create via API**:
-```bash
-curl "https://api.cloudflare.com/client/v4/accounts/{account_id}/images/v1/variants" \
-  --header "Authorization: Bearer <API_TOKEN>" \
-  --header "Content-Type: application/json" \
-  --data '{
-    "id": "avatar",
-    "options": {
-      "fit": "cover",
-      "width": 200,
-      "height": 200,
-      "metadata": "none"
-    },
-    "neverRequireSignedURLs": false
-  }'
-```
-
-**Use in URLs**:
-```html
-<img src="https://imagedelivery.net/<ACCOUNT_HASH>/<IMAGE_ID>/avatar" />
-```
-
-**When to use**:
-- Consistent image sizes across your app
-- Private images (works with signed URLs)
-- Simple, predictable URLs
-
-**See**: `templates/variants-management.ts`
-
-### Flexible Variants
-
-Dynamic transformations using params in URL.
-
-**Enable** (per account, one-time):
-```bash
-curl --request PATCH \
-  https://api.cloudflare.com/client/v4/accounts/{account_id}/images/v1/config \
-  --header "Authorization: Bearer <API_TOKEN>" \
-  --header "Content-Type: application/json" \
-  --data '{"flexible_variants": true}'
-```
-
-**Use in URLs**:
-```html
-<img src="https://imagedelivery.net/<ACCOUNT_HASH>/<IMAGE_ID>/w=400,sharpen=3" />
-```
-
-**When to use**:
-- Dynamic sizing needs
-- Public images only (cannot use with signed URLs)
-- Rapid prototyping
-
-**CRITICAL:**
-- ❌ **Cannot use with `requireSignedURLs=true`**
-- ✅ **Use named variants for private images**
-
-**See**: `references/variants-guide.md`
-
----
-
-## Signed URLs (Private Images)
-
-Generate time-limited URLs for private images using HMAC-SHA256 tokens.
-
-**URL Format**:
-```
-https://imagedelivery.net/<ACCOUNT_HASH>/<IMAGE_ID>/<VARIANT>?exp=<EXPIRY>&sig=<SIGNATURE>
-```
-
-**Generate Signature** (Workers example):
-```typescript
-async function generateSignedURL(
-  imageId: string,
-  variant: string,
-  expirySeconds: number = 3600
-): Promise<string> {
-  const accountHash = 'YOUR_ACCOUNT_HASH';
-  const signingKey = 'YOUR_SIGNING_KEY'; // Dashboard → Images → Keys
-
-  const expiry = Math.floor(Date.now() / 1000) + expirySeconds;
-  const stringToSign = `${imageId}${variant}${expiry}`;
-
-  const encoder = new TextEncoder();
-  const keyData = encoder.encode(signingKey);
-  const messageData = encoder.encode(stringToSign);
-
-  const cryptoKey = await crypto.subtle.importKey(
-    'raw',
-    keyData,
-    { name: 'HMAC', hash: 'SHA-256' },
-    false,
-    ['sign']
-  );
-
-  const signature = await crypto.subtle.sign('HMAC', cryptoKey, messageData);
-  const sig = Array.from(new Uint8Array(signature))
-    .map(b => b.toString(16).padStart(2, '0'))
-    .join('');
-
-  return `https://imagedelivery.net/${accountHash}/${imageId}/${variant}?exp=${expiry}&sig=${sig}`;
-}
-```
-
-**Usage**:
-```typescript
-const signedURL = await generateSignedURL('image-id', 'public', 3600);
-// Returns URL valid for 1 hour
-```
-
-**When to use**:
-- User profile photos (private until shared)
-- Paid content (time-limited access)
-- Temporary downloads
-- Secure image delivery
-
-**See**: `templates/signed-urls-generation.ts`, `references/signed-urls-guide.md`
-
----
-
-## Responsive Images
-
-Serve optimal image sizes for different screen sizes.
-
-**Using Named Variants**:
-```html
-<img
-  srcset="
-    https://imagedelivery.net/<HASH>/<ID>/mobile 480w,
-    https://imagedelivery.net/<HASH>/<ID>/tablet 768w,
-    https://imagedelivery.net/<HASH>/<ID>/desktop 1920w
-  "
-  sizes="(max-width: 480px) 480px, (max-width: 768px) 768px, 1920px"
-  src="https://imagedelivery.net/<HASH>/<ID>/desktop"
-  alt="Responsive image"
-/>
-```
-
-**Using Flexible Variants**:
-```html
-<img
-  srcset="
-    https://imagedelivery.net/<HASH>/<ID>/w=480,f=auto 480w,
-    https://imagedelivery.net/<HASH>/<ID>/w=768,f=auto 768w,
-    https://imagedelivery.net/<HASH>/<ID>/w=1920,f=auto 1920w
-  "
-  sizes="(max-width: 480px) 480px, (max-width: 768px) 768px, 1920px"
-  src="https://imagedelivery.net/<HASH>/<ID>/w=1920,f=auto"
-  alt="Responsive image"
-/>
-```
-
-**Art Direction** (different crops for mobile vs desktop):
-```html
-<picture>
-  <source
-    media="(max-width: 767px)"
-    srcset="https://imagedelivery.net/<HASH>/<ID>/mobile-square"
-  />
-  <source
-    media="(min-width: 768px)"
-    srcset="https://imagedelivery.net/<HASH>/<ID>/desktop-wide"
-  />
-  <img src="https://imagedelivery.net/<HASH>/<ID>/desktop-wide" alt="Hero image" />
-</picture>
-```
-
-**See**: `templates/responsive-images-srcset.html`, `references/responsive-images-patterns.md`
+**See**: `templates/signed-urls-generation.ts` for Workers implementation
 
 ---
 
@@ -944,77 +478,11 @@ In-depth documentation Claude can load as needed:
 
 ## Advanced Topics
 
-### Custom Domains
+**Custom Domains**: Serve from your domain via `/cdn-cgi/imagedelivery/<HASH>/<ID>/<VARIANT>` (requires domain on Cloudflare, proxied). Use Transform Rules for custom paths.
 
-Serve images from your own domain instead of `imagedelivery.net`.
+**Batch API**: High-volume uploads via `batch.imagedelivery.net` with batch tokens (Dashboard → Images → Batch API)
 
-**URL Format**:
-```
-https://example.com/cdn-cgi/imagedelivery/<ACCOUNT_HASH>/<IMAGE_ID>/<VARIANT>
-```
-
-**Requirements**:
-- Domain must be on Cloudflare (same account as Images)
-- Proxied through Cloudflare (orange cloud)
-
-**Custom Paths** (Transform Rules):
-
-Rewrite `/images/...` to `/cdn-cgi/imagedelivery/...`:
-
-1. Dashboard → Rules → Transform Rules → Rewrite URL
-2. Match: `starts_with(http.request.uri.path, "/images/")`
-3. Rewrite: `/cdn-cgi/imagedelivery/<ACCOUNT_HASH>${substring(http.request.uri.path, 7)}`
-
-Now `/images/{id}/{variant}` → `/cdn-cgi/imagedelivery/{hash}/{id}/{variant}`
-
-**See**: [Serve images from custom domains](https://developers.cloudflare.com/images/manage-images/serve-images/serve-from-custom-domains/)
-
-### Batch API
-
-High-volume uploads with batch tokens.
-
-**Host**: `batch.imagedelivery.net` (instead of `api.cloudflare.com`)
-
-**Usage**:
-```bash
-# Create batch token in dashboard: Images → Batch API
-
-curl "https://batch.imagedelivery.net/images/v1" \
-  --header "Authorization: Bearer <BATCH_TOKEN>" \
-  --form 'file=@./image.jpg'
-```
-
-**When to use**:
-- Migrating thousands of images
-- Bulk upload workflows
-- Automated image ingestion
-
-**See**: `templates/batch-upload.ts`
-
-### Webhooks
-
-Receive notifications for upload success/failure (Direct Creator Upload only).
-
-**Setup**:
-1. Dashboard → Notifications → Destinations → Webhooks → Create
-2. Enter webhook URL and test
-3. Notifications → All Notifications → Add → Images → Select webhook
-
-**Payload** (example):
-```json
-{
-  "imageId": "2cdc28f0-017a-49c4-9ed7-87056c83901",
-  "status": "uploaded",
-  "metadata": {"userId": "12345"}
-}
-```
-
-**When to use**:
-- Update database after upload
-- Trigger image processing pipeline
-- Notify user of upload status
-
-**See**: [Configure webhooks](https://developers.cloudflare.com/images/manage-images/configure-webhooks/)
+**Webhooks**: Notifications for Direct Creator Upload (Dashboard → Notifications → Webhooks). Payload includes `imageId`, `status`, `metadata`.
 
 ---
 
@@ -1072,23 +540,6 @@ Receive notifications for upload success/failure (Direct Creator Upload only).
 
 ---
 
-## Complete Setup Checklist
-
-- [ ] Cloudflare account with Images enabled
-- [ ] Account ID and API token obtained (Images: Edit permission)
-- [ ] (Optional) Image transformations enabled on zone
-- [ ] (Optional) Variants created for common use cases
-- [ ] (Optional) Flexible variants enabled if dynamic sizing needed
-- [ ] (Optional) Signing key obtained for private images
-- [ ] (Optional) Webhooks configured for upload notifications
-- [ ] (Optional) Custom domain configured with Transform Rules
-- [ ] Upload method implemented (file, URL, or direct creator)
-- [ ] Serving URLs tested (imagedelivery.net or custom domain)
-- [ ] Transformations tested (URL or Workers)
-- [ ] Error handling implemented (CORS, timeouts, size limits)
-
----
-
 ## Official Documentation
 
 - **Cloudflare Images**: https://developers.cloudflare.com/images/
@@ -1105,21 +556,8 @@ Receive notifications for upload success/failure (Direct Creator Upload only).
 
 ---
 
-## Package Versions (Verified 2025-10-26)
+## Package Versions
 
-**API Version**: v2 (for direct uploads), v1 (for standard uploads)
-
-**No npm packages required** - uses native Cloudflare APIs
-
-**Optional**:
-- `@cloudflare/workers-types@latest` - TypeScript types for Workers
-
----
-
-**Questions? Issues?**
-
-1. Check `references/top-errors.md` for common issues
-2. Verify all steps in the setup process
-3. Check official docs: https://developers.cloudflare.com/images/
-4. Ensure transformations are enabled on zone
-5. Verify CORS setup for Direct Creator Upload
+**Last Verified**: 2025-11-23
+**API Version**: v2 (direct uploads), v1 (standard uploads)
+**Optional**: @cloudflare/workers-types@4.20251121.0
