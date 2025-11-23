@@ -40,10 +40,15 @@ metadata:
 # Cloudflare Agents SDK
 
 **Status**: Production Ready ✅
-**Last Updated**: 2025-11-19
+**Last Updated**: 2025-11-23
 **Dependencies**: cloudflare-worker-base (recommended)
-**Latest Versions**: agents@latest, @modelcontextprotocol/sdk@latest
+**Latest Versions**: agents@0.2.23 (Nov 13, 2025), @modelcontextprotocol/sdk@latest
 **Production Tested**: Cloudflare's own MCP servers (https://github.com/cloudflare/mcp-server-cloudflare)
+
+**Recent Updates (2025)**:
+- **Sept 2025**: AI SDK v5 compatibility, automatic message migration
+- **April 2025**: MCP support (MCPAgent class), `import { context }` from agents
+- **March 2025**: Package rename (agents-sdk → agents)
 
 ---
 
@@ -569,585 +574,104 @@ The rest of this skill focuses on Agents SDK (the infrastructure layer). For AI 
 
 ---
 
-## Configuration Deep Dive
+## Configuration (wrangler.jsonc)
 
-### Complete wrangler.jsonc Example
-
+**Critical Required Configuration**:
 ```jsonc
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "my-agent",
-  "main": "src/index.ts",
-  "account_id": "YOUR_ACCOUNT_ID",
-  "compatibility_date": "2025-10-21",
-  "compatibility_flags": ["nodejs_compat"],
-
-  // Durable Objects configuration (REQUIRED)
   "durable_objects": {
-    "bindings": [
-      {
-        "name": "MyAgent",
-        "class_name": "MyAgent"
-      }
-    ]
+    "bindings": [{ "name": "MyAgent", "class_name": "MyAgent" }]
   },
-
-  // Migrations (REQUIRED)
   "migrations": [
-    {
-      "tag": "v1",
-      "new_sqlite_classes": ["MyAgent"]  // Enables state persistence
-    }
-  ],
-
-  // Optional: Workers AI binding (for AI model calls)
-  "ai": {
-    "binding": "AI"
-  },
-
-  // Optional: Vectorize binding (for RAG)
-  "vectorize": {
-    "bindings": [
-      {
-        "binding": "VECTORIZE",
-        "index_name": "my-agent-vectors"
-      }
-    ]
-  },
-
-  // Optional: Browser Rendering binding (for web browsing)
-  "browser": {
-    "binding": "BROWSER"
-  },
-
-  // Optional: Workflows binding (for async workflows)
-  "workflows": [
-    {
-      "name": "MY_WORKFLOW",
-      "class_name": "MyWorkflow",
-      "script_name": "my-workflow-script"  // If in different project
-    }
-  ],
-
-  // Optional: D1 binding (for additional persistent data)
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "my-agent-db",
-      "database_id": "your-database-id"
-    }
-  ],
-
-  // Optional: R2 binding (for file storage)
-  "r2_buckets": [
-    {
-      "binding": "BUCKET",
-      "bucket_name": "my-agent-files"
-    }
-  ],
-
-  // Optional: Environment variables
-  "vars": {
-    "ENVIRONMENT": "production"
-  },
-
-  // Optional: Secrets (set with: wrangler secret put KEY)
-  // OPENAI_API_KEY, ANTHROPIC_API_KEY, etc.
-
-  // Observability
-  "observability": {
-    "enabled": true
-  }
-}
-```
-
-### Migrations Best Practices
-
-**Atomic Deployments**: Migrations are **atomic operations** - they cannot be gradually deployed.
-
-```jsonc
-{
-  "migrations": [
-    {
-      "tag": "v1",
-      "new_sqlite_classes": ["MyAgent"]  // Initial: enable SQLite
-    },
-    {
-      "tag": "v2",
-      "renamed_classes": [
-        {"from": "MyAgent", "to": "MyRenamedAgent"}
-      ]
-    },
-    {
-      "tag": "v3",
-      "deleted_classes": ["OldAgent"]
-    },
-    {
-      "tag": "v4",
-      "transferred_classes": [
-        {
-          "from": "AgentInOldScript",
-          "from_script": "old-worker",
-          "to": "AgentInNewScript"
-        }
-      ]
-    }
+    { "tag": "v1", "new_sqlite_classes": ["MyAgent"] }  // MUST be in first migration
   ]
 }
 ```
 
-**Migration Rules:**
-- ✅ Each migration needs a unique `tag`
-- ✅ Cannot enable SQLite on existing deployed class (must be in first migration)
-- ✅ Migrations apply in order during deployment
-- ✅ Cannot edit or remove previous migration tags
-- ❌ Never deploy new migrations gradually (atomic only)
+**Common Optional Bindings**: `ai`, `vectorize`, `browser`, `workflows`, `d1_databases`, `r2_buckets`
 
-### Environment-Specific Migrations
+**CRITICAL Migration Rules**:
+- ✅ `new_sqlite_classes` MUST be in tag "v1" (cannot add SQLite to existing deployed class)
+- ✅ `name` and `class_name` MUST match exactly
+- ✅ Migrations are atomic (all instances updated simultaneously)
+- ✅ Each tag must be unique, cannot edit/remove previous tags
 
-```jsonc
-{
-  "migrations": [{"tag": "v1", "new_sqlite_classes": ["MyAgent"]}],
-  "env": {
-    "staging": {
-      "migrations": [
-        {"tag": "v1", "new_sqlite_classes": ["MyAgent"]},
-        {"tag": "v2-staging", "renamed_classes": [{"from": "MyAgent", "to": "StagingAgent"}]}
-      ]
-    }
-  }
-}
-```
+**See**: https://developers.cloudflare.com/agents/api-reference/configuration/
 
 ---
 
-## Agent Class API
+## Core Agent Patterns
 
-The `Agent` class is the foundation of the Agents SDK. Extend it to create your agent.
+**Agent Class Basics** - Extend `Agent<Env, State>` with lifecycle methods:
+- `onStart()` - Agent initialization
+- `onRequest()` - Handle HTTP requests
+- `onConnect/onMessage/onClose()` - WebSocket handling
+- `onStateUpdate()` - React to state changes
 
-### Basic Agent Structure
+**Key Properties**:
+- `this.env` - Environment bindings (AI, DB, etc.)
+- `this.state` - Current agent state (read-only)
+- `this.setState()` - Update persisted state
+- `this.sql` - Built-in SQLite database
+- `this.name` - Agent instance identifier
+- `this.schedule()` - Schedule future tasks
 
+**See**: Official Agent API docs at https://developers.cloudflare.com/agents/api-reference/agents-api/
+
+---
+
+## WebSockets & Real-Time Communication
+
+Agents support WebSockets for bidirectional real-time communication. Use when you need:
+- Client can send messages while server streams
+- Agent-initiated messages (notifications, updates)
+- Long-lived connections with state
+
+**Basic Pattern**:
 ```typescript
-import { Agent } from "agents";
-
-interface Env {
-  // Environment variables and bindings
-  OPENAI_API_KEY: string;
-  AI: Ai;
-  VECTORIZE: Vectorize;
-  DB: D1Database;
-}
-
-interface State {
-  // Your agent's persistent state
-  counter: number;
-  messages: string[];
-  lastUpdated: Date | null;
-}
-
-export class MyAgent extends Agent<Env, State> {
-  // Optional: Set initial state (first time agent is created)
-  initialState: State = {
-    counter: 0,
-    messages: [],
-    lastUpdated: null
-  };
-
-  // Optional: Called when agent instance starts or wakes from hibernation
-  async onStart() {
-    console.log('Agent started:', this.name, 'State:', this.state);
-  }
-
-  // Handle HTTP requests
-  async onRequest(request: Request): Promise<Response> {
-    return Response.json({ message: "Hello from Agent", state: this.state });
-  }
-
-  // Handle WebSocket connections (optional)
+export class ChatAgent extends Agent<Env, State> {
   async onConnect(connection: Connection, ctx: ConnectionContext) {
-    console.log('Client connected:', connection.id);
-    // Connections are automatically accepted
-  }
-
-  // Handle WebSocket messages (optional)
-  async onMessage(connection: Connection, message: WSMessage) {
-    if (typeof message === 'string') {
-      connection.send(`Echo: ${message}`);
-    }
-  }
-
-  // Handle WebSocket errors (optional)
-  async onError(connection: Connection, error: unknown): Promise<void> {
-    console.error('Connection error:', error);
-  }
-
-  // Handle WebSocket close (optional)
-  async onClose(connection: Connection, code: number, reason: string, wasClean: boolean): Promise<void> {
-    console.log('Connection closed:', code, reason);
-  }
-
-  // Called when state is updated from any source (optional)
-  onStateUpdate(state: State, source: "server" | Connection) {
-    console.log('State updated:', state, 'Source:', source);
-  }
-
-  // Custom methods (call from any handler)
-  async customMethod(data: any) {
-    this.setState({
-      ...this.state,
-      counter: this.state.counter + 1,
-      lastUpdated: new Date()
-    });
-  }
-}
-```
-
-### Accessing Agent Properties
-
-Within any Agent method:
-
-```typescript
-export class MyAgent extends Agent<Env, State> {
-  async someMethod() {
-    // Access environment variables and bindings
-    const apiKey = this.env.OPENAI_API_KEY;
-    const ai = this.env.AI;
-
-    // Access current state (read-only)
-    const counter = this.state.counter;
-
-    // Update state (persisted automatically)
-    this.setState({ ...this.state, counter: counter + 1 });
-
-    // Access SQL database
-    const results = await this.sql`SELECT * FROM users`;
-
-    // Get agent instance name
-    const instanceName = this.name;  // e.g., "user-123"
-
-    // Schedule tasks
-    await this.schedule(60, "runLater", { data: "example" });
-
-    // Call other methods
-    await this.customMethod({ foo: "bar" });
-  }
-}
-```
-
----
-
-## HTTP & Server-Sent Events
-
-### HTTP Request Handling
-
-```typescript
-export class MyAgent extends Agent<Env> {
-  async onRequest(request: Request): Promise<Response> {
-    const url = new URL(request.url);
-    const method = request.method;
-
-    if (method === "POST" && url.pathname === "/increment") {
-      const counter = (this.state.counter || 0) + 1;
-      this.setState({ ...this.state, counter });
-      return Response.json({ counter });
-    }
-
-    if (method === "GET" && url.pathname === "/status") {
-      return Response.json({ state: this.state, name: this.name });
-    }
-
-    return new Response("Not Found", { status: 404 });
-  }
-}
-```
-
-### Server-Sent Events (SSE) Streaming
-
-```typescript
-export class MyAgent extends Agent<Env> {
-  async onRequest(request: Request): Promise<Response> {
-    const stream = new ReadableStream({
-      async start(controller) {
-        const encoder = new TextEncoder();
-
-        // Send events to client
-        controller.enqueue(encoder.encode('data: {"message": "Starting"}\n\n'));
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        controller.enqueue(encoder.encode('data: {"message": "Processing"}\n\n'));
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
-        controller.enqueue(encoder.encode('data: {"message": "Complete"}\n\n'));
-
-        controller.close();
-      }
-    });
-
-    return new Response(stream, {
-      headers: {
-        'Content-Type': 'text/event-stream',
-        'Cache-Control': 'no-cache',
-        'Connection': 'keep-alive'
-      }
-    });
-  }
-}
-```
-
-**SSE vs WebSockets:**
-
-| Feature | SSE | WebSockets |
-|---------|-----|------------|
-| Direction | Server → Client only | Bi-directional |
-| Protocol | HTTP | ws:// or wss:// |
-| Reconnection | Automatic | Manual |
-| Binary Data | Limited | Full support |
-| Use Case | Streaming responses, notifications | Chat, real-time collaboration |
-
-**Recommendation**: Use WebSockets for most agent applications (full duplex, better for long sessions).
-
----
-
-## WebSockets
-
-### Complete WebSocket Example
-
-```typescript
-import { Agent, Connection, ConnectionContext, WSMessage } from "agents";
-
-interface ChatState {
-  messages: Array<{ id: string; text: string; sender: string; timestamp: number }>;
-  participants: string[];
-}
-
-export class ChatAgent extends Agent<Env, ChatState> {
-  initialState: ChatState = {
-    messages: [],
-    participants: []
-  };
-
-  async onConnect(connection: Connection, ctx: ConnectionContext) {
-    // Access original HTTP request for auth
-    const authHeader = ctx.request.headers.get('Authorization');
-    const userId = ctx.request.headers.get('X-User-ID') || 'anonymous';
-
-    // Connections are automatically accepted
-    // Optionally close connection if unauthorized:
-    // if (!authHeader) {
-    //   connection.close(401, "Unauthorized");
-    //   return;
-    // }
-
-    // Add to participants
-    this.setState({
-      ...this.state,
-      participants: [...this.state.participants, userId]
-    });
-
-    // Send welcome message
-    connection.send(JSON.stringify({
-      type: 'welcome',
-      message: 'Connected to chat',
-      participants: this.state.participants
-    }));
+    // Auth check, add to participants, send welcome
   }
 
   async onMessage(connection: Connection, message: WSMessage) {
-    if (typeof message === 'string') {
-      try {
-        const data = JSON.parse(message);
-
-        if (data.type === 'chat') {
-          // Add message to state
-          const newMessage = {
-            id: crypto.randomUUID(),
-            text: data.text,
-            sender: data.sender || 'anonymous',
-            timestamp: Date.now()
-          };
-
-          this.setState({
-            ...this.state,
-            messages: [...this.state.messages, newMessage]
-          });
-
-          // Broadcast to this connection (state sync will broadcast to all)
-          connection.send(JSON.stringify({
-            type: 'message_added',
-            message: newMessage
-          }));
-        }
-      } catch (e) {
-        connection.send(JSON.stringify({ type: 'error', message: 'Invalid message format' }));
-      }
-    }
-  }
-
-  async onError(connection: Connection, error: unknown): Promise<void> {
-    console.error('WebSocket error:', error);
-    // Optionally log to external monitoring
-  }
-
-  async onClose(connection: Connection, code: number, reason: string, wasClean: boolean): Promise<void> {
-    console.log(`Connection ${connection.id} closed:`, code, reason, wasClean);
-    // Clean up connection-specific state if needed
+    // Process message, update state, broadcast response
   }
 }
 ```
 
-### Connection Management
+**SSE Alternative**: For one-way server → client streaming (simpler, HTTP-based), use Server-Sent Events instead of WebSockets.
 
-```typescript
-export class MyAgent extends Agent {
-  async onMessage(connection: Connection, message: WSMessage) {
-    // Connection properties
-    const connId = connection.id;  // Unique connection ID
-    const connState = connection.state;  // Connection-specific state
-
-    // Update connection state (not agent state)
-    connection.setState({ ...connection.state, lastActive: Date.now() });
-
-    // Send to this connection only
-    connection.send("Message to this client");
-
-    // Close connection programmatically
-    connection.close(1000, "Goodbye");
-  }
-}
-```
+**See**: https://developers.cloudflare.com/agents/api-reference/websockets/
 
 ---
 
 ## State Management
 
-### Using setState()
+**Two State Mechanisms**:
 
+1. **`this.setState(newState)`** - JSON-serializable state (up to 1GB)
+   - Automatically persisted, syncs to WebSocket clients
+   - Use for: User preferences, session data, small datasets
+
+2. **`this.sql`** - Built-in SQLite database (up to 1GB)
+   - Tagged template literals prevent SQL injection
+   - Use for: Relational data, large datasets, complex queries
+
+**State Rules**:
+- ✅ JSON-serializable only (objects, arrays, primitives, null)
+- ✅ Persists across restarts, immediately consistent
+- ❌ No functions or circular references
+- ❌ 1GB total limit (state + SQL combined)
+
+**SQL Pattern**:
 ```typescript
-interface UserState {
-  name: string;
-  email: string;
-  preferences: { theme: string; notifications: boolean };
-  loginCount: number;
-  lastLogin: Date | null;
-}
-
-export class UserAgent extends Agent<Env, UserState> {
-  initialState: UserState = {
-    name: "",
-    email: "",
-    preferences: { theme: "dark", notifications: true },
-    loginCount: 0,
-    lastLogin: null
-  };
-
-  async onRequest(request: Request): Promise<Response> {
-    if (request.method === "POST" && new URL(request.url).pathname === "/login") {
-      // Update state
-      this.setState({
-        ...this.state,
-        loginCount: this.state.loginCount + 1,
-        lastLogin: new Date()
-      });
-
-      // State is automatically persisted and synced to connected clients
-      return Response.json({ success: true, state: this.state });
-    }
-
-    return Response.json({ state: this.state });
-  }
-
-  onStateUpdate(state: UserState, source: "server" | Connection) {
-    console.log('State updated:', state);
-    console.log('Source:', source);  // "server" or Connection object
-
-    // React to state changes
-    if (state.loginCount > 10) {
-      console.log('Frequent user!');
-    }
-  }
-}
+await this.sql`CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, email TEXT)`
+await this.sql`INSERT INTO users (email) VALUES (${userEmail})`  // ← Prepared statement
+const users = await this.sql`SELECT * FROM users WHERE email = ${email}`  // ← Returns array
 ```
 
-**State Rules:**
-- ✅ State is JSON-serializable (objects, arrays, strings, numbers, booleans, null)
-- ✅ State persists across agent restarts
-- ✅ State is immediately consistent within the agent
-- ✅ State automatically syncs to connected WebSocket clients
-- ❌ State cannot contain functions or circular references
-- ❌ Total state size limited by database size (1GB max per agent)
-
-### Using SQL Database
-
-Each agent has a built-in SQLite database accessible via `this.sql`:
-
-```typescript
-export class MyAgent extends Agent {
-  async onStart() {
-    // Create tables on first start
-    await this.sql`
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-      )
-    `;
-
-    await this.sql`
-      CREATE INDEX IF NOT EXISTS idx_email ON users(email)
-    `;
-  }
-
-  async addUser(name: string, email: string) {
-    // Insert with prepared statement (prevents SQL injection)
-    const result = await this.sql`
-      INSERT INTO users (name, email)
-      VALUES (${name}, ${email})
-    `;
-
-    return result;
-  }
-
-  async getUser(email: string) {
-    // Query returns array of results
-    const users = await this.sql`
-      SELECT * FROM users WHERE email = ${email}
-    `;
-
-    return users[0] || null;
-  }
-
-  async getAllUsers() {
-    const users = await this.sql`
-      SELECT * FROM users ORDER BY created_at DESC
-    `;
-
-    return users;
-  }
-
-  async updateUser(id: number, name: string) {
-    await this.sql`
-      UPDATE users SET name = ${name} WHERE id = ${id}
-    `;
-  }
-
-  async deleteUser(id: number) {
-    await this.sql`
-      DELETE FROM users WHERE id = ${id}
-    `;
-  }
-}
-```
-
-**SQL Best Practices:**
-- ✅ Use tagged template literals (prevents SQL injection)
-- ✅ Create indexes for frequently queried columns
-- ✅ Use transactions for multiple related operations
-- ✅ Query results are always arrays (even for single row)
-- ❌ Don't construct SQL strings manually
-- ❌ Be mindful of 1GB database size limit
+**See**: https://developers.cloudflare.com/agents/api-reference/store-and-sync-state/
 
 ---
 
@@ -1398,620 +922,88 @@ export class MyWorkflow extends WorkflowEntrypoint<Env> {
 
 ## Browse the Web
 
-Agents can browse the web using [Browser Rendering](https://developers.cloudflare.com/browser-rendering/).
+Agents can use Browser Rendering for web scraping and automation:
 
-### Browser Rendering Binding
+**Binding**: Add `"browser": { "binding": "BROWSER" }` to wrangler.jsonc
+**Package**: `@cloudflare/puppeteer`
+**Use Case**: Web scraping, screenshots, automated browsing within agent workflows
 
-`wrangler.jsonc`:
-
-```jsonc
-{
-  "browser": {
-    "binding": "BROWSER"
-  }
-}
-```
-
-### Installation
-
-```bash
-npm install @cloudflare/puppeteer
-```
-
-### Web Scraping Example
-
-```typescript
-import { Agent } from "agents";
-import puppeteer from "@cloudflare/puppeteer";
-
-interface Env {
-  BROWSER: Fetcher;
-  OPENAI_API_KEY: string;
-}
-
-export class BrowserAgent extends Agent<Env> {
-  async browse(urls: string[]) {
-    const responses = [];
-
-    for (const url of urls) {
-      const browser = await puppeteer.launch(this.env.BROWSER);
-      const page = await browser.newPage();
-
-      await page.goto(url);
-      await page.waitForSelector("body");
-
-      const bodyContent = await page.$eval("body", el => el.innerHTML);
-
-      // Extract data with AI
-      const data = await this.extractData(bodyContent);
-      responses.push({ url, data });
-
-      await browser.close();
-    }
-
-    return responses;
-  }
-
-  async extractData(html: string): Promise<any> {
-    // Use OpenAI or Workers AI to extract structured data
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${this.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [{
-          role: 'user',
-          content: `Extract product info from HTML: ${html.slice(0, 4000)}`
-        }],
-        response_format: { type: "json_object" }
-      })
-    });
-
-    const result = await response.json();
-    return JSON.parse(result.choices[0].message.content);
-  }
-
-  async onRequest(request: Request): Promise<Response> {
-    const url = new URL(request.url).searchParams.get('url');
-    if (!url) {
-      return new Response("Missing url parameter", { status: 400 });
-    }
-
-    const results = await this.browse([url]);
-    return Response.json(results);
-  }
-}
-```
-
-### Screenshot Capture
-
-```typescript
-export class ScreenshotAgent extends Agent<Env> {
-  async captureScreenshot(url: string): Promise<Buffer> {
-    const browser = await puppeteer.launch(this.env.BROWSER);
-    const page = await browser.newPage();
-
-    await page.goto(url);
-    const screenshot = await page.screenshot({ fullPage: true });
-
-    await browser.close();
-
-    return screenshot;
-  }
-}
-```
+**See**: `cloudflare-browser-rendering` skill for complete Puppeteer + Workers integration guide.
 
 ---
 
 ## Retrieval Augmented Generation (RAG)
 
-Implement RAG using Vectorize + Workers AI embeddings.
+Agents can implement RAG using Vectorize (vector database) + Workers AI (embeddings):
 
-### Vectorize Binding
+**Pattern**: Ingest docs → generate embeddings → store in Vectorize → query → retrieve context → pass to AI
 
-`wrangler.jsonc`:
+**Bindings**:
+- `"ai": { "binding": "AI" }` - Workers AI for embeddings
+- `"vectorize": { "bindings": [{ "binding": "VECTORIZE", "index_name": "my-vectors" }] }` - Vector search
 
-```jsonc
-{
-  "ai": {
-    "binding": "AI"
-  },
-  "vectorize": {
-    "bindings": [
-      {
-        "binding": "VECTORIZE",
-        "index_name": "my-agent-vectors"
-      }
-    ]
-  }
-}
-```
+**Typical Workflow**:
+1. Generate embeddings with Workers AI (`@cf/baai/bge-base-en-v1.5`)
+2. Upsert vectors to Vectorize (`this.env.VECTORIZE.upsert(vectors)`)
+3. Query similar vectors (`this.env.VECTORIZE.query(queryVector, { topK: 5 })`)
+4. Use retrieved context in AI prompt
 
-### Create Index
-
-```bash
-npx wrangler vectorize create my-agent-vectors \
-  --dimensions=768 \
-  --metric=cosine
-```
-
-### Complete RAG Implementation
-
-```typescript
-import { Agent } from "agents";
-import { generateText } from "ai";
-import { openai } from "@ai-sdk/openai";
-
-interface Env {
-  AI: Ai;
-  VECTORIZE: Vectorize;
-  OPENAI_API_KEY: string;
-}
-
-export class RAGAgent extends Agent<Env> {
-  // Ingest documents
-  async ingestDocuments(documents: Array<{ id: string; text: string; metadata: any }>) {
-    const vectors = [];
-
-    for (const doc of documents) {
-      // Generate embedding with Workers AI
-      const { data } = await this.env.AI.run('@cf/baai/bge-base-en-v1.5', {
-        text: [doc.text]
-      });
-
-      vectors.push({
-        id: doc.id,
-        values: data[0],
-        metadata: { ...doc.metadata, text: doc.text }
-      });
-    }
-
-    // Insert into Vectorize
-    await this.env.VECTORIZE.upsert(vectors);
-
-    return { ingested: vectors.length };
-  }
-
-  // Query knowledge base
-  async queryKnowledge(userQuery: string, topK: number = 5) {
-    // Generate query embedding
-    const { data } = await this.env.AI.run('@cf/baai/bge-base-en-v1.5', {
-      text: [userQuery]
-    });
-
-    // Search Vectorize
-    const results = await this.env.VECTORIZE.query(data[0], { topK });
-
-    // Extract relevant documents
-    const context = results.matches.map(match => match.metadata.text).join('\n\n');
-
-    return context;
-  }
-
-  // RAG Chat
-  async chat(userMessage: string) {
-    // Retrieve relevant context
-    const context = await this.queryKnowledge(userMessage);
-
-    // Generate response with context
-    const { text } = await generateText({
-      model: openai('gpt-4o-mini'),
-      messages: [
-        {
-          role: 'system',
-          content: `You are a helpful assistant. Use the following context to answer questions:\n\n${context}`
-        },
-        {
-          role: 'user',
-          content: userMessage
-        }
-      ]
-    });
-
-    return { response: text, context };
-  }
-
-  async onRequest(request: Request): Promise<Response> {
-    const { message } = await request.json();
-    const result = await this.chat(message);
-    return Response.json(result);
-  }
-}
-```
-
-### Metadata Filtering
-
-```typescript
-// Create metadata indexes BEFORE inserting vectors
-await this.env.VECTORIZE.createMetadataIndex("category");
-await this.env.VECTORIZE.createMetadataIndex("language");
-
-// Query with filters
-const results = await this.env.VECTORIZE.query(queryVector, {
-  topK: 10,
-  filter: {
-    category: { $eq: "documentation" },
-    language: { $eq: "en" }
-  }
-});
-```
-
-**See**: [cloudflare-vectorize skill](../cloudflare-vectorize/) for complete Vectorize guide.
+**See**: `cloudflare-vectorize` skill for complete RAG implementation guide.
 
 ---
 
 ## Using AI Models
 
-### AI SDK (Vercel)
+Agents can call AI models using:
+- **Vercel AI SDK** (recommended): Multi-provider, automatic streaming, tool calling
+- **Workers AI**: Cloudflare's on-platform inference (cost-effective, manual parsing)
 
-```bash
-npm install ai @ai-sdk/openai @ai-sdk/anthropic
-```
+**Architecture Note**: Agents SDK provides infrastructure (WebSockets, state, scheduling). AI inference is a separate layer - use AI SDK for the "brain".
 
-```typescript
-import { Agent } from "agents";
-import { generateText, streamText } from "ai";
-import { openai } from "@ai-sdk/openai";
-import { anthropic } from "@ai-sdk/anthropic";
-
-export class AIAgent extends Agent {
-  // Simple text generation
-  async generateResponse(prompt: string) {
-    const { text } = await generateText({
-      model: openai('gpt-4o-mini'),
-      prompt
-    });
-
-    return text;
-  }
-
-  // Streaming response
-  async streamResponse(prompt: string): Promise<Response> {
-    const result = streamText({
-      model: anthropic('claude-sonnet-4-5'),
-      prompt
-    });
-
-    return result.toTextStreamResponse();
-  }
-
-  // Structured output
-  async extractData(text: string) {
-    const { object } = await generateObject({
-      model: openai('gpt-4o-mini'),
-      schema: z.object({
-        name: z.string(),
-        email: z.string().email(),
-        age: z.number().optional()
-      }),
-      prompt: `Extract user info from: ${text}`
-    });
-
-    return object;
-  }
-}
-```
-
-### Workers AI
-
-```typescript
-interface Env {
-  AI: Ai;
-}
-
-export class WorkersAIAgent extends Agent<Env> {
-  async generateText(prompt: string) {
-    const response = await this.env.AI.run('@cf/meta/llama-3-8b-instruct', {
-      messages: [{ role: 'user', content: prompt }]
-    });
-
-    return response;
-  }
-
-  async generateImage(prompt: string) {
-    const response = await this.env.AI.run('@cf/black-forest-labs/flux-1-schnell', {
-      prompt
-    });
-
-    return response;
-  }
-}
-```
-
-**See**: [cloudflare-workers-ai skill](../cloudflare-workers-ai/) for complete Workers AI guide.
+**See**:
+- `ai-sdk-core` skill for complete AI SDK integration patterns
+- `cloudflare-workers-ai` skill for Workers AI streaming parsing
 
 ---
 
 ## Calling Agents
 
-### Using routeAgentRequest
+**Two Main Patterns**:
 
-Automatically route requests to agents based on URL pattern `/agents/:agent/:name`:
+1. **`routeAgentRequest(request, env)`** - Auto-route via URL pattern `/agents/:agent/:name`
+   - Example: `/agents/my-agent/user-123` routes to MyAgent instance "user-123"
 
+2. **`getAgentByName<Env, T>(env.AgentBinding, instanceName)`** - Custom routing
+   - Returns agent stub for calling methods or passing requests
+   - Example: `const agent = getAgentByName(env.MyAgent, 'user-${userId}')`
+
+**Multi-Agent Communication**:
 ```typescript
-import { Agent, AgentNamespace, routeAgentRequest } from 'agents';
-
-interface Env {
-  MyAgent: AgentNamespace<MyAgent>;
-}
-
-export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    // Routes to: /agents/my-agent/user-123
-    const response = await routeAgentRequest(request, env);
-
-    if (response) {
-      return response;
-    }
-
-    return new Response("Not Found", { status: 404 });
-  }
-} satisfies ExportedHandler<Env>;
-
-export class MyAgent extends Agent<Env> {
-  async onRequest(request: Request): Promise<Response> {
-    return Response.json({ agent: this.name });
-  }
-}
-```
-
-**URL Pattern**: `/agents/my-agent/user-123`
-- `my-agent` = class name in kebab-case
-- `user-123` = agent instance name
-
-### Using getAgentByName
-
-For custom routing or calling agents from Workers:
-
-```typescript
-import { Agent, AgentNamespace, getAgentByName } from 'agents';
-
-interface Env {
-  MyAgent: AgentNamespace<MyAgent>;
-}
-
-export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    const userId = new URL(request.url).searchParams.get('userId') || 'anonymous';
-
-    // Get or create agent instance
-    const agent = getAgentByName<Env, MyAgent>(env.MyAgent, `user-${userId}`);
-
-    // Pass request to agent
-    return (await agent).fetch(request);
-  }
-} satisfies ExportedHandler<Env>;
-
-export class MyAgent extends Agent<Env> {
-  // Agent implementation
-}
-```
-
-### Calling Agent Methods Directly
-
-```typescript
-export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    const agent = getAgentByName<Env, MyAgent>(env.MyAgent, 'user-123');
-
-    // Call custom methods on agent using RPC
-    const result = await (await agent).customMethod({ data: "example" });
-
-    return Response.json({ result });
-  }
-}
-
-export class MyAgent extends Agent<Env> {
-  async customMethod(params: { data: string }): Promise<any> {
-    return { processed: params.data };
-  }
-}
-```
-
-### Multi-Agent Communication
-
-```typescript
-interface Env {
-  AgentA: AgentNamespace<AgentA>;
-  AgentB: AgentNamespace<AgentB>;
-}
-
 export class AgentA extends Agent<Env> {
   async processData(data: any) {
-    // Call another agent
     const agentB = getAgentByName<Env, AgentB>(this.env.AgentB, 'processor-1');
-    const result = await (await agentB).analyze(data);
-
-    return result;
-  }
-}
-
-export class AgentB extends Agent<Env> {
-  async analyze(data: any) {
-    return { analyzed: true, data };
+    return await (await agentB).analyze(data);
   }
 }
 ```
 
-### Authentication Patterns
+**CRITICAL Security**: Always authenticate in Worker BEFORE creating/accessing agents. Agents should assume the caller is authorized.
 
-```typescript
-export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    // Authenticate BEFORE invoking agent
-    const authHeader = request.headers.get('Authorization');
-    if (!authHeader) {
-      return new Response("Unauthorized", { status: 401 });
-    }
-
-    const userId = await verifyToken(authHeader);
-    if (!userId) {
-      return new Response("Forbidden", { status: 403 });
-    }
-
-    // Only create/access agent for authenticated users
-    const agent = getAgentByName<Env, MyAgent>(env.MyAgent, `user-${userId}`);
-    return (await agent).fetch(request);
-  }
-}
-```
-
-**CRITICAL**: Always authenticate in Worker, **NOT** in Agent. Agents should assume the caller is authorized.
+**See**: https://developers.cloudflare.com/agents/api-reference/calling-agents/
 
 ---
 
 ## Client APIs
 
-### AgentClient (Browser)
+**Browser/React Integration**:
+- **`AgentClient`** (from `agents/client`) - WebSocket client for browser
+- **`agentFetch`** (from `agents/client`) - HTTP requests to agents
+- **`useAgent`** (from `agents/react`) - React hook for WebSocket connections + state sync
+- **`useAgentChat`** (from `agents/ai-react`) - Pre-built chat UI hook
 
-```typescript
-import { AgentClient } from "agents/client";
+**All client libraries automatically handle**: WebSocket connections, state synchronization, reconnection logic.
 
-// Connect to agent instance
-const client = new AgentClient({
-  agent: "chat-agent",        // Class name in kebab-case
-  name: "room-123",           // Instance name
-  host: window.location.host
-});
-
-client.onopen = () => {
-  console.log("Connected");
-  client.send(JSON.stringify({ type: "join", user: "alice" }));
-};
-
-client.onmessage = (event) => {
-  const data = JSON.parse(event.data);
-  console.log("Received:", data);
-};
-
-client.onclose = () => {
-  console.log("Disconnected");
-};
-```
-
-### agentFetch (HTTP Requests)
-
-```typescript
-import { agentFetch } from "agents/client";
-
-async function getData() {
-  const response = await agentFetch(
-    { agent: "my-agent", name: "user-123" },
-    {
-      method: "GET",
-      headers: { "Authorization": `Bearer ${token}` }
-    }
-  );
-
-  const data = await response.json();
-  return data;
-}
-```
-
-### useAgent Hook (React)
-
-```typescript
-import { useAgent } from "agents/react";
-import { useState } from "react";
-
-function ChatUI() {
-  const [messages, setMessages] = useState([]);
-
-  const connection = useAgent({
-    agent: "chat-agent",
-    name: "room-123",
-    onMessage: (event) => {
-      const data = JSON.parse(event.data);
-      if (data.type === 'message') {
-        setMessages(prev => [...prev, data.message]);
-      }
-    },
-    onOpen: () => console.log("Connected"),
-    onClose: () => console.log("Disconnected")
-  });
-
-  const sendMessage = (text: string) => {
-    connection.send(JSON.stringify({ type: 'chat', text }));
-  };
-
-  return (
-    <div>
-      {messages.map((msg, i) => <div key={i}>{msg.text}</div>)}
-      <button onClick={() => sendMessage("Hello")}>Send</button>
-    </div>
-  );
-}
-```
-
-### State Synchronization
-
-```typescript
-import { useAgent } from "agents/react";
-import { useState } from "react";
-
-function Counter() {
-  const [count, setCount] = useState(0);
-
-  const agent = useAgent({
-    agent: "counter-agent",
-    name: "my-counter",
-    onStateUpdate: (newState) => {
-      setCount(newState.counter);
-    }
-  });
-
-  const increment = () => {
-    agent.setState({ counter: count + 1 });
-  };
-
-  return (
-    <div>
-      <p>Count: {count}</p>
-      <button onClick={increment}>Increment</button>
-    </div>
-  );
-}
-```
-
-### useAgentChat Hook
-
-```typescript
-import { useAgentChat } from "agents/ai-react";
-
-function ChatInterface() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useAgentChat({
-    agent: "ai-chat-agent",
-    name: "chat-session-123"
-  });
-
-  return (
-    <div>
-      <div>
-        {messages.map((msg, i) => (
-          <div key={i}>
-            <strong>{msg.role}:</strong> {msg.content}
-          </div>
-        ))}
-      </div>
-
-      <form onSubmit={handleSubmit}>
-        <input
-          value={input}
-          onChange={handleInputChange}
-          placeholder="Type a message..."
-          disabled={isLoading}
-        />
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? "Thinking..." : "Send"}
-        </button>
-      </form>
-    </div>
-  );
-}
-```
+**See**: https://developers.cloudflare.com/agents/api-reference/client-apis/
 
 ---
 
@@ -2145,158 +1137,6 @@ npx @modelcontextprotocol/inspector@latest
 
 ---
 
-## Patterns & Concepts
-
-### Chat Agents (AIChatAgent)
-
-```typescript
-import { AIChatAgent } from "agents/ai-chat-agent";
-import { streamText } from "ai";
-import { openai } from "@ai-sdk/openai";
-
-export class MyChatAgent extends AIChatAgent<Env> {
-  async onChatMessage(onFinish) {
-    const result = streamText({
-      model: openai('gpt-4o-mini'),
-      messages: this.messages,
-      onFinish
-    });
-
-    return result.toTextStreamResponse();
-  }
-
-  // Optional: Customize message persistence
-  async onStateUpdate(state, source) {
-    console.log('Chat state updated:', this.messages.length, 'messages');
-  }
-}
-```
-
-### Human-in-the-Loop (HITL)
-
-```typescript
-export class ApprovalAgent extends Agent {
-  async processRequest(data: any) {
-    // Process automatically
-    const processed = await this.autoProcess(data);
-
-    // If confidence low, request human review
-    if (processed.confidence < 0.8) {
-      this.setState({
-        ...this.state,
-        pendingReview: {
-          data: processed,
-          requestedAt: Date.now(),
-          status: 'pending'
-        }
-      });
-
-      // Send notification to human
-      await this.notifyHuman(processed);
-
-      return { status: 'pending_review', id: processed.id };
-    }
-
-    // High confidence, proceed automatically
-    return this.complete(processed);
-  }
-
-  async approveReview(id: string, approved: boolean) {
-    const pending = this.state.pendingReview;
-
-    if (approved) {
-      await this.complete(pending.data);
-    } else {
-      await this.reject(pending.data);
-    }
-
-    this.setState({
-      ...this.state,
-      pendingReview: null
-    });
-  }
-}
-```
-
-### Tools Concept
-
-Tools enable agents to interact with external services:
-
-```typescript
-export class ToolAgent extends Agent {
-  // Tool: Search flights
-  async searchFlights(from: string, to: string, date: string) {
-    const response = await fetch(`https://api.flights.com/search`, {
-      method: 'POST',
-      body: JSON.stringify({ from, to, date })
-    });
-    return response.json();
-  }
-
-  // Tool: Book flight
-  async bookFlight(flightId: string, passengers: any[]) {
-    const response = await fetch(`https://api.flights.com/book`, {
-      method: 'POST',
-      body: JSON.stringify({ flightId, passengers })
-    });
-    return response.json();
-  }
-
-  // Tool: Send confirmation email
-  async sendEmail(to: string, subject: string, body: string) {
-    // Use email service
-    return { sent: true };
-  }
-
-  // Orchestrate tools
-  async bookTrip(params: any) {
-    const flights = await this.searchFlights(params.from, params.to, params.date);
-    const booking = await this.bookFlight(flights[0].id, params.passengers);
-    await this.sendEmail(params.email, "Booking Confirmed", `Booking ID: ${booking.id}`);
-
-    return booking;
-  }
-}
-```
-
-### Multi-Agent Orchestration
-
-```typescript
-interface Env {
-  ResearchAgent: AgentNamespace<ResearchAgent>;
-  WriterAgent: AgentNamespace<WriterAgent>;
-  EditorAgent: AgentNamespace<EditorAgent>;
-}
-
-export class OrchestratorAgent extends Agent<Env> {
-  async createArticle(topic: string) {
-    // 1. Research agent gathers information
-    const researcher = getAgentByName<Env, ResearchAgent>(
-      this.env.ResearchAgent,
-      `research-${topic}`
-    );
-    const research = await (await researcher).research(topic);
-
-    // 2. Writer agent creates draft
-    const writer = getAgentByName<Env, WriterAgent>(
-      this.env.WriterAgent,
-      `writer-${topic}`
-    );
-    const draft = await (await writer).write(research);
-
-    // 3. Editor agent reviews
-    const editor = getAgentByName<Env, EditorAgent>(
-      this.env.EditorAgent,
-      `editor-${topic}`
-    );
-    const final = await (await editor).edit(draft);
-
-    return final;
-  }
-}
-```
-
----
 
 ## Critical Rules
 
