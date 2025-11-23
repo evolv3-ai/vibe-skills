@@ -1551,6 +1551,50 @@ Build with Claude Messages API using structured outputs (v0.69.0+, Nov 2025) for
 
 ---
 
+## Claude-Code-Bash-Patterns Skill - DELETED ❌
+
+**Analysis Date**: 2025-11-23
+**Decision**: DELETED (not worth maintaining)
+**Reason**: Redundant with official Claude Code documentation
+
+### Research Findings ✅
+
+**Claude Code Bash Tool & Hooks Updates (Nov 2025):**
+
+1. **No Substantial Nov 2025 Updates:**
+   - Changelog only extends to early 2025
+   - No significant Bash tool improvements in Nov 2025
+   - Minor: Auto-backgrounding with `BASH_DEFAULT_TIMEOUT_MS`
+   - Minor: `tool_use_id` field added to hooks
+
+2. **Hooks System Known Bugs:**
+   - PreToolUse/PostToolUse hooks not firing reliably (GitHub #6305, #6403, #3148)
+   - Makes ~40% of skill content unreliable
+
+3. **Breaking Changes Suggest Simplification:**
+   - Sandbox feature removed from Bash tool
+   - Output styles deprecated → use CLAUDE.md instead
+   - Bash tool clarified as "for terminal operations only"
+
+4. **Official Docs Comprehensive:**
+   - https://docs.claude.com/en/docs/claude-code/tools (Bash tool)
+   - https://docs.claude.com/en/docs/claude-code/hooks-guide (Hooks system)
+   - All patterns already well-documented
+
+### Why Deleted:
+
+1. **Official docs excellent** - Claude Code docs cover Bash tool + hooks comprehensively
+2. **Hooks buggy** - Multiple reports of PreToolUse/PostToolUse not working
+3. **Minimal knowledge gaps** - No substantial Nov 2025 updates worth preserving
+4. **Redundant with LLM training** - Standard bash patterns (&&, ||, HEREDOC) already known
+5. **Niche value** - 12 "known issues" mostly Windows-specific edge cases
+6. **Author skill** - Created by user, not production-validated patterns
+
+**Lines Removed**: 1,186 lines (~3,950 tokens)
+**Impact**: Cleaner skill library, reduced maintenance burden
+
+---
+
 ## Phase 2 Summary So Far
 
 **Skills Completed:**
@@ -1602,6 +1646,8 @@ Build with Claude Messages API using structured outputs (v0.69.0+, Nov 2025) for
 18. ✅ Trimmed claude-api (530 lines, 56.5% reduction, v0.69.0 structured outputs + model deprecations + Haiku 4.5 added)
 19. ✅ Audited clerk-auth (research phase + trim)
 20. ✅ Trimmed clerk-auth (420 lines, 47% reduction, API v2025-11-10 breaking changes + PKCE + Client Trust defense added)
+21. ✅ Evaluated claude-code-bash-patterns (research phase)
+22. ✅ DELETED claude-code-bash-patterns (1,186 lines removed - redundant with official docs, hooks buggy, minimal knowledge gaps)
 
 **Next Session:**
 1. Continue A-Z systematic audit (next: cloudflare-agents)
