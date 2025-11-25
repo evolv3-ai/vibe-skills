@@ -15,7 +15,7 @@ A custom status line for Claude Code that displays accurate token usage with a b
 - 🧱 **Brick visualization** showing token breakdown by category
 - 🔧 **Git integration**: repo:branch [commit] message | github-repo *↑↓
 - 📊 **Session metrics**: model name, lines changed, free space
-- 🎨 **Model-aware**: Automatic context limits (200k Sonnet, 1M Opus)
+- 🎨 **Model-aware**: Automatic context limits (200k for all models in Claude Code)
 - ⚡ **Zero config**: Auto-detects everything, just install and go
 
 ## 🚀 Quick Start

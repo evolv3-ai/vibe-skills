@@ -53,7 +53,7 @@ ${colors.green}Features:${colors.reset}
   • Real-time context tracking from transcript files
   • Brick visualization showing token breakdown
   • Git integration (repo, branch, commit, status)
-  • Model-aware context limits (200k Sonnet, 1M Opus)
+  • Model-aware context limits (200k for all models in Claude Code)
   • Session metrics (lines changed, free space)
 
 ${colors.green}More Info:${colors.reset}

@@ -101,8 +101,10 @@ transcript_path=$(echo "$input" | jq -r '.transcript_path // ""')
 model_id=$(echo "$input" | jq -r '.model.id // ""')
 
 # Determine context limit based on model
+# NOTE: While Opus 4/4.5 models have 1M context at API level, Claude Code CLI
+# enforces a 200k limit for all models. Using 200k for accurate display.
 case "$model_id" in
-    *"opus-4"*) total_tokens=1000000 ;;
+    *"opus-4"*) total_tokens=200000 ;;  # Claude Code limits to 200k
     *"sonnet-4"*|*"sonnet-3-7"*) total_tokens=200000 ;;
     *"haiku"*) total_tokens=200000 ;;
     *) total_tokens=200000 ;;  # Default

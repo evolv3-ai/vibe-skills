@@ -9,7 +9,7 @@ A custom status line for Claude Code CLI that displays real-time context trackin
 ### Real-Time Context Tracking
 - **Accurate token usage** from Claude Code's transcript files
 - **Brick visualization** showing context breakdown by category
-- **Model-aware limits** (200k for Sonnet, 1M for Opus)
+- **Model-aware limits** (200k for all models in Claude Code)
 - **Token breakdown**: System, Tools, MCP, Memory, Messages
 
 ### Git Integration
