@@ -3335,15 +3335,25 @@ grep -n "^| \*\*" skills/cloudflare-r2/SKILL.md
 72. ✅ REDUCTION: neon-vercel-postgres (1,296→922 lines, -374 lines, -28.9%, removed basic SQL patterns + generic transaction concepts + generic ORM CRUD + generic pooling theory + generic optimization + generic security best practices, retained all 15 errors + Neon branching + pooled connection string specifics + edge compatibility + Vercel env vars + Prisma edge incompatibility + template tag syntax + transaction API + auto-suspend behavior)
 73. ✅ Audited openai-api (1 package update: openai 6.7.0→6.9.1, MAJOR GPT-5.1 knowledge gap Nov 13, 2025)
 74. ✅ REDUCTION: openai-api (2,100→872 lines, -1,228 lines, -58.5%, ADDED GPT-5.1 updates + reasoning_effort 'none' + 24hr prompt caching + breaking change migration notes + new dev tools, removed generic HTTP codes + verbose message roles + verbose JSON structures + verbose streaming + verbose function calling + RAG patterns + cosine similarity + L2 normalization + verbose DALL-E/GPT-Image-1 params + verbose TTS params + verbose moderation categories + generic error handling + verbose rate limits + generic best practices, retained all errors 401/429 + GPT-5 parameters + GPT-5 limitations + text-embedding-3 dimensions + DALL-E 3 prompt revision + GPT-Image-1 multipart + gpt-4o-mini-tts voice instructions Nov 2024 + TTS streaming SSE + 11 safety categories + rate limit headers)
+75. ✅ Audited openai-apps-mcp (6 package updates: @modelcontextprotocol/sdk 1.21.0→1.23.0, hono 4.10.2→4.10.6, zod 3.25.76→4.1.13 MAJOR, @cloudflare/vite-plugin 1.13.13→1.15.2, vite 7.1.9→7.2.4, wrangler 4.42.2→4.50.0, MAJOR knowledge gaps: Zod 4.0 breaking changes July 2025 + MCP Apps Extension SEP-1865 Nov 21 2025 + MCP Spec 2025-11-25 + Apps in ChatGPT GA Nov 13 2025)
+76. ✅ REDUCTION: openai-apps-mcp (1,000→288 lines, -712 lines, -71.2%, ADDED Zod 4.0 migration notes + .default() breaking change + .prefault() API + error.issues not error.errors + .merge()/.superRefine() deprecated + 14x performance + MCP Apps Extension SEP-1865 + MCP Spec 2025-11-25 + Apps GA Nov 13 + working implementation reference /home/jez/Documents/chatgpt-app-sdk, removed generic "What Are OpenAI Apps" + verbose architecture + generic key components + duplicative 5-step setup + config files reference + generic patterns text/list/callbacks + bundled resources + generic Zod/env/React examples + duplicative troubleshooting + setup checklist + verbose explanations, retained all 8 errors + OpenAI-specific metadata text/html+skybridge + ui://widget/ + window.openai.* + ChatGPT CORS/CSP/SSE + ASSETS binding + Critical Requirements + Quick Start minimal example + MCP server pattern + widget data access + action-oriented descriptions)
+
+**Cumulative Impact:**
+- Skills audited: 35 of 59 (59.3%)
+- Skills deleted: 3
+- Lines removed: ~23,271 lines (net after google-gemini-api +37 enhancement)
+- Tokens saved: ~77,739 tokens per invocation (across 34 reduction audits)
+- Average reduction: 51.1% (34 reduction audits, 1 enhancement update)
+- Annual savings (5 uses/month): ~4,664,340 tokens across reduction audits
 
 **Next Session:**
-1. Continue A-Z systematic audit (next skill alphabetically after openai-api)
+1. Continue A-Z systematic audit (next skill alphabetically after openai-apps-mcp)
 2. Follow KNOWLEDGE_GAP_AUDIT_CHECKLIST.md process
 3. Research → Audit → Trim → Commit (one skill per session)
-4. Pattern validated: ~50.5% average reduction across 33 skills (1 enhancement update)
+4. Pattern validated: ~51.1% average reduction across 34 skills (1 enhancement update)
 
 **Long Term:**
-- Audit remaining 22 skills alphabetically (34 audited + 3 deleted = 37 of 59 complete, 62.7%)
+- Audit remaining 21 skills alphabetically (35 audited + 3 deleted = 38 of 59 complete, 64.4%)
 - Update skill creation guidelines with "knowledge gap test"
 - Establish quarterly review process for skills
 - Target: Continue 50-70% token savings across all skills
@@ -3353,7 +3363,7 @@ grep -n "^| \*\*" skills/cloudflare-r2/SKILL.md
 ## Last Checkpoint
 
 **Date**: 2025-11-26
-**Commit**: db75762
-**Message**: "skill/openai-api: Reduction audit + GPT-5.1 updates + package update"
+**Commit**: f9c1c20
+**Message**: "skill/openai-apps-mcp: Reduction audit + Zod 4.0 migration + 6 package updates"
 
-**Status**: Phase 2 in progress - 34 skills audited (57.6%), 3 skills deleted (claude-code-bash-patterns, gemini-cli, github-project-automation), ~22,559 lines removed from reduction audits (net after google-gemini-api +37 enhancement), 33 reduction audits complete, 1 enhancement update, ~75,365 tokens saved per invocation, 50.5% average reduction, 37 of 59 complete (62.7%), ready for next skill alphabetically after openai-api
+**Status**: Phase 2 in progress - 35 skills audited (59.3%), 3 skills deleted (claude-code-bash-patterns, gemini-cli, github-project-automation), ~23,271 lines removed from reduction audits (net after google-gemini-api +37 enhancement), 34 reduction audits complete, 1 enhancement update, ~77,739 tokens saved per invocation, 51.1% average reduction, 38 of 59 complete (64.4%), ready for next skill alphabetically after openai-apps-mcp
