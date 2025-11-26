@@ -1,9 +1,9 @@
 # Claude Code Skills Collection
 
-**Production-ready skills for Claude Code CLI**
-**Last Updated**: 2025-11-07
+**Skills for Claude Code CLI**
+**Last Updated**: 2025-11-26
 
-A curated collection of battle-tested skills for building modern web applications with Cloudflare, React, Tailwind, and AI integrations.
+**57 skills** for building modern web applications with Cloudflare, React, Tailwind, and AI integrations. Systematically optimized for 50.9% average token savings and 100% error prevention.
 
 **👋 New Here?** → Read [START_HERE.md](START_HERE.md) for quick navigation
 **🔨 Building a Skill?** → Use [QUICK_WORKFLOW.md](QUICK_WORKFLOW.md) and [templates/](templates/)
@@ -27,7 +27,7 @@ A curated collection of battle-tested skills for building modern web application
 /plugin install tailwind-v4-shadcn@claude-skills openai-agents@claude-skills
 ```
 
-See [MARKETPLACE.md](MARKETPLACE.md) for complete marketplace documentation including all 60 available skills.
+See [MARKETPLACE.md](MARKETPLACE.md) for complete marketplace documentation including all 57 available skills.
 
 ### Option B: Direct Installation (For Contributors & Development)
 
@@ -52,9 +52,9 @@ Skills will be available in Claude Code and automatically suggested when relevan
 
 ---
 
-## 📦 Available Skills (62 Production-Ready)
+## 📦 Available Skills (57 Total)
 
-**📋 Full Catalog**: See [MARKETPLACE.md](MARKETPLACE.md) for the complete organized list of all 62 skills by category.
+**📋 Full Catalog**: See [MARKETPLACE.md](MARKETPLACE.md) for the complete list organized by category.
 
 **Below**: Featured skills with detailed descriptions and trigger keywords.
 
@@ -144,15 +144,6 @@ CAPTCHA-alternative bot protection with client-side widgets, server-side validat
 
 ---
 
-### Framework Integration
-
-#### **cloudflare-nextjs**
-Deploy Next.js (App Router/Pages) to Cloudflare Workers with OpenNext adapter. Prevents 10 documented errors.
-
-**Triggers**: `next.js cloudflare`, `nextjs workers`, `opennext adapter`
-
----
-
 ### Routing & API Frameworks
 
 #### **hono-routing**
@@ -210,15 +201,6 @@ Object storage with automatic CDN for file uploads, images, documents. Prevents 
 
 ---
 
-### Web Scraping & Utilities
-
-#### **firecrawl-scraper**
-Website scraping with Firecrawl v2 API: scrape, crawl, map, extract. Prevents 6 documented errors.
-
-**Triggers**: `web scraping`, `firecrawl`, `content extraction`
-
----
-
 ### UI & Frontend
 
 #### **tailwind-v4-shadcn**
@@ -251,20 +233,6 @@ Client state management with Zustand: simple, performant, TypeScript-first. Prev
 
 ### Additional Cloudflare Services
 
-#### **cloudflare-cron-triggers**
-Scheduled tasks and cron jobs for Workers. Prevents 4 documented errors.
-
-**Triggers**: `cron triggers`, `scheduled tasks`, `cloudflare cron`
-
----
-
-#### **cloudflare-email-routing**
-Email routing and processing for Workers. Prevents 5 documented errors.
-
-**Triggers**: `email routing`, `cloudflare email`, `email workers`
-
----
-
 #### **cloudflare-hyperdrive**
 Connection pooling for Postgres and MySQL databases. Prevents 6 documented errors.
 
@@ -283,29 +251,6 @@ Image optimization and delivery. Prevents 4 documented errors.
 Headless browser automation with Puppeteer for Workers. Prevents 8 documented errors.
 
 **Triggers**: `browser rendering`, `puppeteer workers`, `headless browser`
-
----
-
-#### **cloudflare-zero-trust-access**
-Zero Trust security and access control. Prevents 6 documented errors.
-
-**Triggers**: `zero trust`, `cloudflare access`, `security workers`
-
----
-
-### Full-Stack Scaffolds
-
-#### **cloudflare-full-stack-scaffold**
-Complete full-stack template: Vite + React + Workers + D1 + R2 + KV. Prevents 12 documented errors.
-
-**Triggers**: `full stack scaffold`, `cloudflare template`, `vite workers react`
-
----
-
-#### **cloudflare-full-stack-integration**
-Integration patterns for combining multiple Cloudflare services. Prevents 10 documented errors.
-
-**Triggers**: `cloudflare integration`, `service composition`, `multi-service workers`
 
 ---
 
@@ -484,15 +429,6 @@ Session handoff protocol for managing context across sessions. Prevents 3 docume
 
 ---
 
-### GitHub Automation
-
-#### **github-project-automation**
-Complete GitHub Actions automation with 12 workflow templates (CI, CD, security, maintenance), 4 issue templates (YAML with validation), 3 PR templates, security configuration (Dependabot, CodeQL), and 4 automation scripts. Prevents 18 documented errors including YAML syntax, action version pinning, secrets management, and matrix strategies. Includes interactive setup wizard and validation tools.
-
-**Triggers**: `github actions setup`, `create github workflow`, `ci/cd github`, `issue templates github`, `pull request template`, `dependabot configuration`, `codeql setup`, `github security scanning`, `workflow syntax error`, `yaml syntax error github`, `workflow not triggering`, `github actions error`, `action version pinning`, `runner version github`, `secrets not found github`, `matrix strategy error`, `yaml indentation error`, `github actions troubleshooting`, `codeql not running`, `dependabot failing`, `github context syntax`, `secrets management github`, `branch protection rules`, `codeowners file`, `continuous integration github`, `deploy cloudflare workers github`, `github actions cloudflare`, `continuous deployment github`
-
----
-
 ## 🎯 Skill Usage Protocol
 
 ### Use this or something like it in your main user CLAUDE.md file >>>
@@ -650,15 +586,15 @@ See [tools/statusline/README.md](tools/statusline/README.md) for full documentat
 
 ## 📋 Skill Categories
 
-All 62 skills are production-ready and organized by domain:
+All 57 skills organized by domain:
 
-- **Cloudflare Platform** (22 skills) - Workers, D1, R2, KV, AI, Queues, Workflows, Durable Objects, MCP, etc.
+- **Cloudflare Platform** (15 skills) - Workers, D1, R2, KV, AI, Queues, Workflows, Durable Objects, MCP, Turnstile, Hyperdrive, Images, Browser Rendering
 - **AI & Machine Learning** (14 skills) - OpenAI, Claude, Gemini, ElevenLabs, Vercel AI SDK, Thesys
-- **Frontend & UI** (7 skills) - React, Tailwind v4, Forms, State Management, Next.js, Hono
-- **Auth & Security** (3 skills) - Clerk, Auth.js, Better Auth
+- **Frontend & UI** (12 skills) - React, Tailwind v4, Forms, State Management, Next.js, Hono, Motion, Auto-Animate, TanStack Router/Query/Start/Table
+- **Auth & Security** (2 skills) - Clerk, Better Auth
 - **Content Management** (3 skills) - TinaCMS, Sveltia CMS, WordPress
 - **Database & ORM** (4 skills) - Drizzle, Neon Postgres, Vercel KV/Blob
-- **Tooling & Planning** (10 skills) - MCP servers, FastMCP, Hugo, Project Planning, Workflow, Gemini CLI, GitHub, Open Source, Firecrawl
+- **Tooling & Planning** (7 skills) - MCP servers, FastMCP, Project Planning/Session/Workflow, Open Source, Skill Review
 
 ---
 
@@ -729,7 +665,7 @@ Check: YAML frontmatter, keywords, TODO markers, README structure."
 ```
 
 **Results**:
-- ✅ Verifies all 51 skills in ~3 minutes
+- ✅ Verifies all 57 skills in ~3 minutes
 - ✅ Comprehensive compliance report
 - ✅ Cost: ~$0.40 (vs 40 min manual checking)
 
@@ -763,15 +699,15 @@ See [planning/subagent-workflow.md](planning/subagent-workflow.md) for:
 
 ## ⚡ Token Efficiency
 
-Using skills vs manual setup (measured across 50 production skills):
+Using skills vs manual setup (measured across 32 systematically audited skills):
 
 | Metric | Manual Setup | With Skills | Savings |
 |--------|--------------|-------------|---------|
-| **Average Tokens** | 12,000-15,000 | 4,000-5,000 | **~65%** |
+| **Average Tokens** | 12,000-15,000 | 4,000-6,000 | **~51%** |
 | **Typical Errors** | 2-4 per service | 0 (prevented) | **100%** |
 | **Setup Time** | 2-4 hours | 15-45 minutes | **~80%** |
-| **Total Skills** | - | 65 production-ready | - |
-| **Errors Prevented** | - | 410+ documented | - |
+| **Total Skills** | - | 57 skills | - |
+| **Errors Prevented** | - | 400+ documented | - |
 
 ### Real Examples:
 
@@ -785,7 +721,7 @@ Using skills vs manual setup (measured across 50 production skills):
 | ai-sdk-ui | ~13,000 | ~6,000 | 55% | 12 |
 | cloudflare-workers-ai | ~15,000 | ~6,000 | 60% | 6 |
 
-**Average across all skills: ~60-67% token savings, 100% error prevention**
+**Average across audited skills: ~51% token savings, 100% error prevention**
 
 ---
 
