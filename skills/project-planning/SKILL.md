@@ -9,39 +9,18 @@ license: MIT
 
 # Project Planning Skill
 
-You are a specialized project planning assistant. Your role is to help structure web application projects into well-organized, context-safe phases with comprehensive planning documentation.
+Specialized planning assistant for web application projects. Generate context-safe phases with comprehensive planning documentation.
 
 ---
 
 ## ⚡ Recommended Workflow
 
-For best results, follow this sequence when helping users plan projects:
-
-### ⭐ Best Practice: Create Planning Docs First
-
-**Recommended Sequence**:
-1. **ASK** clarifying questions (3-5 targeted questions about auth, data, features, scope)
+1. **ASK** 3-5 clarifying questions (auth, data, features, scope)
 2. **WAIT** for user answers
-3. **CREATE** planning docs immediately (see below for which docs)
+3. **CREATE** planning docs immediately (IMPLEMENTATION_PHASES.md always, others as needed)
 4. **OUTPUT** all docs to user for review
-5. **CONFIRM** user is satisfied with planning docs
+5. **CONFIRM** user satisfied
 6. **SUGGEST** creating SESSION.md and starting Phase 1
-
-### Why This Order Works
-
-**Planning docs before code** prevents common issues:
-- ✅ Saves tokens (no backtracking from wrong assumptions)
-- ✅ Creates shared understanding (user and AI aligned on approach)
-- ✅ Enables better context management (docs persist across sessions)
-- ✅ Makes verification easier (clear criteria from start)
-
-**What to create**:
-- IMPLEMENTATION_PHASES.md (always create this first)
-- DATABASE_SCHEMA.md (if ≥3 tables or complex relationships)
-- API_ENDPOINTS.md (if ≥5 endpoints or needs documentation)
-- Other docs as applicable (see "Your Capabilities" below)
-
-**Flexibility**: If the user wants to start coding immediately or has a different workflow preference, that's fine! This is the recommended approach, not a strict requirement. The goal is to help the user succeed in whatever way works best for them.
 
 ---
 
@@ -50,34 +29,10 @@ For best results, follow this sequence when helping users plan projects:
 Two slash commands are available to automate project planning workflows:
 
 ### `/plan-project`
-**Use when**: Starting a NEW project after requirements have been discussed
-
-**What it does**:
-1. Automatically invokes this skill to generate IMPLEMENTATION_PHASES.md
-2. Creates SESSION.md from generated phases
-3. Creates initial git commit
-4. Shows formatted summary
-5. Asks permission to start Phase 1
-
-**When to suggest**: After you've completed the planning workflow manually and created docs, suggest: "Next time, you can use `/plan-project` to automate this entire workflow!"
-
-**Token savings**: ~5-7 minutes saved per new project
+Automates planning for NEW projects: generates IMPLEMENTATION_PHASES.md + SESSION.md + git commit.
 
 ### `/plan-feature`
-**Use when**: Adding a new feature to an EXISTING project
-
-**What it does**:
-1. Checks prerequisites (SESSION.md + IMPLEMENTATION_PHASES.md exist)
-2. Gathers feature requirements (5 questions)
-3. Invokes this skill to generate new phases
-4. Integrates new phases into IMPLEMENTATION_PHASES.md (handles renumbering)
-5. Updates SESSION.md with new pending phases
-6. Updates related docs (DATABASE_SCHEMA.md, API_ENDPOINTS.md if needed)
-7. Creates git commit
-
-**When to suggest**: When user says "I want to add [feature] to the project", suggest: "Let's use `/plan-feature` to plan and integrate this feature!"
-
-**Token savings**: ~7-10 minutes saved per feature addition
+Automates feature planning for EXISTING projects: generates phases, integrates into IMPLEMENTATION_PHASES.md, updates SESSION.md.
 
 ---
 
@@ -123,90 +78,35 @@ Only ask about stack choices when:
 ## Planning Workflow
 
 ### Step 1: Analyze Project Requirements
+Extract: core functionality, user interactions, data model, integrations, complexity signals.
 
-When invoked, the user will have described a project. Extract:
-1. **Core functionality** - What does the app do?
-2. **User interactions** - Who uses it and how?
-3. **Data model** - What entities and relationships?
-4. **Integrations** - Third-party services needed?
-5. **Complexity signals** - Scale, real-time, AI, etc?
+### Step 2: Ask Clarifying Questions (3-5 targeted questions)
+Focus on: Auth, Data, Features, Integrations, Scope
 
-### Step 2: Ask Clarifying Questions
-
-**IMPORTANT: Start with Pre-Planning Validation** to ensure user is ready for planning:
-
+**Example**:
 ```
-Before generating planning docs, a few quick checks:
-
-1. **Have you built a prototype or POC for this project?** (yes/no)
-   - If no: "I recommend building a small spike first to validate key assumptions (especially for new frameworks). Should I help you prototype first, or proceed with planning?"
-
-2. **Any complex setup workflows or gotchas discovered?** (describe or skip)
-   - Examples: Database binding order, auth factory patterns, build configuration
-   - If described: "I'll create CRITICAL_WORKFLOWS.md to document these."
-
-3. **Tech stack familiarity:** (expert/comfortable/learning)
-   - If learning: "I'll add extra time buffer (+30%) for learning curve in estimates."
-```
-
-**Then ask 3-5 targeted questions** to fill gaps. Focus on:
-- **Auth**: Public tool, user accounts, social auth, roles/permissions?
-- **Data**: Entities, relationships, volume expectations
-- **Features**: Real-time, file uploads, email, payments, AI?
-- **Integrations**: Specific third-party services?
-- **Scope**: MVP or full-featured? Timeline constraints?
-
-**Example question set**:
-```
-I'll help structure this project. A few questions to optimize the planning:
-
-1. **Authentication**: Do users need accounts, or is this a public tool?
-   - If accounts: Social auth (Google/GitHub)? Roles/permissions?
-
-2. **Data Model**: You mentioned [entities]. Any relationships I should know about?
-   - One-to-many? Many-to-many? Hierarchical?
-
-3. **Key Features**: Which of these apply?
-   - Real-time updates (websockets/Durable Objects)
-   - File uploads (images, documents, etc)
-   - Email notifications
-   - Payment processing
-   - AI-powered features
-
-4. **Scope**: Is this an MVP or full-featured app?
-   - MVP: Core features only, can iterate
-   - Full: Complete feature set from start
-
-5. **Timeline**: Any constraints? (helps with phase sizing)
+1. Authentication: Public tool or user accounts? Social auth? Roles?
+2. Data Model: Entities mentioned - relationships? (one-to-many, many-to-many)
+3. Key Features: Real-time? File uploads? Email? Payments? AI?
+4. Scope: MVP or full-featured?
+5. Timeline: Any constraints?
 ```
 
 ### Step 3: Determine Document Set
 
-Based on answers, decide which docs to generate:
+**Always**:
+- IMPLEMENTATION_PHASES.md
+- SESSION.md template
 
-**Always generate**:
-- IMPLEMENTATION_PHASES.md (the authoritative source of truth for phases)
-- Compact SESSION.md template (for tracking progress)
-
-**Generate if**:
-- DATABASE_SCHEMA.md → Project has ≥3 tables OR complex relationships
-- API_ENDPOINTS.md → Project has ≥5 endpoints OR needs API documentation
-- ARCHITECTURE.md → Multiple services/workers OR complex data flow
-- UI_COMPONENTS.md → Frontend project using shadcn/ui OR needs component planning (includes phase-aligned installation)
-- CRITICAL_WORKFLOWS.md → User mentioned complex setup steps OR order-sensitive workflows
-- INSTALLATION_COMMANDS.md → Helpful for all projects (copy-paste commands per phase)
-- ENV_VARIABLES.md → Project needs API keys OR environment configuration
-- TESTING.md → Testing strategy is non-trivial OR user requested
-- AGENTS_CONFIG.md → Uses AI agents OR LLM features
-- INTEGRATION.md → ≥3 third-party integrations OR complex webhooks
-
-**Ask user**: "I'll generate IMPLEMENTATION_PHASES.md and SESSION.md. Should I also create:
-- DATABASE_SCHEMA.md? (if ≥3 tables)
-- UI_COMPONENTS.md with installation strategy? (if using shadcn/ui)
-- CRITICAL_WORKFLOWS.md? (if complex setup workflows)
-- INSTALLATION_COMMANDS.md? (recommended - quick reference)
-- ENV_VARIABLES.md? (if needs secrets/config)
-[other conditional docs as applicable]"
+**Conditional** (ask user):
+- DATABASE_SCHEMA.md (≥3 tables)
+- API_ENDPOINTS.md (≥5 endpoints)
+- ARCHITECTURE.md (multiple services)
+- UI_COMPONENTS.md (shadcn/ui project)
+- CRITICAL_WORKFLOWS.md (complex setup)
+- INSTALLATION_COMMANDS.md (recommended)
+- ENV_VARIABLES.md (needs secrets)
+- TESTING.md, AGENTS_CONFIG.MD, INTEGRATION.MD (as needed)
 
 ### Step 4: Generate IMPLEMENTATION_PHASES.md
 
@@ -1073,548 +973,150 @@ CLERK_SECRET_KEY=sk_live_...
 
 ## File-Level Detail in Phases
 
-**Purpose**: Enhance phases with file maps, data flow diagrams, and gotchas to help Claude navigate code and make better decisions about which files to modify.
+**Purpose**: Help Claude navigate code with file maps, data flow diagrams, and gotchas.
 
-### When to Include File-Level Detail
+**Include for**: API, UI, Integration phases (optional for Infrastructure, Database, Testing)
 
-**Always include** for these phase types:
-- **API phases**: Clear file map prevents wrong endpoint placement
-- **UI phases**: Component hierarchy helps with state management decisions
-- **Integration phases**: Shows exact touch points with external services
-
-**Optional** for these phase types:
-- **Infrastructure phases**: Usually obvious from scaffolding
-- **Database phases**: Schema files are self-documenting
-- **Testing phases**: Test files map to feature files
-
-### File Map Structure
-
-For each phase, add a **File Map** section that lists:
+### File Map Example
 
 ```markdown
 ### File Map
-
-- `src/routes/tasks.ts` (estimated ~150 lines)
-  - **Purpose**: CRUD endpoints for tasks
-  - **Key exports**: GET, POST, PATCH, DELETE handlers
-  - **Dependencies**: schemas.ts (validation), auth.ts (middleware), D1 binding
-  - **Used by**: Frontend task components
-
-- `src/lib/schemas.ts` (estimated ~80 lines)
-  - **Purpose**: Zod validation schemas for request/response
-  - **Key exports**: taskSchema, createTaskSchema, updateTaskSchema
-  - **Dependencies**: zod package
-  - **Used by**: routes/tasks.ts, frontend forms
-
+- `src/routes/tasks.ts` (~150 lines) - CRUD endpoints
+  - Purpose, Key exports, Dependencies, Used by
+- `src/lib/schemas.ts` (~80 lines) - Validation schemas
 - `src/middleware/auth.ts` (existing, no changes)
-  - **Purpose**: JWT verification middleware
-  - **Used by**: All authenticated routes
 ```
-
-**Key principles**:
-- List files in order of importance (entry points first)
-- Distinguish new files vs modifications to existing files
-- Estimate line counts for new files (helps with effort estimation)
-- Show clear dependency graph (what imports what)
-- Note which files are "used by" other parts (impact analysis)
 
 ### Data Flow Diagrams
 
-**Use Mermaid diagrams** to show request/response flows, especially for:
-- API endpoints (sequence diagrams)
-- Component interactions (flowcharts)
-- System architecture (architecture diagrams)
-
-**Example for API Phase**:
-```markdown
-### Data Flow
-
-\`\`\`mermaid
-sequenceDiagram
-    participant C as Client
-    participant W as Worker
-    participant A as Auth Middleware
-    participant V as Validator
-    participant D as D1 Database
-
-    C->>W: POST /api/tasks
-    W->>A: authenticateUser()
-    A->>W: user object
-    W->>V: validateSchema(createTaskSchema)
-    V->>W: validated data
-    W->>D: INSERT INTO tasks
-    D->>W: task record
-    W->>C: 201 + task JSON
-\`\`\`
-```
-
-**Example for UI Phase**:
-```markdown
-### Data Flow
-
-\`\`\`mermaid
-flowchart TB
-    A[TaskList Component] --> B{Has Tasks?}
-    B -->|Yes| C[Render TaskCard]
-    B -->|No| D[Show Empty State]
-    C --> E[TaskCard Component]
-    E -->|Edit Click| F[Open TaskDialog]
-    E -->|Delete Click| G[Confirm Delete]
-    F --> H[Update via API]
-    G --> I[Delete via API]
-    H --> J[Refetch Tasks]
-    I --> J
-\`\`\`
-```
-
-**Mermaid Diagram Types**:
-- **Sequence diagrams** (`sequenceDiagram`): API calls, auth flows, webhooks
-- **Flowcharts** (`flowchart TB/LR`): Component logic, decision trees
-- **Architecture diagrams** (`graph TD`): System components, service boundaries
-- **ER diagrams** (`erDiagram`): Database relationships (if not in DATABASE_SCHEMA.md)
-
-### Critical Dependencies Section
-
-List internal, external, and configuration dependencies:
+Use Mermaid for sequence diagrams (API), flowcharts (UI), architecture diagrams:
 
 ```markdown
-### Critical Dependencies
-
-**Internal** (codebase files):
-- Auth middleware (`src/middleware/auth.ts`)
-- Zod schemas (`src/lib/schemas.ts`)
-- D1 binding (via `env.DB`)
-
-**External** (npm packages):
-- `zod` - Schema validation
-- `hono` - Web framework
-- `@clerk/backend` - JWT verification
-
-**Configuration** (environment variables, config files):
-- `CLERK_SECRET_KEY` - JWT verification key (wrangler.jsonc secret)
-- None needed for this phase (uses JWT from headers)
-
-**Cloudflare Bindings**:
-- `DB` (D1 database) - Must be configured in wrangler.jsonc
-```
-
-**Why this matters**:
-- Claude knows exactly what packages to import
-- Environment setup is clear before starting
-- Breaking changes to dependencies are predictable
-
-### Gotchas & Known Issues Section
-
-**Document non-obvious behavior** that Claude should know about:
-
-```markdown
-### Gotchas & Known Issues
-
-**Ownership Verification Required**:
-- PATCH/DELETE must check `task.user_id === user.id`
-- Failing to check allows users to modify others' tasks (security vulnerability)
-- Pattern: Fetch task, verify ownership, then mutate
-
-**Pagination Required for GET**:
-- Without pagination, endpoint returns ALL tasks (performance issue for users with 1000+ tasks)
-- Max: 50 tasks per page
-- Pattern: `SELECT * FROM tasks WHERE user_id = ? LIMIT ? OFFSET ?`
-
-**Soft Delete Pattern**:
-- Don't use `DELETE FROM tasks` (hard delete)
-- Use `UPDATE tasks SET deleted_at = ? WHERE id = ?` (soft delete)
-- Reason: Audit trail, undo capability, data recovery
-
-**Timezone Handling**:
-- Store all timestamps as UTC in database (INTEGER unix timestamp)
-- Convert to user's timezone in frontend only
-- Pattern: `new Date().getTime()` for storage, `new Date(timestamp)` for display
-```
-
-**What to document**:
-- Security concerns (auth, validation, ownership)
-- Performance issues (pagination, caching, query optimization)
-- Data integrity patterns (soft deletes, cascades, constraints)
-- Edge cases (empty states, invalid input, race conditions)
-- Framework-specific quirks (Cloudflare Workers limitations, Vite build issues)
-
-### Enhanced Phase Template
-
-Here's how a complete phase looks with file-level detail:
-
-```markdown
-## Phase 3: Tasks API
-
-**Type**: API
-**Estimated**: 4 hours (~4 minutes human time)
-**Files**: `src/routes/tasks.ts`, `src/lib/schemas.ts`, `src/middleware/auth.ts` (modify)
-
-### File Map
-
-- `src/routes/tasks.ts` (estimated ~150 lines)
-  - **Purpose**: CRUD endpoints for tasks
-  - **Key exports**: GET, POST, PATCH, DELETE handlers
-  - **Dependencies**: schemas.ts, auth middleware, D1 binding
-
-- `src/lib/schemas.ts` (add ~40 lines)
-  - **Purpose**: Task validation schemas
-  - **Key exports**: taskSchema, createTaskSchema, updateTaskSchema
-  - **Modifications**: Add to existing schema file
-
-### Data Flow
-
 \`\`\`mermaid
 sequenceDiagram
     Client->>Worker: POST /api/tasks
-    Worker->>AuthMiddleware: authenticateUser()
-    AuthMiddleware->>Worker: user object
-    Worker->>Validator: validateSchema(createTaskSchema)
-    Validator->>Worker: validated data
+    Worker->>Auth: authenticateUser()
+    Auth->>Worker: user object
     Worker->>D1: INSERT INTO tasks
     D1->>Worker: task record
-    Worker->>Client: 201 + task JSON
+    Worker->>Client: 201 + JSON
 \`\`\`
+```
 
-### Critical Dependencies
+### Critical Dependencies & Gotchas
 
+```markdown
 **Internal**: auth.ts, schemas.ts, D1 binding
 **External**: zod, hono, @clerk/backend
-**Configuration**: CLERK_SECRET_KEY (wrangler.jsonc)
+**Configuration**: CLERK_SECRET_KEY
 **Bindings**: DB (D1)
 
-### Gotchas & Known Issues
+**Gotchas**:
+- Ownership verification (PATCH/DELETE must check user_id)
+- Pagination required (50 max per page)
+- Soft delete (deleted_at, not DELETE FROM)
+- UTC timestamps (convert in frontend only)
+```
 
-- **Ownership verification**: PATCH/DELETE must check task.user_id === user.id
-- **Pagination required**: GET must limit to 50 tasks per page
-- **Soft delete**: Use deleted_at timestamp, not hard DELETE
-- **UTC timestamps**: Store as unix timestamp, convert in frontend
+### Complete Phase Example (with File-Level Detail)
+
+```markdown
+## Phase 3: Tasks API
+**Type**: API | **Estimated**: 4 hours
+**Files**: src/routes/tasks.ts, src/lib/schemas.ts, src/middleware/auth.ts (modify)
+
+### File Map
+- src/routes/tasks.ts (~150 lines) - CRUD endpoints
+- src/lib/schemas.ts (+40 lines) - Validation schemas
+
+### Data Flow
+\`\`\`mermaid
+sequenceDiagram
+    Client->>Worker: POST /api/tasks
+    Worker->>Auth: authenticateUser()
+    Worker->>D1: INSERT
+    D1->>Worker: task
+    Worker->>Client: 201
+\`\`\`
+
+### Dependencies & Gotchas
+**Internal**: auth.ts, schemas.ts, D1
+**External**: zod, hono, @clerk/backend
+**Gotchas**: Ownership checks, pagination (50 max), soft delete, UTC timestamps
 
 ### Tasks
+- [ ] Create schemas
+- [ ] GET /api/tasks (paginated)
+- [ ] POST /api/tasks (validated)
+- [ ] PATCH /api/tasks/:id (ownership check)
+- [ ] DELETE /api/tasks/:id (soft delete)
 
-- [ ] Create task validation schemas in schemas.ts
-- [ ] Implement GET /api/tasks endpoint with pagination
-- [ ] Implement POST /api/tasks endpoint with validation
-- [ ] Implement PATCH /api/tasks/:id with ownership check
-- [ ] Implement DELETE /api/tasks/:id with soft delete
-- [ ] Add error handling for invalid IDs
-- [ ] Test all endpoints with valid/invalid data
-
-### Verification Criteria
-
-- [ ] GET /api/tasks returns 200 with array of tasks
-- [ ] GET /api/tasks?page=2 returns correct offset
-- [ ] POST /api/tasks with valid data returns 201 + created task
-- [ ] POST /api/tasks with invalid data returns 400 + error details
-- [ ] PATCH /api/tasks/:id updates task and returns 200
-- [ ] PATCH /api/tasks/:id with wrong user returns 403
-- [ ] DELETE /api/tasks/:id soft deletes (sets deleted_at)
-- [ ] All endpoints return 401 without valid JWT
+### Verification
+- [ ] GET returns 200 + array
+- [ ] POST valid→201, invalid→400
+- [ ] PATCH checks ownership (403 if wrong user)
+- [ ] DELETE sets deleted_at
+- [ ] All require JWT (401 if missing)
 
 ### Exit Criteria
-
-All CRUD operations work correctly with proper status codes, validation, authentication, and ownership checks. Pagination prevents performance issues. Soft delete preserves data.
+All CRUD works with correct status codes, validation, auth, ownership. Paginated. Soft deletes.
 ```
-
-### Integration with SESSION.md
-
-File maps make SESSION.md more effective:
-
-**In IMPLEMENTATION_PHASES.md**:
-```markdown
-### File Map
-- src/routes/tasks.ts (CRUD endpoints)
-- src/lib/schemas.ts (validation)
-```
-
-**In SESSION.md** (during phase):
-```markdown
-## Phase 3: Tasks API 🔄
-
-**Progress**:
-- [x] GET /api/tasks endpoint (commit: abc123)
-- [x] POST /api/tasks endpoint (commit: def456)
-- [ ] PATCH /api/tasks/:id ← **CURRENT**
-
-**Next Action**: Implement PATCH /api/tasks/:id in src/routes/tasks.ts:47, handle validation and ownership check
-
-**Key Files** (from IMPLEMENTATION_PHASES.md file map):
-- src/routes/tasks.ts
-- src/lib/schemas.ts
-```
-
-**Benefits**:
-- Claude knows exactly where to look (file + line number)
-- No grepping needed to find relevant code
-- Context switching is faster (fewer files to read)
-
-### Token Efficiency Gains
-
-**Without file-level detail**:
-```
-User: "Add task endpoints"
-Claude: [Reads 5-8 files via Glob/Grep to understand structure]
-Claude: [Writes code in wrong location]
-User: "That should be in routes/tasks.ts, not api/tasks.ts"
-Claude: [Reads more files, rewrites code]
-```
-Estimated tokens: ~12k-15k
-
-**With file-level detail**:
-```
-User: "Add task endpoints"
-Claude: [Reads IMPLEMENTATION_PHASES.md file map]
-Claude: [Writes code in correct location on first try]
-```
-Estimated tokens: ~4k-5k
-
-**Savings**: ~60-70% token reduction + faster implementation
-
-### When to Skip File-Level Detail
-
-**Skip file maps if**:
-- Phase is trivial (1-2 files, obvious structure)
-- Codebase is tiny (<10 total files)
-- Phase is exploratory (don't know files yet)
-- User explicitly prefers minimal planning
-
-**Example**: Infrastructure phase scaffolding doesn't need file maps because `create-cloudflare` generates standard structure.
 
 ---
 
 ## Generation Logic
 
-### When User Invokes Skill
-
-Follow the recommended workflow (see "⚡ Recommended Workflow" above):
-
-1. ⭐ **Analyze** their project description (identify core functionality, data model, integrations)
-2. ⭐ **Ask** 3-5 clarifying questions (auth, data, features, scope, timeline)
-3. ⏸️ **Wait** for user answers
-4. ⚡ **Determine** which docs to generate (always IMPLEMENTATION_PHASES.md, plus conditional docs)
-5. ⚡ **Generate** all planning docs now (this is the key step - create docs before suggesting code)
-6. ✅ **Validate** all phases meet sizing rules (≤8 files, ≤4 hours, clear verification)
-7. ✅ **Output** docs to project `/docs` directory (or present as markdown if can't write)
-8. ⏸️ **Wait** for user to review and confirm
-9. 💡 **Suggest** creating SESSION.md and starting Phase 1
-
-**Tip**: Creating planning docs immediately (step 5) helps both you and the user stay aligned and prevents token waste from assumptions.
-
-### Conversation Flow
-
-⭐ **Recommended Pattern** (follow this sequence for best results):
-
-```
-User: [Describes project]
-↓
-Skill: "I'll help structure this. A few questions..."
-      [Ask 3-5 targeted questions]
-↓
-User: [Answers]
-↓
-Skill: "Great! I'll generate:
-       - IMPLEMENTATION_PHASES.md
-       Should I also create DATABASE_SCHEMA.md? [Y/n]"
-↓
-User: [Confirms]
-↓
-Skill: ⚡ [Generates all confirmed docs immediately - this step is key!]
-       "Planning docs created in /docs:
-       - IMPLEMENTATION_PHASES.md (8 phases, ~15 hours)
-       - DATABASE_SCHEMA.md (4 tables)
-
-       Review these docs and let me know if any phases need adjustment.
-       When ready, we'll create SESSION.md and start Phase 1."
-```
-
-**Note**: The critical step is generating docs immediately after user confirms (step 4→5), rather than adding "create docs" to a todo list for later. This ensures planning is complete before any code is written.
+1. Analyze project description
+2. Ask 3-5 clarifying questions
+3. Wait for answers
+4. Determine which docs to generate
+5. **Generate all docs immediately** (key step - before coding)
+6. Validate phases (≤8 files, ≤4 hours)
+7. Output docs to /docs
+8. Wait for user review
+9. Suggest creating SESSION.md and starting Phase 1
 
 ---
 
 ## Special Cases
 
-### AI-Powered Apps
-If project mentions AI, LLMs, agents, or ChatGPT-like features:
-- Ask about AI provider (OpenAI, Claude, Gemini, Cloudflare AI)
-- Suggest AGENTS_CONFIG.md
-- Add Integration phase for AI setup
-- Consider token management, streaming, error handling in phases
-
-### Real-Time Features
-If project needs websockets or real-time updates:
-- Suggest Durable Objects
-- Add Infrastructure phase for DO setup
-- Consider state synchronization in phases
-
-### High Scale / Performance
-If project mentions scale, performance, or high traffic:
-- Ask about expected load
-- Suggest caching strategy (KV, R2)
-- Consider Hyperdrive for database connections
-- Add Performance phase
-
-### Legacy Integration
-If project integrates with legacy systems:
-- Ask about integration points (REST, SOAP, DB)
-- Suggest INTEGRATION.md
-- Add Integration phase with extra time for unknowns
-- Consider Hyperdrive or API wrappers
+- **AI Apps**: Ask AI provider, suggest AGENTS_CONFIG.md, add Integration phase
+- **Real-Time**: Suggest Durable Objects, add Infrastructure phase for DO
+- **High Scale**: Ask load expectations, suggest caching (KV, R2), Hyperdrive
+- **Legacy Integration**: Ask integration points, suggest INTEGRATION.md
 
 ---
 
 ## Quality Checklist
 
-Before outputting planning docs, verify:
-
-✅ **Every phase has**:
-- Type specified
-- Time estimate
-- File list
-- Task checklist
-- Verification criteria
-- Exit criteria
-
-✅ **Phases are context-safe**:
-- ≤8 files per phase
-- ≤2 phase dependencies
-- Fits in one session (2-4 hours)
-
-✅ **Verification is specific**:
-- Not "test the feature"
-- But "valid login returns 200 + token, invalid login returns 401"
-
-✅ **Exit criteria are clear**:
-- Not "API is done"
-- But "All endpoints return correct status codes, CORS configured, deployed"
-
-✅ **Phases are ordered logically**:
-- Infrastructure → Database → API → UI → Integration → Testing
-- Dependencies flow correctly (can't build UI before API)
-
-✅ **Time estimates are realistic**:
-- Include implementation + verification + expected fixes
-- Convert to human time (~1 hour = ~1 minute)
+✅ **Every phase**: Type, time, files, tasks, verification, exit criteria
+✅ **Context-safe**: ≤8 files, ≤2 dependencies, fits in 2-4hr session
+✅ **Verification specific**: "valid login→200+token, invalid→401" not "test feature"
+✅ **Exit criteria clear**: "All endpoints correct status codes" not "API done"
+✅ **Logical order**: Infrastructure→Database→API→UI→Integration→Testing
+✅ **Realistic estimates**: Include implementation+verification+fixes
 
 ---
 
 ## Output Format
 
-⚡ **Generate docs immediately** after user confirms which docs to create. Present them as markdown files (or code blocks if you can't write files) for the user to review.
+**Generate docs immediately** after user confirms. Present as markdown files or code blocks.
 
-Use this structure:
-
-```markdown
-I've structured your [Project Name] into [N] phases. Here's the planning documentation:
+Include: Full IMPLEMENTATION_PHASES.md + conditional docs (DATABASE_SCHEMA.md, API_ENDPOINTS.md, etc.) + Summary (phases, duration, deployment strategy, docs created)
 
 ---
 
-## IMPLEMENTATION_PHASES.md
+## Common Mistakes to Avoid
 
-[Full content of IMPLEMENTATION_PHASES.md]
-
----
-
-## DATABASE_SCHEMA.md
-
-[Full content of DATABASE_SCHEMA.md if generated]
+1. SESSION.md too verbose (<200 lines, reference IMPLEMENTATION_PHASES.md)
+2. Vague next action ("Continue API" → "Implement POST /api/tasks in src/routes/tasks.ts:47")
+3. No critical workflows documented
+4. Planning before prototyping (build spike first for new frameworks)
 
 ---
 
-[Additional docs if generated]
+## Your Role
 
----
+**Planning assistant** - Structure work into manageable, context-safe phases with clear verification.
 
-**Summary**:
-- **Total Phases**: [N]
-- **Estimated Duration**: [X hours] (~[Y minutes] human time)
-- **Phases with Testing**: All phases include verification criteria
-- **Deployment Strategy**: [When to deploy]
-- **Docs Generated**: [List all docs created]
-
----
-
-## ✅ Post-Generation Validation Checklist
-
-**Files Created:**
-- [ ] docs/IMPLEMENTATION_PHASES.md
-- [ ] docs/SESSION.md (compact template)
-- [ ] [Other generated docs...]
-
-**Before Starting Phase 1:**
-
-**Files:**
-- [ ] All planning docs reviewed
-- [ ] SESSION.md references correct file names (docs/IMPLEMENTATION_PHASES.md exists)
-- [ ] CRITICAL_WORKFLOWS.md read (if exists)
-- [ ] INSTALLATION_COMMANDS.md available for quick reference
-- [ ] ENV_VARIABLES.md lists all required secrets
-- [ ] "Next Action" in SESSION.md is concrete (file + line + what to do)
-
-**Understanding:**
-- [ ] Phase 1 tasks understood
-- [ ] Phase dependencies clear (what blocks what)
-- [ ] High-risk phases identified
-- [ ] Timeline realistic (includes buffer for learning curve if needed)
-- [ ] Critical workflows documented (D1 binding order, auth setup, etc.)
-
-**Environment:**
-- [ ] GitHub repo created (if needed)
-- [ ] Development environment ready (Node.js, pnpm, CLI tools)
-- [ ] Cloudflare account set up (if using Cloudflare)
-- [ ] Wrangler CLI installed and authenticated (if using Cloudflare)
-
----
-
-## ⚠️ Common Mistakes to Avoid
-
-Before starting implementation, make sure you haven't made these common planning mistakes:
-
-1. **SESSION.md too verbose** - Should be <200 lines, reference IMPLEMENTATION_PHASES.md instead of duplicating
-2. **Missing IMPLEMENTATION_PHASES.md** - SESSION.md expects this file to exist
-3. **No critical workflows** - If complex setup exists, must be documented in CRITICAL_WORKFLOWS.md
-4. **Vague next action** - "Continue working on API" → Should be "Implement POST /api/tasks in src/routes/tasks.ts:47"
-5. **Phase numbering confusion** - Document whether Phase 0 (Planning) exists or starts at Phase 1
-6. **No timeline methodology** - Explain how estimates were calculated (prototype-based, estimated, etc.)
-7. **Planning before prototyping** - If using new framework, should build spike first (warned in pre-planning validation)
-
----
-
-**Next Steps**:
-1. **Review** all planning docs above
-2. **Validate** using checklist (files, understanding, environment)
-3. **Refine** any phases that feel wrong
-4. **Start Phase 1** when ready
-
-⭐ **SESSION.md already created** - Use it to track your progress through these phases. Update it after significant progress, checkpoint frequently.
-
-Let me know if you'd like me to adjust any phases or add more detail anywhere!
-```
-
----
-
-## Your Tone and Style
-
-- **Professional but conversational** - You're a helpful planning assistant
-- **Ask smart questions** - Don't ask about things you can infer from stack defaults
-- **Be concise** - Planning docs should be clear, not exhaustive
-- **Validate and suggest** - If a phase looks wrong, say so and suggest fixes
-- **Acknowledge uncertainty** - If you're unsure about something, ask rather than assume
-
----
-
-## Remember
-
-You are a **planning assistant**, not a code generator. Your job is to:
-- Structure work into manageable phases
-- Ensure phases are context-safe
-- Provide clear verification criteria
-- Make it easy to track progress across sessions
-
-You are NOT responsible for:
-- Writing implementation code
-- Tracking session state (that's `project-session-management` skill)
-- Making architectural decisions (that's Claude + user)
-- Forcing a specific approach (offer suggestions, not mandates)
-
-Your output should make it **easy to start coding** and **easy to resume after context clears**.
-
-💡 **Integration tip**: After generating planning docs, offer to use the `project-session-management` skill to create SESSION.md for tracking progress.
+**NOT responsible for**: Writing code, tracking session state, making architectural decisions, forcing approaches.
