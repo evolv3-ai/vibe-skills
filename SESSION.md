@@ -60,6 +60,7 @@
 44. ✅ tailwind-v4-shadcn (629→379 lines, 39.7% reduction, Tailwind v4-specific knowledge (late 2024): 4-step @theme inline architecture + tw-animate-css requirement + @plugin directive + CSS variable mapping + container queries built-in, 5 errors preserved, removed meta-commentary + generic patterns)
 45. ✅ tanstack-router (333→160 lines, 51.9% reduction, 1 package update @tanstack/react-router 1.134.13→1.139.10, removed verbose examples + meta-content, retained all 5 error patterns (devtools dependency, plugin order CRITICAL, type registration, loader not running, TanStack Form memory leak #5734), Cloudflare Workers integration + TanStack Query pattern, last verified 2025-11-28)
 46. ✅ tanstack-start (107→107 lines, MAINTENANCE UPDATE, package update @tanstack/react-start 1.136.9→1.139.10, draft placeholder skill awaiting v1.0 stable + issue #5734 resolution, last updated Nov 20 2025 with related PR #1866, last verified 2025-11-28)
+47. ✅ tanstack-table (726→213 lines, 70.7% reduction, no package updates (already current: @tanstack/react-table@8.21.3, @tanstack/react-virtual@3.13.12), removed verbose code examples + meta-content, retained all 6 error patterns (infinite re-renders, query state mismatch, manual flags, TypeScript imports, sorting, performance), server-side D1 pagination/filtering/sorting pattern + virtualization, last verified 2025-11-28)
 
 **Skills Deleted:**
 1. ✅ claude-code-bash-patterns (1,186 lines removed - redundant with official Claude Code docs)
@@ -70,14 +71,14 @@
 1. ✅ KNOWLEDGE_GAP_AUDIT_CHECKLIST.md (comprehensive 12-step process)
 
 **Cumulative Impact:**
-- Skills audited: 46 of 58 (79.3%)
+- Skills audited: 47 of 58 (81.0%)
 - Skills deleted: 3
-- Lines removed: ~25,916 lines (net after google-gemini-api +37 enhancement)
-- Tokens saved: ~86,453 tokens per invocation (across 39 reduction audits)
-- Average reduction: 53.9% (39 reduction audits, 1 enhancement update, 1 maintenance update)
-- Annual savings (5 uses/month): ~5,187,180 tokens across reduction audits
+- Lines removed: ~26,429 lines (net after google-gemini-api +37 enhancement)
+- Tokens saved: ~88,163 tokens per invocation (across 40 reduction audits)
+- Average reduction: 54.5% (40 reduction audits, 1 enhancement update, 1 maintenance update)
+- Annual savings (5 uses/month): ~5,289,780 tokens across reduction audits
 
-**Next:** Continue A-Z systematic audit (next skill after tanstack-start alphabetically)
+**Next:** Continue A-Z systematic audit (next skill after tanstack-table alphabetically)
 
 ---
 
