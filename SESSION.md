@@ -56,6 +56,7 @@
 40. ✅ project-session-management (482→243 lines, 49.6% reduction, workflow skill, SESSION.md template + git checkpoint format + expected uncommitted files behavior (CRITICAL) + automation commands)
 41. ✅ react-hook-form-zod (1,431→248 lines, 82.7% reduction, 1 package update zod 4.1.12→4.1.13, 12 issues preserved including #13109 Zod v4 type inference, useFieldArray field.id requirement, Controller {...field} spread, server validation security)
 42. ✅ skill-review (413→122 lines, 70.5% reduction, meta-skill, 9-phase audit process, severity classification, better-auth example, 10 issue types prevented)
+43. ✅ sveltia-cms (1,901→680 lines, 64.2% reduction, 1 package update @sveltia/cms 0.113.5→0.120.1, 8 knowledge gaps v0.105.0-v0.120.0: author template tags + TOML config + SiteConfig→CmsConfig breaking + field-specific media folders + logo.src deprecation + sanitize_preview XSS fix, 8 errors preserved, migration from Decap CMS + Cloudflare Workers OAuth)
 
 **Skills Deleted:**
 1. ✅ claude-code-bash-patterns (1,186 lines removed - redundant with official Claude Code docs)
@@ -66,14 +67,14 @@
 1. ✅ KNOWLEDGE_GAP_AUDIT_CHECKLIST.md (comprehensive 12-step process)
 
 **Cumulative Impact:**
-- Skills audited: 42 of 58 (72.4%)
+- Skills audited: 43 of 58 (74.1%)
 - Skills deleted: 3
-- Lines removed: ~24,272 lines (net after google-gemini-api +37 enhancement)
-- Tokens saved: ~80,979 tokens per invocation (across 36 reduction audits)
-- Average reduction: 53.2% (36 reduction audits, 1 enhancement update)
-- Annual savings (5 uses/month): ~4,858,740 tokens across reduction audits
+- Lines removed: ~25,493 lines (net after google-gemini-api +37 enhancement)
+- Tokens saved: ~85,046 tokens per invocation (across 37 reduction audits)
+- Average reduction: 54.3% (37 reduction audits, 1 enhancement update)
+- Annual savings (5 uses/month): ~5,102,760 tokens across reduction audits
 
-**Next:** Continue A-Z systematic audit (next skill after skill-review alphabetically)
+**Next:** Continue A-Z systematic audit (next skill: tailwind-v4-shadcn)
 
 ---
 
