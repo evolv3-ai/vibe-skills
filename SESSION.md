@@ -64,6 +64,7 @@
 47. ✅ tanstack-table (726→213 lines, 70.7% reduction, no package updates (already current: @tanstack/react-table@8.21.3, @tanstack/react-virtual@3.13.12), removed verbose code examples + meta-content, retained all 6 error patterns (infinite re-renders, query state mismatch, manual flags, TypeScript imports, sorting, performance), server-side D1 pagination/filtering/sorting pattern + virtualization, last verified 2025-11-28)
 48. ✅ thesys-generative-ui (1,877→1,877 lines, MAINTENANCE UPDATE, package update @thesysai/genui-sdk 0.6.40→0.7.4, DEFERRED for full audit - exceptionally large skill (1,877 lines) requires dedicated reduction session, all 12 error patterns present, last verified 2025-11-28)
 49. ✅ tinacms (1,753→551 lines, 68.6% reduction, 2 package updates: tinacms 2.9.0→2.10.0, @tinacms/cli 1.11.0→1.12.5, removed verbose framework setups (Vite, Astro, framework-agnostic) + collection templates + deployment patterns + GraphQL/auth examples, retained all 9 error patterns (ESbuild compilation, module resolution, field naming, Docker binding, missing _template, path mismatch, build ordering, asset loading, reference 503) + schema config + Next.js integration, last verified 2025-11-28)
+50. ✅ typescript-mcp (852→296 lines, 65.3% reduction, 3 package updates: @modelcontextprotocol/sdk 1.20.2→1.23.0, hono 4.10.1→4.10.7, zod 3.23.8→4.1.13 (MAJOR v3→v4), removed verbose template examples + Cloudflare integration examples + testing/deployment/CI/CD sections, retained all 10 error patterns (export syntax CRITICAL, unclosed transport, tool schema validation, tool arguments, CORS, rate limiting, TS compilation memory, ReDoS vulnerability, auth bypass, env leakage) + transport close pattern + authentication, last verified 2025-11-28)
 
 **Skills Deferred:**
 1. ⏸️ thesys-generative-ui (1,877 lines) - Requires dedicated audit session, target ~550-600 lines (70% reduction)
@@ -77,15 +78,15 @@
 1. ✅ KNOWLEDGE_GAP_AUDIT_CHECKLIST.md (comprehensive 12-step process)
 
 **Cumulative Impact:**
-- Skills audited: 49 of 58 (84.5%)
+- Skills audited: 50 of 58 (86.2%)
 - Skills deferred: 1 (thesys-generative-ui - exceptionally large, needs dedicated session)
 - Skills deleted: 3
-- Lines removed: ~27,631 lines (net after google-gemini-api +37 enhancement)
-- Tokens saved: ~92,170 tokens per invocation (across 41 reduction audits)
-- Average reduction: 54.8% (41 reduction audits, 1 enhancement update, 2 maintenance updates)
-- Annual savings (5 uses/month): ~5,530,200 tokens across reduction audits
+- Lines removed: ~28,187 lines (net after google-gemini-api +37 enhancement)
+- Tokens saved: ~94,023 tokens per invocation (across 42 reduction audits)
+- Average reduction: 55.0% (42 reduction audits, 1 enhancement update, 2 maintenance updates)
+- Annual savings (5 uses/month): ~5,641,380 tokens across reduction audits
 
-**Next:** Continue A-Z systematic audit (next skill after tinacms alphabetically)
+**Next:** Continue A-Z systematic audit (next skill after typescript-mcp alphabetically)
 
 ---
 
