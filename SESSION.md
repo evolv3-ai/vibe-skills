@@ -168,25 +168,26 @@
 84. ✅ REDUCTION: open-source-contributions (1,233→465 lines, -768 lines, -62.3%, removed verbose overview + generic fork workflow + detailed Conventional Commits explanation + generic communication advice + verbose PR description examples + generic 'Following Project Conventions' + verbose PR sizing examples + 'Handling PR Rejections' + 'Be Patient' section + generic git command reference + verbose GitHub CLI examples, retained all 16 error patterns with specific file examples + Pre-PR check script workflow + Critical Workflow Rules (RULE 1, 2, 3) + PR size research numbers (50/200/400 lines, defect detection data) + specific exclusion patterns (SESSION.md, planning/*, screenshots) + response templates + pre-submission checklist + bundled resources + GitHub linking syntax (Closes #123, Fixes #456) + feature flags pattern)
 85. ✅ Audited project-planning (0 package dependencies, template/workflow skill, expected lower reduction)
 86. ✅ REDUCTION: project-planning (1,620→1,122 lines, -498 lines, -30.7%, removed verbose workflow explanations + detailed automation command descriptions + lengthy planning workflow prose + File-Level Detail section (311→45 lines major reduction) + Enhanced Phase Template verbose example + Integration with SESSION.md verbose explanation + Token efficiency comparisons + Generation Logic verbose flow + Special Cases detailed explanations + Quality Checklist verbose items + Output Format lengthy example + Post-Generation Validation verbose checklist + Your Tone and Style explanations + Remember section verbose prose, retained ALL 11 template structures (IMPLEMENTATION_PHASES, DATABASE_SCHEMA, API_ENDPOINTS, ARCHITECTURE, UI_COMPONENTS, CRITICAL_WORKFLOWS, INSTALLATION_COMMANDS, ENV_VARIABLES, SESSION, plus examples) + Phase type definitions + Phase validation rules + Default stack knowledge + Automation command info + Complete phase example + Quality checklist condensed + Common mistakes condensed)
+87. ✅ REDUCTION: project-workflow (698→206 lines, -492 lines, -70.5%, workflow skill documenting 7 slash commands for project lifecycle automation (post-knowledge cutoff Nov 2025), removed verbose overview + lengthy installation + redundant command documentation (5-7 items → 2-3 lines) + verbose examples × 7 commands + Complete Workflow Examples verbose format (40→3 lines) + Configuration section + Best Practices generic advice + Advanced Usage verbose examples + FAQ generic Q&A + Related Skills duplicate + verbose Support, retained all 7 command specs: /explore-idea (pre-planning validation 10-15min) + /plan-project (generate docs 5-7min) + /plan-feature (add features 7-10min) + /wrap-session (checkpoint 2-3min) + /continue-session (context load 1-2min) + /workflow (interactive guide) + /release (8-phase safety checks 10-15min) + command relationships diagram + time savings breakdown (35-55min per lifecycle) + integration with project-planning/project-session-management + workflow patterns (full/quick/helpers) + prerequisites per command + troubleshooting, version 1.0.0 Nov 2025)
 
 **Cumulative Impact:**
-- Skills audited: 39 of 58 (67.2%)
+- Skills audited: 40 of 58 (69.0%)
 - Skills created: 2 (react-native-expo #1, ts-agent-sdk #58)
 - Skills deleted: 3
 - Total skills: 58 (58 from Phase 1 - 3 deletions + 2 new = 58 active)
-- Lines removed: ~26,422 lines (net after 2 enhancement updates: google-gemini-api +37, openai-apps-mcp +6)
-- Tokens saved: ~86,634 tokens per invocation (across 38 reduction audits)
-- Average reduction: 52.3% (38 reduction audits, 2 enhancement updates, 2 new skills)
-- Annual savings (5 uses/month): ~5,198,040 tokens across reduction audits
+- Lines removed: ~26,914 lines (net after 2 enhancement updates: google-gemini-api +37, openai-apps-mcp +6)
+- Tokens saved: ~88,277 tokens per invocation (across 39 reduction audits)
+- Average reduction: 52.8% (39 reduction audits, 2 enhancement updates, 2 new skills)
+- Annual savings (5 uses/month): ~5,296,620 tokens across reduction audits
 
 **Next Session:**
-1. Continue A-Z systematic audit (next skill alphabetically after project-planning)
+1. Continue A-Z systematic audit (next skill alphabetically after project-workflow)
 2. Follow KNOWLEDGE_GAP_AUDIT_CHECKLIST.md process
 3. Research → Audit → Trim → Commit (one skill per session)
-4. Pattern validated: ~52.3% average reduction across 38 skills (2 enhancement updates)
+4. Pattern validated: ~52.8% average reduction across 39 skills (2 enhancement updates)
 
 **Long Term:**
-- Audit remaining 19 skills alphabetically (39 audited of 58 total, 67.2% complete)
+- Audit remaining 18 skills alphabetically (40 audited of 58 total, 69.0% complete)
 - Update skill creation guidelines with "knowledge gap test"
 - Establish quarterly review process for skills
 - Target: Continue 50-70% token savings across all skills
@@ -196,7 +197,7 @@
 ## Last Checkpoint
 
 **Date**: 2025-11-28
-**Commit**: 9a67a63
-**Message**: "skill/project-planning: Phase 2 knowledge-gap audit (30.7% reduction)"
+**Commit**: b6ee6a0
+**Message**: "skill/project-workflow: Phase 2 knowledge-gap audit (70.5% reduction)"
 
-**Status**: Phase 2 in progress - 39 skills audited (67.2%), 2 skills created (react-native-expo, ts-agent-sdk), 3 skills deleted (claude-code-bash-patterns, gemini-cli, github-project-automation), 58 total active skills, ~26,422 lines removed (net after 2 enhancement updates), 38 reduction audits complete (77.9% highest: openai-assistants, 72.6%: openai-responses, 62.3%: open-source-contributions, 30.7% latest template skill: project-planning), 2 enhancement updates, ~86,634 tokens saved per invocation, 52.3% average reduction, ready for next skill alphabetically
+**Status**: Phase 2 in progress - 40 skills audited (69.0%), 2 skills created (react-native-expo, ts-agent-sdk), 3 skills deleted (claude-code-bash-patterns, gemini-cli, github-project-automation), 58 total active skills, ~26,914 lines removed (net after 2 enhancement updates), 39 reduction audits complete (77.9% highest: openai-assistants, 72.6%: openai-responses, 70.5% latest workflow skill: project-workflow, 62.3%: open-source-contributions), 2 enhancement updates, ~88,277 tokens saved per invocation, 52.8% average reduction, ready for next skill alphabetically
