@@ -2,9 +2,10 @@
  * Google Chat Cards v2 - Builder Examples
  *
  * Ready-to-use card patterns for common use cases
+ * Updated: Nov 2025 - Markdown support examples
  */
 
-// Example 1: Simple Text Card
+// Example 1: Simple Text Card (HTML formatting)
 export function createTextCard(title: string, message: string) {
   return {
     cardsV2: [{
@@ -20,6 +21,29 @@ export function createTextCard(title: string, message: string) {
     }]
   }
 }
+
+// Example 1b: Text Card with Markdown (NEW: Sept 2025 - better for AI agents)
+export function createMarkdownCard(title: string, markdown: string) {
+  return {
+    cardsV2: [{
+      cardId: `markdown-${Date.now()}`,
+      card: {
+        header: { title },
+        sections: [{
+          widgets: [{
+            textParagraph: {
+              text: markdown // Pass Markdown directly - no HTML conversion needed!
+            }
+          }]
+        }]
+      }
+    }]
+  }
+}
+
+// Usage with LLM output:
+// const llmOutput = "**Summary:**\n\n- Point 1\n- Point 2\n\n```python\nprint('hello')\n```"
+// return createMarkdownCard("AI Response", llmOutput)
 
 // Example 2: Card with Buttons
 export function createButtonCard(title: string, message: string, buttons: Array<{ text: string; action: string }>) {

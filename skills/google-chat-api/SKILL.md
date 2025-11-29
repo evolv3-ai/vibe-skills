@@ -39,9 +39,9 @@ metadata:
 # Google Chat API
 
 **Status**: Production Ready
-**Last Updated**: 2025-11-29
+**Last Updated**: 2025-11-29 (Research verified: Markdown support, Material Design updates)
 **Dependencies**: Cloudflare Workers (recommended), Web Crypto API for token verification
-**Latest Versions**: Google Chat API v1 (stable), google-chat-cards@1.0.3 (unofficial helper)
+**Latest Versions**: Google Chat API v1 (stable), Cards v2 (Cards v1 deprecated)
 
 ---
 
@@ -168,6 +168,8 @@ Best for:
 
 ### Step 2: Design Cards (If Using Interactive Bot)
 
+**IMPORTANT**: Use Cards v2 only. Cards v1 was deprecated in 2025. Cards v2 matches Material Design on web (faster rendering, better aesthetics).
+
 Cards v2 structure:
 ```json
 {
@@ -200,6 +202,40 @@ Cards v2 structure:
 - `divider` - Horizontal line
 - `image` - Images
 - `decoratedText` - Text with icon/button
+
+**Text Formatting** (NEW: Sept 2025 - GA):
+
+Cards v2 supports both HTML and Markdown formatting:
+
+```typescript
+// HTML formatting (traditional)
+{
+  textParagraph: {
+    text: "This is <b>bold</b> and <i>italic</i> text with <font color='#ea9999'>color</font>"
+  }
+}
+
+// Markdown formatting (NEW - better for AI agents)
+{
+  textParagraph: {
+    text: "This is **bold** and *italic* text\n\n- Bullet list\n- Second item\n\n```\ncode block\n```"
+  }
+}
+```
+
+**Supported Markdown** (text messages and cards):
+- `**bold**` or `*italic*`
+- `` `code` `` for inline code
+- `- list item` or `1. ordered` for lists
+- ` ```code block``` ` for multi-line code
+- `~strikethrough~`
+
+**Supported HTML** (cards only):
+- `<b>bold</b>`, `<i>italic</i>`, `<u>underline</u>`
+- `<font color="#FF0000">colored</font>`
+- `<a href="url">link</a>`
+
+**Why Markdown matters**: LLMs naturally output Markdown. Before Sept 2025, you had to convert Markdown→HTML. Now you can pass Markdown directly to Chat.
 
 **CRITICAL**:
 - **Max 100 widgets per card** - silently truncated if exceeded
