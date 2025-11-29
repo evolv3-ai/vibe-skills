@@ -1,6 +1,6 @@
 {
   "name": "auto-animate",
-  "description": "Add zero-config automatic animations to React UIs with AutoAnimate (@formkit/auto-animate). Lightweight (2kb) with built-in accessibility support. Smooth transitions for DOM changes (add/remove/move) without animation code. Use when: animating dynamic lists, building accordions, implementing toast notifications, adding form validation messages, or encountering SSR errors with animation libraries.",
+  "description": "Zero-config animations for React, Vue, Solid, Svelte, Preact with @formkit/auto-animate (3.28kb). Prevents 10+ documented errors: SSR/Next.js imports, conditional parents, missing keys, flexbox width, table display, Jest/esbuild config, CSS position conflicts, Vue/Nuxt registration, Angular ESM. Use when: animating lists/accordions/toasts/forms, troubleshooting SSR animation errors, need accessible animations (auto prefers-reduced-motion), or want drop-in transitions without Motion overhead.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",

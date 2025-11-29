@@ -1,6 +1,6 @@
 {
   "name": "clerk-auth",
-  "description": "Add Clerk authentication to React, Next.js, and Cloudflare Workers. Features: JWT templates, protected routes, shadcn/ui integration, E2E testing support. Use when: setting up auth, configuring custom JWT claims/middleware, or troubleshooting Missing Clerk Secret Key, JWKS errors, Core 2 migration, authorizedParties issues.",
+  "description": "Clerk auth with API version 2025-11-10 breaking changes (billing endpoints, payment_source→payment_method), Next.js v6 async auth(), PKCE for custom OAuth, credential stuffing defense. Use when: troubleshooting Missing Clerk Secret Key, JWKS errors, authorizedParties CSRF, JWT size limits (1.2KB), 431 header errors (Vite dev mode), or testing with 424242 OTP.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",

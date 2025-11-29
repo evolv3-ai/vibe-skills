@@ -1,6 +1,6 @@
 {
   "name": "claude-api",
-  "description": "Integrate Claude API with streaming, prompt caching, tool use, vision, and extended thinking. Use when: building chatbots, AI assistants, content tools in Node.js/Workers/Next.js, or troubleshooting rate_limit_error, overloaded_error, invalid_request_error, 429 errors.",
+  "description": "Build with Claude Messages API using structured outputs (v0.69.0+, Nov 2025) for guaranteed JSON schema validation. Covers prompt caching (90% savings), streaming SSE, tool use, model deprecations (3.5/3.7 retired Oct 2025). Use when: building chatbots/agents with validated JSON responses, or troubleshooting rate_limit_error, structured output validation, prompt caching not activating, streaming SSE parsing.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
