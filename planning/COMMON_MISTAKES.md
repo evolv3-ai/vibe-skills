@@ -2,7 +2,7 @@
 
 **Purpose**: Learn from failures without experiencing them yourself
 
-**Last Updated**: 2025-10-21
+**Last Updated**: 2025-12-02
 
 ---
 
@@ -22,12 +22,10 @@ This skill helps you build stuff...
 ---
 name: my-awesome-skill
 description: |
-  This skill provides comprehensive knowledge for building stuff.
+  Build stuff with production-tested patterns. Covers setup, configuration,
+  and common issues.
 
-  Use when: specific scenarios
-
-  Keywords: technology, use-case, errors
-license: MIT
+  Use when: building stuff, configuring things, or troubleshooting errors.
 ---
 
 # My Awesome Skill
@@ -57,8 +55,9 @@ license MIT  # ← Wrong: Use quotes or pipe for multiline
 ---
 name: my-skill
 description: |
-  This skill provides...
-license: MIT
+  This skill provides production-tested patterns for X.
+
+  Use when: building X, configuring Y, or troubleshooting Z errors.
 ---
 ```
 
@@ -152,37 +151,42 @@ description: |
 
 ## STRUCTURE MISTAKES
 
-### Mistake #7: Non-Standard Frontmatter Fields
+### Mistake #7: Non-Standard Frontmatter Fields (CRITICAL - Dec 2025)
 
-❌ **WRONG** (Custom fields):
+❌ **WRONG** (Fields that BREAK discovery):
 ```yaml
 ---
 name: my-skill
-version: 1.0.0  # ← Not in spec
-author: Me  # ← Not in spec
-tags:  # ← Not in spec
-  - cloudflare
 description: ...
+license: MIT        # ← NOT RECOGNIZED - breaks discovery!
+metadata:           # ← NOT RECOGNIZED - breaks discovery!
+  keywords: [...]
+  version: 1.0.0
 ---
 ```
 
-✅ **CORRECT** (Standard fields only):
+✅ **CORRECT** (ONLY these 3 fields are valid):
 ```yaml
 ---
 name: my-skill
 description: |
-  ...
-license: MIT
-# Optional official fields:
-# allowed-tools: [bash, python]
-# metadata:
-#   category: "cloudflare"
+  What it does and when to use it. Max 1024 chars.
+allowed-tools:      # ← OPTIONAL - restricts tool access
+  - Read
+  - Glob
 ---
 ```
 
-**Impact**: Non-standard fields may be ignored or break future versions
+**Valid Fields (Dec 2025)**:
+| Field | Required | Notes |
+|-------|----------|-------|
+| `name` | Yes | Max 64 chars, lowercase-hyphen-case |
+| `description` | Yes | Max 1024 chars |
+| `allowed-tools` | No | Restricts which tools Claude can use |
 
-**Real Example**: cloudflare-vectorize used custom fields - fixed in audit (2025-10-21)
+**Impact**: `license:` and `metadata:` fields **PREVENT SKILL DISCOVERY**
+
+**Real Example**: fastmcp skill wasn't being discovered due to `license:` and `metadata:` fields - fixed in mass audit (2025-12-02, 58 skills affected)
 
 ---
 
@@ -481,14 +485,13 @@ Production-ready knowledge domain...
 **AFTER** (Fixed):
 ```yaml
 ---
-name: Cloudflare Workers AI
+name: cloudflare-workers-ai
 description: |
-  This skill provides Workers AI knowledge...
+  Build AI inference with Cloudflare Workers AI. Covers model selection,
+  streaming responses, and binding configuration.
 
-  Use when: implementing AI inference...
-
-  Keywords: workers ai, llm, @cf/meta/llama...
-license: MIT
+  Use when: implementing AI inference, using @cf/meta/llama models, or
+  troubleshooting Workers AI errors.
 ---
 
 # Cloudflare Workers AI - Complete Reference
@@ -497,34 +500,37 @@ license: MIT
 
 ---
 
-### Example 2: cloudflare-vectorize (Fixed 2025-10-21)
+### Example 2: All Skills (Fixed 2025-12-02)
 
-**BEFORE** (Non-standard):
+**BEFORE** (58 skills had this issue):
 ```yaml
 ---
-name: cloudflare-vectorize
-version: 1.0.0  # ← Custom field
-author: Jezweb  # ← Custom field
-tags: [cloudflare, vectorize]  # ← Custom field
-description: Complete guide...
+name: fastmcp
+description: |
+  Build MCP servers with FastMCP...
+license: MIT           # ← NOT RECOGNIZED!
+metadata:              # ← NOT RECOGNIZED!
+  version: "2.0.0"
+  keywords: [mcp, fastmcp]
 ---
 ```
-⚠️ Works but non-standard
+❌ Skills not being discovered due to invalid fields
 
 **AFTER** (Standard):
 ```yaml
 ---
-name: Cloudflare Vectorize
+name: fastmcp
 description: |
-  This skill provides comprehensive knowledge...
+  Build MCP servers with FastMCP framework. Covers tools, resources,
+  storage backends, and OAuth Proxy.
 
-  Use when: creating vector indexes...
-
-  Keywords: vectorize, vector database, RAG...
-license: MIT
+  Use when: creating MCP servers, defining tools, or troubleshooting
+  module-level server errors.
 ---
 ```
-✅ Follows official spec
+✅ Only valid fields = proper discovery
+
+**Lesson**: z.o.rro reported fastmcp wasn't being discovered. Investigation revealed `license:` and `metadata:` fields are NOT recognized by Claude Code. Mass fix applied to 58 skills.
 
 ---
 
@@ -539,7 +545,7 @@ Before committing, verify you DIDN'T make these mistakes:
 - [ ] ✅ Keywords comprehensive
 - [ ] ✅ Third-person description
 - [ ] ✅ Imperative instructions (not "you should")
-- [ ] ✅ Only standard frontmatter fields
+- [ ] ✅ Only valid frontmatter fields (name, description, allowed-tools)
 - [ ] ✅ Package versions current
 - [ ] ✅ Templates tested
 - [ ] ✅ Error sources documented

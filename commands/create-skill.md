@@ -160,6 +160,8 @@ Ask Claude Code: "Use the <skill-name> skill to..."
 
 - Skills are symlinked to `~/.claude/skills/` for Claude Code to discover
 - The [TODO] markers in SKILL.md are intentional - fill them all before committing
-- Description should be 250-350 characters with "Use when:" scenarios
-- Keywords in metadata improve discoverability
+- Description should be 250-350 characters (max 1024) with "Use when:" scenarios
+- Include keywords IN the description text (NOT in metadata - metadata field is not recognized)
+- ONLY valid frontmatter fields: `name`, `description`, `allowed-tools`
+- Do NOT use `license:` or `metadata:` - they break skill discovery
 - Test with `check-metadata.sh` before committing

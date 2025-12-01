@@ -1,7 +1,7 @@
 # Claude Code Skill Standards
 
-**Last Updated**: 2025-10-20
-**Source**: https://docs.claude.com/en/docs/claude-code/skills
+**Last Updated**: 2025-12-02
+**Source**: https://code.claude.com/docs/en/skills.md
 **Reference Skill**: ~/.claude/skills/tailwind-v4-shadcn/
 
 ---
@@ -34,22 +34,33 @@ Skills are modular capabilities stored in `~/.claude/skills/` that Claude Code a
 
 ### YAML Frontmatter (Top of File)
 
+**IMPORTANT: Valid Frontmatter Fields (Dec 2025)**
+
+| Field | Required | Max Length | Notes |
+|-------|----------|------------|-------|
+| `name` | ✅ Yes | 64 chars | Lowercase letters, numbers, hyphens only |
+| `description` | ✅ Yes | 1024 chars | Must include what + when to use |
+| `allowed-tools` | ❌ No | - | Restricts tool access when skill active |
+
+**⚠️ Invalid Fields** (will prevent skill discovery):
+- `license:` - NOT recognized
+- `metadata:` - NOT recognized
+- Any other custom fields - NOT recognized
+
 ```yaml
 ---
-name: Skill Display Name
+name: my-skill-name
 description: |
   What the skill does and when Claude should use it.
 
   Use when: specific scenarios where this skill applies.
-
-  Keywords: keyword1, keyword2, error messages, technology names
 ---
 ```
 
 **Critical**: The `description` field determines when Claude uses the skill. It MUST include:
 - What the skill does
 - When Claude should use it
-- Keywords for discovery
+- Keywords integrated into the text
 
 ### Markdown Content (After Frontmatter)
 

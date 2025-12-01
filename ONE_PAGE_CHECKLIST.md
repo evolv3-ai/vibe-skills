@@ -43,7 +43,7 @@ Research completed before building:
 - [ ] **description**: Uses third-person ("This skill should be used when..." not "Use this skill when...")
 - [ ] **description**: Includes "Use when" scenarios
 - [ ] **description**: Includes keywords (technologies, use cases, error messages)
-- [ ] **license**: Present (e.g., `MIT` or `Complete terms in LICENSE.txt`)
+- [ ] **description**: Max 1024 characters
 
 **Description Quality:**
 - [ ] Target: 250-350 chars (sweet spot for detail vs brevity)
@@ -51,25 +51,27 @@ Research completed before building:
 - [ ] Two-paragraph format if complex (warnings, USPs)
 - [ ] No passive voice ("This skill provides...")
 - [ ] No meta-commentary ("INCLUDES CRITICAL...")
-- [ ] Keywords moved to metadata.keywords (not inline)
+- [ ] Keywords integrated into description text
 - [ ] Readable aloud without running out of breath
 - [ ] Preserves unique selling points ("only", "official")
 - [ ] Critical warnings naturalized (not "CRITICAL:")
-- [ ] **allowed-tools** (optional): Included if pre-approving tools
-- [ ] **metadata** (optional): Used if custom fields needed
+- [ ] **allowed-tools** (optional): Included if restricting tool access
 
 **Example:**
 ```yaml
 ---
 name: my-skill-name
 description: |
-  This skill provides comprehensive knowledge for [technology]. It should be used when
-  building projects with [use case], configuring [feature], or encountering [error].
+  Build [technology] projects with production-tested patterns. Covers [feature1],
+  [feature2], and [feature3].
 
-  Keywords: technology, use-case, error-message, related-tech
-license: MIT
+  Use when: building [use case], configuring [feature], or troubleshooting
+  [error-message] errors.
 ---
 ```
+
+**Note**: Only `name`, `description`, and `allowed-tools` are valid frontmatter fields.
+Fields like `license:` and `metadata:` are NOT recognized by Claude Code.
 
 ---
 
@@ -153,7 +155,7 @@ Skill meets official standards:
 - [ ] Checked [planning/COMMON_MISTAKES.md](planning/COMMON_MISTAKES.md)
 - [ ] Referenced working example (tailwind-v4-shadcn or Cloudflare skills)
 - [ ] No deprecated patterns used
-- [ ] No non-standard frontmatter fields (except allowed-tools, metadata)
+- [ ] No non-standard frontmatter fields (ONLY name, description, allowed-tools are valid)
 - [ ] Writing style consistent (imperative, third-person)
 
 ---
@@ -184,7 +186,6 @@ All required documentation present:
 
 - [ ] SKILL.md complete
 - [ ] README.md complete
-- [ ] LICENSE field in frontmatter
 - [ ] Research log in planning/research-logs/
 - [ ] Templates tested and documented
 - [ ] Scripts documented with usage examples

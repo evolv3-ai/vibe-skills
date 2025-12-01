@@ -1,8 +1,8 @@
 # Official Anthropic Standards vs Our Approach
 
-**Last Updated**: 2025-10-21
-**Official Source**: https://github.com/anthropics/skills
-**Spec Version**: 1.0 (2025-10-16)
+**Last Updated**: 2025-12-02
+**Official Source**: https://code.claude.com/docs/en/skills.md
+**Spec Version**: Updated Dec 2025
 
 ---
 
@@ -30,17 +30,29 @@
 
 ---
 
-## Optional YAML Fields
+## Valid YAML Fields (Dec 2025 - CRITICAL UPDATE)
 
-### From agent_skills_spec.md
+### From Claude Code Documentation
 
-| Field | Official Spec | Our Approach | Notes |
-|-------|---------------|--------------|-------|
-| **license** | Optional | ✅ We use MIT | Recommended |
-| **allowed-tools** | Optional (Claude Code only) | ⚠️ Not yet using | Can add when needed |
-| **metadata** | Optional (key-value map) | ⚠️ Not yet using | Can add custom fields |
+⚠️ **WARNING**: The official Claude Code skill parser ONLY recognizes these fields:
 
-**Verdict**: ✅ **COMPATIBLE** - We can add these anytime without breaking anything
+| Field | Required | Max Length | Notes |
+|-------|----------|------------|-------|
+| **name** | ✅ Yes | 64 chars | Lowercase letters, numbers, hyphens |
+| **description** | ✅ Yes | 1024 chars | Must include what + when to use |
+| **allowed-tools** | ❌ No | - | Restricts tool access when skill active |
+
+### ❌ NOT Recognized (Will Break Discovery)
+
+| Field | Status | Impact |
+|-------|--------|--------|
+| **license** | NOT RECOGNIZED | May prevent skill discovery |
+| **metadata** | NOT RECOGNIZED | May prevent skill discovery |
+| **Any custom field** | NOT RECOGNIZED | May prevent skill discovery |
+
+**Lesson Learned (Dec 2025)**: We had `license: MIT` and `metadata:` blocks in 58 skills. User z.o.rro reported fastmcp wasn't being discovered. Investigation revealed these fields break Claude Code's skill parser. Mass fix applied.
+
+**Verdict**: ⚠️ **CORRECTED** - Only use name, description, allowed-tools
 
 ---
 
