@@ -106,18 +106,38 @@ ls docs/IMPLEMENTATION_PHASES.md
 ls SESSION.md
 ```
 
+### 3.5. Create Session Protocol Rule
+
+**Create `.claude/rules/` directory and copy session protocol:**
+```bash
+mkdir -p .claude/rules
+```
+
+**Copy session protocol from skill** (if project-session-management skill is installed):
+```bash
+cp ~/.claude/skills/project-session-management/rules/session-protocol.md .claude/rules/
+```
+
+**If skill not installed**, create the rule manually by reading the template from:
+`skills/project-session-management/rules/session-protocol.md`
+
+**Customize for this project:**
+- Update "Key Files" section to list only the planning docs that were actually created
+- Add any project-specific files or conventions
+- This rule will be committed with the project and work across all environments (local, Claude Code online, team members)
+
 ### 4. Create Initial Git Commit (If Not Already Committed)
 
 **Check if planning docs are committed:**
 ```bash
-git status --short docs/ SESSION.md
+git status --short docs/ SESSION.md .claude/rules/
 ```
 
 **If uncommitted planning docs exist:**
 
-Stage all planning docs:
+Stage all planning docs and rules:
 ```bash
-git add docs/ SESSION.md
+git add docs/ SESSION.md .claude/rules/
 ```
 
 Check if this is initial commit:
@@ -144,6 +164,7 @@ Generated planning documentation:
 [- ARCHITECTURE.md]
 [- other docs...]
 - SESSION.md (session tracking)
+- .claude/rules/session-protocol.md (session rules)
 
 Next: Start Phase 1 - [Phase 1 Name]
 
@@ -165,6 +186,7 @@ Generated planning docs:
 [- API_ENDPOINTS.md]
 [- other docs...]
 - SESSION.md (session tracking)
+- .claude/rules/session-protocol.md (session rules)
 
 Next: Start Phase 1 - [Phase 1 Name]
 
@@ -198,6 +220,7 @@ PLANNING DOCS CREATED:
 
 ✅ IMPLEMENTATION_PHASES.md ([N] phases)
 ✅ SESSION.md (progress tracker)
+✅ .claude/rules/session-protocol.md (session rules)
 [✅ DATABASE_SCHEMA.md] (if created)
 [✅ API_ENDPOINTS.md] (if created)
 [✅ ARCHITECTURE.md] (if created)
@@ -330,6 +353,7 @@ git push
 ✅ project-planning skill invoked successfully
 ✅ IMPLEMENTATION_PHASES.md created with validated phases
 ✅ SESSION.md created with Phase 1 as current
+✅ .claude/rules/session-protocol.md created (portable session rules)
 ✅ Planning docs committed to git (if git repo exists)
 ✅ User has clear "Next Action" to start Phase 1
 ✅ User knows where to find all planning docs
