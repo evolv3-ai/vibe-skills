@@ -1,8 +1,9 @@
 #!/bin/bash
 
 # Claude Code Custom Status Line with Context Brick Visualization
+# v2.0 - Uses native context_window data from Claude Code 2.0.65+
 # Shows: Model | Repo:Branch [commit] message | GitHub | git status | lines changed
-#        Context usage as horizontal brick visualization (like /context)
+#        Context usage as horizontal brick visualization
 
 # Read JSON from stdin
 input=$(cat)
@@ -92,131 +93,77 @@ if [[ "$lines_added" -gt 0 || "$lines_removed" -gt 0 ]]; then
 fi
 
 # Build Line 2: Context Brick Visualization
-# Parse REAL context data from transcript file
+# Try native context_window first (Claude Code 2.0.65+)
+input_tokens=$(echo "$input" | jq -r '.context_window.total_input_tokens // null')
 
-# Extract transcript path from JSON
-transcript_path=$(echo "$input" | jq -r '.transcript_path // ""')
+if [[ "$input_tokens" != "null" && -n "$input_tokens" && "$input_tokens" != "0" ]]; then
+    # Use native context_window data (2.0.65+)
+    output_tokens=$(echo "$input" | jq -r '.context_window.total_output_tokens // 0')
+    total_tokens=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
+    used_tokens=$((input_tokens + output_tokens))
+else
+    # Fallback: Parse transcript for older Claude Code versions
+    transcript_path=$(echo "$input" | jq -r '.transcript_path // ""')
+    total_tokens=200000  # Default context limit
 
-# Get model ID for context limit detection
-model_id=$(echo "$input" | jq -r '.model.id // ""')
+    if [[ -f "$transcript_path" && -s "$transcript_path" ]]; then
+        # Parse JSONL transcript - get the LAST assistant message's token usage
+        last_usage=$(grep '"type":"assistant"' "$transcript_path" 2>/dev/null | \
+                     tail -1 | \
+                     jq -r '.message.usage // null' 2>/dev/null)
 
-# Determine context limit based on model
-# NOTE: While Opus 4/4.5 models have 1M context at API level, Claude Code CLI
-# enforces a 200k limit for all models. Using 200k for accurate display.
-case "$model_id" in
-    *"opus-4"*) total_tokens=200000 ;;  # Claude Code limits to 200k
-    *"sonnet-4"*|*"sonnet-3-7"*) total_tokens=200000 ;;
-    *"haiku"*) total_tokens=200000 ;;
-    *) total_tokens=200000 ;;  # Default
-esac
+        if [[ -n "$last_usage" && "$last_usage" != "null" ]]; then
+            used_tokens=$(echo "$last_usage" | jq '
+                (.input_tokens // 0) +
+                (.cache_read_input_tokens // 0) +
+                (.cache_creation_input_tokens // 0) +
+                (.output_tokens // 0)
+            ')
+        else
+            used_tokens=0
+        fi
 
-# Parse transcript for token usage (if available)
-if [[ -f "$transcript_path" && -s "$transcript_path" ]]; then
-    # Parse JSONL transcript - get the LAST assistant message's token usage
-    # (Each message contains cumulative context, so we only need the most recent)
-    last_usage=$(grep '"type":"assistant"' "$transcript_path" 2>/dev/null | \
-                 tail -1 | \
-                 jq -r '.message.usage // null' 2>/dev/null)
-
-    if [[ -n "$last_usage" && "$last_usage" != "null" ]]; then
-        # Sum all token types from the last message
-        used_tokens=$(echo "$last_usage" | jq '
-            (.input_tokens // 0) +
-            (.cache_read_input_tokens // 0) +
-            (.cache_creation_input_tokens // 0) +
-            (.output_tokens // 0)
-        ')
+        # Ensure we have a valid number
+        if [[ ! "$used_tokens" =~ ^[0-9]+$ ]]; then
+            used_tokens=0
+        fi
     else
         used_tokens=0
     fi
-
-    # Ensure we have a valid number
-    if [[ ! "$used_tokens" =~ ^[0-9]+$ ]]; then
-        used_tokens=0
-    fi
-else
-    # No transcript available (new session)
-    used_tokens=0
 fi
 
-# Estimate breakdown (rough approximation based on typical usage)
-# In future: could parse tool definitions, CLAUDE.md, etc. for accuracy
-system_tokens=$((total_tokens * 2 / 100))      # ~2% system prompt
-tools_tokens=$((total_tokens * 8 / 100))       # ~8% tools
-mcp_tokens=$((total_tokens * 1 / 100))         # ~1% MCP
-memory_tokens=$((total_tokens * 5 / 100))      # ~5% memory/files
-message_tokens=$((used_tokens - system_tokens - tools_tokens - mcp_tokens - memory_tokens))
-if [[ $message_tokens -lt 0 ]]; then
-    message_tokens=0
-fi
-
+# Calculate metrics
 free_tokens=$((total_tokens - used_tokens))
-
-usage_pct=$(( (used_tokens * 100) / total_tokens ))
+if [[ $total_tokens -gt 0 ]]; then
+    usage_pct=$(( (used_tokens * 100) / total_tokens ))
+else
+    usage_pct=0
+fi
 
 # Convert to 'k' format for display
 used_k=$(( used_tokens / 1000 ))
 total_k=$(( total_tokens / 1000 ))
 free_k=$(( free_tokens / 1000 ))
-system_k=$(( system_tokens / 1000 ))
-tools_k=$(( tools_tokens / 1000 ))
-mcp_k=$(( mcp_tokens / 1000 ))
-memory_k=$(( memory_tokens / 1000 ))
-message_k=$(( message_tokens / 1000 ))
 
-# Generate brick visualization (40 bricks total for more granularity)
+# Get session duration (convert ms to HHh MMm format)
+duration_ms=$(echo "$input" | jq -r '.cost.total_duration_ms // 0')
+duration_hours=$((duration_ms / 3600000))
+duration_min=$(((duration_ms % 3600000) / 60000))
+
+# Get session cost (only show if > 0, for API users)
+cost_usd=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
+
+# Generate brick visualization (40 bricks total)
 total_bricks=40
 used_bricks=$(( (used_tokens * total_bricks) / total_tokens ))
 free_bricks=$((total_bricks - used_bricks))
 
-# Color codes for different types (matching /context)
-# System: dim (gray), Tools: yellow, MCP: magenta, Memory: blue, Messages: cyan, Free: dim white
+# Build brick line with single colour (cyan for used, dim white for free)
 brick_line="ctx ["
 
-# Calculate bricks per category (proportional to actual usage)
-system_bricks=$(( (system_tokens * total_bricks) / total_tokens ))
-tools_bricks=$(( (tools_tokens * total_bricks) / total_tokens ))
-mcp_bricks=$(( (mcp_tokens * total_bricks) / total_tokens ))
-memory_bricks=$(( (memory_tokens * total_bricks) / total_tokens ))
-message_bricks=$(( (message_tokens * total_bricks) / total_tokens ))
-
-# Draw bricks by category
-brick_count=0
-
-# System bricks (dim white)
-for ((i=0; i<system_bricks && brick_count<used_bricks; i++)); do
-    brick_line+="\033[2;37m■\033[0m"
-    ((brick_count++))
-done
-
-# Tools bricks (yellow)
-for ((i=0; i<tools_bricks && brick_count<used_bricks; i++)); do
-    brick_line+="\033[0;33m■\033[0m"
-    ((brick_count++))
-done
-
-# MCP bricks (magenta/pink)
-for ((i=0; i<mcp_bricks && brick_count<used_bricks; i++)); do
-    brick_line+="\033[0;35m■\033[0m"
-    ((brick_count++))
-done
-
-# Memory bricks (blue)
-for ((i=0; i<memory_bricks && brick_count<used_bricks; i++)); do
-    brick_line+="\033[0;34m■\033[0m"
-    ((brick_count++))
-done
-
-# Message bricks (cyan)
-for ((i=0; i<message_bricks && brick_count<used_bricks; i++)); do
+# Used bricks (cyan)
+for ((i=0; i<used_bricks; i++)); do
     brick_line+="\033[0;36m■\033[0m"
-    ((brick_count++))
-done
-
-# Fill any remaining used bricks (in case of rounding)
-while ((brick_count < used_bricks)); do
-    brick_line+="\033[0;36m■\033[0m"
-    ((brick_count++))
 done
 
 # Free bricks (dim/gray hollow squares)
@@ -224,15 +171,26 @@ for ((i=0; i<free_bricks; i++)); do
     brick_line+="\033[2;37m□\033[0m"
 done
 
-brick_line+="] \033[1m${usage_pct}%\033[0m (${used_k}k/${total_k}k tokens)"
+brick_line+="] \033[1m${usage_pct}%\033[0m (${used_k}k/${total_k}k)"
 
-# Add breakdown (simplified)
-brick_line+=" | \033[2;37msys:${system_k}k\033[0m"
-brick_line+=" \033[0;33mtools:${tools_k}k\033[0m"
-brick_line+=" \033[0;35mmcp:${mcp_k}k\033[0m"
-brick_line+=" \033[0;34mmem:${memory_k}k\033[0m"
-brick_line+=" \033[0;36mmsg:${message_k}k\033[0m"
+# Add free space
 brick_line+=" | \033[1;32m${free_k}k free\033[0m"
+
+# Add duration (HHh MMm format)
+brick_line+=" | ${duration_hours}h ${duration_min}m"
+
+# Add cost only if non-zero, rounded to 2 decimal places
+if command -v bc &> /dev/null; then
+    if (( $(echo "$cost_usd > 0" | bc -l 2>/dev/null || echo "0") )); then
+        cost_formatted=$(printf "%.2f" "$cost_usd" 2>/dev/null || echo "0.00")
+        brick_line+=" | \033[0;33m\$${cost_formatted}\033[0m"
+    fi
+else
+    # Fallback without bc: simple string comparison
+    if [[ "$cost_usd" != "0" && "$cost_usd" != "0.0" && "$cost_usd" != "0.00" && -n "$cost_usd" ]]; then
+        brick_line+=" | \033[0;33m\$${cost_usd}\033[0m"
+    fi
+fi
 
 # Output both lines
 echo -e "$line1"
