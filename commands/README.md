@@ -1,6 +1,6 @@
 # Claude Code Slash Commands
 
-Eight slash commands for automating project exploration, planning, session workflow, skill creation, and release safety with Claude Code.
+Nine slash commands for automating project exploration, planning, session workflow, knowledge capture, skill creation, and release safety with Claude Code.
 
 ## ⚠️ New Installation Method
 
@@ -31,6 +31,7 @@ cp skills/project-workflow/commands/wrap-session.md ~/.claude/commands/
 cp skills/project-workflow/commands/continue-session.md ~/.claude/commands/
 cp skills/project-workflow/commands/workflow.md ~/.claude/commands/
 cp skills/project-workflow/commands/release.md ~/.claude/commands/
+cp commands/reflect.md ~/.claude/commands/
 ```
 
 Commands are immediately available in Claude Code after copying.
@@ -146,6 +147,49 @@ Commands are immediately available in Claude Code after copying.
 6. Asks permission to continue or adjust direction
 
 **Time savings**: 1-2 minutes per resume (5-8 manual reads → 1 command)
+
+---
+
+### Knowledge Capture Commands
+
+#### `/reflect`
+
+**Purpose**: Self-reflection to capture operational knowledge before it's lost to context clearing
+
+**Usage**: Type `/reflect` before compacting context, after completing significant work, or when valuable learnings have accumulated
+
+**What it does**:
+1. Self-analyzes current conversation for operational knowledge
+2. Identifies workflows, patterns, tool sequences, corrections, discoveries
+3. Identifies **automation opportunities** - recurring processes worth scripting
+4. Categorizes each learning by appropriate destination
+5. Routes to: ~/.claude/CLAUDE.md (universal), ./CLAUDE.md (project), skills, docs/learnings.md, or SESSION.md
+6. Suggests creating scripts/commands for repeatable processes
+7. Presents findings with proposed destinations
+8. Applies updates and creates automation after user confirmation
+
+**Knowledge types captured**:
+- **Workflows**: Multi-step processes that achieved outcomes
+- **Patterns**: Reusable approaches to common problems
+- **Tool Sequences**: Effective tool combinations and order of operations
+- **Corrections**: What didn't work → what did work
+- **Discoveries**: New capabilities or undocumented behaviors
+- **Automation Opportunities**: Recurring processes worth scripting (suggests shell scripts, npm scripts, slash commands)
+
+**Time savings**: Preserves 5-15 minutes of operational learning per session (otherwise lost on context clear)
+
+**When to use**:
+- Before `/compact` or context clearing
+- After completing a significant task successfully
+- When you've discovered an effective workflow
+- Anytime important process knowledge has accumulated
+
+**When to skip**:
+- Session was purely routine (no new learnings)
+- All knowledge is already in commits/docs
+- Quick Q&A session with no process insights
+
+**Output**: Categorized learnings with routing suggestions, optional file updates
 
 ---
 
@@ -291,7 +335,7 @@ These commands work together and integrate with planning/session skills:
 1. Rough idea → /explore-idea → [Creates PROJECT_BRIEF.md] → Decision
 2. If proceeding → /plan-project → [Reads brief, creates IMPLEMENTATION_PHASES.md + SESSION.md]
 3. Start Phase 1 → Work on phases
-4. Context full → /wrap-session → [Updates SESSION.md, git checkpoint]
+4. Context full → /reflect → [Captures learnings] → /wrap-session → [git checkpoint]
 5. New session → /continue-session → [Loads context, continues from "Next Action"]
 6. Need feature → /plan-feature → [Adds phases to existing plan]
 7. Repeat wrap → resume cycle
@@ -306,6 +350,7 @@ Clear requirements → /plan-project → Work → /wrap-session → /continue-se
 **Helper workflows**:
 ```
 Need guidance? → /workflow → [Interactive guide to commands]
+Capture learnings? → /reflect → [Extracts operational knowledge → routes to docs]
 Release project? → /release → [Safety checks + GitHub release]
 ```
 
@@ -350,6 +395,17 @@ Release project? → /release → [Safety checks + GitHub release]
 - ✅ Detects uncommitted changes
 - ✅ Optional "Next Action" file opening
 
+**`/reflect`**:
+- ✅ Self-analyzes conversation for operational knowledge
+- ✅ Categorizes: workflows, patterns, tool sequences, corrections, discoveries
+- ✅ Identifies automation opportunities (recurring processes)
+- ✅ Smart routing to appropriate destinations
+- ✅ Routes to: CLAUDE.md (global/project), skills, docs/learnings.md, SESSION.md
+- ✅ Suggests scripts/commands for repeatable processes
+- ✅ Shows proposed changes before applying
+- ✅ Matches existing file styles when inserting
+- ✅ Prevents duplicate knowledge entries
+
 **`/workflow`**:
 - ✅ Interactive guidance based on user context
 - ✅ Shows decision trees (which command to use)
@@ -374,16 +430,17 @@ Release project? → /release → [Safety checks + GitHub release]
 
 ## Total Time Savings
 
-**35-55 minutes per project lifecycle**:
+**40-70 minutes per project lifecycle**:
 - Exploration: 10-15 minutes (explore-idea)
 - Planning: 5-7 minutes (plan-project)
 - Feature additions: 7-10 minutes each (plan-feature)
 - Session cycles: 3-5 minutes each (wrap + resume)
+- Knowledge capture: 5-15 minutes per session (reflect)
 - Release safety: 10-15 minutes (release)
 - Workflow navigation: Instant (workflow)
 
 ---
 
-**Version**: 4.0.0
-**Last Updated**: 2025-11-07
+**Version**: 5.0.0
+**Last Updated**: 2025-12-12
 **Author**: Jeremy Dawes | Jezweb
