@@ -3,8 +3,8 @@
 **Repository**: https://github.com/jezweb/claude-skills
 **Purpose**: Production-ready skills for Claude Code CLI
 **Owner**: Jeremy Dawes (Jez) | Jezweb
-**Status**: Active Development | 58 Skills Complete (13 archived)
-**Last Updated**: 2025-11-29
+**Status**: Active Development | 63 Skills Complete (13 archived)
+**Last Updated**: 2025-12-15
 
 ---
 
@@ -126,6 +126,7 @@ claude-skills/
 │   ├── check-metadata.sh         # YAML metadata validator
 │   ├── check-ai-models.sh        # AI model reference checker
 │   ├── check-all-versions.sh     # Comprehensive checker (runs all)
+│   ├── check-marketplace-sync.sh # Verify marketplace.json matches skills/
 │   ├── generate-plugin-manifests.sh  # Generate marketplace manifests
 │   ├── release-check.sh          # Pre-release safety checks
 │   ├── review-skill.sh           # Skill audit/review automation
@@ -234,11 +235,11 @@ This repository has three types of files:
 
 ---
 
-## Current Status (2025-11-29)
+## Current Status (2025-12-15)
 
-### ✅ Active Skills (58)
+### ✅ Active Skills (63)
 
-All 58 skills are production-ready and organized by domain:
+All 63 skills are production-ready and organized by domain:
 
 **Cloudflare Platform** (20 skills):
 - cloudflare-worker-base, cloudflare-d1, cloudflare-r2, cloudflare-kv
@@ -288,7 +289,6 @@ All 58 skills are production-ready and organized by domain:
 ```
 1. RESEARCH
    • Read planning/research-protocol.md
-   • Check Context7 MCP for library docs
    • Verify latest package versions (npm view)
    • Document in planning/research-logs/
 
@@ -467,7 +467,7 @@ ls -la ~/.claude/skills/
 ### Development
 
 ```bash
-# Check all versions (npm, GitHub, metadata, AI models)
+# Check all versions (npm, GitHub, metadata, AI models, marketplace sync)
 ./scripts/check-all-versions.sh                    # All skills
 ./scripts/check-all-versions.sh cloudflare-worker-base  # Specific skill
 
@@ -476,6 +476,8 @@ ls -la ~/.claude/skills/
 ./scripts/check-github-releases.sh [skill-name]    # GitHub releases only
 ./scripts/check-metadata.sh [skill-name]           # Metadata only
 ./scripts/check-ai-models.sh [skill-name]          # AI models only
+./scripts/check-marketplace-sync.sh                # Marketplace sync only
+./scripts/check-marketplace-sync.sh --fix          # Auto-fix marketplace.json
 
 # Create new skill from template
 cp -r templates/skill-skeleton/ skills/new-skill-name/
@@ -708,6 +710,6 @@ See [planning/COMMON_MISTAKES.md](planning/COMMON_MISTAKES.md) for detailed exam
 
 ---
 
-**Last Updated**: 2025-11-07
-**Next Review**: 2026-01-29 (Quarterly)
+**Last Updated**: 2025-12-15
+**Next Review**: 2026-03-15 (Quarterly)
 **Maintainer**: Jeremy Dawes | jeremy@jezweb.net | https://jezweb.com.au

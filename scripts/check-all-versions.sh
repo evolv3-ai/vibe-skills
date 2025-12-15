@@ -8,6 +8,7 @@
 # - GitHub releases
 # - YAML metadata validation
 # - AI model references
+# - Marketplace sync (marketplace.json vs actual skills)
 #
 # Exit code: Always 0 (info only, no failures)
 
@@ -94,20 +95,24 @@ if [ -n "$SKILL_NAME" ]; then
 fi
 
 # 1. NPM Packages
-print_section "1/4: Checking NPM Packages"
+print_section "1/5: Checking NPM Packages"
 "$SCRIPT_DIR/check-npm-versions.sh" $CHECKER_ARGS --markdown "$REPORT_FILE"
 
 # 2. GitHub Releases
-print_section "2/4: Checking GitHub Releases"
+print_section "2/5: Checking GitHub Releases"
 "$SCRIPT_DIR/check-github-releases.sh" $CHECKER_ARGS --markdown "$REPORT_FILE"
 
 # 3. Metadata
-print_section "3/4: Checking Skill Metadata"
+print_section "3/5: Checking Skill Metadata"
 "$SCRIPT_DIR/check-metadata.sh" $CHECKER_ARGS --markdown "$REPORT_FILE"
 
 # 4. AI Models
-print_section "4/4: Checking AI Model References"
+print_section "4/5: Checking AI Model References"
 "$SCRIPT_DIR/check-ai-models.sh" $CHECKER_ARGS --markdown "$REPORT_FILE"
+
+# 5. Marketplace Sync
+print_section "5/5: Checking Marketplace Sync"
+"$SCRIPT_DIR/check-marketplace-sync.sh" --markdown "$REPORT_FILE" || true
 
 # Generate action items section
 echo "" >> "$REPORT_FILE"
@@ -122,6 +127,7 @@ npm_warnings=$(grep -c "⚠️.*update" "$REPORT_FILE" 2>/dev/null | tr -d '\n' 
 major_warnings=$(grep -c "MAJOR.*breaking" "$REPORT_FILE" 2>/dev/null | tr -d '\n' || echo "0")
 stale_warnings=$(grep -c "STALE" "$REPORT_FILE" 2>/dev/null | tr -d '\n' || echo "0")
 deprecated_models=$(grep -c "Deprecated" "$REPORT_FILE" 2>/dev/null | tr -d '\n' || echo "0")
+marketplace_issues=$(grep -c "Phantom\|Missing" "$REPORT_FILE" 2>/dev/null | tr -d '\n' || echo "0")
 
 echo "### High Priority" >> "$REPORT_FILE"
 echo "" >> "$REPORT_FILE"
@@ -138,6 +144,10 @@ if [ "$stale_warnings" -gt 0 ]; then
     echo "- ⚠️ **$stale_warnings skill(s) with stale verification dates** - Re-test and update metadata" >> "$REPORT_FILE"
 fi
 
+if [ "$marketplace_issues" -gt 0 ]; then
+    echo "- ❌ **Marketplace out of sync** - Run \`./scripts/check-marketplace-sync.sh --fix\`" >> "$REPORT_FILE"
+fi
+
 if [ "$npm_warnings" -gt 0 ]; then
     echo "" >> "$REPORT_FILE"
     echo "### Medium Priority" >> "$REPORT_FILE"
@@ -145,7 +155,7 @@ if [ "$npm_warnings" -gt 0 ]; then
     echo "- ⚠️ **$npm_warnings minor/patch package update(s)** - Update when convenient" >> "$REPORT_FILE"
 fi
 
-if [ "$major_warnings" -eq 0 ] && [ "$deprecated_models" -eq 0 ] && [ "$stale_warnings" -eq 0 ] && [ "$npm_warnings" -eq 0 ]; then
+if [ "$major_warnings" -eq 0 ] && [ "$deprecated_models" -eq 0 ] && [ "$stale_warnings" -eq 0 ] && [ "$npm_warnings" -eq 0 ] && [ "$marketplace_issues" -eq 0 ]; then
     echo "✅ **No action items** - All dependencies are up-to-date!" >> "$REPORT_FILE"
 fi
 
@@ -193,11 +203,12 @@ echo "  • NPM packages: See report for details"
 echo "  • GitHub releases: See report for details"
 echo "  • Metadata: See report for details"
 echo "  • AI models: See report for details"
+echo "  • Marketplace sync: See report for details"
 echo ""
 echo -e "${YELLOW}📄 Full report:${NC} $REPORT_FILE"
 echo ""
 
-if [ "$major_warnings" -gt 0 ] || [ "$deprecated_models" -gt 0 ]; then
+if [ "$major_warnings" -gt 0 ] || [ "$deprecated_models" -gt 0 ] || [ "$marketplace_issues" -gt 0 ]; then
     echo -e "${RED}⚠️  HIGH PRIORITY ITEMS DETECTED${NC}"
     echo ""
     if [ "$major_warnings" -gt 0 ]; then
@@ -205,6 +216,9 @@ if [ "$major_warnings" -gt 0 ] || [ "$deprecated_models" -gt 0 ]; then
     fi
     if [ "$deprecated_models" -gt 0 ]; then
         echo "  • $deprecated_models deprecated AI model reference(s)"
+    fi
+    if [ "$marketplace_issues" -gt 0 ]; then
+        echo "  • Marketplace out of sync - run ./scripts/check-marketplace-sync.sh --fix"
     fi
     echo ""
     echo "  Review $REPORT_FILE for details"

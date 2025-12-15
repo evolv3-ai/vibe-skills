@@ -9,6 +9,124 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added - Marketplace Sync Verification 🔄
+
+**Date**: 2025-12-15
+
+**Change**: Added `check-marketplace-sync.sh` script to verify marketplace.json matches actual skills
+
+**What Changed**:
+- New script: `scripts/check-marketplace-sync.sh`
+- Integrated into `check-all-versions.sh` (now runs 5 checks instead of 4)
+- Fixed marketplace.json: removed 14 phantom skills, added 15 missing skills
+- Removed symlinks from `~/.claude/skills/` - users should install via plugin marketplace
+
+**Usage**:
+```bash
+./scripts/check-marketplace-sync.sh          # Check for mismatches
+./scripts/check-marketplace-sync.sh --fix    # Auto-regenerate marketplace.json
+```
+
+**Installation** (official method):
+```bash
+/plugin marketplace add jezweb/claude-skills
+/plugin install cloudflare-skills@claude-skills
+```
+
+---
+
+### Added - contextbricks NPM Package 📦
+
+**Date**: 2025-12-13
+
+**Change**: Published `contextbricks` v2.1.0 to NPM for context usage monitoring
+
+**Features**:
+- Native `context_window` API support (v2.0.0)
+- Accurate context usage after compaction (v2.1.0)
+- Standalone NPM package: `npm install -g contextbricks`
+
+---
+
+### Added - /reflect Command 🪞
+
+**Date**: 2025-12-10
+
+**Change**: New `/reflect` command for capturing session knowledge
+
+**What It Does**:
+- Extracts operational learnings from current session
+- Suggests updates to CLAUDE.md (Avoidable Errors section)
+- Proposes new skills based on patterns discovered
+- Integrates with `/wrap-session` for end-of-session workflow
+
+---
+
+### Added - Claude Rules Pattern 📋
+
+**Date**: 2025-12-06
+
+**Change**: Added portable correction rules for 32 skills
+
+**What Changed**:
+- New `rules/` directory pattern for skills
+- Rules are copied to projects (`.claude/rules/`) for portable context
+- Bridge Claude's training cutoff with current syntax/patterns
+- 6 high-priority skills + 26 additional skills now have rules
+
+**Skills with Rules**:
+- tailwind-v4-shadcn, cloudflare-worker-base, project-session-management
+- All AI skills (ai-sdk-core, openai-*, claude-*, google-gemini-*)
+- All Cloudflare skills
+- Frontend skills (tanstack-*, zustand, hono-routing, etc.)
+
+---
+
+### Added - New Skills 🆕
+
+**Date**: 2025-11-28 to 2025-12-08
+
+**New Skills**:
+- **cloudflare-python-workers** - Python Workers with Pyodide runtime
+- **fastapi** - Python FastAPI framework patterns
+- **flask** - Python Flask web application patterns
+
+**Total Skills**: 63 (up from 59)
+
+---
+
+### Added - New Commands 🛠️
+
+**Date**: 2025-11-21 to 2025-12-02
+
+**New Commands**:
+- `/brief` - Context preservation for session handoffs
+- `/create-skill` - Interactive wizard for creating new skills
+- `/update-docs` - Documentation audit and maintenance
+
+---
+
+### Enhanced - google-chat-api Skill 💬
+
+**Date**: 2025-11-21
+
+**Change**: Added Markdown support (September 2025 GA feature)
+
+---
+
+### Fixed - Skill Maintenance 🔧
+
+**Date**: 2025-11-17 to 2025-12-15
+
+**Fixes**:
+- Fixed marketplace.json structure to match Anthropic plugin format
+- Fixed ts-agent-sdk: added templates, removed hardcoded paths
+- Fixed missing YAML frontmatter in project-workflow skill
+- Removed non-standard frontmatter fields from all skills
+- Added MCP server compatibility warning to elevenlabs-agents
+
+---
+
 ### Archived - 13 Low-Priority Skills 📦
 
 **Date**: 2025-11-17

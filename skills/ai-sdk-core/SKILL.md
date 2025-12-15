@@ -137,6 +137,54 @@ See official docs for usage: https://ai-sdk.dev/docs/ai-sdk-core
 
 ---
 
+## v5 Stream Response Methods
+
+When returning streaming responses from an API, use the correct method:
+
+| Method | Output Format | Use Case |
+|--------|---------------|----------|
+| `toTextStreamResponse()` | Plain text chunks | Simple text streaming |
+| `toUIMessageStreamResponse()` | SSE with JSON events | **Chat UIs** (text-start, text-delta, text-end, finish) |
+
+**For chat widgets and UIs, always use `toUIMessageStreamResponse()`:**
+
+```typescript
+const result = streamText({
+  model: workersai('@cf/qwen/qwen3-30b-a3b-fp8'),
+  messages,
+  system: 'You are helpful.',
+});
+
+// ✅ For chat UIs - returns SSE with JSON events
+return result.toUIMessageStreamResponse({
+  headers: { 'Access-Control-Allow-Origin': '*' },
+});
+
+// ❌ For simple text - returns plain text chunks only
+return result.toTextStreamResponse();
+```
+
+**Note:** `toDataStreamResponse()` does NOT exist in AI SDK v5 (common misconception).
+
+---
+
+## workers-ai-provider Version Compatibility
+
+**IMPORTANT:** `workers-ai-provider@2.x` requires AI SDK v5, NOT v4.
+
+```bash
+# ✅ Correct - AI SDK v5 with workers-ai-provider v2
+npm install ai@^5.0.0 workers-ai-provider@^2.0.0 zod@^3.25.0
+
+# ❌ Wrong - AI SDK v4 causes error
+npm install ai@^4.0.0 workers-ai-provider@^2.0.0
+# Error: "AI SDK 4 only supports models that implement specification version v1"
+```
+
+**Zod Version:** AI SDK v5 requires `zod@^3.25.0` or later for `zod/v3` and `zod/v4` exports. Older versions (3.22.x) cause build errors: "Could not resolve zod/v4".
+
+---
+
 ## Cloudflare Workers Startup Fix
 
 **Problem:** AI SDK v5 + Zod causes >270ms startup time (exceeds Workers 400ms limit).

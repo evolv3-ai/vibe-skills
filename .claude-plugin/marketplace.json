@@ -6,12 +6,13 @@
   },
   "metadata": {
     "description": "Production-tested skills for Claude Code - Cloudflare, AI, React, Tailwind v4, and modern web development",
-    "version": "2.0.0"
+    "version": "2.1.0",
+    "updated": "2025-12-15"
   },
   "plugins": [
     {
       "name": "cloudflare-skills",
-      "description": "Complete Cloudflare platform skills - Workers, D1, R2, KV, AI, Queues, Durable Objects, and more. 22 production-tested skills for edge computing.",
+      "description": "Complete Cloudflare platform skills - Workers, D1, R2, KV, AI, Queues, Durable Objects, and more. 16 production-tested skills for edge computing.",
       "source": "./",
       "skills": [
         "./skills/cloudflare-worker-base",
@@ -25,22 +26,16 @@
         "./skills/cloudflare-durable-objects",
         "./skills/cloudflare-agents",
         "./skills/cloudflare-mcp-server",
-        "./skills/cloudflare-nextjs",
-        "./skills/cloudflare-cron-triggers",
-        "./skills/cloudflare-email-routing",
         "./skills/cloudflare-hyperdrive",
         "./skills/cloudflare-images",
         "./skills/cloudflare-browser-rendering",
         "./skills/cloudflare-turnstile",
-        "./skills/cloudflare-zero-trust-access",
-        "./skills/cloudflare-full-stack-scaffold",
-        "./skills/cloudflare-full-stack-integration",
-        "./skills/cloudflare-sandbox"
+        "./skills/cloudflare-python-workers"
       ]
     },
     {
       "name": "ai-skills",
-      "description": "AI and LLM integration skills - Vercel AI SDK, OpenAI, Google Gemini, Claude API, ElevenLabs, and chatbot patterns. 14 skills for building AI applications.",
+      "description": "AI and LLM integration skills - Vercel AI SDK, OpenAI, Google Gemini, Claude API, ElevenLabs. 14 skills for building AI applications.",
       "source": "./",
       "skills": [
         "./skills/ai-sdk-core",
@@ -49,29 +44,34 @@
         "./skills/openai-agents",
         "./skills/openai-assistants",
         "./skills/openai-responses",
+        "./skills/openai-apps-mcp",
         "./skills/google-gemini-api",
         "./skills/google-gemini-embeddings",
         "./skills/google-gemini-file-search",
+        "./skills/google-chat-api",
         "./skills/claude-api",
         "./skills/claude-agent-sdk",
-        "./skills/thesys-generative-ui",
-        "./skills/elevenlabs-agents",
-        "./skills/better-chatbot",
-        "./skills/better-chatbot-patterns"
+        "./skills/elevenlabs-agents"
       ]
     },
     {
       "name": "frontend-skills",
-      "description": "Frontend and UI skills - Tailwind v4, shadcn/ui, React Hook Form, TanStack Query, Zustand, Next.js, and Hono. 7 skills for modern web UIs.",
+      "description": "Frontend and UI skills - Tailwind v4, shadcn/ui, TanStack suite, animations, and React Native. 13 skills for modern web and mobile UIs.",
       "source": "./",
       "skills": [
         "./skills/tailwind-v4-shadcn",
         "./skills/react-hook-form-zod",
         "./skills/tanstack-query",
+        "./skills/tanstack-router",
+        "./skills/tanstack-start",
+        "./skills/tanstack-table",
         "./skills/zustand-state-management",
         "./skills/nextjs",
         "./skills/hono-routing",
-        "./skills/firecrawl-scraper"
+        "./skills/auto-animate",
+        "./skills/motion",
+        "./skills/tiptap",
+        "./skills/react-native-expo"
       ]
     },
     {
@@ -105,18 +105,27 @@
       ]
     },
     {
+      "name": "backend-skills",
+      "description": "Backend framework skills - FastAPI and Flask for Python web services.",
+      "source": "./",
+      "skills": [
+        "./skills/fastapi",
+        "./skills/flask"
+      ]
+    },
+    {
       "name": "tooling-skills",
-      "description": "Development tooling skills - MCP servers, project planning, session management, workflow automation, and more.",
+      "description": "Development tooling skills - MCP servers, project planning, session management, workflow automation, and skill development.",
       "source": "./",
       "skills": [
         "./skills/typescript-mcp",
         "./skills/fastmcp",
+        "./skills/ts-agent-sdk",
         "./skills/project-planning",
         "./skills/project-session-management",
         "./skills/project-workflow",
-        "./skills/gemini-cli",
-        "./skills/hugo",
-        "./skills/github-project-automation",
+        "./skills/skill-creator",
+        "./skills/skill-review",
         "./skills/open-source-contributions"
       ]
     }
