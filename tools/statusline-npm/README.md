@@ -5,23 +5,17 @@
 [![npm version](https://img.shields.io/npm/v/contextbricks.svg)](https://www.npmjs.com/package/contextbricks)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-A custom status line for Claude Code with rich git integration and session metrics.
-
-> ⚠️ **v3.0.0 Notice**: Context tracking is **temporarily disabled** due to [Anthropic API bug #13783](https://github.com/anthropics/claude-code/issues/13783). The `context_window` API provides cumulative session tokens that never reset after compaction, making context percentages meaningless. The code is preserved and will be re-enabled when Anthropic fixes the API.
+A custom status line for Claude Code with rich git integration, context tracking, and session metrics.
 
 ## ✨ Features
 
+- 🧱 **Brick visualization** showing context usage at a glance
+- 🎯 **Accurate context tracking** using `current_usage` API (Claude Code 2.0.70+)
 - 🔧 **Git integration**: repo:branch [commit] message | github-repo *↑↓
 - ⏱️ **Session duration**: track how long you've been working
 - 💰 **Session cost**: API users see spending (hidden for Max subscribers)
 - 📊 **Session metrics**: model name, lines changed
 - ⚡ **Zero config**: Auto-detects everything, just install and go
-
-### Temporarily Disabled (pending Anthropic fix)
-
-- ~~🧱 **Brick visualization** showing context usage at a glance~~
-- ~~🎯 **Native context_window support** - accurate token data~~
-- ~~📦 **Compaction detection** - shows real context usage after compaction~~
 
 ## 🚀 Quick Start
 
@@ -76,15 +70,9 @@ For Max subscribers (no API cost):
 ctx [■■■■■■■■■■■■■■■■■□□□□□□□□□□□□□□□□□□□□□□□] 43% (86k/200k) | 113k free | 12m45s
 ```
 
-After context compaction (📦 indicates compaction occurred):
-```
-ctx [■■■■■■■■■■■■■■■■■■■■■■■■■■■■□□□□□□□□□□□□] 📦 68% (136k/200k) | 64k free | 2h 38m
-```
-
 **Color Legend:**
 - 🟦 Cyan = Used context
 - ⬜ Dim hollow = Free space
-- 📦 Purple = Context has been compacted (shows actual current usage)
 
 ## 🔧 Requirements
 
@@ -109,25 +97,28 @@ contextbricks --version     # Show version
 
 ## 🎯 How It Works
 
-### Claude Code 2.0.65+ (Native)
+### Claude Code 2.0.70+ (current_usage API)
 
-ContextBricks v2.0 uses the **native `context_window` data** provided by Claude Code:
+ContextBricks v3.1 uses the **`current_usage` field** for accurate context tracking:
 
 ```json
 {
   "context_window": {
-    "total_input_tokens": 15234,
-    "total_output_tokens": 4521,
-    "context_window_size": 200000
+    "context_window_size": 200000,
+    "current_usage": {
+      "input_tokens": 45000,
+      "cache_creation_input_tokens": 3000,
+      "cache_read_input_tokens": 5000
+    }
   }
 }
 ```
 
-This gives you accurate, real-time token counts without any parsing overhead.
+This provides accurate current context usage that properly reflects the state after compaction.
 
 ### Older Versions (Fallback)
 
-For Claude Code < 2.0.65, ContextBricks falls back to parsing session transcript files (JSONL format) to get token usage.
+For Claude Code < 2.0.70 without `current_usage`, the status line shows 0% until data becomes available.
 
 ## 🔄 Updates
 
@@ -141,11 +132,19 @@ npx contextbricks@latest init
 
 ## 📋 Changelog
 
+### v3.1.0 (2025-12-16)
+- **Re-enabled context tracking** - Uses new `current_usage` API (Claude Code 2.0.70+)
+- **Simplified code** - Removed complex compaction detection (~100 lines removed)
+- **Accurate tracking** - `current_usage` provides proper context state after compaction
+
+### v3.0.0 (2025-12-15)
+- **Disabled context tracking** - Temporary due to Anthropic API bug #13783
+- **Git-only mode** - Shows git info, duration, and cost while waiting for fix
+
 ### v2.1.0 (2025-12-13)
 - **Compaction detection** - Shows accurate context usage after automatic compaction
 - **📦 indicator** - Purple box emoji when context has been compacted
 - **Hybrid calculation** - Uses cumulative tokens when normal, transcript parsing when compacted
-- **Fixes >100% display** - No more "246% (492k/200k)" after compaction
 
 ### v2.0.0 (2025-12-11)
 - **Native context_window support** - Uses Claude Code 2.0.65+ native data
@@ -162,15 +161,15 @@ npx contextbricks@latest init
 
 ### Status line shows 0% (0k/200k tokens)
 
-**Cause**: jq not installed or no context data available (new session)
+**Cause**: jq not installed, no context data available (new session), or Claude Code < 2.0.70
 
 **Fix**:
 ```bash
 # Check jq
 which jq || sudo apt install jq
 
-# Test with native data
-echo '{"context_window":{"total_input_tokens":50000,"total_output_tokens":5000,"context_window_size":200000},"model":{"display_name":"Sonnet 4.5"},"workspace":{"current_dir":"'"$PWD"'"},"cost":{"total_duration_ms":300000}}' | ~/.claude/statusline.sh
+# Test with current_usage data (2.0.70+)
+echo '{"context_window":{"context_window_size":200000,"current_usage":{"input_tokens":50000,"cache_creation_input_tokens":3000,"cache_read_input_tokens":2000}},"model":{"display_name":"Sonnet 4.5"},"workspace":{"current_dir":"'"$PWD"'"},"cost":{"total_duration_ms":300000}}' | ~/.claude/statusline.sh
 ```
 
 ### Git info not showing
