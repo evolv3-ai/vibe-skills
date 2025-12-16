@@ -1,7 +1,7 @@
 {
   "name": "contextbricks",
-  "version": "3.0.0",
-  "description": "Git-aware statusline for Claude Code CLI (context tracking disabled pending Anthropic API fix)",
+  "version": "3.1.0",
+  "description": "Git-aware statusline for Claude Code CLI with context brick visualization",
   "keywords": [
     "claude",
     "claude-code",
