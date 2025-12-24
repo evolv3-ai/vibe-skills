@@ -20,6 +20,15 @@ env/
 .env.local
 .env.*.local
 
+# RSA Keys (from key-pair authentication setup)
+*.p8
+*.pub
+rsa_key*
+
+# Local snowflake.yml overrides (may contain credentials)
+snowflake.yml.local
+snowflake.local.yml
+
 # IDE
 .idea/
 .vscode/
@@ -31,8 +40,9 @@ env/
 .DS_Store
 Thumbs.db
 
-# Streamlit
-.streamlit/secrets.toml
+# Streamlit local config
+.streamlit/
+secrets.toml
 
 # Logs
 *.log
@@ -46,3 +56,7 @@ htmlcov/
 # Build artifacts
 dist/
 build/
+
+# Container Runtime specific
+pyproject.toml.local
+requirements.local.txt

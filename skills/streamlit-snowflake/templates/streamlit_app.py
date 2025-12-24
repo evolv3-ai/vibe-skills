@@ -13,8 +13,12 @@ Deploy: snow streamlit deploy --replace
 import streamlit as st
 import pandas as pd
 
+# Import shared utilities (session management, query helpers)
+from common.utils import get_snowpark_session, run_query_safe, show_connection_info
+
 # Page configuration
-# Note: page_title and page_icon are NOT supported in Streamlit in Snowflake
+# Note: page_title, page_icon, and menu_items are NOT supported in Streamlit in Snowflake
+# Only use layout and initial_sidebar_state
 st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded",
@@ -23,20 +27,6 @@ st.set_page_config(
 # Application title
 st.title("My Streamlit App")
 st.markdown("Built with Streamlit in Snowflake")
-
-
-# -----------------------------------------------------------------------------
-# Database Connection
-# -----------------------------------------------------------------------------
-
-@st.cache_resource
-def get_snowpark_session():
-    """
-    Get Snowpark session using native Streamlit connection.
-    Cached to avoid reconnection on every rerun.
-    """
-    conn = st.connection("snowflake")
-    return conn.session()
 
 
 # -----------------------------------------------------------------------------

@@ -6,10 +6,15 @@ This page demonstrates:
 - Table/schema browsing
 - Interactive data filtering
 - Visualization with Plotly
+- Safe identifier handling
 """
 
+import re
 import streamlit as st
 import pandas as pd
+
+# Import shared utilities
+from common.utils import get_snowpark_session
 
 # Try to import plotly (optional dependency)
 try:
@@ -23,23 +28,54 @@ st.title("Data Explorer")
 
 
 # -----------------------------------------------------------------------------
-# Connection (reuse pattern from main app)
+# Identifier Validation (Security)
 # -----------------------------------------------------------------------------
 
-@st.cache_resource
-def get_session():
-    conn = st.connection("snowflake")
-    return conn.session()
+def validate_identifier(name: str) -> bool:
+    """
+    Validate Snowflake identifier to prevent SQL injection.
 
+    Valid identifiers:
+    - Start with letter or underscore
+    - Contain only letters, numbers, underscores
+    - Max 255 characters
+    """
+    if not name or len(name) > 255:
+        return False
+    # Snowflake unquoted identifier pattern
+    pattern = r'^[A-Za-z_][A-Za-z0-9_$]*$'
+    return bool(re.match(pattern, name))
+
+
+def quote_identifier(name: str) -> str:
+    """
+    Quote identifier for safe use in SQL.
+    Escapes any double quotes within the identifier.
+    """
+    if not validate_identifier(name):
+        # For complex identifiers, quote them
+        escaped = name.replace('"', '""')
+        return f'"{escaped}"'
+    return name
+
+
+# -----------------------------------------------------------------------------
+# Data Functions
+# -----------------------------------------------------------------------------
 
 @st.cache_data(ttl=600)
 def get_tables(database: str, schema: str) -> pd.DataFrame:
-    """Get list of tables in a schema."""
-    session = get_session()
+    """Get list of tables in a schema with safe identifier handling."""
+    if not validate_identifier(database) or not validate_identifier(schema):
+        st.error("Invalid database or schema name. Use alphanumeric characters and underscores only.")
+        return pd.DataFrame()
+
+    session = get_snowpark_session()
+    # Use quoted identifiers for safety
     query = f"""
     SELECT table_name, row_count, bytes
-    FROM {database}.information_schema.tables
-    WHERE table_schema = '{schema}'
+    FROM {quote_identifier(database)}.information_schema.tables
+    WHERE table_schema = '{schema.upper()}'
     AND table_type = 'BASE TABLE'
     ORDER BY table_name
     """
@@ -52,9 +88,19 @@ def get_tables(database: str, schema: str) -> pd.DataFrame:
 
 @st.cache_data(ttl=300)
 def preview_table(database: str, schema: str, table: str, limit: int = 100) -> pd.DataFrame:
-    """Preview rows from a table."""
-    session = get_session()
-    query = f'SELECT * FROM {database}.{schema}.{table} LIMIT {limit}'
+    """Preview rows from a table with safe identifier handling."""
+    # Validate all identifiers
+    for name, label in [(database, "Database"), (schema, "Schema"), (table, "Table")]:
+        if not validate_identifier(name):
+            st.error(f"Invalid {label} name: {name}")
+            return pd.DataFrame()
+
+    # Validate limit is reasonable
+    limit = max(1, min(limit, 10000))
+
+    session = get_snowpark_session()
+    # Use quoted identifiers
+    query = f'SELECT * FROM {quote_identifier(database)}.{quote_identifier(schema)}.{quote_identifier(table)} LIMIT {limit}'
     try:
         return session.sql(query).to_pandas()
     except Exception as e:
@@ -72,6 +118,12 @@ with st.sidebar:
     # Database/Schema selection
     database = st.text_input("Database", value="MY_DATABASE")
     schema = st.text_input("Schema", value="PUBLIC")
+
+    # Validate inputs
+    if database and not validate_identifier(database):
+        st.warning("Database name contains invalid characters")
+    if schema and not validate_identifier(schema):
+        st.warning("Schema name contains invalid characters")
 
     # Row limit
     row_limit = st.slider("Preview Rows", 10, 500, 100)
@@ -93,7 +145,7 @@ if tables_df.empty:
     st.warning("No tables found or unable to access schema.")
     st.stop()
 
-# Table selector
+# Table selector - these come from query results, so they're safe
 table_names = tables_df["TABLE_NAME"].tolist()
 selected_table = st.selectbox("Select Table", table_names)
 
@@ -104,7 +156,11 @@ if selected_table:
     table_info = tables_df[tables_df["TABLE_NAME"] == selected_table].iloc[0]
     col1, col2 = st.columns(2)
     with col1:
-        st.metric("Row Count", f"{table_info.get('ROW_COUNT', 'N/A'):,}")
+        row_count = table_info.get('ROW_COUNT')
+        if row_count is not None:
+            st.metric("Row Count", f"{int(row_count):,}")
+        else:
+            st.metric("Row Count", "N/A")
     with col2:
         bytes_val = table_info.get("BYTES", 0) or 0
         st.metric("Size", f"{bytes_val / 1024 / 1024:.2f} MB")
