@@ -19,7 +19,7 @@ description: |
 **Production-tested**: cloudflare-worker-base-test (https://cloudflare-worker-base-test.webfonts.workers.dev)
 **Last Updated**: 2025-11-24
 **Status**: Production Ready ✅
-**Latest Versions**: hono@4.10.6, @cloudflare/vite-plugin@1.15.2, vite@7.2.4, wrangler@4.50.0
+**Latest Versions**: hono@4.11.3, @cloudflare/vite-plugin@1.15.2, vite@7.2.4, wrangler@4.50.0
 
 **Recent Updates (2025)**:
 - **March 2025**: Wrangler v4 release (minimal breaking changes, v3 supported until Q1 2027)
@@ -38,7 +38,7 @@ npm create cloudflare@latest my-worker -- --type hello-world --ts --git --deploy
 
 # 2. Install dependencies
 cd my-worker
-npm install hono@4.10.6
+npm install hono@4.11.3
 npm install -D @cloudflare/vite-plugin@1.15.2 vite@7.2.4
 
 # 3. Create wrangler.jsonc

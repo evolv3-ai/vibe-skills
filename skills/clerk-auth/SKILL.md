@@ -6,7 +6,7 @@ description: |
 
 # Clerk Auth - Breaking Changes & Error Prevention Guide
 
-**Package Versions**: @clerk/nextjs@6.35.4, @clerk/backend@2.23.2, @clerk/clerk-react@5.56.2, @clerk/testing@1.13.18
+**Package Versions**: @clerk/nextjs@6.36.5, @clerk/backend@2.23.2, @clerk/clerk-react@5.56.2, @clerk/testing@1.13.18
 **Breaking Changes**: Nov 2025 - API version 2025-11-10, Oct 2024 - Next.js v6 async auth()
 **Last Updated**: 2025-11-22
 

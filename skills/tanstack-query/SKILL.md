@@ -9,7 +9,7 @@ description: |
 # TanStack Query (React Query) v5
 
 **Last Updated**: 2025-11-28
-**Versions**: @tanstack/react-query@5.90.11, @tanstack/react-query-devtools@5.90.2
+**Versions**: @tanstack/react-query@5.90.16, @tanstack/react-query-devtools@5.90.2
 **Requires**: React 18.0+ (useSyncExternalStore), TypeScript 4.7+ (recommended)
 
 ---

@@ -25,7 +25,7 @@ description: |
 
 **Status**: Production Ready ✅
 **Last Updated**: 2025-11-25
-**Latest Version**: drizzle-orm@0.44.7, drizzle-kit@0.31.7, better-sqlite3@12.4.6
+**Latest Version**: drizzle-orm@0.45.1, drizzle-kit@0.31.8, better-sqlite3@12.4.6
 **Dependencies**: cloudflare-d1, cloudflare-worker-base
 
 ---
@@ -231,8 +231,8 @@ Claude should load these when you need specific deep-dive information:
 ## Dependencies
 
 **Required**:
-- `drizzle-orm@0.44.7` - ORM runtime
-- `drizzle-kit@0.31.7` - CLI tool for migrations
+- `drizzle-orm@0.45.1` - ORM runtime
+- `drizzle-kit@0.31.8` - CLI tool for migrations
 
 **Optional**:
 - `better-sqlite3@12.4.6` - For local SQLite development

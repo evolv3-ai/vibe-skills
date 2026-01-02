@@ -12,7 +12,7 @@ description: |
 **Status**: Production Ready ✅
 **Last Updated**: 2025-11-26
 **Dependencies**: None (framework-agnostic)
-**Latest Versions**: hono@4.10.6, zod@4.1.13, valibot@1.2.0, @hono/zod-validator@0.7.5, @hono/valibot-validator@0.6.0
+**Latest Versions**: hono@4.11.3, zod@4.1.13, valibot@1.2.0, @hono/zod-validator@0.7.5, @hono/valibot-validator@0.6.0
 
 ---
 
@@ -21,7 +21,7 @@ description: |
 ### 1. Install Hono
 
 ```bash
-npm install hono@4.10.6
+npm install hono@4.11.3
 ```
 
 **Why Hono:**
