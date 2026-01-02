@@ -1,0 +1,12 @@
+{
+  "name": "google-spaces-updates",
+  "description": "Post team updates to Google Chat Spaces via webhook. Supports deployment notifications, bug fixes, feature announcements, and questions. Reads config from .claude/settings.json, formats messages with rich formatting, and includes git context (commits, branches, changed files). Use when: post to team, notify team, update the team, after deployments, completing features, fixing bugs reported by team, or asking questions that need team input.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jeremy Dawes",
+    "email": "jeremy@jezweb.net"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/jezweb/claude-skills",
+  "keywords": ["google spaces","google chat","team notifications","webhook","deployment updates","team chat","chat spaces api","notify team","post update","team collaboration","slack alternative project: {   name: my-project","repo: github.com/org/my-project }","team: {   chat_webhook: https://chat.googleapis.com/v1/spaces/SPACE_ID/messages?key=KEY&token=TOKEN","members: [Deepinder","Joshua"]
+}

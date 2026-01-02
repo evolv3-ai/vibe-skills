@@ -1,0 +1,4 @@
+{
+  "test_webhook": "https://chat.googleapis.com/v1/spaces/AAQAZ2LOguk/messages?key=AIzaSyDdI0hCZtE6vySjMm-WEfRq3CPzqKqqsHI&token=b0UjCCk1d5XNWyjJF_nOzqg_TlB-lsD-bBqidLVRNHA",
+  "note": "Use this webhook for testing new message formats before posting to real team spaces"
+}
