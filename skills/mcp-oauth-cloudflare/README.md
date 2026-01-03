@@ -62,13 +62,18 @@ mcp-oauth-cloudflare/
 
 ```json
 {
-  "@cloudflare/workers-oauth-provider": "^0.1.0",
-  "agents": "^0.2.32",
+  "@cloudflare/workers-oauth-provider": "^0.2.2",
+  "agents": "^0.3.3",
   "@modelcontextprotocol/sdk": "^1.25.1",
-  "hono": "^4.6.14",
-  "zod": "^3.24.1"
+  "hono": "^4.11.3",
+  "zod": "^3.24.2"
 }
 ```
+
+**v0.2.0+ Features:**
+- Refresh token support for long-lived sessions
+- Bearer token + OAuth coexistence for CLI tools
+- Improved state validation
 
 ## Why OAuth Over Auth Tokens?
 

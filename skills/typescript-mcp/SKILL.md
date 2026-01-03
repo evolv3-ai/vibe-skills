@@ -9,8 +9,9 @@ allowed-tools: [Read, Write, Edit, Bash, Grep, Glob]
 
 # TypeScript MCP on Cloudflare Workers
 
-**Last Updated**: 2025-11-28
-**Versions**: @modelcontextprotocol/sdk@1.23.0, hono@4.10.7, zod@4.1.13
+**Last Updated**: 2026-01-03
+**Versions**: @modelcontextprotocol/sdk@1.25.1, hono@4.11.3, zod@3.24.2
+**Spec Version**: 2025-11-25
 
 ---
 
@@ -79,6 +80,104 @@ app.use('/mcp', async (c, next) => {
 const jwt = c.req.header('Cf-Access-Jwt-Assertion');
 const payload = await verifyJWT(jwt, c.env.CF_ACCESS_TEAM_DOMAIN);
 ```
+
+---
+
+## Tasks (v1.24.0+)
+
+Tasks enable **long-running operations** that return a handle for polling results later. Useful for expensive computations, batch processing, or operations that may need input.
+
+**Task States**: `working` → `input_required` → `completed` / `failed` / `cancelled`
+
+**Server Capability Declaration**:
+```typescript
+const server = new McpServer({
+  name: 'my-server',
+  version: '1.0.0',
+  capabilities: {
+    tasks: {
+      list: {},
+      cancel: {},
+      requests: {
+        tools: { call: {} }
+      }
+    }
+  }
+});
+```
+
+**Tool with Task Support**:
+```typescript
+server.registerTool(
+  'long-running-analysis',
+  {
+    description: 'Analyze large dataset',
+    inputSchema: z.object({ datasetId: z.string() }),
+    execution: { taskSupport: 'optional' }  // 'forbidden' | 'optional' | 'required'
+  },
+  async ({ datasetId }, extra) => {
+    // If invoked as task, extra.task contains taskId
+    const result = await performAnalysis(datasetId);
+    return { content: [{ type: 'text', text: JSON.stringify(result) }] };
+  }
+);
+```
+
+**Client Task Request**:
+```json
+{
+  "method": "tools/call",
+  "params": {
+    "name": "long-running-analysis",
+    "arguments": { "datasetId": "abc123" },
+    "task": { "ttl": 60000 }
+  }
+}
+```
+
+**Task Lifecycle**:
+1. Client sends request with `task` param → receives `taskId`
+2. Client polls via `tasks/get` with `taskId`
+3. When status is `completed`, client calls `tasks/result` to get output
+4. Optional: Client can `tasks/cancel` to abort
+
+📚 **Spec**: https://modelcontextprotocol.io/specification/2025-11-25/basic/utilities/tasks
+
+---
+
+## Sampling with Tools (v1.24.0+)
+
+Servers can now include **tool definitions in sampling requests**, enabling server-side agent loops.
+
+**Use Case**: Server needs to orchestrate multi-step reasoning using LLM + tools without custom frameworks.
+
+```typescript
+// Server initiates sampling with tools available
+const result = await server.requestSampling({
+  messages: [{ role: 'user', content: 'Analyze this data and fetch more if needed' }],
+  maxTokens: 4096,
+  tools: [
+    {
+      name: 'fetch_data',
+      description: 'Fetch additional data from API',
+      inputSchema: { type: 'object', properties: { query: { type: 'string' } } }
+    }
+  ]
+});
+
+// Handle tool calls in response
+if (result.content[0].type === 'tool_use') {
+  const toolResult = await executeLocalTool(result.content[0]);
+  // Continue conversation with tool result...
+}
+```
+
+**Key Points**:
+- Server-side agentic behavior as first-class MCP feature
+- Standard MCP primitives (no custom frameworks)
+- Tool definitions follow same schema as `tools/list`
+
+📚 **Spec**: SEP-1577
 
 ---
 
@@ -266,7 +365,7 @@ wrangler deploy
 
 ## Templates & References
 
-**Templates**: `basic-mcp-server.ts`, `tool-server.ts`, `resource-server.ts`, `authenticated-server.ts`, `wrangler.jsonc`
+**Templates**: `basic-mcp-server.ts`, `tool-server.ts`, `resource-server.ts`, `authenticated-server.ts`, `tasks-server.ts`, `wrangler.jsonc`
 
 **References**: `tool-patterns.md`, `authentication-guide.md`, `testing-guide.md`, `cloudflare-integration.md`, `common-errors.md`
 
@@ -278,10 +377,10 @@ wrangler deploy
 - ✅ Close transport on response end (`c.res.raw.on('close', () => transport.close())`)
 - ✅ Use direct export (`export default app`, NOT `{ fetch: app.fetch }`)
 - ✅ Implement authentication for production
-- ✅ Update to SDK v1.23.0+ for security fixes
+- ✅ Update to SDK v1.25.1+ for security fixes and Tasks support
 
 **Never**:
 - ❌ Export with object wrapper
 - ❌ Forget to close StreamableHTTPServerTransport
 - ❌ Log environment variables or secrets
-- ❌ Use outdated SDK versions
+- ❌ Use outdated SDK versions (<1.20.2 has ReDoS vulnerability)

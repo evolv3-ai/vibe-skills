@@ -9,10 +9,10 @@ allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 
 # Next.js App Router - Production Patterns
 
-**Version**: Next.js 16.0.0
+**Version**: Next.js 16.1.1
 **React Version**: 19.2.0
 **Node.js**: 20.9+
-**Last Verified**: 2025-10-24
+**Last Verified**: 2026-01-03
 
 ---
 
@@ -20,15 +20,17 @@ allowed-tools: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"]
 
 1. [When to Use This Skill](#when-to-use-this-skill)
 2. [When NOT to Use This Skill](#when-not-to-use-this-skill)
-3. [Next.js 16 Breaking Changes](#nextjs-16-breaking-changes)
-4. [Cache Components & Caching APIs](#cache-components--caching-apis)
-5. [Route Handlers (Next.js 16 Updates)](#route-handlers-nextjs-16-updates)
-6. [Proxy vs Middleware](#proxy-vs-middleware)
-7. [Parallel Routes - default.js Required](#parallel-routes---defaultjs-required-breaking)
-8. [React 19.2 Features](#react-192-features)
-9. [Turbopack (Stable in Next.js 16)](#turbopack-stable-in-nextjs-16)
-10. [Common Errors & Solutions](#common-errors--solutions)
-11. [Templates & Resources](#templates--resources)
+3. [Security Advisories (December 2025)](#security-advisories-december-2025)
+4. [Next.js 16.1 Updates](#nextjs-161-updates-december-2025)
+5. [Next.js 16 Breaking Changes](#nextjs-16-breaking-changes)
+6. [Cache Components & Caching APIs](#cache-components--caching-apis)
+7. [Route Handlers (Next.js 16 Updates)](#route-handlers-nextjs-16-updates)
+8. [Proxy vs Middleware](#proxy-vs-middleware)
+9. [Parallel Routes - default.js Required](#parallel-routes---defaultjs-required-breaking)
+10. [React 19.2 Features](#react-192-features)
+11. [Turbopack (Stable in Next.js 16)](#turbopack-stable-in-nextjs-16)
+12. [Common Errors & Solutions](#common-errors--solutions)
+13. [Templates & Resources](#templates--resources)
 
 ---
 
@@ -71,6 +73,39 @@ Do NOT use this skill for:
 - **tailwind-v4-shadcn**: For Tailwind v4 + shadcn/ui setup (composable with this skill)
 - **clerk-auth**: For Clerk authentication in Next.js (composable with this skill)
 - **better-auth**: For Better Auth integration (composable with this skill)
+
+---
+
+## Security Advisories (December 2025)
+
+**CRITICAL**: Three security vulnerabilities were disclosed in December 2025 affecting Next.js with React Server Components:
+
+| CVE | Severity | Affected | Description |
+|-----|----------|----------|-------------|
+| **CVE-2025-66478** | CRITICAL (10.0) | 15.x, 16.x | Server Component arbitrary code execution |
+| **CVE-2025-55184** | HIGH | 13.x-16.x | Denial of Service via malformed request |
+| **CVE-2025-55183** | MEDIUM | 13.x-16.x | Source code exposure in error responses |
+
+**Action Required**: Upgrade to Next.js 16.1.1 or later immediately.
+
+```bash
+npm update next
+# Verify: npm list next should show 16.1.1+
+```
+
+**References**:
+- https://nextjs.org/security
+- https://github.com/vercel/next.js/security/advisories
+
+---
+
+## Next.js 16.1 Updates (December 2025)
+
+**New in 16.1**:
+- **Turbopack File System Caching (STABLE)**: Now enabled by default in development
+- **Next.js Bundle Analyzer**: New experimental feature for bundle analysis
+- **Improved Debugging**: Enhanced `next dev --inspect` support
+- **Security Fixes**: Addresses CVE-2025-66478, CVE-2025-55184, CVE-2025-55183
 
 ---
 

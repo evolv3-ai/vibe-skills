@@ -16,9 +16,11 @@ This skill provides production-tested patterns, templates, and error prevention 
 - **Icons Support**: Visual representations for better UX
 - **API Integration**: OpenAPI/Swagger auto-generation, FastAPI conversion, manual integration
 - **Cloud Deployment**: FastMCP Cloud requirements and common pitfalls
-- **Error Prevention**: 25 documented errors with solutions
+- **Error Prevention**: 28 documented errors with solutions
 - **Production Patterns**: Self-contained architecture, connection pooling, caching, retry logic
 - **Context Features**: Elicitation, progress tracking, sampling, state management
+- **Background Tasks (v2.14.0+)**: Long-running operations with progress tracking
+- **Sampling with Tools (v2.14.1+)**: Agentic workflows where LLM can call tools
 - **Testing**: Unit and integration testing patterns
 - **Client Configuration**: Claude Desktop, Claude Code CLI
 
@@ -139,7 +141,7 @@ This is the highest token savings in the skills collection!
 
 ## Errors Prevented
 
-This skill prevents 25 common errors:
+This skill prevents 28 common errors:
 
 ### Core Server Errors (1-5)
 1. **Missing server object** - Module-level export for FastMCP Cloud
@@ -184,6 +186,11 @@ This skill prevents 25 common errors:
 24. **Icon data URI format error** - Invalid data URI format
 25. **Lifespan behavior change (v2.13.0)** - Per-server vs per-session
 
+### v2.14.0 Migration Errors (26-28)
+26. **BearerAuthProvider removed** - Use OAuth patterns instead
+27. **Context.get_http_request() removed** - Use alternative context methods
+28. **fastmcp.Image import changed** - New import path required
+
 ## What's Included
 
 ### Templates (19)
@@ -211,12 +218,12 @@ This skill prevents 25 common errors:
 
 **Configuration:**
 - `.env.example` - Environment variables
-- `requirements.txt` - Package dependencies (fastmcp>=2.13.0)
+- `requirements.txt` - Package dependencies (fastmcp>=2.14.0)
 - `pyproject.toml` - Package configuration
 
 ### Reference Docs (11)
 **Error & Deployment:**
-- `common-errors.md` - 25 errors with solutions
+- `common-errors.md` - 28 errors with solutions
 - `cloud-deployment.md` - FastMCP Cloud guide
 - `cli-commands.md` - FastMCP CLI reference
 
@@ -260,7 +267,7 @@ Example prompts:
 ## Production Validation
 
 **Tested With:**
-- FastMCP 2.13.0+ (v2.13.0 "Cache Me If You Can" release)
+- FastMCP 2.14.x (v2.14.0+ with Background Tasks and Sampling with Tools)
 - Python 3.10, 3.11, 3.12
 - Storage backends: Memory, Disk, Redis
 - Middleware: All 8 built-in types
@@ -269,20 +276,24 @@ Example prompts:
 - OpenAPI integrations
 - FastAPI conversions
 - Server composition (import/mount)
+- Background Tasks with Docket scheduler
+- Sampling with Tools (AnthropicSamplingHandler)
 
 **Based On:**
-- Official FastMCP v2.13.0 documentation
+- Official FastMCP v2.14.x documentation
 - FastMCP updates: https://gofastmcp.com/updates.md
 - Storage backends: https://gofastmcp.com/servers/storage-backends.md
 - Icons: https://gofastmcp.com/servers/icons.md
 - Progress: https://gofastmcp.com/servers/progress.md
+- Background Tasks: https://gofastmcp.com/servers/tasks.md
+- Sampling: https://gofastmcp.com/servers/sampling.md
 - Real-world production patterns
 - SimPro MCP server case study
 - FastMCP Cloud deployment experience
 
 ## Package Info
 
-- **Package**: `fastmcp>=2.13.0`
+- **Package**: `fastmcp>=2.14.0`
 - **Python**: `>=3.10`
 - **Repository**: https://github.com/jlowin/fastmcp
 - **Cloud**: https://fastmcp.cloud
@@ -292,6 +303,7 @@ Example prompts:
   - `cryptography` (encrypted storage)
   - `httpx` (async HTTP)
   - `pydantic` (validation)
+  - `docket` (background task scheduling, optional)
 
 ## Related Skills
 
@@ -304,13 +316,13 @@ Example prompts:
 
 ## Skill Metadata
 
-- **Version**: 2.0.0
+- **Version**: 2.1.0
 - **License**: MIT
 - **Token Savings**: 90-95%
-- **Errors Prevented**: 25
+- **Errors Prevented**: 28
 - **Production Tested**: ✅
-- **Last Updated**: 2025-11-04
-- **Breaking Changes**: v2.13.0 lifespan behavior (per-server vs per-session)
+- **Last Updated**: 2026-01-03
+- **Breaking Changes**: v2.14.0 removes BearerAuthProvider and Context.get_http_request()
 
 ---
 

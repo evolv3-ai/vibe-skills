@@ -12,8 +12,8 @@ description: |
 
 **Status**: Beta (requires `python_workers` compatibility flag)
 **Runtime**: Pyodide (Python 3.12+ compiled to WebAssembly)
-**CLI**: pywrangler (Dec 2025)
-**Last Verified**: 2025-12-08
+**Package Versions**: workers-py@1.7.0, workers-runtime-sdk@0.3.1, wrangler@4.54.0
+**Last Verified**: 2026-01-03
 
 ## Quick Start (5 Minutes)
 
@@ -250,7 +250,7 @@ class MyWorkflow(WorkflowEntrypoint):
 ```jsonc
 {
   "compatibility_flags": ["python_workers", "python_workflows"],
-  "compatibility_date": "2025-08-01",
+  "compatibility_date": "2025-12-01",
   "workflows": [
     {
       "name": "my-workflow",
@@ -544,16 +544,23 @@ See [Cloudflare FastAPI example](https://developers.cloudflare.com/workers/langu
 
 ```json
 {
-  "workers-py": "latest",
-  "workers-runtime-sdk": "latest",
-  "wrangler": "^4.0.0"
+  "workers-py": "1.7.0",
+  "workers-runtime-sdk": "0.3.1",
+  "wrangler": "4.54.0"
 }
 ```
+
+**Note**: Always pin versions for reproducible builds. Check [PyPI workers-py](https://pypi.org/project/workers-py/) for latest releases.
 
 ---
 
 ## Production Validation
 
 - Cloudflare changelog: Dec 8, 2025 (Pywrangler + cold start improvements)
+- workers-py 1.7.0: Latest stable (Jan 2026)
 - Python Workflows beta: Aug 22, 2025
 - Handler pattern change: Aug 14, 2025
+
+**Compatibility Date Guidance**:
+- Use `2025-12-01` for new projects (latest features including pywrangler improvements)
+- Use `2025-08-01` only if you need to match older production Workers

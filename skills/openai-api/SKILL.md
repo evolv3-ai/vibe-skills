@@ -128,8 +128,8 @@ The Chat Completions API is the core interface for interacting with OpenAI's lan
 - **gpt-4o**: Multimodal model with vision capabilities
 - **gpt-4-turbo**: Fast GPT-4 variant
 
-#### GPT-4 Series
-- **gpt-4**: Original GPT-4 model
+#### GPT-4 Series (Legacy)
+- **gpt-4**: Original GPT-4 model *(deprecated - use gpt-5 or gpt-4o)*
 
 ### Basic Request Structure
 

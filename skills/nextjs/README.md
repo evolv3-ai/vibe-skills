@@ -1,7 +1,8 @@
 # Next.js App Router - Production Patterns
 
-**Version**: Next.js 16.0.0 | **React**: 19.2.0 | **Node.js**: 20.9+
+**Version**: Next.js 16.1.1 | **React**: 19.2.0 | **Node.js**: 20.9+
 **Production Tested**: ✅ | **Token Savings**: 65-70% | **Errors Prevented**: 18+
+**Last Updated**: 2026-01-03 | **Security**: 3 CVEs patched in 16.1.1
 
 ---
 

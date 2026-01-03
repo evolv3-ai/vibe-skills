@@ -355,6 +355,207 @@ app.use('/mcp', async (c, next) => {
 
 ---
 
+## Method 6: OAuth Client Credentials (M2M) (v1.24.0+)
+
+Best for: Machine-to-machine communication, service accounts, backend integrations.
+
+**What's Different:** Unlike Method 3 (OAuth 2.0), this flow has no user consent - clients authenticate directly with client ID/secret. Added in SDK v1.24.0 via SEP-1046.
+
+### When to Use
+
+| Scenario | Use Client Credentials |
+|----------|----------------------|
+| Backend service accessing MCP tools | ✅ Yes |
+| CI/CD pipelines calling MCP server | ✅ Yes |
+| Automated data processing | ✅ Yes |
+| Interactive user sessions | ❌ No (use OAuth 2.0) |
+| Browser-based clients | ❌ No (secret exposure risk) |
+
+### Implementation
+
+**1. Register Service Client:**
+
+Create a client ID/secret pair for each service that needs access:
+
+```bash
+# Generate client credentials
+CLIENT_ID=$(node -e "console.log(require('crypto').randomUUID())")
+CLIENT_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+
+# Store in KV
+wrangler kv key put --binding=MCP_CLIENTS "client:${CLIENT_ID}" "${CLIENT_SECRET}"
+
+echo "Client ID: $CLIENT_ID"
+echo "Client Secret: $CLIENT_SECRET"
+```
+
+**2. Token Endpoint:**
+
+```typescript
+import { Hono } from 'hono';
+import { sign } from '@tsndr/cloudflare-worker-jwt';
+
+type Env = {
+  MCP_CLIENTS: KVNamespace;
+  JWT_SECRET: string;
+};
+
+const app = new Hono<{ Bindings: Env }>();
+
+// OAuth token endpoint (client credentials flow)
+app.post('/oauth/token', async (c) => {
+  const contentType = c.req.header('Content-Type');
+
+  let grantType: string, clientId: string, clientSecret: string;
+
+  if (contentType?.includes('application/x-www-form-urlencoded')) {
+    const body = await c.req.parseBody();
+    grantType = body.grant_type as string;
+    clientId = body.client_id as string;
+    clientSecret = body.client_secret as string;
+  } else {
+    const body = await c.req.json();
+    grantType = body.grant_type;
+    clientId = body.client_id;
+    clientSecret = body.client_secret;
+  }
+
+  // Validate grant type
+  if (grantType !== 'client_credentials') {
+    return c.json({ error: 'unsupported_grant_type' }, 400);
+  }
+
+  // Validate client credentials
+  const storedSecret = await c.env.MCP_CLIENTS.get(`client:${clientId}`);
+
+  if (!storedSecret || storedSecret !== clientSecret) {
+    return c.json({ error: 'invalid_client' }, 401);
+  }
+
+  // Generate access token
+  const expiresIn = 3600; // 1 hour
+  const accessToken = await sign({
+    sub: clientId,
+    type: 'service',
+    exp: Math.floor(Date.now() / 1000) + expiresIn,
+    iat: Math.floor(Date.now() / 1000),
+  }, c.env.JWT_SECRET);
+
+  return c.json({
+    access_token: accessToken,
+    token_type: 'Bearer',
+    expires_in: expiresIn,
+  });
+});
+```
+
+**3. MCP Endpoint Validation:**
+
+```typescript
+import { verify } from '@tsndr/cloudflare-worker-jwt';
+
+app.use('/mcp', async (c, next) => {
+  const authHeader = c.req.header('Authorization');
+
+  if (!authHeader?.startsWith('Bearer ')) {
+    return c.json({ error: 'unauthorized' }, 401);
+  }
+
+  const token = authHeader.slice(7);
+
+  try {
+    const isValid = await verify(token, c.env.JWT_SECRET);
+    if (!isValid) {
+      return c.json({ error: 'invalid_token' }, 401);
+    }
+
+    const payload = JSON.parse(atob(token.split('.')[1]));
+
+    // Check expiration
+    if (payload.exp < Math.floor(Date.now() / 1000)) {
+      return c.json({ error: 'token_expired' }, 401);
+    }
+
+    // Attach client info to context
+    c.set('clientId', payload.sub);
+    c.set('clientType', payload.type);
+
+    await next();
+  } catch {
+    return c.json({ error: 'invalid_token' }, 401);
+  }
+});
+```
+
+### Client Usage
+
+```typescript
+// 1. Get access token
+const tokenResponse = await fetch('https://mcp.example.com/oauth/token', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+  body: new URLSearchParams({
+    grant_type: 'client_credentials',
+    client_id: 'YOUR_CLIENT_ID',
+    client_secret: 'YOUR_CLIENT_SECRET',
+  }),
+});
+
+const { access_token } = await tokenResponse.json();
+
+// 2. Use token for MCP calls
+const mcpResponse = await fetch('https://mcp.example.com/mcp', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${access_token}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    jsonrpc: '2.0',
+    method: 'tools/call',
+    params: { name: 'my-tool', arguments: {} },
+    id: 1,
+  }),
+});
+```
+
+### Token Refresh
+
+```typescript
+// Client-side: refresh before expiration
+async function getValidToken(cache: TokenCache): Promise<string> {
+  const now = Math.floor(Date.now() / 1000);
+
+  // Refresh 5 minutes before expiration
+  if (cache.expiresAt - now < 300) {
+    const response = await fetch('/oauth/token', {
+      method: 'POST',
+      body: new URLSearchParams({
+        grant_type: 'client_credentials',
+        client_id: cache.clientId,
+        client_secret: cache.clientSecret,
+      }),
+    });
+
+    const { access_token, expires_in } = await response.json();
+    cache.token = access_token;
+    cache.expiresAt = now + expires_in;
+  }
+
+  return cache.token;
+}
+```
+
+### Security Considerations
+
+- **Never expose client secrets** in browser code or public repositories
+- **Use short token lifetimes** (1 hour recommended) to limit damage if compromised
+- **Rotate client secrets** periodically and after any suspected compromise
+- **Scope tokens appropriately** - add scopes to limit what each client can access
+- **Rate limit token endpoint** to prevent brute force attacks
+
+---
+
 ## Combined Authentication
 
 Use multiple methods for flexibility:
@@ -493,5 +694,5 @@ app.use('/mcp', async (c, next) => {
 
 ---
 
-**Last Updated:** 2025-10-28
-**Verified With:** Cloudflare Workers, @modelcontextprotocol/sdk@1.20.2
+**Last Updated:** 2026-01-03
+**Verified With:** Cloudflare Workers, @modelcontextprotocol/sdk@1.25.1

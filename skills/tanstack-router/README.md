@@ -4,16 +4,36 @@ Type-safe, file-based routing for React applications with Cloudflare Workers int
 
 ## Auto-Trigger Keywords
 
-- "TanStack Router", "type-safe routing", "file-based routing"
-- "React routing TypeScript", "route loaders", "data loading routes"
-- "Cloudflare Workers routing", "SPA routing"
+### Primary Keywords
+- "TanStack Router", "tanstack router", "@tanstack/react-router"
+- "type-safe routing", "file-based routing", "React routing TypeScript"
+- "route loaders", "data loading routes", "SPA routing"
+
+### Feature Keywords
+- "virtual file routes", "@tanstack/virtual-file-routes", "programmatic routes"
+- "search params validation", "validateSearch", "@tanstack/zod-adapter"
+- "beforeLoad", "route guards", "authenticated routes", "protected routes"
+- "errorComponent", "route error boundary", "notFoundComponent"
+
+### Integration Keywords
+- "Cloudflare Workers routing", "TanStack Query integration"
+- "route-level data fetching", "prefetch routes"
+
+### Error Keywords
+- "routeTree.gen.ts missing", "route type inference not working"
+- "loader not running", "TanStack Form memory leak"
+- "virtual routes conflict", "validateSearch page reload"
 
 ## What This Provides
 
 ### 🎯 Core Features
 - **Type-safe navigation** - Compile-time route validation
 - **File-based routing** - Automatic route generation from file structure
+- **Virtual file routes** - Programmatic route configuration (v1.140+)
 - **Route loaders** - Data fetching at route level
+- **Search params validation** - Zod adapter with type safety
+- **Error boundaries** - Route-level error handling with reset
+- **beforeLoad guards** - Authentication without content flash
 - **TanStack Query integration** - Coordinate routing + data fetching
 - **Cloudflare Workers ready** - Deploy SPAs to Workers + Static Assets
 
@@ -55,15 +75,19 @@ export const Route = createFileRoute('/posts/$postId')({
 <Link to="/posts/$postId" params={{ postId: '123' }} />
 ```
 
-## 7 Errors Prevented
+## 11 Errors Prevented
 
 1. Devtools dependency resolution
-2. Vite plugin ordering
+2. Vite plugin ordering (CRITICAL)
 3. Type registration missing
 4. Loader not running
-5. Memory leaks (known issue)
+5. Memory leaks with TanStack Form (known issue #5734)
 6. Middleware undefined errors
 7. API route errors after restart
+8. Virtual routes index/layout conflict (#5421)
+9. Search params type inference regression (#3100)
+10. TanStack Start validators on reload (#3711)
+11. Flash of protected content (beforeLoad pattern)
 
 ## Token Efficiency
 
@@ -78,10 +102,14 @@ export const Route = createFileRoute('/posts/$postId')({
 ```bash
 npm install @tanstack/react-router @tanstack/router-devtools
 npm install -D @tanstack/router-plugin
+# Optional: Search params validation
+npm install @tanstack/zod-adapter zod
+# Optional: Virtual file routes
+npm install @tanstack/virtual-file-routes
 ```
 
-**Latest:** v1.134.13
+**Latest:** v1.144.0
 
 ---
 
-**Version:** 1.0.0 | **Last Updated:** 2025-11-07
+**Version:** 1.1.0 | **Last Updated:** 2026-01-03

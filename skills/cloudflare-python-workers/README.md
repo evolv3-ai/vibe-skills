@@ -1,7 +1,8 @@
 # Cloudflare Python Workers
 
 **Status**: Beta
-**Last Updated**: 2025-12-08
+**Package Versions**: workers-py@1.7.0, workers-runtime-sdk@0.3.1, wrangler@4.54.0
+**Last Updated**: 2026-01-03
 
 ## Auto-Trigger Keywords
 
@@ -97,13 +98,13 @@ Claude automatically uses this skill when you mention:
 
 ---
 
-## Latest Versions (Dec 2025)
+## Latest Versions (Jan 2026)
 
 | Package | Version |
 |---------|---------|
-| workers-py | latest |
-| workers-runtime-sdk | latest |
-| wrangler | ^4.0.0 |
+| workers-py | 1.7.0 |
+| workers-runtime-sdk | 0.3.1 |
+| wrangler | 4.54.0 |
 | Python | 3.12+ |
 
 ---

@@ -11,8 +11,8 @@ description: |
 # Azure Auth - Microsoft Entra ID for React + Cloudflare Workers
 
 **Package Versions**: @azure/msal-react@3.0.23, @azure/msal-browser@4.27.0, jose@5.9.6
-**Breaking Changes**: Azure AD B2C sunset May 2025, MSAL v2→v3 migration
-**Last Updated**: 2025-12-15
+**Breaking Changes**: Azure AD B2C sunset (May 2025 - complete), ADAL retirement (Sept 2025 - complete), MSAL v2→v3 migration
+**Last Updated**: 2026-01-03
 
 ---
 
@@ -520,18 +520,43 @@ VITE_AZURE_TENANT_ID=your-tenant-id-guid
 
 ---
 
-## Azure AD B2C Sunset Notice
+## Azure AD B2C Sunset (Complete)
 
-**Effective May 1, 2025**: Azure AD B2C is no longer available for new customers.
+**Status**: Azure AD B2C has been sunset as of May 1, 2025. New customers cannot sign up for B2C.
 
-**Migration Path**: Use **Microsoft Entra External ID** for consumer/customer identity scenarios.
+**Existing B2C Customers**: Continue using B2C with standard support, but plan migration to Entra External ID.
 
-**Key Differences**:
-- Different authority URL format
-- Updated SDK support
-- New pricing model
+**New Projects**: Use **Microsoft Entra External ID** for consumer/customer identity scenarios.
+
+**Migration Path**:
+- Different authority URL format (`{tenant}.ciamlogin.com` vs `{tenant}.b2clogin.com`)
+- Updated SDK support (same MSAL libraries)
+- New pricing model (consumption-based)
 
 See: https://learn.microsoft.com/en-us/entra/external-id/
+
+---
+
+## ADAL Retirement (Complete)
+
+**Status**: Azure AD Authentication Library (ADAL) was retired on September 30, 2025. Apps using ADAL no longer receive security updates.
+
+**If you're migrating from ADAL**:
+1. ADAL → MSAL migration is required
+2. ADAL used v1.0 endpoints; MSAL uses v2.0 endpoints
+3. Token cache format differs - users must re-authenticate
+4. Scopes replace "resources" in token requests
+
+**Key Migration Changes**:
+```typescript
+// ADAL (deprecated) - resource-based
+acquireToken({ resource: "https://graph.microsoft.com" })
+
+// MSAL (current) - scope-based
+acquireTokenSilent({ scopes: ["https://graph.microsoft.com/User.Read"] })
+```
+
+See: https://learn.microsoft.com/en-us/entra/msal/javascript/migration/msal-net-migration
 
 ---
 

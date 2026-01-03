@@ -1,15 +1,15 @@
 # AI SDK UI - Frontend React Hooks
 
-**Version**: AI SDK v5.0.95+
+**Version**: AI SDK v6.0.6 (Stable)
 **Status**: Production-Ready ✅
-**Framework**: React 18+, Next.js 14+
-**Last Updated**: 2025-11-19
+**Framework**: React 18+/19, Next.js 14+/15+
+**Last Updated**: 2026-01-03
 
 ---
 
 ## What This Skill Does
 
-Provides complete implementation patterns for Vercel AI SDK v5 **frontend React hooks**:
+Provides complete implementation patterns for Vercel AI SDK v6 **frontend React hooks**:
 
 - **useChat** - Chat interfaces with streaming
 - **useCompletion** - Text completions
@@ -86,9 +86,13 @@ This skill should be automatically discovered when working with any of the follo
 - `onFinish not called`
 - `stream aborted`
 - `v5 migration useChat`
+- `v6 migration useChat`
 - `useChat breaking changes`
 - `input handleInputChange removed`
 - `sendMessage v5`
+- `message parts v6`
+- `m.content undefined`
+- `parts array v6`
 
 ### Framework Integration Keywords
 
@@ -110,15 +114,15 @@ This skill should be automatically discovered when working with any of the follo
 ## Quick Start
 
 ```bash
-npm install ai @ai-sdk/openai
+npm install ai @ai-sdk/react @ai-sdk/openai
 ```
 
-**5-minute chat interface:**
+**5-minute chat interface (v6 with message parts):**
 
 ```tsx
 // app/chat/page.tsx
 'use client';
-import { useChat } from 'ai/react';
+import { useChat } from '@ai-sdk/react';
 import { useState } from 'react';
 
 export default function Chat() {
@@ -128,7 +132,11 @@ export default function Chat() {
   return (
     <div>
       {messages.map(m => (
-        <div key={m.id}>{m.role}: {m.content}</div>
+        <div key={m.id}>
+          {m.role}: {m.parts.map((part, i) => (
+            part.type === 'text' ? <span key={i}>{part.text}</span> : null
+          ))}
+        </div>
       ))}
       <form onSubmit={(e) => {
         e.preventDefault();
@@ -149,7 +157,7 @@ import { openai } from '@ai-sdk/openai';
 
 export async function POST(req: Request) {
   const { messages } = await req.json();
-  const result = streamText({ model: openai('gpt-4-turbo'), messages });
+  const result = streamText({ model: openai('gpt-5'), messages });
   return result.toDataStreamResponse();
 }
 ```
@@ -186,28 +194,37 @@ export async function POST(req: Request) {
 
 ---
 
-## Critical v5 Changes
+## Critical v6 Changes
 
-**BREAKING: useChat no longer manages input state!**
+**BREAKING: Message content is now accessed via `.parts` array!**
 
-**v4 (OLD):**
+**v5 (OLD):**
 ```tsx
-const { input, handleInputChange, handleSubmit } = useChat();
-<input value={input} onChange={handleInputChange} />
+{messages.map(m => <div>{m.content}</div>)}
 ```
 
-**v5 (NEW):**
+**v6 (NEW):**
 ```tsx
-const { sendMessage } = useChat();
-const [input, setInput] = useState('');
-<input value={input} onChange={(e) => setInput(e.target.value)} />
+{messages.map(m => (
+  <div>
+    {m.parts.map((part, i) => (
+      part.type === 'text' ? <span key={i}>{part.text}</span> : null
+    ))}
+  </div>
+))}
 ```
 
-**Other changes:**
+**Part Types in v6:**
+- `text` - Text content (`.text`)
+- `tool-invocation` - Tool calls (`.toolName`, `.args`, `.result`)
+- `file` - File attachments (`.mimeType`, `.data`)
+- `reasoning` - Model reasoning
+- `source` - Source citations
+
+**Prior v4→v5 changes still apply:**
+- `input`, `handleInputChange`, `handleSubmit` removed
 - `append()` → `sendMessage()`
 - `onResponse` removed → use `onFinish`
-- `initialMessages` → controlled mode with `messages` prop
-- `maxSteps` removed (handle server-side)
 
 See `references/use-chat-migration.md` for complete migration guide.
 
@@ -270,16 +287,17 @@ This skill documents and prevents 12 common UI errors:
 
 ## Package Versions
 
-**Required:**
-- `ai`: ^5.0.76
-- `@ai-sdk/openai`: ^2.0.53
-- `react`: ^18.2.0
-- `zod`: ^3.23.8
+**v6 (Recommended):**
+- `ai`: ^6.0.6
+- `@ai-sdk/react`: ^3.0.6
+- `@ai-sdk/openai`: ^3.0.2
+- `react`: ^18.3.0
+- `zod`: ^3.24.2
 
 **Next.js:**
-- `next`: ^14.0.0
-- `react`: ^18.2.0
-- `react-dom`: ^18.2.0
+- `next`: ^14.0.0 or ^15.0.0
+- `react`: ^18.3.0 or ^19.0.0
+- `react-dom`: ^18.3.0 or ^19.0.0
 
 ---
 
@@ -306,20 +324,27 @@ This skill documents and prevents 12 common UI errors:
 
 **Verified**:
 - ✅ All 11 templates work copy-paste
-- ✅ v5 breaking changes documented
+- ✅ v5→v6 breaking changes documented
+- ✅ Message parts structure documented
 - ✅ 12 common errors prevented
-- ✅ Package versions current (2025-11-19)
+- ✅ Package versions current (2026-01-03)
 - ✅ Next.js App Router & Pages Router examples
 - ✅ Token savings: 55%
 
 ---
 
-## Recent Updates (v1.0.1 - 2025-11-19)
+## Recent Updates
 
-- **Updated Package Versions**: AI SDK 5.0.95, @ai-sdk/anthropic 2.0.45, @ai-sdk/openai 2.0.68, @ai-sdk/google 2.0.38
-- **Added Metadata**: YAML frontmatter now includes version tracking and last_verified date
-- **Clarified Engine Versions**: Added comment explaining minimum supported versions in package.json
-- **Zod 3.x for Compatibility**: Templates use Zod 3.23.8 for maximum compatibility
+**v1.1.0 (2026-01-03):**
+- **AI SDK v6 Stable**: Updated from v5.0.99/v6.0.0-beta to v6.0.6 stable
+- **Message Parts Structure**: Added v6 breaking change documentation (.content → .parts)
+- **Package Updates**: @ai-sdk/react 1.0.0→3.0.6, @ai-sdk/openai 2.0.68→3.0.2
+- **useAssistant Deprecation**: Added deprecation notice (OpenAI Assistants sunset Aug 26, 2026)
+- **React 19 Support**: Framework support expanded to React 19 and Next.js 15
+
+**v1.0.1 (2025-11-19):**
+- Updated Package Versions: AI SDK 5.0.95
+- Added YAML frontmatter metadata
 
 ---
 

@@ -1,7 +1,7 @@
 # Cloudflare Worker Base Stack
 
 **Status**: ✅ Production Ready
-**Last Updated**: 2025-10-20
+**Last Updated**: 2026-01-03
 **Production Example**: https://cloudflare-worker-base-test.webfonts.workers.dev
 
 ---
@@ -9,13 +9,15 @@
 ## What This Skill Does
 
 Sets up production-ready Cloudflare Workers projects with:
-- **Hono v4.10.1** for routing
-- **@cloudflare/vite-plugin v1.13.13** for development
+- **Hono v4.11.3** for routing
+- **@cloudflare/vite-plugin v1.17.1** for development
+- **Wrangler v4.54.0** with auto-provisioning
 - **Workers Static Assets** for frontend files
+- **Workers RPC** for service-to-service calls
 - **ES Module format** (correct export pattern)
 - **wrangler.jsonc** configuration (preferred over .toml)
 
-**Prevents 6 documented issues** that commonly break Workers projects.
+**Prevents 8 documented issues** that commonly break Workers projects.
 
 ---
 
@@ -34,6 +36,10 @@ Claude automatically uses this skill when you mention:
 - ES Module Worker
 - Serverless Cloudflare
 - Edge computing
+- Workers RPC
+- WorkerEntrypoint
+- Service bindings
+- Auto-provisioning
 
 ### Use Cases
 - Create Cloudflare Worker
@@ -44,6 +50,9 @@ Claude automatically uses this skill when you mention:
 - Initialize Workers project
 - Scaffold CF Worker
 - Workers with frontend
+- Call Worker from Worker
+- Split Worker into microservices
+- Auto-provision D1/R2/KV bindings
 
 ### Common Errors (Triggers Prevention)
 - "Cannot read properties of undefined"
@@ -56,6 +65,8 @@ Claude automatically uses this skill when you mention:
 - HMR crashes during development
 - Routing not working
 - Build fails with Vite
+- 404 for fingerprinted assets during gradual rollout
+- 429 errors with run_worker_first on free tier
 
 ---
 
@@ -69,6 +80,8 @@ Claude automatically uses this skill when you mention:
 | **#4: HMR Race** | "A hanging Promise was canceled" | [workers-sdk #9518](https://github.com/cloudflare/workers-sdk/issues/9518) | Use vite-plugin@1.13.13+ |
 | **#5: Upload Race** | Non-deterministic deployment failures | [workers-sdk #7555](https://github.com/cloudflare/workers-sdk/issues/7555) | Wrangler 4.x+ with retry |
 | **#6: Format Confusion** | Using deprecated Service Worker format | Cloudflare migration guide | ES Module format |
+| **#7: Gradual Rollouts** | 404 for fingerprinted assets during deployment | [CF Static Assets Docs](https://developers.cloudflare.com/workers/static-assets/routing/advanced/gradual-rollouts) | Avoid gradual rollouts with fingerprinted assets |
+| **#8: Free Tier 429** | 429 errors with run_worker_first | [CF Billing Docs](https://developers.cloudflare.com/workers/static-assets/billing-and-limitations) | Minimize patterns or upgrade to Paid |
 
 ---
 
@@ -80,8 +93,8 @@ npm create cloudflare@latest my-worker -- --type hello-world --ts --git --deploy
 
 # 2. Install dependencies
 cd my-worker
-npm install hono@4.10.1
-npm install -D @cloudflare/vite-plugin@1.13.13 vite@latest
+npm install hono@4.11.3
+npm install -D @cloudflare/vite-plugin@1.17.1 vite@7.2.4
 
 # 3. Configure (see SKILL.md for full setup)
 
@@ -99,7 +112,7 @@ npm run deploy
 **Without this skill**: ~8,000 tokens (documentation lookups + trial-and-error fixing errors)
 **With this skill**: ~3,000 tokens (direct implementation with correct patterns)
 
-**Savings**: ~60% token reduction + prevents all 6 common errors on first attempt
+**Savings**: ~60% token reduction + prevents all 8 documented errors on first attempt
 
 ---
 
@@ -128,16 +141,16 @@ cloudflare-worker-base/
 
 ---
 
-## Package Versions (Verified 2025-10-20)
+## Package Versions (Verified 2026-01-03)
 
 | Package | Version | Status |
 |---------|---------|--------|
-| wrangler | 4.43.0 | ✅ Latest stable |
-| @cloudflare/workers-types | 4.20251011.0 | ✅ Latest |
-| hono | 4.10.1 | ✅ Latest stable |
-| @cloudflare/vite-plugin | 1.13.13 | ✅ Latest (fixes HMR) |
-| vite | Latest | ✅ Compatible |
-| typescript | 5.9.0+ | ✅ Standard |
+| wrangler | 4.54.0 | ✅ Latest stable |
+| @cloudflare/workers-types | 4.20260103.0 | ✅ Latest |
+| hono | 4.11.3 | ✅ Latest stable |
+| @cloudflare/vite-plugin | 1.17.1 | ✅ Latest |
+| vite | 7.2.4 | ✅ Latest stable |
+| typescript | 5.9.3+ | ✅ Standard |
 
 ---
 
@@ -148,9 +161,11 @@ cloudflare-worker-base/
 - Adding Vite to an existing Worker
 - Setting up Hono routing
 - Configuring Static Assets with Workers
-- Encountering any of the 6 documented errors
+- Encountering any of the 8 documented errors
 - Need production-ready Worker template
 - Want to avoid common Workers pitfalls
+- Setting up Workers RPC / service bindings
+- Want auto-provisioned D1/R2/KV bindings
 
 ❌ **Don't use this skill for:**
 - Cloudflare Pages projects (use Workers with Static Assets instead)
@@ -172,8 +187,8 @@ cloudflare-worker-base/
 
 ## Research Validation
 
-- ✅ All packages verified on npm (2025-10-20)
-- ✅ All 6 issues have GitHub issue sources
+- ✅ All packages verified on npm (2026-01-03)
+- ✅ All 8 issues have documented sources
 - ✅ Working example deployed: https://cloudflare-worker-base-test.webfonts.workers.dev
 - ✅ Build time: ~45 minutes (0 errors)
 - ✅ Research log: `/home/jez/Documents/claude-skills/planning/research-logs/cloudflare-worker-base.md`

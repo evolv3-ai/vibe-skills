@@ -3,7 +3,7 @@
 **Google Gemini API Skill** for Claude Code CLI
 
 **Status**: Phase 2 Complete ✅
-**Latest SDK**: @google/genai@1.27.0 (⚠️ NOT @google/generative-ai which is DEPRECATED)
+**Latest SDK**: @google/genai@1.34.0 (⚠️ NOT @google/generative-ai which is DEPRECATED)
 **API Coverage**: Text Generation, Multimodal, Function Calling, Streaming, Thinking Mode, **Context Caching**, **Code Execution**, **Grounding with Google Search**
 
 ---
@@ -11,7 +11,7 @@
 ## ⚠️ CRITICAL: SDK Migration Warning
 
 **DEPRECATED**: `@google/generative-ai` (sunset Nov 30, 2025)
-**CURRENT**: `@google/genai` v1.27+ (use this!)
+**CURRENT**: `@google/genai` v1.34+ (use this!)
 
 If you see code using `@google/generative-ai`, it's outdated! This skill uses the **correct current SDK**.
 
@@ -19,7 +19,7 @@ If you see code using `@google/generative-ai`, it's outdated! This skill uses th
 
 ## What This Skill Does
 
-This skill provides comprehensive knowledge for building applications with **Google Gemini API** using the **correct current SDK** (@google/genai v1.27+) and **accurate 2025 model information**.
+This skill provides comprehensive knowledge for building applications with **Google Gemini API** using the **correct current SDK** (@google/genai v1.34+) and **accurate 2025-2026 model information**.
 
 ### Key Capabilities
 
@@ -307,21 +307,24 @@ for await (const chunk of response) {
 
 ---
 
-## Current Models (2025)
+## Current Models (2025-2026)
 
-### Gemini 2.5 Series (General Availability)
+### Gemini 3 Series (December 2025)
+- **gemini-3-flash**: 🆕 Best speed+quality balance for production (1,048,576 input / 65,536 output tokens)
+
+### Gemini 2.5 Series (General Availability - Stable)
 - **gemini-2.5-pro**: State-of-the-art thinking model (1,048,576 input / 65,536 output tokens)
 - **gemini-2.5-flash**: Best price-performance (1,048,576 input / 65,536 output tokens)
 - **gemini-2.5-flash-lite**: Cost-optimized, fastest (1,048,576 input / 65,536 output tokens)
 
 ### Feature Matrix
-| Feature | Pro | Flash | Flash-Lite |
-|---------|-----|-------|------------|
-| Thinking Mode | ✅ | ✅ | ✅ |
-| Function Calling | ✅ | ✅ | ❌ |
-| Multimodal | ✅ | ✅ | ✅ |
-| Streaming | ✅ | ✅ | ✅ |
-| System Instructions | ✅ | ✅ | ✅ |
+| Feature | 3-Flash | 2.5-Pro | 2.5-Flash | 2.5-Flash-Lite |
+|---------|---------|---------|-----------|----------------|
+| Thinking Mode | ✅ | ✅ | ✅ | ✅ |
+| Function Calling | ✅ | ✅ | ✅ | ❌ |
+| Multimodal | ✅ | ✅ | ✅ | ✅ |
+| Streaming | ✅ | ✅ | ✅ | ✅ |
+| System Instructions | ✅ | ✅ | ✅ | ✅ |
 
 **⚠️ Note**: Gemini 2.5 Flash-Lite does NOT support function calling!
 
@@ -402,7 +405,7 @@ ls -la ~/.claude/skills/google-gemini-api
 
 ### Package Version
 ```bash
-npm install @google/genai@1.27.0
+npm install @google/genai@1.34.0
 ```
 
 ⚠️ **NOT**:
@@ -415,9 +418,10 @@ npm install @google/generative-ai  # DEPRECATED!
 export GEMINI_API_KEY="..."
 ```
 
-### Models Overview (2025)
+### Models Overview (2025-2026)
+- **Gemini 3 Flash**: `gemini-3-flash` (🆕 best speed+quality for production)
 - **Gemini 2.5 Pro**: `gemini-2.5-pro` (thinking, function calling, multimodal)
-- **Gemini 2.5 Flash**: `gemini-2.5-flash` (best price-performance)
+- **Gemini 2.5 Flash**: `gemini-2.5-flash` (proven price-performance)
 - **Gemini 2.5 Flash-Lite**: `gemini-2.5-flash-lite` (fastest, no function calling)
 
 ### Context Windows (ACCURATE)
@@ -439,6 +443,6 @@ export GEMINI_API_KEY="..."
 
 ---
 
-**Production Validated**: Templates tested with @google/genai@1.27.0
-**Last Updated**: 2025-10-25
+**Production Validated**: Templates tested with @google/genai@1.34.0
+**Last Updated**: 2026-01-03
 **Maintainer**: Jeremy Dawes | Jezweb

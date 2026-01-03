@@ -1,7 +1,7 @@
 # OpenAI Apps MCP
 
 **Status**: Production Ready ✅
-**Last Updated**: 2025-11-17
+**Last Updated**: 2026-01-03
 **Production Tested**: Based on Toolbase-AI template, tested with MCP Inspector and ChatGPT
 
 ---
@@ -102,8 +102,8 @@ npm create cloudflare@latest my-openai-app -- --type hello-world --ts --git --de
 cd my-openai-app
 
 # 2. Install dependencies
-npm install @modelcontextprotocol/sdk@1.21.0 hono@4.10.2 zod@3.25.76
-npm install -D @cloudflare/vite-plugin@1.13.13 vite@7.1.9
+npm install @modelcontextprotocol/sdk@1.25.1 hono@4.11.3 zod@4.1.13
+npm install -D @cloudflare/vite-plugin@1.17.1 vite@7.2.4
 
 # 3. Create MCP server (see SKILL.md for code)
 # Create src/index.ts with Hono + MCP server
@@ -133,16 +133,16 @@ npx @modelcontextprotocol/inspector https://my-openai-app.workers.dev/mcp
 
 ---
 
-## Package Versions (Verified 2025-11-17)
+## Package Versions (Verified 2026-01-03)
 
 | Package | Version | Status |
 |---------|---------|--------|
-| @modelcontextprotocol/sdk | 1.21.0 | ✅ Latest stable |
-| hono | 4.10.2 | ✅ Latest stable |
-| zod | 3.25.76 | ✅ Latest stable |
-| @cloudflare/vite-plugin | 1.13.13 | ✅ Latest stable |
-| vite | 7.1.9 | ✅ Latest stable |
-| wrangler | 4.42.2 | ✅ Latest stable |
+| @modelcontextprotocol/sdk | 1.25.1 | ✅ Latest stable |
+| hono | 4.11.3 | ✅ Latest stable |
+| zod | 4.1.13 | ✅ Latest stable (see Zod 4 migration notes) |
+| @cloudflare/vite-plugin | 1.17.1 | ✅ Latest stable |
+| vite | 7.2.4 | ✅ Latest stable |
+| wrangler | 4.54.0 | ✅ Latest stable |
 
 ---
 

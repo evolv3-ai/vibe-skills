@@ -22,21 +22,34 @@ ElevenLabs Agents Platform is a comprehensive solution for building production-r
 3. **TTS (Text-to-Speech)** - Converts text to speech (5000+ voices, 31 languages, low latency)
 4. **Turn-Taking Model** - Proprietary model that handles conversation timing and interruptions
 
-### 🚨 Package Updates (November 2025)
+### 🚨 Package Updates (January 2026)
 
 ElevenLabs migrated to new scoped packages in August 2025. **Current packages:**
 
 ```bash
-npm install @elevenlabs/react@0.11.3           # React SDK
-npm install @elevenlabs/client@0.11.3          # JavaScript SDK
-npm install @elevenlabs/react-native@0.5.4     # React Native SDK
-npm install @elevenlabs/elevenlabs-js@2.25.0   # Base SDK (Python: elevenlabs@1.59.0)
+npm install @elevenlabs/react@0.12.3           # React SDK (Dec 2025: localization, Scribe fixes)
+npm install @elevenlabs/client@0.12.2          # JavaScript SDK (Dec 2025: localization)
+npm install @elevenlabs/react-native@0.5.7     # React Native SDK (Dec 2025: mic fixes, speed param)
+npm install @elevenlabs/elevenlabs-js@2.28.0   # Base SDK (Dec 2025: Scribe audio format fix)
 npm install -g @elevenlabs/agents-cli@0.6.1    # CLI
 ```
 
 **DEPRECATED:** `@11labs/react`, `@11labs/client` (uninstall if present)
 
-**⚠️ CRITICAL:** v1 TTS models will be removed 2025-12-15. Migrate to Turbo v2/v2.5.
+**⚠️ CRITICAL:** v1 TTS models were removed on 2025-12-15. Use Turbo v2/v2.5 only.
+
+### December 2025 Updates
+
+**Widget Improvements (v0.5.5)**:
+- Microphone permission handling improvements (better UX for permission requests)
+- Text-only mode (`chat_mode: true`) no longer requires microphone access
+- `end_call` system tool fix (no longer omits last message)
+
+**SDK Fixes**:
+- Scribe audio format parameter now correctly transmitted (v2.28.0)
+- React Native infinite loop fix in useEffect dependencies (v0.5.6)
+- Speed parameter support in TTS overrides (v0.5.7)
+- Localization support for chat UI terms (v0.12.3)
 
 ---
 
@@ -351,11 +364,14 @@ const { startConversation, stopConversation, status, isSpeaking } = useConversat
 
 ### Platforms
 
-- **React**: `@elevenlabs/react@0.11.3`
-- **JavaScript**: `@elevenlabs/client@0.11.3` - `new Conversation({...})`
-- **React Native**: `@elevenlabs/react-native@0.5.4` - Expo SDK 47+, iOS/macOS (custom build required, no Expo Go)
+- **React**: `@elevenlabs/react@0.12.3`
+- **JavaScript**: `@elevenlabs/client@0.12.2` - `new Conversation({...})`
+- **React Native**: `@elevenlabs/react-native@0.5.7` - Expo SDK 47+, iOS/macOS (custom build required, no Expo Go)
 - **Swift**: iOS 14.0+, macOS 11.0+, Swift 5.9+
 - **Embeddable Widget**: `<script src="https://elevenlabs.io/convai-widget/index.js"></script>`
+- **Widget Packages** (Dec 2025):
+  - `@elevenlabs/convai-widget-embed@0.5.5` - For embedding in existing apps
+  - `@elevenlabs/convai-widget-core@0.5.5` - Core widget functionality
 
 ### Scribe (Real-Time Speech-to-Text - Beta 2025)
 
@@ -846,5 +862,5 @@ This skill composes well with:
 ---
 
 **Production Tested**: WordPress Auditor, Customer Support Agents, AgentFlow (webhook integration)
-**Last Updated**: 2025-12-06
-**Package Versions**: elevenlabs@1.59.0, @elevenlabs/elevenlabs-js@2.25.0, @elevenlabs/agents-cli@0.6.1, @elevenlabs/react@0.11.3, @elevenlabs/client@0.11.3, @elevenlabs/react-native@0.5.4
+**Last Updated**: 2026-01-03
+**Package Versions**: elevenlabs@1.59.0, @elevenlabs/elevenlabs-js@2.28.0, @elevenlabs/agents-cli@0.6.1, @elevenlabs/react@0.12.3, @elevenlabs/client@0.12.2, @elevenlabs/react-native@0.5.7

@@ -59,7 +59,8 @@ This skill activates when you mention:
 2. **Azure AD JWKS URL is non-standard** - Fetch from openid-configuration first
 3. **SPA refresh tokens expire in 24 hours** - Handle InteractionRequiredAuthError
 4. **storeAuthStateInCookie: true** - Required for Safari/Edge compatibility
-5. **Azure AD B2C sunset May 2025** - Use Entra External ID for new consumer apps
+5. **Azure AD B2C sunset (complete, May 2025)** - Use Entra External ID for new consumer apps
+6. **ADAL retirement (complete, Sept 2025)** - Migrate from ADAL to MSAL; no more security updates
 
 ## Package Versions
 

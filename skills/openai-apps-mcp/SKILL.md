@@ -10,9 +10,9 @@ allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
 # Building OpenAI Apps with Stateless MCP Servers
 
 **Status**: Production Ready
-**Last Updated**: 2025-11-26
+**Last Updated**: 2026-01-03
 **Dependencies**: `cloudflare-worker-base`, `hono-routing` (optional)
-**Latest Versions**: @modelcontextprotocol/sdk@1.23.0, hono@4.10.6, zod@4.1.13, wrangler@4.50.0
+**Latest Versions**: @modelcontextprotocol/sdk@1.25.1, hono@4.11.3, zod@4.1.13, wrangler@4.54.0
 
 ---
 
@@ -33,8 +33,8 @@ Build **ChatGPT Apps** using **MCP (Model Context Protocol)** servers on Cloudfl
 ```bash
 npm create cloudflare@latest my-openai-app -- --type hello-world --ts --git --deploy false
 cd my-openai-app
-npm install @modelcontextprotocol/sdk@1.23.0 hono@4.10.6 zod@4.1.13
-npm install -D @cloudflare/vite-plugin@1.15.2 vite@7.2.4
+npm install @modelcontextprotocol/sdk@1.25.1 hono@4.11.3 zod@4.1.13
+npm install -D @cloudflare/vite-plugin@1.17.1 vite@7.2.4
 ```
 
 ### 2. Configure wrangler.jsonc
@@ -221,6 +221,29 @@ return {
 <!-- ❌ Blocked --> <script src="https://cdn.example.com/lib.js"></script>
 ```
 
+## MCP SDK 1.25.x Updates (December 2025)
+
+**Breaking Changes** from @modelcontextprotocol/sdk@1.24.x → 1.25.x:
+- Removed loose type exports (Prompts, Resources, Roots, Sampling, Tools) - use specific schemas
+- ES2020 target required (previous: ES2018)
+- `setRequestHandler` is now typesafe - incorrect schemas throw type errors
+
+**New Features**:
+- **Tasks** (v1.24.0+): Long-running operations with progress tracking
+- **Sampling with Tools** (v1.24.0+): Tools can request model sampling
+- **OAuth Client Credentials** (M2M): Machine-to-machine authentication
+
+**Migration**: If using loose type imports, update to specific schema imports:
+```typescript
+// ❌ Old (removed in 1.25.0)
+import { Tools } from '@modelcontextprotocol/sdk/types.js';
+
+// ✅ New (1.25.1+)
+import { ListToolsRequestSchema, CallToolRequestSchema } from '@modelcontextprotocol/sdk/types.js';
+```
+
+---
+
 ## Zod 4.0 Migration Notes (MAJOR UPDATE - July 2025)
 
 **Breaking Changes** from zod@3.x → 4.x:
@@ -250,15 +273,15 @@ try {
 ```json
 {
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.23.0",
-    "hono": "^4.10.6",
+    "@modelcontextprotocol/sdk": "^1.25.1",
+    "hono": "^4.11.3",
     "zod": "^4.1.13"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.15.2",
-    "@cloudflare/workers-types": "^4.20250531.0",
+    "@cloudflare/vite-plugin": "^1.17.1",
+    "@cloudflare/workers-types": "^4.20260103.0",
     "vite": "^7.2.4",
-    "wrangler": "^4.50.0"
+    "wrangler": "^4.54.0"
   }
 }
 ```

@@ -1,8 +1,8 @@
 # Drizzle ORM for Cloudflare D1
 
 **Status**: Production Ready ✅
-**Last Updated**: 2025-10-24
-**Production Tested**: Used across 2025 Cloudflare ecosystem, full D1 compatibility
+**Last Updated**: 2026-01-03
+**Production Tested**: Used across 2025-2026 Cloudflare ecosystem, full D1 compatibility
 
 ---
 
@@ -198,15 +198,15 @@ EOF
 
 ---
 
-## Package Versions (Verified 2025-10-24)
+## Package Versions (Verified 2026-01-03)
 
 | Package | Version | Status |
 |---------|---------|--------|
-| drizzle-orm | 0.44.7 | ✅ Latest stable |
-| drizzle-kit | 0.31.5 | ✅ Latest stable |
-| @cloudflare/workers-types | 4.20251014.0 | ✅ Latest |
-| wrangler | 4.43.0+ | ✅ Compatible |
-| better-sqlite3 | 12.4.1 | ✅ Optional (local dev) |
+| drizzle-orm | 0.45.1 | ✅ Latest stable |
+| drizzle-kit | 0.31.8 | ✅ Latest stable |
+| @cloudflare/workers-types | 4.20260103.0 | ✅ Latest |
+| wrangler | 4.54.0+ | ✅ Compatible |
+| better-sqlite3 | 12.4.6 | ✅ Optional (local dev) |
 
 ---
 

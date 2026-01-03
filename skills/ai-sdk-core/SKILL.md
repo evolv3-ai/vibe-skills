@@ -652,7 +652,7 @@ try {
     // 1. Simplify schema
     // 2. Add more context to prompt
     // 3. Provide examples in prompt
-    // 4. Try different model (gpt-4 better than gpt-3.5 for complex objects)
+    // 4. Try different model (gpt-5 or claude-sonnet-4-5 for complex objects)
   }
 }
 ```

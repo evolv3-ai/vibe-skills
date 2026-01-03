@@ -1,6 +1,6 @@
 {
   "name": "clerk-auth",
-  "description": "Clerk auth with API version 2025-11-10 breaking changes (billing endpoints, payment_source→payment_method), Next.js v6 async auth(), PKCE for custom OAuth, credential stuffing defense. Use when: troubleshooting Missing Clerk Secret Key, JWKS errors, authorizedParties CSRF, JWT size limits (1.2KB), 431 header errors (Vite dev mode), or testing with 424242 OTP. ``` GET /v1/commerce/plans → GET /v1/billing/plans GET /v1/commerce/statements → GET /v1/billing/statements POST /v1/me/commerce/che",
+  "description": "Clerk auth with API Keys beta (Dec 2025), Next.js 16 proxy.ts, API version 2025-11-10 breaking changes, clerkMiddleware() options, webhooks, and component reference. Use when: API keys for users/orgs, Next.js 16 middleware filename, troubleshooting JWKS/CSRF/JWT errors, webhook verification, or testing with 424242 OTP. return ( <div> <h2>API Keys</h2> <APIKeys /> {/* Full CRUD UI for users API keys */} </div> ) secretKey: process.env.CLERK_SECRET_KEY, authorizedParties: [https://yourdomain.com],",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",

@@ -9,8 +9,8 @@ description: |
 # Tailwind v4 + shadcn/ui Production Stack
 
 **Production-tested**: WordPress Auditor (https://wordpress-auditor.webfonts.workers.dev)
-**Last Updated**: 2025-11-28
-**Versions**: tailwindcss@4.1.17, @tailwindcss/vite@4.1.17
+**Last Updated**: 2026-01-03
+**Versions**: tailwindcss@4.1.18, @tailwindcss/vite@4.1.18
 **Status**: Production Ready ✅
 
 ---
@@ -368,7 +368,7 @@ See `reference/migration-guide.md` for complete guide.
 
 ---
 
-**Last Updated**: 2025-11-28
-**Skill Version**: 2.0.0
-**Tailwind v4**: 4.1.17 (Latest)
+**Last Updated**: 2026-01-03
+**Skill Version**: 2.0.1
+**Tailwind v4**: 4.1.18 (Latest)
 **Production**: WordPress Auditor (https://wordpress-auditor.webfonts.workers.dev)

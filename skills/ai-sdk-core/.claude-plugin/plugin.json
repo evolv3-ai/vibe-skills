@@ -1,6 +1,6 @@
 {
   "name": "ai-sdk-core",
-  "description": "Build backend AI with Vercel AI SDK v5/v6. Covers v6 beta (Agent abstraction, tool approval, reranking), v4→v5 migration (breaking changes), latest models (GPT-5/5.1, Claude 4.x, Gemini 2.5), Workers startup fix, and 12 error solutions (AI_APICallError, AI_NoObjectGeneratedError, streamText silent errors). Use when: implementing AI SDK v5/v6, migrating v4→v5, troubleshooting errors, fixing Workers startup issues, or updating to latest models. model: workersai(@cf/qwen/qwen3-30b-a3b-fp8), mes",
+  "description": "Build backend AI with Vercel AI SDK v5/v6. v6 stable introduces Output API (Output.object/array/choice replace deprecated generateObject/streamObject), plus speech synthesis, transcription, image generation, embeddings, reranking, MCP tools, and middleware. Covers v4→v5 migration, latest models (GPT-5.2, Claude 4.x, Gemini 2.5), Workers startup fix, and 12 error solutions. Use when: implementing AI SDK v5/v6, using Output API, speech/transcription/image features, embeddings, MCP tools, migrati",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",

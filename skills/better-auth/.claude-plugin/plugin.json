@@ -1,6 +1,6 @@
 {
   "name": "better-auth",
-  "description": "Build authentication systems for TypeScript/Cloudflare Workers with social auth, 2FA, passkeys, organizations, RBAC, and OAuth 2.1 provider capabilities. Self-hosted alternative to Clerk/Auth.js. IMPORTANT: Requires Drizzle ORM or Kysely for D1 - no direct D1 adapter. v1.4.10 (Dec 2025) adds OAuth 2.1 Provider plugin (MCP deprecated), admin impersonation prevention, background tasks, Patreon/Kick/Vercel OAuth providers. v1.4.0 adds ESM-only (breaking), stateless sessions, SCIM. Use when: self-ho",
+  "description": "Build authentication systems for TypeScript/Cloudflare Workers with social auth, 2FA, passkeys, organizations, RBAC, OAuth 2.1 provider, and 15+ plugins. Self-hosted alternative to Clerk/Auth.js. IMPORTANT: Requires Drizzle ORM or Kysely for D1 - no direct D1 adapter. Workers require nodejs_compat flag. v1.4.10 adds OAuth 2.1 Provider (MCP deprecated), Bearer tokens, Google One Tap, SCIM, Anonymous auth, rate limiting, Patreon/Kick/Vercel providers. Use when: self-hosting auth on Cloudflare D1, ",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",

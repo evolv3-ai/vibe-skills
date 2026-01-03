@@ -1,18 +1,18 @@
 ---
 name: openai-assistants
 description: |
-  Build stateful chatbots with OpenAI Assistants API v2 - Code Interpreter, File Search (10k files), Function Calling. ⚠️ Sunset H1 2026; use openai-responses for new projects.
+  Build stateful chatbots with OpenAI Assistants API v2 - Code Interpreter, File Search (10k files), Function Calling. ⚠️ Deprecated (sunset August 26, 2026); use openai-responses for new projects.
 
-  Use when: building stateful chatbots, implementing RAG, or troubleshooting "thread has active run", vector store delays, polling timeouts, or file upload errors.
+  Use when: maintaining legacy chatbots, implementing RAG with vector stores, or troubleshooting "thread has active run", vector store delays, polling timeouts, or file upload errors.
 ---
 
 # OpenAI Assistants API v2
 
-**Status**: Production Ready (⚠️ Deprecated - Sunset H1 2026)
-**Package**: openai@6.9.1
-**Last Updated**: 2025-11-27
+**Status**: Production Ready (⚠️ Deprecated - Sunset August 26, 2026)
+**Package**: openai@6.15.0
+**Last Updated**: 2026-01-03
 **v1 Deprecated**: December 18, 2024
-**v2 Sunset**: H1 2026 (migrate to Responses API)
+**v2 Sunset**: August 26, 2026 (migrate to Responses API)
 
 ---
 
@@ -20,7 +20,7 @@ description: |
 
 **OpenAI is deprecating Assistants API in favor of [Responses API](../openai-responses/SKILL.md).**
 
-**Timeline**: v1 deprecated Dec 18, 2024 | v2 sunset H1 2026
+**Timeline**: v1 deprecated Dec 18, 2024 | v2 sunset August 26, 2026
 
 **Use this skill if**: Maintaining legacy apps or migrating existing code (12-18 month window)
 **Don't use if**: Starting new projects (use `openai-responses` skill instead)
@@ -32,7 +32,7 @@ description: |
 ## Quick Start
 
 ```bash
-npm install openai@6.9.1
+npm install openai@6.15.0
 ```
 
 ```typescript

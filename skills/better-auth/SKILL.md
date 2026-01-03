@@ -408,6 +408,128 @@ export const auth = betterAuth({
 
 ---
 
+## Stateless Sessions (v1.4.0+)
+
+Store sessions entirely in signed cookies without database storage:
+
+```typescript
+export const auth = betterAuth({
+  session: {
+    // Stateless: No database storage, session lives in cookie only
+    storage: undefined, // or omit entirely
+
+    // Cookie configuration
+    cookieCache: {
+      enabled: true,
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      encoding: "jwt", // Use JWT for stateless (not "compact")
+    },
+
+    // Session expiration
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+  },
+});
+```
+
+**When to Use:**
+
+| Storage Type | Use Case | Tradeoffs |
+|--------------|----------|-----------|
+| **Stateless (cookie-only)** | Read-heavy apps, edge/serverless, no revocation needed | Can't revoke sessions, limited payload size |
+| **D1 Database** | Full session management, audit trails, revocation | Eventual consistency issues |
+| **KV Storage** | Strong consistency, high read performance | Extra binding setup |
+
+**Key Points:**
+- Stateless sessions can't be revoked (user must wait for expiry)
+- Cookie size limit ~4KB (limits session data)
+- Use `encoding: "jwt"` for interoperability, `"jwe"` for encrypted
+- Server must have consistent `BETTER_AUTH_SECRET` across all instances
+
+---
+
+## JWT Key Rotation (v1.4.0+)
+
+Automatically rotate JWT signing keys for enhanced security:
+
+```typescript
+import { jwt } from "better-auth/plugins";
+
+export const auth = betterAuth({
+  plugins: [
+    jwt({
+      // Key rotation (optional, enterprise security)
+      keyRotation: {
+        enabled: true,
+        rotationInterval: 60 * 60 * 24 * 30, // Rotate every 30 days
+        keepPreviousKeys: 3, // Keep 3 old keys for validation
+      },
+
+      // Custom signing algorithm (default: HS256)
+      algorithm: "RS256", // Requires asymmetric keys
+
+      // JWKS endpoint (auto-generated at /api/auth/jwks)
+      exposeJWKS: true,
+    }),
+  ],
+});
+```
+
+**Key Points:**
+- Key rotation prevents compromised key from having indefinite validity
+- Old keys are kept temporarily to validate existing tokens
+- JWKS endpoint at `/api/auth/jwks` for external services
+- Use RS256 for public key verification (microservices)
+- HS256 (default) for single-service apps
+
+---
+
+## Provider Scopes Reference
+
+Common OAuth providers and the scopes needed for user data:
+
+| Provider | Scope | Returns |
+|----------|-------|---------|
+| **Google** | `openid` | User ID only |
+| | `email` | Email address, email_verified |
+| | `profile` | Name, avatar (picture), locale |
+| **GitHub** | `user:email` | Email address (may be private) |
+| | `read:user` | Name, avatar, profile URL, bio |
+| **Microsoft** | `openid` | User ID only |
+| | `email` | Email address |
+| | `profile` | Name, locale |
+| | `User.Read` | Full profile from Graph API |
+| **Discord** | `identify` | Username, avatar, discriminator |
+| | `email` | Email address |
+| **Apple** | `name` | First/last name (first auth only) |
+| | `email` | Email or relay address |
+| **Patreon** | `identity` | User ID, name |
+| | `identity[email]` | Email address |
+| **Vercel** | (auto) | Email, name, avatar |
+
+**Configuration Example:**
+
+```typescript
+socialProviders: {
+  google: {
+    clientId: env.GOOGLE_CLIENT_ID,
+    clientSecret: env.GOOGLE_CLIENT_SECRET,
+    scope: ["openid", "email", "profile"], // All user data
+  },
+  github: {
+    clientId: env.GITHUB_CLIENT_ID,
+    clientSecret: env.GITHUB_CLIENT_SECRET,
+    scope: ["user:email", "read:user"], // Email + full profile
+  },
+  microsoft: {
+    clientId: env.MS_CLIENT_ID,
+    clientSecret: env.MS_CLIENT_SECRET,
+    scope: ["openid", "email", "profile", "User.Read"],
+  },
+}
+```
+
+---
+
 ## Session Cookie Caching
 
 Three encoding strategies for session cookies:
@@ -1774,12 +1896,12 @@ return c.json({ members });
 
 **Tested with**:
 - `better-auth@1.4.10`
-- `drizzle-orm@0.44.7`
-- `drizzle-kit@0.31.6`
+- `drizzle-orm@0.45.1`
+- `drizzle-kit@0.31.8`
 - `kysely@0.28.8`
 - `kysely-d1@0.4.0`
 - `@cloudflare/workers-types@latest`
-- `hono@4.7.0`
+- `hono@4.11.3`
 - Node.js 18+, Bun 1.0+
 
 **Breaking changes**:

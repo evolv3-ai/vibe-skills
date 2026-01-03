@@ -1,6 +1,6 @@
 {
   "name": "tanstack-query",
-  "description": "Manage server state in React with TanStack Query v5. Set up queries with useQuery, mutations with useMutation, configure QueryClient caching strategies, implement optimistic updates, and handle infinite scroll with useInfiniteQuery. Use when: setting up data fetching in React projects, migrating from v4 to v5, or fixing object syntax required errors, query callbacks removed issues, cacheTime renamed to gcTime, isPending vs isLoading confusion, keepPreviousData removed problems. defaultOptions: {",
+  "description": "Manage server state in React with TanStack Query v5. Covers useMutationState (cross-component mutations), simplified optimistic updates, throwOnError for error boundaries, network mode (offline/PWA), useQueries combine, infiniteQueryOptions, and maxPages for memory optimization. Use when: setting up data fetching, useMutationState, optimistic updates with variables, throwOnError error boundaries, offline/PWA network mode, or fixing v4→v5 migration errors (object syntax, gcTime, isPending, keep",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",

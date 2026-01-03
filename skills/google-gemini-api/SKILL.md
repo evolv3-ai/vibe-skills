@@ -18,8 +18,8 @@ description: |
 # Google Gemini API - Complete Guide
 
 **Version**: Phase 2 Complete + Gemini 3 ✅
-**Package**: @google/genai@1.30.0 (⚠️ NOT @google/generative-ai)
-**Last Updated**: 2025-11-26 (Package update + FileSearch preview)
+**Package**: @google/genai@1.34.0 (⚠️ NOT @google/generative-ai)
+**Last Updated**: 2026-01-03 (v1.34.0 + Gemini 3 Flash)
 
 ---
 
@@ -89,7 +89,7 @@ This skill uses the **correct current SDK** and provides a complete migration gu
 
 **CORRECT SDK:**
 ```bash
-npm install @google/genai@1.30.0
+npm install @google/genai@1.34.0
 ```
 
 **❌ WRONG (DEPRECATED):**
@@ -148,16 +148,25 @@ console.log(data.candidates[0].content.parts[0].text);
 
 ## Current Models (2025)
 
-### Gemini 3 Series (Preview - November 2025)
+### Gemini 3 Series (December 2025)
+
+#### gemini-3-flash
+- **Context**: 1,048,576 input tokens / 65,536 output tokens
+- **Status**: 🆕 Generally Available (December 2025)
+- **Description**: Google's fastest and most efficient Gemini 3 model for production workloads
+- **Best for**: High-throughput applications, low-latency responses, cost-sensitive production
+- **Features**: Enhanced multimodal, function calling, streaming, thinking mode
+- **Benchmark Performance**: Matches gemini-2.5-pro quality at gemini-2.5-flash speed/cost
+- **Recommended for**: Production use cases requiring speed + quality balance
 
 #### gemini-3-pro-preview
 - **Context**: TBD (documentation pending)
-- **Status**: 🆕 Preview release (November 18, 2025)
+- **Status**: Preview release (November 18, 2025)
 - **Description**: Google's newest and most intelligent AI model with state-of-the-art reasoning
 - **Best for**: Most complex reasoning tasks, advanced multimodal understanding, benchmark-critical applications
 - **Features**: Enhanced multimodal (text, image, video, audio, PDF), function calling, streaming
 - **Benchmark Performance**: Outperforms Gemini 2.5 Pro on every major AI benchmark
-- **⚠️ Preview**: Use for evaluation. Consider gemini-2.5-pro for production until stable release
+- **⚠️ Preview**: Use for evaluation. Consider gemini-3-flash or gemini-2.5-pro for production
 
 ### Gemini 2.5 Series (General Availability - Stable)
 
@@ -184,16 +193,16 @@ console.log(data.candidates[0].content.parts[0].text);
 
 ### Model Feature Matrix
 
-| Feature | 3-Pro (Preview) | 2.5-Pro | 2.5-Flash | 2.5-Flash-Lite |
-|---------|-----------------|---------|-----------|----------------|
-| Thinking Mode | TBD | ✅ Default ON | ✅ Default ON | ✅ Default ON |
-| Function Calling | ✅ | ✅ | ✅ | ✅ |
-| Multimodal | ✅ Enhanced | ✅ | ✅ | ✅ |
-| Streaming | ✅ | ✅ | ✅ | ✅ |
-| System Instructions | ✅ | ✅ | ✅ | ✅ |
-| Context Window | TBD | 1,048,576 in | 1,048,576 in | 1,048,576 in |
-| Output Tokens | TBD | 65,536 max | 65,536 max | 65,536 max |
-| Status | Preview | Stable | Stable | Stable |
+| Feature | 3-Flash | 3-Pro (Preview) | 2.5-Pro | 2.5-Flash | 2.5-Flash-Lite |
+|---------|---------|-----------------|---------|-----------|----------------|
+| Thinking Mode | ✅ Default ON | TBD | ✅ Default ON | ✅ Default ON | ✅ Default ON |
+| Function Calling | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Multimodal | ✅ Enhanced | ✅ Enhanced | ✅ | ✅ | ✅ |
+| Streaming | ✅ | ✅ | ✅ | ✅ | ✅ |
+| System Instructions | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Context Window | 1,048,576 in | TBD | 1,048,576 in | 1,048,576 in | 1,048,576 in |
+| Output Tokens | 65,536 max | TBD | 65,536 max | 65,536 max | 65,536 max |
+| Status | **GA** | Preview | Stable | Stable | Stable |
 
 ### ⚠️ Context Window Correction
 
@@ -2116,7 +2125,7 @@ const response = await chat.sendMessage(message);
 
 ### Installation
 ```bash
-npm install @google/genai@1.30.0
+npm install @google/genai@1.34.0
 ```
 
 ### Environment
@@ -2124,9 +2133,10 @@ npm install @google/genai@1.30.0
 export GEMINI_API_KEY="..."
 ```
 
-### Models (2025)
+### Models (2025-2026)
+- `gemini-3-flash` (1,048,576 in / 65,536 out) - **NEW** Best speed+quality balance
 - `gemini-2.5-pro` (1,048,576 in / 65,536 out) - Best for complex reasoning
-- `gemini-2.5-flash` (1,048,576 in / 65,536 out) - Best price-performance balance
+- `gemini-2.5-flash` (1,048,576 in / 65,536 out) - Proven price-performance balance
 - `gemini-2.5-flash-lite` (1,048,576 in / 65,536 out) - Fastest, most cost-effective
 
 ### Basic Generation
@@ -2167,6 +2177,6 @@ config: {
 
 ---
 
-**Last Updated**: 2025-11-26
-**Production Validated**: All features tested with @google/genai@1.30.0
+**Last Updated**: 2026-01-03
+**Production Validated**: All features tested with @google/genai@1.34.0
 **Phase**: 2 Complete ✅ (All Core + Advanced Features)

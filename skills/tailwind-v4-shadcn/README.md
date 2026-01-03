@@ -1,7 +1,7 @@
 # Tailwind v4 + shadcn/ui Skill
 
 **Status**: Production Ready ✅
-**Last Updated**: 2025-11-09
+**Last Updated**: 2026-01-03
 **Production Tested**: WordPress Auditor (https://wordpress-auditor.webfonts.workers.dev)
 
 ---
@@ -137,17 +137,17 @@ When Claude detects trigger keywords, it should:
 ```json
 {
   "dependencies": {
-    "tailwindcss": "^4.1.17",
-    "@tailwindcss/vite": "^4.1.17",
+    "tailwindcss": "^4.1.18",
+    "@tailwindcss/vite": "^4.1.18",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^3.3.1",
+    "tailwind-merge": "^3.4.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "@types/node": "^24.10.0",
-    "@vitejs/plugin-react": "^5.1.0",
-    "vite": "^7.2.2",
+    "@types/node": "^25.0.3",
+    "@vitejs/plugin-react": "^5.1.2",
+    "vite": "^7.3.0",
     "typescript": "~5.9.0",
     "tw-animate-css": "^1.4.0"
   }
@@ -179,13 +179,13 @@ Result: Working project in ~1 minute, 0 errors
 
 ```yaml
 name: tailwind-v4-shadcn
-version: 1.0.0
+version: 2.0.1
 category: frontend-setup
 stack: [vite, react, tailwind-v4, shadcn-ui]
 confidence: high  # Production-tested pattern
 auto_invoke_threshold: 0.7  # Invoke if 70%+ match
 maintained_by: jeremy@jezweb.net
-last_tested: 2025-10-20
+last_tested: 2026-01-03
 ```
 
 ---

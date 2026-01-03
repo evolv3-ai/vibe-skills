@@ -53,29 +53,39 @@ fastmcp dev server.py
 python server.py --transport http --port 8000
 ```
 
-## What's New in v2.13.1 (November 2025)
+## What's New in v2.14.x (December 2025)
 
-**Meta Parameter Support:**
-- ToolResult can return metadata alongside results (enables OpenAI Apps SDK integration)
-- Client-sent meta parameters now supported
+### v2.14.2 (December 31, 2024)
+- MCP SDK pinned to <2.x for compatibility
+- Supabase provider gains `auth_route` parameter
+- Bug fixes: outputSchema `$ref` resolution, OAuth Proxy validation, OpenAPI 3.1 support
 
-**Authentication Improvements:**
-- `DebugTokenVerifier` for custom token validation during development
-- OCI (Oracle Cloud Infrastructure) authentication provider added
-- Enhanced OAuth error handling and messaging
-- Improved CSP policies for OAuth consent screens
+### v2.14.1: Sampling with Tools (SEP-1577)
+- **`ctx.sample()` now accepts tools** for agentic workflows
+- `AnthropicSamplingHandler` promoted from experimental
+- `ctx.sample_step()` for single LLM call returning `SampleStep`
+- Python 3.13 support added
 
-**Utilities & Developer Experience:**
-- `Image.to_data_uri()` method added for easier icon embedding
-- Manual Client initialization control (defer connection until needed)
-- 20+ bug fixes: URL encoding in Cursor deeplinks, OAuth metadata endpoint handling, Windows test timeouts, token cache expiration
+### v2.14.0: Background Tasks (SEP-1686)
+- **Protocol-native background tasks** for long-running operations
+- Add `task=True` to async decorators; progress tracking without blocking
+- MCP 2025-11-25 specification support
+- SEP-1699: SSE polling and event resumability
+- SEP-1330: Multi-select enum elicitation schemas
+- SEP-1034: Default values for elicitation schemas
 
-**Security Update:**
-- **CVE-2025-61920**: authlib updated to 1.6.5
-- Safer Windows API validation for Cursor deeplink URLs
+**⚠️ Breaking Changes (v2.14.0):**
+- `BearerAuthProvider` module removed (use `JWTVerifier` or `OAuthProxy`)
+- `Context.get_http_request()` method removed
+- `fastmcp.Image` top-level import removed (use `from fastmcp.utilities import Image`)
+- `enable_docket`, `enable_tasks` settings removed (always enabled)
+- `run_streamable_http_async()`, `sse_app()`, `streamable_http_app()`, `run_sse_async()` methods removed
+- `dependencies` parameter removed from decorators
+- `output_schema=False` support eliminated
+- `FASTMCP_SERVER_` environment variable prefix deprecated
 
 **Known Compatibility:**
-- MCP SDK 1.21.1 excluded due to integration test failures (use 1.21.0 or 1.22.0+)
+- MCP SDK pinned to <2.x (v2.14.2+)
 
 ---
 
@@ -144,6 +154,103 @@ async def enhance_text(text: str, context: Context) -> str:
     )
     return response["content"]
 ```
+
+## Background Tasks (v2.14.0+)
+
+Long-running operations that report progress without blocking clients. Uses Docket task scheduler (always enabled in v2.14.0+).
+
+**Basic Usage:**
+```python
+@mcp.tool(task=True)  # Enable background task mode
+async def analyze_large_dataset(dataset_id: str, context: Context) -> dict:
+    """Analyze large dataset with progress tracking."""
+    data = await fetch_dataset(dataset_id)
+
+    for i, chunk in enumerate(data.chunks):
+        # Report progress to client
+        await context.report_progress(
+            current=i + 1,
+            total=len(data.chunks),
+            message=f"Processing chunk {i + 1}/{len(data.chunks)}"
+        )
+        await process_chunk(chunk)
+
+    return {"status": "complete", "records_processed": len(data)}
+```
+
+**Task States:** `pending` → `running` → `completed` / `failed` / `cancelled`
+
+**When to Use:**
+- Operations taking >30 seconds (LLM timeout risk)
+- Batch processing with per-item status updates
+- Operations that may need user input mid-execution
+- Long-running API calls or data processing
+
+**Important:** Tasks execute through Docket scheduler. Cannot execute tasks through proxies (will raise error).
+
+## Sampling with Tools (v2.14.1+)
+
+Servers can pass tools to `ctx.sample()` for agentic workflows where the LLM can call tools during sampling.
+
+**Agentic Sampling:**
+```python
+from fastmcp import Context
+from fastmcp.sampling import AnthropicSamplingHandler
+
+# Configure sampling handler
+mcp = FastMCP("Agent Server")
+mcp.add_sampling_handler(AnthropicSamplingHandler(api_key=os.getenv("ANTHROPIC_API_KEY")))
+
+@mcp.tool()
+async def research_topic(topic: str, context: Context) -> dict:
+    """Research a topic using agentic sampling with tools."""
+
+    # Define tools available during sampling
+    research_tools = [
+        {
+            "name": "search_web",
+            "description": "Search the web for information",
+            "inputSchema": {"type": "object", "properties": {"query": {"type": "string"}}}
+        },
+        {
+            "name": "fetch_url",
+            "description": "Fetch content from a URL",
+            "inputSchema": {"type": "object", "properties": {"url": {"type": "string"}}}
+        }
+    ]
+
+    # Sample with tools - LLM can call these tools during reasoning
+    result = await context.sample(
+        messages=[{"role": "user", "content": f"Research: {topic}"}],
+        tools=research_tools,
+        max_tokens=4096
+    )
+
+    return {"research": result.content, "tools_used": result.tool_calls}
+```
+
+**Single-Step Sampling:**
+```python
+@mcp.tool()
+async def get_single_response(prompt: str, context: Context) -> dict:
+    """Get a single LLM response without tool loop."""
+
+    # sample_step() returns SampleStep for inspection
+    step = await context.sample_step(
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.7
+    )
+
+    return {
+        "content": step.content,
+        "model": step.model,
+        "stop_reason": step.stop_reason
+    }
+```
+
+**Sampling Handlers:**
+- `AnthropicSamplingHandler` - For Claude models (v2.14.1+)
+- `OpenAISamplingHandler` - For GPT models
 
 ## Storage Backends
 
@@ -507,6 +614,36 @@ def create_server():
 **Cause:** Expecting v2.12 behavior (per-session) in v2.13.0+ (per-server)
 **Solution:** v2.13.0+ lifespans run ONCE per server, not per session - use middleware for per-session logic
 
+### Error 26: BearerAuthProvider Removed (v2.14.0)
+**Error:** `ImportError: cannot import name 'BearerAuthProvider' from 'fastmcp.auth'`
+**Cause:** `BearerAuthProvider` module removed in v2.14.0
+**Solution:** Use `JWTVerifier` for token validation or `OAuthProxy` for full OAuth flows:
+```python
+# Before (v2.13.x)
+from fastmcp.auth import BearerAuthProvider
+
+# After (v2.14.0+)
+from fastmcp.auth import JWTVerifier
+auth = JWTVerifier(issuer="...", audience="...", public_key="...")
+```
+
+### Error 27: Context.get_http_request() Removed (v2.14.0)
+**Error:** `AttributeError: 'Context' object has no attribute 'get_http_request'`
+**Cause:** `Context.get_http_request()` method removed in v2.14.0
+**Solution:** Access request info through middleware or use `InitializeResult` exposed to middleware
+
+### Error 28: Image Import Path Changed (v2.14.0)
+**Error:** `ImportError: cannot import name 'Image' from 'fastmcp'`
+**Cause:** `fastmcp.Image` top-level import removed in v2.14.0
+**Solution:** Use new import path:
+```python
+# Before (v2.13.x)
+from fastmcp import Image
+
+# After (v2.14.0+)
+from fastmcp.utilities import Image
+```
+
 ---
 
 ## Production Patterns, Testing, CLI
@@ -539,10 +676,10 @@ FASTMCP_LOG_LEVEL=DEBUG fastmcp dev  # Debug logging
 ## References & Summary
 
 **Official:** https://github.com/jlowin/fastmcp, https://fastmcp.cloud, https://modelcontextprotocol.io, Context7: `/jlowin/fastmcp`
-**Related Skills:** openai-api, claude-api, cloudflare-worker-base
-**Package Versions:** fastmcp>=2.13.1, Python>=3.10, httpx, pydantic, py-key-value-aio, cryptography
+**Related Skills:** openai-api, claude-api, cloudflare-worker-base, typescript-mcp
+**Package Versions:** fastmcp>=2.14.2, Python>=3.10, httpx, pydantic, py-key-value-aio, cryptography
 
-**15 Key Takeaways:**
+**17 Key Takeaways:**
 1. Module-level server export (FastMCP Cloud)
 2. Persistent storage (Disk/Redis) for OAuth/caching
 3. Server lifespans for resource management
@@ -558,7 +695,9 @@ FASTMCP_LOG_LEVEL=DEBUG fastmcp dev  # Debug logging
 13. Production patterns (utils, pooling, retry, caching)
 14. OpenAPI auto-generation
 15. Health checks + monitoring
+16. **Background tasks** for long-running operations (`task=True`)
+17. **Sampling with tools** for agentic workflows (`ctx.sample(tools=[...])`)
 
-**Production Readiness:** Encrypted storage, 4 auth patterns, 8 middleware types, modular composition, OAuth security (consent screens, PKCE, RFC 7662), response caching, connection pooling, timing middleware
+**Production Readiness:** Encrypted storage, 4 auth patterns, 8 middleware types, modular composition, OAuth security (consent screens, PKCE, RFC 7662), response caching, connection pooling, timing middleware, background tasks, agentic sampling
 
-**Prevents 25 errors. 90-95% token savings.**
+**Prevents 25+ errors. 90-95% token savings.**

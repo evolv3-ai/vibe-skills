@@ -2,7 +2,7 @@
 
 Complete guide for OpenAI's Assistants API v2: stateful conversational AI with built-in tools, vector stores, and thread management.
 
-**⚠️ DEPRECATION NOTICE**: OpenAI plans to sunset Assistants API in H1 2026. Use [openai-responses](../openai-responses/) for new projects.
+**⚠️ DEPRECATION NOTICE**: OpenAI will sunset Assistants API on **August 26, 2026**. Use [openai-responses](../openai-responses/) for new projects.
 
 ---
 
@@ -64,7 +64,7 @@ This skill automatically activates when you mention:
 - ✅ **Streaming** - Real-time Server-Sent Events (SSE)
 
 ### Implementation Approaches
-- ✅ Node.js SDK (openai@6.7.0)
+- ✅ Node.js SDK (openai@6.15.0)
 - ✅ Fetch API (Cloudflare Workers compatible)
 
 ---
@@ -203,7 +203,7 @@ openai-assistants/
 ## Dependencies
 
 ```bash
-npm install openai@6.7.0
+npm install openai@6.15.0
 ```
 
 **Environment Variables:**
@@ -227,14 +227,14 @@ export OPENAI_API_KEY="sk-..."
 **✅ Production Ready** (with deprecation timeline)
 
 **Tested With:**
-- openai@6.7.0
+- openai@6.15.0
 - Node.js 18+
 - Cloudflare Workers
 - Next.js 14+
 
 **Deprecation Timeline:**
 - Dec 2024: v1 deprecated
-- H1 2026: v2 sunset planned
+- August 26, 2026: v2 sunset
 - Migration path: Responses API
 
 ---
@@ -245,9 +245,9 @@ export OPENAI_API_KEY="sk-..."
 
 OpenAI announced plans to deprecate Assistants API in favor of Responses API:
 
-- **Timeline**: H1 2026 sunset
+- **Timeline**: August 26, 2026 sunset
 - **Replacement**: [Responses API](https://platform.openai.com/docs/api-reference/responses)
-- **Migration**: 12-18 month window
+- **Migration**: 8 months remaining (from Jan 2026)
 - **New Projects**: Use `openai-responses` skill instead
 
 This skill remains valuable for:
@@ -278,6 +278,6 @@ This skill remains valuable for:
 
 ---
 
-**Last Updated**: 2025-10-25
-**Status**: Production Ready (Deprecated H1 2026)
+**Last Updated**: 2026-01-03
+**Status**: Production Ready (Deprecated August 26, 2026)
 **License**: MIT

@@ -375,16 +375,16 @@ Claude should load these when you need specific deep-dive information:
 
 ---
 
-## Package Versions (Verified 2025-11-25)
+## Package Versions (Verified 2026-01-03)
 
 ```json
 {
   "dependencies": {
-    "drizzle-orm": "^0.44.7"
+    "drizzle-orm": "^0.45.1"
   },
   "devDependencies": {
-    "drizzle-kit": "^0.31.7",
-    "@cloudflare/workers-types": "^4.20251125.0",
+    "drizzle-kit": "^0.31.8",
+    "@cloudflare/workers-types": "^4.20260103.0",
     "better-sqlite3": "^12.4.6"
   }
 }

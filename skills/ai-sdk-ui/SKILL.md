@@ -1,33 +1,62 @@
 ---
 name: ai-sdk-ui
 description: |
-  Build React chat interfaces with Vercel AI SDK v5/v6. Covers v6 beta (agent integration, tool approval,
-  auto-submit), v4→v5 migration (breaking changes), useChat/useCompletion/useObject/useAssistant hooks,
+  Build React chat interfaces with Vercel AI SDK v6. Covers v6 stable (agent integration, tool approval,
+  message parts structure, auto-submit), v5→v6 migration, useChat/useCompletion/useObject hooks,
   and 12 UI error solutions (stream parsing, stale body values, React update depth).
 
-  Use when: implementing AI SDK v5/v6 chat UIs, migrating v4→v5, troubleshooting "useChat failed to parse
-  stream", "useChat no response", or "stale body values" errors, or integrating OpenAI assistants.
+  Use when: implementing AI SDK v6 chat UIs, migrating v5→v6, troubleshooting "useChat failed to parse
+  stream", "useChat no response", or "stale body values" errors, or building AI chat interfaces.
 ---
 
 # AI SDK UI - Frontend React Hooks
 
-Frontend React hooks for AI-powered user interfaces with Vercel AI SDK v5/v6.
+Frontend React hooks for AI-powered user interfaces with Vercel AI SDK v6.
 
-**Version**: AI SDK v5.0.99 (Stable) / v6.0.0-beta.108 (Beta)
-**Framework**: React 18+, Next.js 14+
-**Last Updated**: 2025-11-22
+**Version**: AI SDK v6.0.6 (Stable)
+**Framework**: React 18+/19, Next.js 14+/15+
+**Last Updated**: 2026-01-03
 
 ---
 
-## AI SDK 6 Beta (November 2025)
+## AI SDK v6 Stable (January 2026)
 
-**Status:** Beta (stable release planned end of 2025)
-**Latest:** ai@6.0.0-beta.108 (Nov 22, 2025)
+**Status:** Stable Release
+**Latest:** ai@6.0.6, @ai-sdk/react@3.0.6, @ai-sdk/openai@3.0.2
 **Migration:** Minimal breaking changes from v5 → v6
 
-### New UI Features in v6 Beta
+### New UI Features in v6
 
-**1. Agent Integration**
+**1. Message Parts Structure (Breaking Change)**
+In v6, message content is now accessed via `.parts` array instead of `.content`:
+
+```tsx
+// ❌ v5 (OLD)
+{messages.map(m => (
+  <div key={m.id}>{m.content}</div>
+))}
+
+// ✅ v6 (NEW)
+{messages.map(m => (
+  <div key={m.id}>
+    {m.parts.map((part, i) => {
+      if (part.type === 'text') return <span key={i}>{part.text}</span>;
+      if (part.type === 'tool-invocation') return <ToolCall key={i} tool={part} />;
+      if (part.type === 'file') return <FilePreview key={i} file={part} />;
+      return null;
+    })}
+  </div>
+))}
+```
+
+**Part Types:**
+- `text` - Text content with `.text` property
+- `tool-invocation` - Tool calls with `.toolName`, `.args`, `.result`
+- `file` - File attachments with `.mimeType`, `.data`
+- `reasoning` - Model reasoning (when available)
+- `source` - Source citations
+
+**3. Agent Integration**
 Type-safe messaging with agents using `InferAgentUIMessage<typeof agent>`:
 
 ```tsx
@@ -43,7 +72,7 @@ export default function AgentChat() {
 }
 ```
 
-**2. Tool Approval Workflows (Human-in-the-Loop)**
+**4. Tool Approval Workflows (Human-in-the-Loop)**
 Request user confirmation before executing tools:
 
 ```tsx
@@ -89,7 +118,7 @@ export default function ChatWithApproval() {
 }
 ```
 
-**3. Auto-Submit Capability**
+**5. Auto-Submit Capability**
 Automatically continue conversation after handling approvals:
 
 ```tsx
@@ -104,7 +133,7 @@ export default function AutoSubmitChat() {
 }
 ```
 
-**4. Structured Output in Chat**
+**6. Structured Output in Chat**
 Generate structured data alongside tool calling (previously only available in `useObject`):
 
 ```tsx
@@ -164,7 +193,11 @@ See `references/use-chat-migration.md` for complete migration guide.
 
 ---
 
-## useAssistant Hook
+## useAssistant Hook (Deprecated)
+
+> **⚠️ Deprecation Notice**: `useAssistant` is deprecated as of AI SDK v5. OpenAI Assistants API v2
+> will sunset on August 26, 2026. For new projects, use `useChat` with custom backend logic instead.
+> See the **openai-assistants** skill for migration guidance.
 
 Interact with OpenAI-compatible assistant APIs with automatic UI state management.
 
@@ -376,36 +409,36 @@ See `references/streaming-patterns.md` for comprehensive best practices.
 
 ## Package Versions
 
-**Stable (v5):**
+**Stable (v6 - Recommended):**
+```json
+{
+  "dependencies": {
+    "ai": "^6.0.6",
+    "@ai-sdk/react": "^3.0.6",
+    "@ai-sdk/openai": "^3.0.2",
+    "react": "^18.3.0",
+    "zod": "^3.24.2"
+  }
+}
+```
+
+**Legacy (v5):**
 ```json
 {
   "dependencies": {
     "ai": "^5.0.99",
     "@ai-sdk/react": "^1.0.0",
-    "@ai-sdk/openai": "^2.0.68",
-    "react": "^18.2.0",
-    "zod": "^3.23.8"
-  }
-}
-```
-
-**Beta (v6):**
-```json
-{
-  "dependencies": {
-    "ai": "6.0.0-beta.108",
-    "@ai-sdk/react": "beta",
-    "@ai-sdk/openai": "beta"
+    "@ai-sdk/openai": "^2.0.68"
   }
 }
 ```
 
 **Version Notes:**
-- AI SDK v5.0.99 (stable, Nov 2025)
-- AI SDK v6.0.0-beta.108 (beta, Nov 22, 2025) - minimal breaking changes
-- React 18+ (React 19 supported)
-- Next.js 14+ recommended (13.4+ works)
-- Zod 3.23.8+ for schema validation
+- AI SDK v6.0.6 (stable, Jan 2026) - recommended for new projects
+- AI SDK v5.x (legacy) - still supported but not receiving new features
+- React 18.3+ / React 19 supported
+- Next.js 14+/15+ recommended
+- Zod 3.24.2+ for schema validation
 
 ---
 
@@ -466,4 +499,4 @@ See `references/` for:
 ---
 
 **Production Tested**: WordPress Auditor (https://wordpress-auditor.webfonts.workers.dev)
-**Last Updated**: 2025-11-22
+**Last Updated**: 2026-01-03

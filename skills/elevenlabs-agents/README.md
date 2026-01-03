@@ -46,11 +46,12 @@ This skill should be used when working with:
 - Tool parameter schemas and validation
 
 **SDKs & Integration**:
-- React SDK (`@elevenlabs/react`)
-- JavaScript SDK (`@elevenlabs/client`)
-- React Native SDK (`@elevenlabs/react-native`)
+- React SDK (`@elevenlabs/react@0.12.3`)
+- JavaScript SDK (`@elevenlabs/client@0.12.2`)
+- React Native SDK (`@elevenlabs/react-native@0.5.7`)
 - Swift SDK (iOS/macOS)
-- Embeddable widget
+- Embeddable widget (`@elevenlabs/convai-widget-embed@0.5.5`)
+- Widget core (`@elevenlabs/convai-widget-core@0.5.5`)
 - Scribe (Real-Time Speech-to-Text) - Beta
 
 **Testing & Analytics**:
@@ -82,7 +83,7 @@ This skill should be used when working with:
 
 ## Errors Prevented
 
-This skill prevents 21+ common errors:
+This skill prevents 27+ common errors:
 
 1. **Package deprecation** (@11labs/* → @elevenlabs/*)
 2. **Android audio cutoff** (connectionDelay configuration)
@@ -142,13 +143,15 @@ const agent = await client.agents.create({
 
 ## Package Versions
 
-**🚨 IMPORTANT**: ElevenLabs migrated packages in August 2025. Use these current versions:
+**🚨 IMPORTANT**: ElevenLabs migrated packages in August 2025. Use these current versions (January 2026):
 
-- `@elevenlabs/elevenlabs-js`: 2.21.0
-- `@elevenlabs/agents-cli`: 0.2.0
-- `@elevenlabs/react`: 0.9.1
-- `@elevenlabs/client`: 0.9.1
-- `@elevenlabs/react-native`: 0.5.2
+- `@elevenlabs/react`: 0.12.3 (Dec 2025: localization, Scribe fixes)
+- `@elevenlabs/client`: 0.12.2 (Dec 2025: localization)
+- `@elevenlabs/react-native`: 0.5.7 (Dec 2025: mic fixes, speed param)
+- `@elevenlabs/elevenlabs-js`: 2.28.0 (Dec 2025: Scribe audio format fix)
+- `@elevenlabs/agents-cli`: 0.6.1
+- `@elevenlabs/convai-widget-embed`: 0.5.5 (new - widget embedding)
+- `@elevenlabs/convai-widget-core`: 0.5.5 (new - widget core)
 
 **DEPRECATED** (do not use):
 - `@11labs/react` - Deprecated August 2025

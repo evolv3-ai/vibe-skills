@@ -21,6 +21,9 @@ This skill automatically activates when you mention:
 - **Cloudflare D1 integration** - Complete Workers + D1 + Table examples
 - **TanStack Query coordination** - Proper query key patterns, state sync
 - **Virtualization** - TanStack Virtual for large datasets (10k+ rows)
+- **Column/Row Pinning** - Keep important columns/rows visible during scroll
+- **Row Expanding** - Nested data and detail rows
+- **Row Grouping** - Group by column values with aggregation
 - **Type safety** - TypeScript patterns, column helper usage
 - **Error prevention** - 6+ documented issues with solutions
 
@@ -219,7 +222,7 @@ npm install @tanstack/react-virtual@latest
 
 ---
 
-**Version:** 1.0.0
-**Last Updated:** 2025-11-07
+**Version:** 1.1.0
+**Last Updated:** 2026-01-03
 **Author:** Jeremy Dawes | Jezweb
 **License:** MIT

@@ -1,7 +1,7 @@
 # TypeScript MCP Server for Cloudflare Workers
 
 **Status**: Production Ready ✅
-**Last Updated**: 2025-10-28
+**Last Updated**: 2026-01-03
 **Production Tested**: Official MCP SDK examples + Cloudflare MCP server
 
 ---
@@ -21,6 +21,9 @@ Claude Code automatically discovers this skill when you mention:
 - mcp tools
 - mcp resources
 - mcp prompts
+- mcp tasks
+- mcp sampling
+- mcp long-running
 - streamablehttpservertransport
 - mcpserver
 
@@ -84,7 +87,7 @@ Provides production-ready patterns for building Model Context Protocol (MCP) ser
 | Missing rate limiting | No protection against API abuse | Security best practice | Provides rate limiting patterns |
 | TypeScript OOM | Large SDK dependency tree | modelcontextprotocol/typescript-sdk#985 | Increases Node.js memory in build scripts |
 | ReDoS vulnerability | Regex in URI template parsing | modelcontextprotocol/typescript-sdk#965 | Requires SDK v1.20.2+ |
-| Authentication bypass | No auth implemented | Security best practice | Provides 5 authentication methods |
+| Authentication bypass | No auth implemented | Security best practice | Provides 6 authentication methods |
 | Env variable leakage | Secrets logged or returned | Cloudflare best practice | Never logs env objects |
 
 ---
@@ -153,16 +156,16 @@ npm run deploy
 
 ---
 
-## Package Versions (Verified 2025-10-28)
+## Package Versions (Verified 2026-01-03)
 
 | Package | Version | Status |
 |---------|---------|--------|
-| @modelcontextprotocol/sdk | 1.20.2 | ✅ Latest stable |
-| @cloudflare/workers-types | 4.20251011.0 | ✅ Latest |
-| hono | 4.10.1 | ✅ Latest stable |
-| zod | 3.23.8 | ✅ Latest stable |
-| wrangler | 4.43.0 | ✅ Latest stable |
-| typescript | 5.7.0 | ✅ Latest stable |
+| @modelcontextprotocol/sdk | 1.25.1 | ✅ Latest stable |
+| @cloudflare/workers-types | 4.20251230.0 | ✅ Latest |
+| hono | 4.11.3 | ✅ Latest stable |
+| zod | 3.24.2 | ✅ Latest stable |
+| wrangler | 4.50.0 | ✅ Latest stable |
+| typescript | 5.7.3 | ✅ Latest stable |
 
 ---
 
@@ -192,6 +195,7 @@ typescript-mcp/
 │   ├── resource-server.ts              # Resources only (data exposure)
 │   ├── full-server.ts                  # Complete (tools + resources + prompts)
 │   ├── authenticated-server.ts         # With API key auth
+│   ├── tasks-server.ts                 # Tasks for long-running ops (v1.24.0+)
 │   └── wrangler.jsonc                  # Cloudflare Workers config
 ├── references/               # Advanced documentation
 │   ├── tool-patterns.md                # Common tool implementations

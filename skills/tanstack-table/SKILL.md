@@ -14,7 +14,7 @@ Headless data tables with server-side pagination, filtering, sorting, and virtua
 
 ## Quick Start
 
-**Last Updated**: 2025-11-28
+**Last Updated**: 2026-01-03
 **Versions**: @tanstack/react-table@8.21.3, @tanstack/react-virtual@3.13.12
 
 ```bash
@@ -161,6 +161,215 @@ function VirtualizedTable() {
     </div>
   )
 }
+```
+
+---
+
+## Column/Row Pinning
+
+Pin columns or rows to keep them visible during horizontal/vertical scroll:
+
+```typescript
+import { useReactTable, getCoreRowModel } from '@tanstack/react-table'
+
+const table = useReactTable({
+  data,
+  columns,
+  getCoreRowModel: getCoreRowModel(),
+  // Enable pinning
+  enableColumnPinning: true,
+  enableRowPinning: true,
+  // Initial pinning state
+  initialState: {
+    columnPinning: {
+      left: ['select', 'name'],  // Pin to left
+      right: ['actions'],        // Pin to right
+    },
+  },
+})
+
+// Render with pinned columns
+function PinnedTable() {
+  return (
+    <div className="flex">
+      {/* Left pinned columns */}
+      <div className="sticky left-0 bg-background z-10">
+        {table.getLeftHeaderGroups().map(/* render left headers */)}
+        {table.getRowModel().rows.map(row => (
+          <tr>{row.getLeftVisibleCells().map(/* render cells */)}</tr>
+        ))}
+      </div>
+
+      {/* Center scrollable columns */}
+      <div className="overflow-x-auto">
+        {table.getCenterHeaderGroups().map(/* render center headers */)}
+        {table.getRowModel().rows.map(row => (
+          <tr>{row.getCenterVisibleCells().map(/* render cells */)}</tr>
+        ))}
+      </div>
+
+      {/* Right pinned columns */}
+      <div className="sticky right-0 bg-background z-10">
+        {table.getRightHeaderGroups().map(/* render right headers */)}
+        {table.getRowModel().rows.map(row => (
+          <tr>{row.getRightVisibleCells().map(/* render cells */)}</tr>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// Toggle pinning programmatically
+column.pin('left')   // Pin column to left
+column.pin('right')  // Pin column to right
+column.pin(false)    // Unpin column
+row.pin('top')       // Pin row to top
+row.pin('bottom')    // Pin row to bottom
+```
+
+---
+
+## Row Expanding (Nested Data)
+
+Show/hide child rows or additional details:
+
+```typescript
+import { useReactTable, getCoreRowModel, getExpandedRowModel } from '@tanstack/react-table'
+
+// Data with nested children
+const data = [
+  {
+    id: 1,
+    name: 'Parent Row',
+    subRows: [
+      { id: 2, name: 'Child Row 1' },
+      { id: 3, name: 'Child Row 2' },
+    ],
+  },
+]
+
+const table = useReactTable({
+  data,
+  columns,
+  getCoreRowModel: getCoreRowModel(),
+  getExpandedRowModel: getExpandedRowModel(),  // Required for expanding
+  getSubRows: row => row.subRows,               // Tell table where children are
+})
+
+// Render with expand button
+function ExpandableTable() {
+  return (
+    <tbody>
+      {table.getRowModel().rows.map(row => (
+        <>
+          <tr key={row.id}>
+            <td>
+              {row.getCanExpand() && (
+                <button onClick={row.getToggleExpandedHandler()}>
+                  {row.getIsExpanded() ? '▼' : '▶'}
+                </button>
+              )}
+            </td>
+            {row.getVisibleCells().map(cell => (
+              <td key={cell.id} style={{ paddingLeft: `${row.depth * 20}px` }}>
+                {cell.renderValue()}
+              </td>
+            ))}
+          </tr>
+        </>
+      ))}
+    </tbody>
+  )
+}
+
+// Control expansion programmatically
+table.toggleAllRowsExpanded()     // Expand/collapse all
+row.toggleExpanded()              // Toggle single row
+table.getIsAllRowsExpanded()      // Check if all expanded
+```
+
+**Detail Rows** (custom content, not nested data):
+
+```typescript
+function DetailRow({ row }) {
+  if (!row.getIsExpanded()) return null
+
+  return (
+    <tr>
+      <td colSpan={columns.length}>
+        <div className="p-4 bg-muted">
+          Custom detail content for row {row.id}
+        </div>
+      </td>
+    </tr>
+  )
+}
+```
+
+---
+
+## Row Grouping
+
+Group rows by column values:
+
+```typescript
+import { useReactTable, getCoreRowModel, getGroupedRowModel } from '@tanstack/react-table'
+
+const table = useReactTable({
+  data,
+  columns,
+  getCoreRowModel: getCoreRowModel(),
+  getGroupedRowModel: getGroupedRowModel(),    // Required for grouping
+  getExpandedRowModel: getExpandedRowModel(),  // Groups are expandable
+  initialState: {
+    grouping: ['status'],  // Group by 'status' column
+  },
+})
+
+// Column with aggregation
+const columns = [
+  {
+    accessorKey: 'status',
+    header: 'Status',
+  },
+  {
+    accessorKey: 'amount',
+    header: 'Amount',
+    aggregationFn: 'sum',                      // Sum grouped values
+    aggregatedCell: ({ getValue }) => `Total: ${getValue()}`,
+  },
+]
+
+// Render grouped table
+function GroupedTable() {
+  return (
+    <tbody>
+      {table.getRowModel().rows.map(row => (
+        <tr key={row.id}>
+          {row.getVisibleCells().map(cell => (
+            <td key={cell.id}>
+              {cell.getIsGrouped() ? (
+                // Grouped cell - show group header with expand toggle
+                <button onClick={row.getToggleExpandedHandler()}>
+                  {row.getIsExpanded() ? '▼' : '▶'} {cell.renderValue()} ({row.subRows.length})
+                </button>
+              ) : cell.getIsAggregated() ? (
+                // Aggregated cell - show aggregation result
+                cell.renderValue()
+              ) : cell.getIsPlaceholder() ? null : (
+                // Regular cell
+                cell.renderValue()
+              )}
+            </td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  )
+}
+
+// Built-in aggregation functions
+// 'sum', 'min', 'max', 'extent', 'mean', 'median', 'unique', 'uniqueCount', 'count'
 ```
 
 ---

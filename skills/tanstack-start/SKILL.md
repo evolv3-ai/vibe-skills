@@ -14,14 +14,16 @@ allowed-tools: [Bash, Read, Write, Edit]
 ⚠️ **Status: Release Candidate - Monitoring for Stability**
 
 This skill is prepared but NOT published. Waiting for:
-- ⏸️ v1.0 stable release (currently RC v1.139.10 as of 2025-11-28)
-- ❌ GitHub #5734 resolved (memory leak with TanStack Form - OPEN, last updated Nov 20, 2025, related PR #1866)
+- ⏸️ v1.0 stable release (currently RC v1.145.3 as of 2026-01-03)
+- ❌ GitHub #5734 resolved (memory leak with TanStack Form - **STILL OPEN**, last activity Nov 20, 2025, related PR tanstack/form#1866)
 - ⏸️ Critical bugs stabilization period
 - ⏸️ Template/reference content creation
 
-**Current Package:** `@tanstack/react-start@1.139.10` (Nov 28, 2025)
+**Current Package:** `@tanstack/react-start@1.145.3` (Jan 2026)
 
 **DO NOT USE IN PRODUCTION YET** - RC status, active memory leak issue
+
+**Issue #5734 Summary**: Memory leak when using TanStack Form with TanStack Start. Pages with forms leak memory on repeated loads, causing server crashes (~30 min). Heap snapshots show retained object references preventing GC.
 
 ---
 
@@ -66,7 +68,7 @@ npm create cloudflare@latest -- --framework=tanstack-start
 
 ---
 
-**Last Updated:** 2025-11-28
+**Last Updated:** 2026-01-03
 **RC Announced:** September 22, 2025
 **Expected Stable:** Pending issue #5734 resolution + final RC feedback
-**Monitoring:** Issue #5734 last updated Nov 20, 2025 (related PR #1866 in TanStack Form repo)
+**Monitoring:** Issue #5734 still open (last activity Nov 20, 2025). Related PR #1866 in TanStack Form repo.

@@ -17,16 +17,19 @@ description: |
 # Cloudflare Worker Base Stack
 
 **Production-tested**: cloudflare-worker-base-test (https://cloudflare-worker-base-test.webfonts.workers.dev)
-**Last Updated**: 2025-11-24
+**Last Updated**: 2026-01-03
 **Status**: Production Ready ✅
-**Latest Versions**: hono@4.11.3, @cloudflare/vite-plugin@1.15.2, vite@7.2.4, wrangler@4.50.0
+**Latest Versions**: hono@4.11.3, @cloudflare/vite-plugin@1.17.1, vite@7.2.4, wrangler@4.54.0
 
-**Recent Updates (2025)**:
+**Recent Updates (2025-2026)**:
+- **Wrangler 4.55+**: Auto-config for frameworks (`wrangler deploy --x-autoconfig`)
+- **Wrangler 4.45+**: Auto-provisioning for R2, D1, KV bindings (enabled by default)
+- **Workers RPC**: JavaScript-native RPC via `WorkerEntrypoint` class for service bindings
 - **March 2025**: Wrangler v4 release (minimal breaking changes, v3 supported until Q1 2027)
 - **June 2025**: Native Integrations removed from dashboard (CLI-based approach with wrangler secrets)
 - **2025 Platform**: Workers VPC Services, Durable Objects Data Studio, 64 env vars (5KB each), unlimited Cron Triggers per Worker, WebSocket 32 MiB messages, node:fs/Web File System APIs
 - **2025 Static Assets**: Gradual rollout asset mismatch issue, free tier 429 errors with run_worker_first, Vite plugin auto-detection
-- **Hono 4.10.x**: Enhanced TypeScript RPC type inference, cloneRawRequest utility, JWT aud validation, auth middleware improvements
+- **Hono 4.11.x**: Enhanced TypeScript RPC type inference, cloneRawRequest utility, JWT aud validation, auth middleware improvements
 
 ---
 
@@ -39,7 +42,7 @@ npm create cloudflare@latest my-worker -- --type hello-world --ts --git --deploy
 # 2. Install dependencies
 cd my-worker
 npm install hono@4.11.3
-npm install -D @cloudflare/vite-plugin@1.15.2 vite@7.2.4
+npm install -D @cloudflare/vite-plugin@1.17.1 vite@7.2.4
 
 # 3. Create wrangler.jsonc
 {
@@ -153,6 +156,82 @@ export default {
 **Free Tier Warning** (2025): `run_worker_first` patterns count toward free tier limits. After exceeding, requests get 429 instead of falling back to free static assets. Use negative patterns (`!/pattern`) or upgrade to Paid plan.
 
 
+## Auto-Provisioning (Wrangler 4.45+)
+
+**Default Behavior**: Wrangler automatically provisions R2 buckets, D1 databases, and KV namespaces when deploying. This eliminates manual resource creation steps.
+
+**How It Works**:
+```jsonc
+// wrangler.jsonc - Just define bindings, resources auto-create on deploy
+{
+  "d1_databases": [{ "binding": "DB", "database_name": "my-app-db" }],
+  "r2_buckets": [{ "binding": "STORAGE", "bucket_name": "my-app-files" }],
+  "kv_namespaces": [{ "binding": "CACHE", "title": "my-app-cache" }]
+}
+```
+
+```bash
+# Deploy - resources auto-provisioned if they don't exist
+wrangler deploy
+
+# Disable auto-provisioning (use existing resources only)
+wrangler deploy --no-x-provision
+```
+
+**Benefits**:
+- No separate `wrangler d1 create` / `wrangler r2 create` steps needed
+- Idempotent - existing resources are used, not recreated
+- Works with local dev (`wrangler dev` creates local emulated resources)
+
+
+## Workers RPC (Service Bindings)
+
+**What It Is**: JavaScript-native RPC system for calling methods between Workers. Uses Cap'n Proto under the hood for zero-copy message passing.
+
+**Use Case**: Split your application into multiple Workers (e.g., API Worker + Auth Worker + Email Worker) that call each other with type-safe methods.
+
+**Defining an RPC Service**:
+```typescript
+import { WorkerEntrypoint } from 'cloudflare:workers'
+
+export class AuthService extends WorkerEntrypoint<Env> {
+  async verifyToken(token: string): Promise<{ userId: string; valid: boolean }> {
+    // Access bindings via this.env
+    const session = await this.env.SESSIONS.get(token)
+    return session ? { userId: session.userId, valid: true } : { userId: '', valid: false }
+  }
+
+  async createSession(userId: string): Promise<string> {
+    const token = crypto.randomUUID()
+    await this.env.SESSIONS.put(token, JSON.stringify({ userId }), { expirationTtl: 3600 })
+    return token
+  }
+}
+
+// Default export still handles HTTP requests
+export default { fetch: ... }
+```
+
+**Calling from Another Worker**:
+```typescript
+// wrangler.jsonc
+{
+  "services": [
+    { "binding": "AUTH", "service": "auth-worker", "entrypoint": "AuthService" }
+  ]
+}
+
+// In your main Worker
+const { valid, userId } = await env.AUTH.verifyToken(authHeader)
+```
+
+**Key Points**:
+- **Zero latency**: Workers on same account typically run in same thread
+- **Type-safe**: Full TypeScript support for method signatures
+- **32 MiB limit**: Max serialized RPC message size
+- **Self-bindings**: In `wrangler dev`, shows as `[connected]` for same-Worker calls
+
+
 ## Bundled Resources
 
 **Templates**: Complete setup files in `templates/` directory (wrangler.jsonc, vite.config.ts, package.json, tsconfig.json, src/index.ts, public/index.html, styles.css, script.js)
@@ -169,18 +248,18 @@ export default {
 
 ---
 
-## Dependencies (Latest Verified 2025-11-24)
+## Dependencies (Latest Verified 2026-01-03)
 
 ```json
 {
   "dependencies": {
-    "hono": "^4.10.6"
+    "hono": "^4.11.3"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^1.15.2",
-    "@cloudflare/workers-types": "^4.20251121.0",
+    "@cloudflare/vite-plugin": "^1.17.1",
+    "@cloudflare/workers-types": "^4.20260103.0",
     "vite": "^7.2.4",
-    "wrangler": "^4.50.0",
+    "wrangler": "^4.54.0",
     "typescript": "^5.9.3"
   }
 }

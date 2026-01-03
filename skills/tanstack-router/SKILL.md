@@ -14,12 +14,14 @@ Type-safe, file-based routing for React SPAs with route-level data loading and T
 
 ## Quick Start
 
-**Last Updated**: 2025-11-28
-**Version**: @tanstack/react-router@1.139.10
+**Last Updated**: 2026-01-03
+**Version**: @tanstack/react-router@1.144.0
 
 ```bash
 npm install @tanstack/react-router @tanstack/router-devtools
 npm install -D @tanstack/router-plugin
+# Optional: Zod validation adapter
+npm install @tanstack/zod-adapter zod
 ```
 
 **Vite Config** (TanStackRouterVite MUST come before react()):
@@ -90,6 +92,178 @@ export const Route = createFileRoute('/posts/$postId')({
 
 ---
 
+## Virtual File Routes (v1.140+)
+
+Programmatic route configuration when file-based conventions don't fit your needs:
+
+**Install**: `npm install @tanstack/virtual-file-routes`
+
+**Vite Config**:
+```typescript
+import { tanstackRouter } from '@tanstack/router-plugin/vite'
+
+export default defineConfig({
+  plugins: [
+    tanstackRouter({
+      target: 'react',
+      virtualRouteConfig: './routes.ts', // Point to your routes file
+    }),
+    react(),
+  ],
+})
+```
+
+**routes.ts** (define routes programmatically):
+```typescript
+import { rootRoute, route, index, layout, physical } from '@tanstack/virtual-file-routes'
+
+export const routes = rootRoute('root.tsx', [
+  index('home.tsx'),
+  route('/posts', 'posts/posts.tsx', [
+    index('posts/posts-home.tsx'),
+    route('$postId', 'posts/posts-detail.tsx'),
+  ]),
+  layout('first', 'layout/first-layout.tsx', [
+    route('/nested', 'nested.tsx'),
+  ]),
+  physical('/classic', 'file-based-subtree'), // Mix with file-based
+])
+```
+
+**Use Cases**: Custom route organization, mixing file-based and code-based, complex nested layouts.
+
+---
+
+## Search Params Validation (Zod Adapter)
+
+Type-safe URL search params with runtime validation:
+
+**Basic Pattern** (inline validation):
+```typescript
+import { z } from 'zod'
+
+export const Route = createFileRoute('/products')({
+  validateSearch: (search) => z.object({
+    page: z.number().catch(1),
+    filter: z.string().catch(''),
+    sort: z.enum(['newest', 'oldest', 'price']).catch('newest'),
+  }).parse(search),
+})
+```
+
+**Recommended Pattern** (Zod adapter with fallbacks):
+```typescript
+import { zodValidator, fallback } from '@tanstack/zod-adapter'
+import { z } from 'zod'
+
+const searchSchema = z.object({
+  query: z.string().min(1).max(100),
+  page: fallback(z.number().int().positive(), 1),
+  sortBy: z.enum(['name', 'date', 'relevance']).optional(),
+})
+
+export const Route = createFileRoute('/search')({
+  validateSearch: zodValidator(searchSchema),
+  // Type-safe: Route.useSearch() returns typed params
+})
+```
+
+**Why `.catch()` over `.default()`**: Use `.catch()` to silently fix malformed params. Use `.default()` + `errorComponent` to show validation errors.
+
+---
+
+## Error Boundaries
+
+Handle errors at route level with typed error components:
+
+**Route-Level Error Handling**:
+```typescript
+export const Route = createFileRoute('/posts/$postId')({
+  loader: async ({ params }) => {
+    const post = await fetchPost(params.postId)
+    if (!post) throw new Error('Post not found')
+    return { post }
+  },
+  errorComponent: ({ error, reset }) => (
+    <div>
+      <p>Error: {error.message}</p>
+      <button onClick={reset}>Retry</button>
+    </div>
+  ),
+})
+```
+
+**Default Error Component** (global fallback):
+```typescript
+const router = createRouter({
+  routeTree,
+  defaultErrorComponent: ({ error }) => (
+    <div className="error-page">
+      <h1>Something went wrong</h1>
+      <p>{error.message}</p>
+    </div>
+  ),
+})
+```
+
+**Not Found Handling**:
+```typescript
+export const Route = createFileRoute('/posts/$postId')({
+  notFoundComponent: () => <div>Post not found</div>,
+})
+```
+
+---
+
+## Authentication with beforeLoad
+
+Protect routes before they load (no flash of protected content):
+
+**Single Route Protection**:
+```typescript
+import { redirect } from '@tanstack/react-router'
+
+export const Route = createFileRoute('/dashboard')({
+  beforeLoad: async ({ context }) => {
+    if (!context.auth.isAuthenticated) {
+      throw redirect({
+        to: '/login',
+        search: { redirect: location.pathname }, // Save for post-login
+      })
+    }
+  },
+})
+```
+
+**Protect Multiple Routes** (layout route pattern):
+```typescript
+// routes/(authenticated)/route.tsx - protects all children
+export const Route = createFileRoute('/(authenticated)')({
+  beforeLoad: async ({ context }) => {
+    if (!context.auth.isAuthenticated) {
+      throw redirect({ to: '/login' })
+    }
+  },
+})
+```
+
+**Passing Auth Context** (from React hooks):
+```typescript
+// main.tsx - pass auth state to router
+function App() {
+  const auth = useAuth() // Your auth hook
+
+  return (
+    <RouterProvider
+      router={router}
+      context={{ auth }} // Available in beforeLoad
+    />
+  )
+}
+```
+
+---
+
 ## Known Issues & Solutions
 
 **Issue #1: Devtools Dependency Resolution**
@@ -111,8 +285,23 @@ export const Route = createFileRoute('/posts/$postId')({
 
 **Issue #5: Memory Leak with TanStack Form**
 - **Error**: Production crashes when using TanStack Form + Router
-- **Source**: GitHub Issue #5734 (known issue, unfixed as of v1.139)
+- **Source**: GitHub Issue #5734 (known issue, still open as of v1.144)
 - **Workaround**: Use React Hook Form or Formik instead
+
+**Issue #6: Virtual Routes Index/Layout Conflict**
+- **Error**: route.tsx and index.tsx conflict when using `physical()` in virtual routing
+- **Source**: GitHub Issue #5421
+- **Fix**: Use pathless route instead: `_layout.tsx` + `_layout.index.tsx`
+
+**Issue #7: Search Params Type Inference**
+- **Error**: Type inference not working with `zodSearchValidator`
+- **Source**: GitHub Issue #3100 (regression since v1.81.5)
+- **Fix**: Use `zodValidator` from `@tanstack/zod-adapter` instead
+
+**Issue #8: TanStack Start Validators on Reload**
+- **Error**: `validateSearch` not working on page reload in TanStack Start
+- **Source**: GitHub Issue #3711
+- **Note**: Works on client-side navigation, fails on direct page load
 
 ---
 
@@ -143,4 +332,6 @@ export const Route = createFileRoute('/posts')({
 
 ---
 
-**Related Skills**: tanstack-query (data fetching), cloudflare-worker-base (API backend), tailwind-v4-shadcn (UI)
+**Related Skills**: tanstack-query (data fetching), react-hook-form-zod (form validation), cloudflare-worker-base (API backend), tailwind-v4-shadcn (UI)
+
+**Related Packages**: @tanstack/zod-adapter (search validation), @tanstack/virtual-file-routes (programmatic routes)
