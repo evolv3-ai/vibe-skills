@@ -1448,6 +1448,165 @@ await refetch()
 
 ---
 
+### Issue 14: apiKey Table Schema Mismatch with D1
+
+**Problem**: better-auth CLI (`npx @better-auth/cli generate`) fails with "Failed to initialize database adapter" when using D1.
+
+**Symptoms**: CLI cannot connect to D1 to introspect schema. Running migrations through CLI doesn't work.
+
+**Root Cause**: The CLI expects a direct SQLite connection, but D1 requires Cloudflare's binding API.
+
+**Solution**: Skip the CLI and create migrations manually using the documented apiKey schema:
+
+```sql
+CREATE TABLE api_key (
+  id TEXT PRIMARY KEY NOT NULL,
+  user_id TEXT NOT NULL REFERENCES user(id) ON DELETE CASCADE,
+  name TEXT,
+  start TEXT,
+  prefix TEXT,
+  key TEXT NOT NULL,
+  enabled INTEGER DEFAULT 1,
+  rate_limit_enabled INTEGER,
+  rate_limit_time_window INTEGER,
+  rate_limit_max INTEGER,
+  request_count INTEGER DEFAULT 0,
+  last_request INTEGER,
+  remaining INTEGER,
+  refill_interval INTEGER,
+  refill_amount INTEGER,
+  last_refill_at INTEGER,
+  expires_at INTEGER,
+  permissions TEXT,
+  metadata TEXT,
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL
+);
+```
+
+**Key Points**:
+- The table has exactly **21 columns** (as of better-auth v1.4+)
+- Column names use `snake_case` (e.g., `rate_limit_time_window`, not `rateLimitTimeWindow`)
+- D1 doesn't support `ALTER TABLE DROP COLUMN` - if schema drifts, use fresh migration pattern (drop and recreate tables)
+- In Drizzle adapter config, use `apikey` (lowercase) as the table name mapping
+
+**Fresh Migration Pattern for D1**:
+```sql
+-- Drop in reverse dependency order
+DROP TABLE IF EXISTS api_key;
+DROP TABLE IF EXISTS session;
+-- ... other tables
+
+-- Recreate with clean schema
+CREATE TABLE api_key (...);
+```
+
+**Source**: Production debugging with D1 + better-auth apiKey plugin
+
+---
+
+### Issue 15: Admin Plugin Requires DB Role (Dual-Auth)
+
+**Problem**: Admin plugin methods like `listUsers` fail with "You are not allowed to list users" even though your middleware passes.
+
+**Symptoms**: Custom `requireAdmin` middleware (checking ADMIN_EMAILS env var) passes, but `auth.api.listUsers()` returns 403.
+
+**Root Cause**: better-auth admin plugin has **two** authorization layers:
+1. **Your middleware** - Custom check (e.g., ADMIN_EMAILS)
+2. **better-auth internal** - Checks `user.role === 'admin'` in database
+
+Both must pass for admin plugin methods to work.
+
+**Solution**: Set user role to 'admin' in the database:
+
+```sql
+-- Fix for existing users
+UPDATE user SET role = 'admin' WHERE email = 'admin@example.com';
+```
+
+Or use the admin UI/API to set roles after initial setup.
+
+**Why**: The admin plugin's `listUsers`, `banUser`, `impersonateUser`, etc. all check `user.role` in the database, not your custom middleware logic.
+
+**Source**: Production debugging - misleading error message led to root cause discovery via `wrangler tail`
+
+---
+
+### Issue 16: Organization/Team updated_at Must Be Nullable
+
+**Problem**: Organization creation fails with SQL constraint error even though API returns "slug already exists".
+
+**Symptoms**:
+- Error message says "An organization with this slug already exists"
+- Database table is actually empty
+- `wrangler tail` shows: `Failed query: insert into "organization" ... values (?, ?, ?, null, null, ?, null)`
+
+**Root Cause**: better-auth inserts `null` for `updated_at` on creation (only sets it on updates). If your schema has `NOT NULL` constraint, insert fails.
+
+**Solution**: Make `updated_at` nullable in both schema and migrations:
+
+```typescript
+// Drizzle schema - CORRECT
+export const organization = sqliteTable('organization', {
+  // ...
+  updatedAt: integer('updated_at', { mode: 'timestamp' }), // No .notNull()
+});
+
+export const team = sqliteTable('team', {
+  // ...
+  updatedAt: integer('updated_at', { mode: 'timestamp' }), // No .notNull()
+});
+```
+
+```sql
+-- Migration - CORRECT
+CREATE TABLE organization (
+  -- ...
+  updated_at INTEGER  -- No NOT NULL
+);
+```
+
+**Applies to**: `organization` and `team` tables (possibly other plugin tables)
+
+**Source**: Production debugging - `wrangler tail` revealed actual SQL error behind misleading "slug exists" message
+
+---
+
+### Issue 17: API Response Double-Nesting (listMembers, etc.)
+
+**Problem**: Custom API endpoints return double-nested data like `{ members: { members: [...], total: N } }`.
+
+**Symptoms**: UI shows "undefined" for counts, empty lists despite data existing.
+
+**Root Cause**: better-auth methods like `listMembers` return `{ members: [...], total: N }`. Wrapping with `c.json({ members: result })` creates double nesting.
+
+**Solution**: Extract the array from better-auth response:
+
+```typescript
+// ❌ WRONG - Double nesting
+const result = await auth.api.listMembers({ ... });
+return c.json({ members: result });
+// Returns: { members: { members: [...], total: N } }
+
+// ✅ CORRECT - Extract array
+const result = await auth.api.listMembers({ ... });
+const members = result?.members || [];
+return c.json({ members });
+// Returns: { members: [...] }
+```
+
+**Affected methods** (return objects, not arrays):
+- `listMembers` → `{ members: [...], total: N }`
+- `listUsers` → `{ users: [...], total: N, limit: N }`
+- `listOrganizations` → `{ organizations: [...] }` (check structure)
+- `listInvitations` → `{ invitations: [...] }`
+
+**Pattern**: Always check better-auth method return types before wrapping in your API response.
+
+**Source**: Production debugging - UI showed "undefined" count, API inspection revealed nesting issue
+
+---
+
 ## Migration Guides
 
 ### From Clerk
