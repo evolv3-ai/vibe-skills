@@ -12,7 +12,7 @@ description: |
 **Status**: Production Ready ✅
 **Last Updated**: 2026-01-06
 **Dependencies**: None (framework-agnostic)
-**Latest Versions**: hono@4.11.3, zod@4.1.13, valibot@1.2.0, @hono/zod-validator@0.7.5, @hono/valibot-validator@0.6.0
+**Latest Versions**: hono@4.11.3, zod@4.3.5, valibot@1.2.0, @hono/zod-validator@0.7.6, @hono/valibot-validator@0.6.1
 
 ---
 
@@ -52,7 +52,7 @@ export default app
 ### 3. Add Request Validation
 
 ```bash
-npm install zod@4.1.13 @hono/zod-validator@0.7.5
+npm install zod@4.3.5 @hono/zod-validator@0.7.6
 ```
 
 ```typescript
@@ -448,7 +448,7 @@ app.get('/', (c) => {
 #### Validation with Zod
 
 ```bash
-npm install zod@4.1.13 @hono/zod-validator@0.7.5
+npm install zod@4.3.5 @hono/zod-validator@0.7.6
 ```
 
 ```typescript
@@ -558,7 +558,7 @@ app.post(
 #### Validation with Valibot
 
 ```bash
-npm install valibot@1.2.0 @hono/valibot-validator@0.6.0
+npm install valibot@1.2.0 @hono/valibot-validator@0.6.1
 ```
 
 ```typescript
@@ -1051,8 +1051,8 @@ app.get('/', (c) => {
 {
   "dependencies": {
     "hono": "^4.11.3",
-    "zod": "^4.1.13",
-    "@hono/zod-validator": "^0.7.5"
+    "zod": "^4.3.5",
+    "@hono/zod-validator": "^0.7.6"
   }
 }
 ```
@@ -1064,7 +1064,7 @@ app.get('/', (c) => {
   "dependencies": {
     "hono": "^4.11.3",
     "valibot": "^1.2.0",
-    "@hono/valibot-validator": "^0.6.0"
+    "@hono/valibot-validator": "^0.6.1"
   }
 }
 ```
@@ -1075,10 +1075,10 @@ app.get('/', (c) => {
 {
   "dependencies": {
     "hono": "^4.11.3",
-    "zod": "^4.1.13",
+    "zod": "^4.3.5",
     "valibot": "^1.2.0",
-    "@hono/zod-validator": "^0.7.5",
-    "@hono/valibot-validator": "^0.6.0",
+    "@hono/zod-validator": "^0.7.6",
+    "@hono/valibot-validator": "^0.6.1",
     "@hono/typia-validator": "^0.1.2",
     "@hono/arktype-validator": "^2.0.1"
   }
@@ -1159,10 +1159,10 @@ For deeper understanding, see:
     "hono": "^4.11.3"
   },
   "optionalDependencies": {
-    "zod": "^4.1.13",
+    "zod": "^4.3.5",
     "valibot": "^1.2.0",
-    "@hono/zod-validator": "^0.7.5",
-    "@hono/valibot-validator": "^0.6.0",
+    "@hono/zod-validator": "^0.7.6",
+    "@hono/valibot-validator": "^0.6.1",
     "@hono/typia-validator": "^0.1.2",
     "@hono/arktype-validator": "^2.0.1"
   },
