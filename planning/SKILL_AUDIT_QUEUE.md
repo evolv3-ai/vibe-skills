@@ -26,7 +26,7 @@ Core skills used in most projects - errors here have wide impact.
 | Skill | Last Audit | Has Rules | Status |
 |-------|------------|-----------|--------|
 | cloudflare-worker-base | 2026-01-06 | ✓ | ✅ |
-| tailwind-v4-shadcn | 2026-01-03 | ✓ | ⬜ |
+| tailwind-v4-shadcn | 2026-01-06 | ✓ | ✅ |
 | ai-sdk-core | 2026-01-03 | ✓ | ⬜ |
 | drizzle-orm-d1 | 2026-01-03 | ✓ | ⬜ |
 | hono-routing | 2026-01-06 | ✓ | ⬜ |
