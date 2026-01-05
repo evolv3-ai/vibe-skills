@@ -1898,7 +1898,7 @@ return c.json({ members });
 - `better-auth@1.4.10`
 - `drizzle-orm@0.45.1`
 - `drizzle-kit@0.31.8`
-- `kysely@0.28.8`
+- `kysely@0.28.9`
 - `kysely-d1@0.4.0`
 - `@cloudflare/workers-types@latest`
 - `hono@4.11.3`

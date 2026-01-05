@@ -31,7 +31,7 @@ Core skills used in most projects - errors here have wide impact.
 | drizzle-orm-d1 | 2026-01-06 | ✓ | ✅ |
 | hono-routing | 2026-01-06 | ✓ | ✅ |
 | clerk-auth | 2026-01-06 | ✓ | ✅ |
-| better-auth | 2026-01-03 | ✓ | ⬜ |
+| better-auth | 2026-01-06 | ✓ | ✅ |
 
 ### Tier 2: AI/ML Skills (High Churn)
 AI SDKs change frequently - prone to training cutoff issues.
