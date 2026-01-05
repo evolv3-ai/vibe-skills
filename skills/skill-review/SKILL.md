@@ -99,7 +99,7 @@ Invoke: `/review-skill <skill-name>` or use this skill when detecting outdated p
 
 **Scripts**: `scripts/review-skill.sh` (automated validation)
 
-**Commands**: `.claude/commands/review-skill.md` (slash command)
+**Commands**: `commands/review-skill.md` (slash command, symlinked to ~/.claude/commands/)
 
 ---
 

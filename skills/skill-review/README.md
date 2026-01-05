@@ -252,7 +252,7 @@ Claude recognizes these phrases and may suggest review:
 
 **Full Process Guide**: `planning/SKILL_REVIEW_PROCESS.md` (~3,500 words)
 
-**Slash Command**: `.claude/commands/review-skill.md`
+**Slash Command**: `commands/review-skill.md` (symlinked to ~/.claude/commands/)
 
 **Review Script**: `scripts/review-skill.sh`
 
