@@ -467,7 +467,7 @@ This skill prevents **12** documented issues:
 ```json
 {
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.70.1"
+    "@anthropic-ai/sdk": "^0.71.2"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",

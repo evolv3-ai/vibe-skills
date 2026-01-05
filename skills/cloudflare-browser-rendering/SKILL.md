@@ -726,7 +726,7 @@ Deep-dive documentation:
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20251014.0",
-    "wrangler": "^4.43.0"
+    "wrangler": "^4.54.0"
   }
 }
 ```

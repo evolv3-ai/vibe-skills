@@ -9,7 +9,7 @@ description: |
 # Zustand State Management
 
 **Last Updated**: 2025-11-28
-**Latest Version**: zustand@5.0.8 (current)
+**Latest Version**: zustand@5.0.9 (current)
 **Dependencies**: React 18+, TypeScript 5+
 
 ---
@@ -198,11 +198,11 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 
 // Verify versions
-// zustand@5.0.8 includes createJSONStorage
+// zustand@5.0.9 includes createJSONStorage
 // zustand@4.x uses different API
 
 // Check your package.json
-// "zustand": "^5.0.8"
+// "zustand": "^5.0.9"
 ```
 
 ### Issue #4: Infinite Render Loop

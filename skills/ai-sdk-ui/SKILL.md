@@ -413,7 +413,7 @@ See `references/streaming-patterns.md` for comprehensive best practices.
 ```json
 {
   "dependencies": {
-    "ai": "^6.0.6",
+    "ai": "^6.0.8",
     "@ai-sdk/react": "^3.0.6",
     "@ai-sdk/openai": "^3.0.2",
     "react": "^18.3.0",

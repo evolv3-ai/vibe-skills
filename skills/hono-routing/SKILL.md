@@ -1035,7 +1035,7 @@ app.get('/', (c) => {
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "hono": "^4.10.6"
+    "hono": "^4.11.3"
   },
   "devDependencies": {
     "typescript": "^5.9.0",
@@ -1050,7 +1050,7 @@ app.get('/', (c) => {
 ```json
 {
   "dependencies": {
-    "hono": "^4.10.6",
+    "hono": "^4.11.3",
     "zod": "^4.1.13",
     "@hono/zod-validator": "^0.7.5"
   }
@@ -1062,7 +1062,7 @@ app.get('/', (c) => {
 ```json
 {
   "dependencies": {
-    "hono": "^4.10.6",
+    "hono": "^4.11.3",
     "valibot": "^1.2.0",
     "@hono/valibot-validator": "^0.6.0"
   }
@@ -1074,7 +1074,7 @@ app.get('/', (c) => {
 ```json
 {
   "dependencies": {
-    "hono": "^4.10.6",
+    "hono": "^4.11.3",
     "zod": "^4.1.13",
     "valibot": "^1.2.0",
     "@hono/zod-validator": "^0.7.5",
@@ -1156,7 +1156,7 @@ For deeper understanding, see:
 ```json
 {
   "dependencies": {
-    "hono": "^4.10.6"
+    "hono": "^4.11.3"
   },
   "optionalDependencies": {
     "zod": "^4.1.13",

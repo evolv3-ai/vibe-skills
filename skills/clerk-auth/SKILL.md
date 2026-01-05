@@ -593,7 +593,7 @@ Add to `package.json`:
 ```json
 {
   "dependencies": {
-    "@clerk/nextjs": "^6.35.4",
+    "@clerk/nextjs": "^6.36.5",
     "@clerk/clerk-react": "^5.56.2",
     "@clerk/backend": "^2.23.2",
     "@clerk/testing": "^1.13.18"
