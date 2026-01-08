@@ -18,8 +18,8 @@ description: |
 # Google Gemini API - Complete Guide
 
 **Version**: Phase 2 Complete + Gemini 3 ✅
-**Package**: @google/genai@1.34.0 (⚠️ NOT @google/generative-ai)
-**Last Updated**: 2026-01-03 (v1.34.0 + Gemini 3 Flash)
+**Package**: @google/genai@1.35.0 (⚠️ NOT @google/generative-ai)
+**Last Updated**: 2026-01-09
 
 ---
 
