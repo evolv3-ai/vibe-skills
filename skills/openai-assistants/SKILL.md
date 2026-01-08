@@ -10,7 +10,7 @@ description: |
 
 **Status**: Production Ready (⚠️ Deprecated - Sunset August 26, 2026)
 **Package**: openai@6.15.0
-**Last Updated**: 2026-01-03
+**Last Updated**: 2026-01-09
 **v1 Deprecated**: December 18, 2024
 **v2 Sunset**: August 26, 2026 (migrate to Responses API)
 
@@ -280,6 +280,6 @@ See `references/migration-from-v1.md`
 
 ---
 
-**Last Updated**: 2025-11-27
-**Package**: openai@6.9.1
-**Status**: Production Ready (⚠️ Deprecated - Sunset H1 2026)
+**Last Updated**: 2026-01-09
+**Package**: openai@6.15.0
+**Status**: Production Ready (⚠️ Deprecated - Sunset August 26, 2026)
