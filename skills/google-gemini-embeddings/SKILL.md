@@ -747,8 +747,8 @@ const queryEmbedding = await ai.models.embedContent({
 **Token Savings**: ~60% compared to manual implementation
 **Errors Prevented**: 8 documented errors with solutions
 **Production Tested**: ✅ Verified in RAG applications
-**Package Version**: @google/genai@1.30.0
-**Last Updated**: 2025-11-26
+**Package Version**: @google/genai@1.35.0
+**Last Updated**: 2026-01-09
 
 ---
 
