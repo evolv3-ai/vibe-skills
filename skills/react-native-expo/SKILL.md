@@ -9,9 +9,9 @@ description: |
 # React Native Expo (0.76-0.82+ / SDK 52+)
 
 **Status**: Production Ready
-**Last Updated**: 2025-11-22
+**Last Updated**: 2026-01-09
 **Dependencies**: Node.js 18+, Expo CLI
-**Latest Versions**: react-native@0.82, expo@~52.0.0, react@19.1
+**Latest Versions**: react-native@0.83.1, expo@~54.0.31, react@19.1
 
 ---
 

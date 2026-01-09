@@ -99,7 +99,7 @@ npm install motion
 yarn add motion
 ```
 
-**Current Version**: 12.23.24 (verified 2025-11-09)
+**Current Version**: 12.24.12 (verified 2026-01-09)
 
 **Note for Cloudflare Workers**:
 ```bash
@@ -702,12 +702,12 @@ See `references/motion-vs-auto-animate.md` for detailed comparison.
 
 ---
 
-## Package Versions (Verified 2025-11-09)
+## Package Versions (Verified 2026-01-09)
 
 | Package | Version | Status |
 |---------|---------|--------|
-| motion | 12.23.24 | ✅ Latest stable |
-| framer-motion | 12.23.24 | ✅ Same version as motion |
+| motion | 12.24.12 | ✅ Latest stable |
+| framer-motion | 12.24.12 | ✅ Same version as motion |
 | react | 19.2.0 | ✅ Latest stable |
 | next | 16.0.1 | ✅ Latest stable |
 | vite | 7.2.2 | ✅ Latest stable |

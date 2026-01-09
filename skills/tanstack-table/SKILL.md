@@ -14,8 +14,8 @@ Headless data tables with server-side pagination, filtering, sorting, and virtua
 
 ## Quick Start
 
-**Last Updated**: 2026-01-06
-**Versions**: @tanstack/react-table@8.21.3, @tanstack/react-virtual@3.13.12
+**Last Updated**: 2026-01-09
+**Versions**: @tanstack/react-table@8.21.3, @tanstack/react-virtual@3.13.18
 
 ```bash
 npm install @tanstack/react-table@latest

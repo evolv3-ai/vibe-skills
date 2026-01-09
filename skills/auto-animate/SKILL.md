@@ -11,9 +11,9 @@ description: |
 
 # AutoAnimate - Error Prevention Guide
 
-**Package**: @formkit/auto-animate@0.9.0 (Sept 2025)
+**Package**: @formkit/auto-animate@0.9.0 (current)
 **Frameworks**: React, Vue, Solid, Svelte, Preact
-**Last Updated**: 2025-11-22
+**Last Updated**: 2026-01-09
 
 ---
 
