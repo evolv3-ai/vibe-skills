@@ -214,9 +214,8 @@ If `--diff` flag is present, first check if documentation has changed:
 ls skills/<skill-name>/SKILL.md
 
 # Run scraper (uses cached content if fresh)
-FIRECRAWL_API_KEY=fc-e9df4ba6d5184b3a876d2bba3ffcee06 \
-  /home/jez/Documents/claude-skills/.venv/bin/python \
-  scripts/deep-audit-scrape.py <skill-name>
+FIRECRAWL_API_KEY=fc-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx \
+  python scripts/deep-audit-scrape.py <skill-name>
 ```
 
 If scrape fails due to missing `doc_sources`, inform user they need to add metadata.
