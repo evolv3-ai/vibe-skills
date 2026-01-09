@@ -4,7 +4,7 @@ paths: "**/*.py", "**/*mcp*.py"
 
 # FastMCP Corrections
 
-This project uses **fastmcp>=2.13.1**.
+This project uses **fastmcp>=2.14.2** (PyPI - Python package).
 
 ## Module-Level Server Export Required
 

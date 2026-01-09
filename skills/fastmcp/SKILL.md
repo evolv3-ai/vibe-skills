@@ -677,7 +677,7 @@ FASTMCP_LOG_LEVEL=DEBUG fastmcp dev  # Debug logging
 
 **Official:** https://github.com/jlowin/fastmcp, https://fastmcp.cloud, https://modelcontextprotocol.io, Context7: `/jlowin/fastmcp`
 **Related Skills:** openai-api, claude-api, cloudflare-worker-base, typescript-mcp
-**Package Versions:** fastmcp>=3.26.8, Python>=3.10, httpx, pydantic, py-key-value-aio, cryptography
+**Package Versions:** fastmcp>=2.14.2 (PyPI), Python>=3.10, httpx, pydantic, py-key-value-aio, cryptography
 **Last Updated**: 2026-01-09
 
 **17 Key Takeaways:**

@@ -1,5 +1,5 @@
 # FastMCP Core
-fastmcp>=2.13.0
+fastmcp>=2.14.2
 
 # Storage Backends (for production persistence)
 py-key-value-aio>=0.1.0  # Memory, Disk, Redis, DynamoDB storage
