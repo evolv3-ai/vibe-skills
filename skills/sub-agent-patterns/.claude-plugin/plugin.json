@@ -1,0 +1,12 @@
+{
+  "name": "sub-agent-patterns",
+  "description": "Effective patterns for delegating tasks to parallel sub-agents in Claude Code. Covers when to delegate, prompt templates, batch sizing, output formats, and commit strategies. Use when: bulk operations across many items, parallel research, multi-file audits, or any repetitive task requiring judgment.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jeremy Dawes",
+    "email": "jeremy@jezweb.net"
+  },
+  "license": "MIT",
+  "repository": "https://github.com/jezweb/claude-skills",
+  "keywords": []
+}

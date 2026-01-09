@@ -1,6 +1,6 @@
 {
   "name": "firecrawl-scraper",
-  "description": "Complete knowledge domain for Firecrawl v2 API - web scraping and crawling that converts websites into LLM-ready markdown or structured data. Use when: scraping websites, crawling entire sites, extracting web content, converting HTML to markdown, building web scrapers, handling dynamic JavaScript content, bypassing anti-bot protection, extracting structured data from web pages, or when encountering content not loading, JavaScript rendering issues, or blocked by bot detection.",
+  "description": "Convert websites into LLM-ready markdown with Firecrawl v4 API. Handles JavaScript rendering, anti-bot bypass, and structured data extraction for RAG and AI applications. Use when: scraping websites, crawling sites, or troubleshooting content not loading, JavaScript rendering, or bot detection.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": ["firecrawl","firecrawl api","web scraping","web crawler","scrape website","crawl website","extract content","html to markdown","site crawler","content extraction","web automation","firecrawl-py","firecrawl-js","llm ready data","structured data extraction"]
+  "keywords": []
 }

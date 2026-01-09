@@ -1,6 +1,6 @@
 {
   "name": "tanstack-table",
-  "description": "Build headless data tables with TanStack Table v8. Provides server-side pagination, filtering, sorting, and virtualization patterns for Cloudflare Workers + D1 databases. Use when building tables with large datasets, coordinating with TanStack Query, or troubleshooting state management issues, pagination coordination errors, or performance bottlenecks. { accessorKey: name, header: Name }, { accessorKey: email, header: Email }, const data = useMemo(() => [...users], []) // Stable reference const ",
+  "description": "Build headless data tables with TanStack Table v8. Server-side pagination, filtering, sorting, and virtualization for Cloudflare Workers + D1. Use when building tables with large datasets, coordinating with TanStack Query, or fixing state management or performance issues.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",

@@ -1,6 +1,6 @@
 {
   "name": "zustand-state-management",
-  "description": "Build type-safe global state in React applications with Zustand. Supports TypeScript, persist middleware, devtools, slices pattern, and Next.js SSR. Use when setting up React state, migrating from Redux/Context API, implementing localStorage persistence, or troubleshooting Next.js hydration errors, TypeScript inference issues, or infinite render loops. bears: number increase: (by: number) => void bears: 0, increase: (by) => set((state) => ({ bears: state.bears + by })), count: 0, increment: () =",
+  "description": "Build type-safe global state in React with Zustand. Supports TypeScript, persist middleware, devtools, slices pattern, and Next.js SSR with hydration handling. Use when setting up React state, migrating from Redux/Context, or troubleshooting hydration errors, TypeScript inference, or infinite render loops.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",

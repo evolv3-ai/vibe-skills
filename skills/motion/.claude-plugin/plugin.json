@@ -1,6 +1,6 @@
 {
   "name": "motion",
-  "description": "Build sophisticated React animations with Motion (formerly Framer Motion) - declarative animations, gestures (drag, hover, tap), scroll effects, spring physics, layout animations, and SVG manipulation. Optimize bundle size with LazyMotion (4.6 KB) or useAnimate mini (2.3 KB). Use when: adding drag-and-drop interactions, creating scroll-triggered animations, implementing modal dialogs with transitions, building carousels with momentum, animating page/route transitions, creating parallax hero sect",
+  "description": "Build React animations with Motion (Framer Motion) - gestures (drag, hover, tap), scroll effects, spring physics, layout animations, SVG. Bundle: 2.3 KB (mini) to 34 KB (full). Use when: drag-and-drop, scroll animations, modals, carousels, parallax. Troubleshoot: AnimatePresence exit, list performance, Tailwind conflicts, Next.js use client.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",

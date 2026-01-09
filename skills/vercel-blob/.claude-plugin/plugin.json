@@ -1,6 +1,6 @@
 {
   "name": "vercel-blob",
-  "description": "Integrate Vercel Blob object storage for file uploads, image management, and CDN-delivered assets in Next.js applications. Supports client-side uploads with presigned URLs and multipart transfers. Use when implementing file uploads (images, PDFs, videos), managing user-generated content, or troubleshooting missing tokens, size limit errors, or client upload failures. const file = formData.get(file) as File; const blob = await put(file.name, file, { access: public }); return blob.url; return awai",
+  "description": "Integrate Vercel Blob for file uploads and CDN-delivered assets in Next.js. Supports client-side uploads with presigned URLs and multipart transfers for large files. Use when implementing file uploads (images, PDFs, videos) or troubleshooting missing tokens, size limits, or client upload failures.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",

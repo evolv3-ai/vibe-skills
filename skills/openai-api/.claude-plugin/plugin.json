@@ -1,6 +1,6 @@
 {
   "name": "openai-api",
-  "description": "Build with OpenAIs stateless APIs - Chat Completions (GPT-5.2, GPT-5.1, o3, o4-mini), Realtime API (voice), Batch API (50% savings), Embeddings, Images (DALL-E 3), Audio (Whisper + TTS), and Moderation. Node.js SDK and fetch for Cloudflare Workers. Use when: implementing chat with GPT-5.2/5.1/o3/o4-mini, Realtime voice API (WebSocket), Batch API for cost savings, xhigh reasoning (GPT-5.2), streaming responses, function calling/tools, structured outputs, embeddings for RAG, DALL-E 3 images, Whisp",
+  "description": "Build with OpenAI stateless APIs - Chat Completions (GPT-5.2, o3), Realtime voice, Batch API (50% savings), Embeddings, DALL-E 3, Whisper, and TTS. Use when: implementing GPT-5 chat, streaming, function calling, embeddings for RAG, or troubleshooting rate limits (429), API errors.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",

@@ -1,6 +1,6 @@
 {
   "name": "cloudflare-python-workers",
-  "description": "Build Python APIs on Cloudflare Workers using pywrangler CLI and WorkerEntrypoint class pattern. Includes Python Workflows for multi-step DAG automation with @step.do decorators. Use when: building Python serverless APIs, migrating Python code to edge, using Python ML libraries, or creating durable workflows. Prevents async errors, package compatibility issues, handler pattern mistakes. async def fetch(self, request): return Response(Hello from Python Worker!) name: my-python-worker, main: src/e",
+  "description": "Build Python APIs on Cloudflare Workers using pywrangler CLI and WorkerEntrypoint class pattern. Includes Python Workflows for multi-step DAG automation. Prevents 8 documented errors. Use when: building Python serverless APIs, migrating Python to edge, or troubleshooting async errors, package compatibility, handler pattern mistakes.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",

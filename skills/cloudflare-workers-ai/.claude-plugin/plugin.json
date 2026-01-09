@@ -1,6 +1,6 @@
 {
   "name": "cloudflare-workers-ai",
-  "description": "Run LLMs and AI models on Cloudflares global GPU network with Workers AI. Includes Llama 4, Gemma 3, Mistral 3.1, Flux image generation, BGE embeddings (2x faster, 2025), streaming support, and AI Gateway for cost tracking. Use when: implementing LLM inference, generating images, building RAG with embeddings, streaming AI responses, using AI Gateway, troubleshooting max_tokens defaults (breaking change 2025), BGE pooling parameter (not backwards compatible), or handling AI_ERROR, rate limits, mo",
+  "description": "Run LLMs and AI models on Cloudflares GPU network with Workers AI. Includes Llama 4, Gemma 3, Mistral 3.1, Flux images, BGE embeddings, streaming, and AI Gateway. Handles 2025 breaking changes. Use when: implementing LLM inference, images, RAG, or troubleshooting AI_ERROR, rate limits, max_tokens, BGE pooling.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,5 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": ["workers ai","cloudflare ai","ai bindings","llm workers","@cf/meta/llama-4-scout","@cf/google/gemma-3-12b-it","@cf/mistralai/mistral-small-3.1-24b-instruct","@cf/openai/gpt-oss-120b","workers ai models","ai inference","cloudflare llm","ai streaming","text generation ai","ai embeddings","bge pooling cls mean"]
+  "keywords": []
 }

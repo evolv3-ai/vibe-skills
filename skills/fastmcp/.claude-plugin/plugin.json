@@ -1,6 +1,6 @@
 {
   "name": "fastmcp",
-  "description": "Build MCP servers in Python with FastMCP framework to expose tools, resources, and prompts to LLMs. Supports storage backends (memory/disk/Redis), middleware, OAuth Proxy, OpenAPI integration, and FastMCP Cloud deployment. Use when: creating MCP servers, defining tools or resources, implementing OAuth authentication, configuring storage backends for tokens/cache, adding middleware for logging/rate limiting, deploying to FastMCP Cloud, or troubleshooting module-level server, storage, lifespan, mi",
+  "description": "Build MCP servers in Python with FastMCP to expose tools, resources, and prompts to LLMs. Supports storage backends, middleware, OAuth Proxy, OpenAPI integration, and FastMCP Cloud deployment. Prevents 25+ errors. Use when: creating MCP servers, or troubleshooting module-level server, storage, lifespan, middleware, or OAuth errors.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",

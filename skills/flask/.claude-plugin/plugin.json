@@ -1,6 +1,6 @@
 {
   "name": "flask",
-  "description": "Build Python web applications with Flask, using the application factory pattern, Blueprints, and Flask-SQLAlchemy. Covers project structure, authentication, and configuration management. Use when: creating Flask projects, organizing with blueprints, implementing authentication, or troubleshooting circular imports, application context errors, or blueprint registration. return {message: Hello, World!} app.run(debug=True) ├── conftest.py └── test_main.py Application factory function. ap",
+  "description": "Build Python web apps with Flask using application factory pattern, Blueprints, and Flask-SQLAlchemy. Covers project structure, authentication, and configuration management. Use when: creating Flask projects, organizing blueprints, or troubleshooting circular imports, context errors, or registration.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",

@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "description": "Build content-heavy sites with Git-backed TinaCMS. Provides visual editing and content management for blogs, documentation, and marketing sites with non-technical editors. Use when implementing Next.js, Vite+React, or Astro CMS setups, self-hosting on Cloudflare Workers, or troubleshooting ESbuild compilation errors, module resolution issues, or Docker binding problems.",
+  "description": "Build content-heavy sites with Git-backed TinaCMS. Provides visual editing for blogs, documentation, and marketing sites. Supports Next.js, Vite+React, and Astro with self-hosting options. Use when setting up CMS with non-technical editors or troubleshooting ESbuild compilation, module resolution, or Docker binding issues.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
