@@ -181,3 +181,123 @@ metadata:
 - **Completely different ecosystems!**
 
 This error passed all version checks because the npm version exists - but the skill is for Python!
+
+---
+
+## Execution Instructions
+
+When `/deep-audit <skill-name>` is invoked, execute the following steps:
+
+### Step 1: Validate and Scrape
+
+```bash
+# Check skill exists
+ls skills/<skill-name>/SKILL.md
+
+# Run scraper (uses cached content if fresh)
+FIRECRAWL_API_KEY=fc-e9df4ba6d5184b3a876d2bba3ffcee06 \
+  /home/jez/Documents/claude-skills/.venv/bin/python \
+  scripts/deep-audit-scrape.py <skill-name>
+```
+
+If scrape fails due to missing `doc_sources`, inform user they need to add metadata.
+
+### Step 2: Read Content
+
+Read these files into context:
+1. `skills/<skill-name>/SKILL.md` - The skill being audited
+2. `archive/audit-cache/<skill-name>/*.md` - All scraped doc files
+
+### Step 3: Launch 4 Parallel Comparison Agents
+
+Use the Task tool to launch 4 agents **in parallel** (single message, multiple Task calls):
+
+**Reference**: See `planning/deep-audit-agent-prompts.md` for full prompt templates.
+
+```
+Agent 1: API Coverage
+- Compare documented APIs in scraped docs vs skill coverage
+- Find missing features, deprecated methods
+
+Agent 2: Pattern Validation
+- Check code examples for outdated syntax
+- Find import changes, config changes
+
+Agent 3: Error/Issues
+- Verify error documentation is current
+- Check if fixed issues are still documented
+
+Agent 4: Ecosystem Validation
+- Verify correct package registry (npm/pypi/github)
+- Check install commands, version references
+```
+
+Each agent receives:
+- Scraped documentation content
+- Skill SKILL.md content
+- Skill metadata (ecosystem, package_name)
+
+### Step 4: Aggregate and Report
+
+After all 4 agents complete:
+
+1. **Calculate Overall Score**: Average of 4 agent scores (X/10)
+
+2. **Prioritize Findings**:
+   - CRITICAL: Wrong ecosystem, major API gaps
+   - HIGH: Deprecated patterns, missing features
+   - MEDIUM: Minor updates, new features not covered
+   - LOW: Style improvements, optional enhancements
+
+3. **Generate Report**: Write to `planning/CONTENT_AUDIT_<skill>.md`:
+
+```markdown
+# Content Audit: <skill-name>
+
+**Date**: YYYY-MM-DD
+**Overall Score**: X.X/10
+**Status**: [PASS | NEEDS_UPDATE | CRITICAL]
+
+## Summary
+
+| Category | Score | Status |
+|----------|-------|--------|
+| API Coverage | X/10 | ✅/⚠️/❌ |
+| Pattern Validation | X/10 | ✅/⚠️/❌ |
+| Error Documentation | X/10 | ✅/⚠️/❌ |
+| Ecosystem Accuracy | X/10 | ✅/⚠️/❌ |
+
+## Critical Issues
+[List any critical findings that need immediate attention]
+
+## Recommended Updates
+[Prioritized list of updates to make]
+
+## Agent Reports
+
+### API Coverage Agent
+[Full report from Agent 1]
+
+### Pattern Validation Agent
+[Full report from Agent 2]
+
+### Error/Issues Agent
+[Full report from Agent 3]
+
+### Ecosystem Agent
+[Full report from Agent 4]
+
+## Sources Audited
+- primary: [URL] ([X] chars)
+- api: [URL] ([X] chars)
+- changelog: [URL] ([X] chars)
+```
+
+4. **Inform User**: Display summary and path to full report.
+
+### Step 5: Offer Next Steps
+
+After report is generated, offer:
+1. Open report for review: `cat planning/CONTENT_AUDIT_<skill>.md`
+2. Start fixing issues (if any critical/high findings)
+3. Mark audit complete if score >= 8/10
