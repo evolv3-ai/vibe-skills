@@ -9,7 +9,7 @@ description: |
 # Skill Creator
 
 **Status**: Production Ready
-**Last Updated**: 2025-12-01
+**Last Updated**: 2026-01-09
 **Dependencies**: None
 **Reference**: [Anthropic's skill-creator](https://github.com/anthropics/skills/tree/main/skill-creator)
 
