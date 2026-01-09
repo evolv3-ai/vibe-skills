@@ -543,6 +543,77 @@ def my_sproc(session: Session, table_name: str) -> str:
     return f"Row count: {count}"
 ```
 
+## REST API (SQL API v2)
+
+The REST API is the foundation for programmatic Snowflake access from Cloudflare Workers.
+
+### Endpoint
+
+```
+https://{org-account}.snowflakecomputing.com/api/v2/statements
+```
+
+### Required Headers (CRITICAL)
+
+**ALL requests** must include these headers - missing `Accept` causes silent failures:
+
+```typescript
+const headers = {
+  'Authorization': `Bearer ${jwt}`,
+  'Content-Type': 'application/json',
+  'Accept': 'application/json',  // REQUIRED - "null" error if missing
+  'User-Agent': 'MyApp/1.0',
+};
+```
+
+### Async Query Handling
+
+Even simple queries return async (HTTP 202). Always implement polling:
+
+```typescript
+// Submit returns statementHandle, not results
+const submit = await fetch(url, { method: 'POST', headers, body });
+const { statementHandle } = await submit.json();
+
+// Poll until complete
+while (true) {
+  const status = await fetch(`${url}/${statementHandle}`, { headers });
+  if (status.status === 200) break;  // Complete
+  if (status.status === 202) {
+    await sleep(2000);  // Still running
+    continue;
+  }
+}
+```
+
+### Workers Subrequest Limits
+
+| Plan | Limit | Safe Polling |
+|------|-------|--------------|
+| Free | 50 | 45 attempts @ 2s = 90s max |
+| Paid | 1,000 | 100 attempts @ 500ms = 50s max |
+
+### Fetch Timeouts
+
+Workers `fetch()` has **no default timeout**. Always use AbortController:
+
+```typescript
+const response = await fetch(url, {
+  signal: AbortSignal.timeout(30000),  // 30 seconds
+  headers,
+});
+```
+
+### Cancel on Timeout
+
+Cancel queries when timeout occurs to avoid warehouse costs:
+
+```
+POST /api/v2/statements/{statementHandle}/cancel
+```
+
+See `templates/snowflake-rest-client.ts` for complete implementation.
+
 ## Known Issues
 
 ### 1. Account Identifier Confusion
@@ -585,9 +656,43 @@ def my_sproc(session: Session, table_name: str) -> str:
 
 **Fix**: Always grant REFERENCE_USAGE before `snow app run` when using external databases.
 
+### 6. REST API Missing Accept Header
+
+**Symptom**: "Unsupported Accept header null is specified" on polling requests.
+
+**Cause**: Initial request had `Accept: application/json` but polling request didn't.
+
+**Fix**: Use consistent headers helper function for ALL requests (submit, poll, cancel).
+
+### 7. Workers Fetch Hangs Forever
+
+**Symptom**: Worker hangs indefinitely waiting for Snowflake response.
+
+**Cause**: Cloudflare Workers' `fetch()` has no default timeout.
+
+**Fix**: Always use `AbortSignal.timeout(30000)` on all Snowflake requests.
+
+### 8. Too Many Subrequests
+
+**Symptom**: "Too many subrequests" error during polling.
+
+**Cause**: Polling every 1 second × 600 attempts = 600 subrequests exceeds limits.
+
+**Fix**: Poll every 2-5 seconds, limit to 45 (free) or 100 (paid) attempts.
+
+### 9. Warehouse Not Auto-Resuming (Perceived)
+
+**Symptom**: Queries return statementHandle but never complete (code 090001 indefinitely).
+
+**Cause**: `090001` means "running" not error. Warehouse IS resuming, just takes time.
+
+**Fix**: Auto-resume works. Wait longer or explicitly resume first: `POST /api/v2/warehouses/{wh}:resume`
+
 ## References
 
 - [Snowflake CLI Documentation](https://docs.snowflake.com/en/developer-guide/snowflake-cli/index)
+- [SQL REST API Reference](https://docs.snowflake.com/en/developer-guide/sql-api/reference)
+- [SQL API Authentication](https://docs.snowflake.com/en/developer-guide/sql-api/authenticating)
 - [Cortex AI Functions](https://docs.snowflake.com/en/user-guide/snowflake-cortex/llm-functions)
 - [Native Apps Framework](https://docs.snowflake.com/en/developer-guide/native-apps/native-apps-about)
 - [Snowpark Python](https://docs.snowflake.com/en/developer-guide/snowpark/python/index)

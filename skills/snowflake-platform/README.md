@@ -53,6 +53,15 @@ This skill activates when conversations include:
 - snowflake udf
 - snowflake stored procedure
 
+**REST API:**
+- snowflake rest api
+- snowflake sql api
+- /api/v2/statements
+- statementHandle
+- statementStatusUrl
+- snowflake polling
+- snowflake async query
+
 **Errors:**
 - jwt validation error snowflake
 - account identifier
@@ -60,15 +69,20 @@ This skill activates when conversations include:
 - external access integration
 - release directive
 - security review status
+- Unsupported Accept header null
+- Too many subrequests
+- 090001 snowflake
+- statementHandle timeout
 
 ## What This Skill Covers
 
 1. **Snow CLI** - Project management, SQL execution, app deployment
-2. **Cortex AI** - LLM functions in SQL (COMPLETE, SUMMARIZE, TRANSLATE, etc.)
-3. **Native Apps** - Development, versioning, marketplace publishing
-4. **Authentication** - JWT key-pair, account identifiers (critical gotcha)
-5. **Snowpark** - Python DataFrame API, UDFs, stored procedures
-6. **Marketplace** - Security review, Provider Studio, paid listings
+2. **REST API** - SQL API v2, async queries, polling, Cloudflare Workers integration
+3. **Cortex AI** - LLM functions in SQL (COMPLETE, SUMMARIZE, TRANSLATE, etc.)
+4. **Native Apps** - Development, versioning, marketplace publishing
+5. **Authentication** - JWT key-pair, account identifiers (critical gotcha)
+6. **Snowpark** - Python DataFrame API, UDFs, stored procedures
+7. **Marketplace** - Security review, Provider Studio, paid listings
 
 ## What This Skill Does NOT Cover
 
@@ -80,6 +94,9 @@ This skill activates when conversations include:
 ## Key Corrections
 
 - Account identifier confusion (org-account vs locator)
+- REST API missing Accept header on polling
+- Workers fetch timeout (use AbortSignal)
+- Subrequest limits during polling
 - External access integration reset after deploys
 - Release channel syntax (CLI vs legacy SQL)
 - Artifact nesting in snowflake.yml
