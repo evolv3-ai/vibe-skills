@@ -34,7 +34,7 @@ metadata:
 **Production-tested**: cloudflare-worker-base-test (https://cloudflare-worker-base-test.webfonts.workers.dev)
 **Last Updated**: 2026-01-03
 **Status**: Production Ready ✅
-**Latest Versions**: hono@4.11.3, @cloudflare/vite-plugin@1.17.1, vite@7.3.0, wrangler@4.54.0
+**Latest Versions**: hono@4.11.3, @cloudflare/vite-plugin@1.17.1, vite@7.3.1, wrangler@4.54.0
 
 **Recent Updates (2025-2026)**:
 - **Wrangler 4.55+**: Auto-config for frameworks (`wrangler deploy --x-autoconfig`)
@@ -57,7 +57,7 @@ npm create cloudflare@latest my-worker -- --type hello-world --ts --git --deploy
 # 2. Install dependencies
 cd my-worker
 npm install hono@4.11.3
-npm install -D @cloudflare/vite-plugin@1.17.1 vite@7.3.0
+npm install -D @cloudflare/vite-plugin@1.17.1 vite@7.3.1
 
 # 3. Create wrangler.jsonc
 {
@@ -273,7 +273,7 @@ const { valid, userId } = await env.AUTH.verifyToken(authHeader)
   "devDependencies": {
     "@cloudflare/vite-plugin": "^1.17.1",
     "@cloudflare/workers-types": "^4.20260103.0",
-    "vite": "^7.2.4",
+    "vite": "^7.3.1",
     "wrangler": "^4.54.0",
     "typescript": "^5.9.3"
   }

@@ -22,7 +22,7 @@ npm install ai @ai-sdk/openai @ai-sdk/anthropic @ai-sdk/google zod
 ## AI SDK 6 (Stable - January 2026)
 
 **Status:** Stable
-**Latest:** ai@6.0.9 (Jan 2026)
+**Latest:** ai@6.0.26 (Jan 2026)
 
 ### BREAKING: Output API Replaces generateObject/streamObject
 
@@ -1063,7 +1063,7 @@ try {
 ## Versions
 
 **AI SDK:**
-- Stable: ai@6.0.9 (Jan 2026)
+- Stable: ai@6.0.26 (Jan 2026)
 - Legacy v5: ai@5.0.117 (ai-v5 tag)
 - Zod 3.x/4.x both supported
 
@@ -1104,4 +1104,4 @@ npm view ai dist-tags
 
 **Last Updated:** 2026-01-06
 **Skill Version:** 2.0.1
-**AI SDK:** 6.0.9 stable
+**AI SDK:** 6.0.26 stable
