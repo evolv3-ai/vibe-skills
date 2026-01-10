@@ -69,6 +69,19 @@ grep -rn "TODO\|FIXME\|XXX" skills/[skill]/
 npm view [package] version
 ```
 
+## Research Fallbacks
+
+When verifying external links or fetching documentation for comparison:
+
+1. **WebFetch** - Try first (fastest)
+2. **Firecrawl** - Use `firecrawl-scraper` skill if WebFetch returns blocks or incomplete content
+3. **Browser Rendering** - Use `cloudflare-browser-rendering` skill for JavaScript-heavy pages
+
+**Decision tree:**
+- Simple doc page? → WebFetch
+- Returns block/incomplete? → Firecrawl with stealth mode
+- Needs JS interaction? → Browser Rendering
+
 ## Severity Levels
 
 | Level | Meaning | Action |

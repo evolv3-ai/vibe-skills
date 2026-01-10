@@ -34,6 +34,26 @@ Before writing content:
 - Identify common errors (GitHub issues, Stack Overflow)
 - Note breaking changes from recent releases
 
+**Research Fallbacks (when WebFetch isn't enough):**
+
+If WebFetch returns incomplete content, blocks, or JavaScript-rendered pages:
+
+1. **Firecrawl** (stealth mode, anti-bot bypass):
+   - Use `firecrawl-scraper` skill for sites that block scrapers
+   - Handles JavaScript rendering and CAPTCHA bypass
+   - Best for: Documentation behind bot protection, SPAs
+
+2. **Cloudflare Browser Rendering** (Puppeteer/Playwright):
+   - Use `cloudflare-browser-rendering` skill for full browser automation
+   - Can screenshot, execute JS, navigate complex flows
+   - Best for: Interactive docs, authenticated content
+
+**Decision tree:**
+- WebFetch works? → Use it (fastest)
+- Page needs JS? → Try Firecrawl first
+- Site blocks scrapers? → Firecrawl with stealth mode
+- Need to interact (click, scroll)? → Browser Rendering
+
 ### 3. SKILL.md Structure
 
 Required sections:

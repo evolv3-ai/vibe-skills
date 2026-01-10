@@ -36,9 +36,29 @@ If the prompt says "deep", "thorough", or "comprehensive", do a deep audit with 
 6. **Apply fixes** - Update skill with missing information
 7. **Report** - Full audit report with gaps and fixes
 
+## Research Fallbacks
+
+When WebFetch returns incomplete content, blocks, or JavaScript-rendered pages:
+
+1. **Firecrawl** (stealth mode, anti-bot bypass):
+   - Use `firecrawl-scraper` skill for sites that block scrapers
+   - Handles JavaScript rendering and CAPTCHA bypass
+   - Best for: Documentation behind bot protection, SPAs
+
+2. **Cloudflare Browser Rendering** (Puppeteer/Playwright):
+   - Use `cloudflare-browser-rendering` skill for full browser automation
+   - Can screenshot, execute JS, navigate complex flows
+   - Best for: Interactive docs, authenticated content
+
+**Decision tree:**
+- WebFetch works? → Use it (fastest)
+- Page needs JS? → Try Firecrawl first
+- Site blocks scrapers? → Firecrawl with stealth mode
+- Need to interact (click, scroll)? → Browser Rendering
+
 ## Official Documentation Sources
 
-**ALWAYS use WebFetch to verify against official docs for deep audits:**
+**Start with WebFetch, escalate to Firecrawl/Browser Rendering if needed:**
 
 | Technology | Documentation URL |
 |------------|-------------------|
