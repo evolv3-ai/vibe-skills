@@ -116,12 +116,37 @@ npm run deploy
 
 ---
 
+## Included Agent
+
+This skill includes a **cloudflare-deploy** agent for automated deployments.
+
+**What it does:**
+1. Pre-flight checks (uncommitted changes)
+2. Build verification
+3. Type checking (if TypeScript)
+4. Wrangler deploy
+5. Deployment verification
+6. Status report
+
+**To install the agent:**
+```bash
+cp ~/.claude/skills/cloudflare-worker-base/agents/cloudflare-deploy.md ~/.claude/agents/
+```
+
+**To use:**
+- Say "deploy to cloudflare" or "deploy this worker"
+- Or explicitly: "use the cloudflare-deploy agent"
+
+---
+
 ## File Structure
 
 ```
 cloudflare-worker-base/
 ├── SKILL.md                    # Full instructions (read this first)
 ├── README.md                   # This file
+├── agents/                     # Companion agents
+│   └── cloudflare-deploy.md    # Deployment workflow agent
 ├── templates/                  # Copy-ready files
 │   ├── wrangler.jsonc          # Worker configuration
 │   ├── vite.config.ts          # Vite + plugin setup
