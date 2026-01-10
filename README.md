@@ -56,6 +56,26 @@ You: "Yes"
 
 ---
 
+## Request a Skill
+
+**Want a skill we don't have?** [Open an issue](https://github.com/jezweb/claude-skills/issues/new?template=skill_request.md&title=Skill+Request:+) with the technology/framework and we'll build it.
+
+Popular requests get prioritized. No need to build it yourself unless you want to.
+
+---
+
+## Your Own Skills Repo
+
+Want your own skills ecosystem with your own authorship? **Fork this repo** or use it as a template:
+
+1. Fork → customize skills with your preferences
+2. Use our agents (`skill-auditor`, `version-checker`) to maintain currency
+3. Pull upstream updates when useful
+
+This works well if you maintain skills across multiple machines or want to publish your own collection.
+
+---
+
 ## Creating Skills
 
 **Quick start**:
