@@ -16,6 +16,47 @@ Sub-agents are specialized AI assistants that Claude Code can delegate tasks to.
 
 ---
 
+## Why Use Sub-Agents: Context Hygiene
+
+The primary value of sub-agents isn't specialization—it's **keeping your main context clean**.
+
+**Without agent** (context bloat):
+```
+Main context accumulates:
+├─ git status output (50 lines)
+├─ npm run build output (200 lines)
+├─ tsc --noEmit output (100 lines)
+├─ wrangler deploy output (100 lines)
+├─ curl health check responses
+├─ All reasoning about what to do next
+└─ Context: 📈 500+ lines consumed
+```
+
+**With agent** (context hygiene):
+```
+Main context:
+├─ "Deploy to cloudflare"
+├─ [agent summary - 30 lines]
+└─ Context: 📊 ~50 lines consumed
+
+Agent context (isolated):
+├─ All verbose tool outputs
+├─ All intermediate reasoning
+└─ Discarded after returning summary
+```
+
+**The math**: A deploy workflow runs ~10 tool calls. That's 500+ lines in main context vs 30-line summary with an agent. Over a session, this compounds dramatically.
+
+**When this matters most**:
+- Repeatable workflows (deploy, migrate, audit, review)
+- Verbose tool outputs (build logs, test results, API responses)
+- Multi-step operations where only the final result matters
+- Long sessions where context pressure builds up
+
+**Key insight**: Use agents for **workflows you repeat**, not just for specialization. The context savings compound over time.
+
+---
+
 ## Built-in Sub-Agents
 
 Claude Code includes three built-in sub-agents available out of the box:
