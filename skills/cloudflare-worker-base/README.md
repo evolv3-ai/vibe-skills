@@ -116,26 +116,23 @@ npm run deploy
 
 ---
 
-## Included Agent
+## Included Agents
 
-This skill includes a **cloudflare-deploy** agent for automated deployments.
+This skill includes **4 companion agents** for common workflows:
 
-**What it does:**
-1. Pre-flight checks (uncommitted changes)
-2. Build verification
-3. Type checking (if TypeScript)
-4. Wrangler deploy
-5. Deployment verification
-6. Status report
+| Agent | Purpose | Trigger Phrases |
+|-------|---------|-----------------|
+| **cloudflare-deploy** | Build → deploy → verify | "deploy to cloudflare", "deploy this worker" |
+| **d1-migration** | Local → test → remote migrations | "run migrations", "update d1 schema" |
+| **cloudflare-debug** | Diagnose worker issues | "debug this worker", "why is it failing" |
+| **worker-scaffold** | Create new projects | "create a new worker", "scaffold cloudflare project" |
 
-**To install the agent:**
+**To install all agents:**
 ```bash
-cp ~/.claude/skills/cloudflare-worker-base/agents/cloudflare-deploy.md ~/.claude/agents/
+cp ~/.claude/skills/cloudflare-worker-base/agents/*.md ~/.claude/agents/
 ```
 
-**To use:**
-- Say "deploy to cloudflare" or "deploy this worker"
-- Or explicitly: "use the cloudflare-deploy agent"
+**Why use agents?** Context hygiene. Each agent runs in isolated context—verbose build logs, migration outputs, and debug traces don't bloat your main conversation. You get a clean summary instead of 500+ lines of tool output.
 
 ---
 
@@ -146,7 +143,10 @@ cloudflare-worker-base/
 ├── SKILL.md                    # Full instructions (read this first)
 ├── README.md                   # This file
 ├── agents/                     # Companion agents
-│   └── cloudflare-deploy.md    # Deployment workflow agent
+│   ├── cloudflare-deploy.md    # Build → deploy → verify
+│   ├── d1-migration.md         # Local → test → remote migrations
+│   ├── cloudflare-debug.md     # Diagnose worker issues
+│   └── worker-scaffold.md      # Create new projects
 ├── templates/                  # Copy-ready files
 │   ├── wrangler.jsonc          # Worker configuration
 │   ├── vite.config.ts          # Vite + plugin setup
