@@ -10,8 +10,11 @@ description: |
 
 **Status**: Production Ready ✅
 **Last Updated**: 2026-01-10
-**Dependencies**: Node.js 18+ or Python 3.8+
+**Dependencies**: Node.js 20+ (Node.js 18 deprecated) or Python 3.9+
 **Latest Versions**: playwright@1.57.0, playwright-stealth@0.0.1, puppeteer-extra-plugin-stealth@2.11.2
+**Browser Versions**: Chromium 143.0.7499.4 | Firefox 144.0.2 | WebKit 26.0
+
+> **⚠️ v1.57 Breaking Change**: Playwright now uses [Chrome for Testing](https://developer.chrome.com/blog/chrome-for-testing/) builds instead of Chromium. This provides more authentic browser behavior but changes the browser icon and title bar.
 
 ---
 
@@ -88,6 +91,19 @@ python scrape.py
 ---
 
 ## The 7-Step Stealth Setup Process
+
+> **⚠️ 2025 Reality Check**: Stealth plugins work well against basic anti-bot measures, but advanced detection systems (Cloudflare Bot Management, PerimeterX, DataDome) have evolved significantly. The detection landscape now includes:
+> - Behavioral analysis (mouse patterns, scroll timing, keystroke dynamics)
+> - TLS fingerprinting (JA3/JA4 signatures)
+> - Canvas and WebGL fingerprinting
+> - HTTP/2 fingerprinting
+>
+> **Recommendations**:
+> - Stealth plugins are a good starting point, not a complete solution
+> - Combine with realistic user behavior simulation (use `steps` option)
+> - Consider residential proxies for heavily protected sites
+> - "What works today may not work tomorrow" - test regularly
+> - For advanced scenarios, research alternatives like `nodriver` or `undetected-chromedriver`
 
 ### Step 1: Install Stealth Plugin (Node.js)
 
@@ -257,6 +273,100 @@ await page.screenshot({ path: 'stealth-test.png', fullPage: true });
 ❌ Ignore navigation errors (catch and retry with backoff)
 ❌ Run headless without testing headed mode first (visual debugging catches issues)
 ❌ Store credentials in code (use environment variables)
+
+---
+
+## Debug Methods (v1.56+)
+
+Playwright v1.56 introduced new methods for capturing debug information without setting up event listeners:
+
+### Console Messages
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('capture console output', async ({ page }) => {
+  await page.goto('https://example.com');
+
+  // Get all recent console messages
+  const messages = page.consoleMessages();
+
+  // Filter by type
+  const errors = messages.filter(m => m.type() === 'error');
+  const logs = messages.filter(m => m.type() === 'log');
+
+  console.log('Console errors:', errors.map(m => m.text()));
+});
+```
+
+### Page Errors
+
+```typescript
+test('check for JavaScript errors', async ({ page }) => {
+  await page.goto('https://example.com');
+
+  // Get all page errors (uncaught exceptions)
+  const errors = page.pageErrors();
+
+  // Fail test if any errors occurred
+  expect(errors).toHaveLength(0);
+});
+```
+
+### Network Requests
+
+```typescript
+test('inspect API calls', async ({ page }) => {
+  await page.goto('https://example.com');
+
+  // Get all recent network requests
+  const requests = page.requests();
+
+  // Filter for API calls
+  const apiCalls = requests.filter(r => r.url().includes('/api/'));
+  console.log('API calls made:', apiCalls.length);
+
+  // Check for failed requests
+  const failed = requests.filter(r => r.failure());
+  expect(failed).toHaveLength(0);
+});
+```
+
+**When to use**: Debugging test failures, verifying no console errors, auditing network activity.
+
+---
+
+## Advanced Mouse Control (v1.57+)
+
+The `steps` option provides fine-grained control over mouse movement, useful for:
+- Appearing more human-like to anti-bot detection
+- Testing drag-and-drop with smooth animations
+- Debugging visual interactions
+
+### Click with Steps
+
+```typescript
+// Move to element in 10 intermediate steps (smoother, more human-like)
+await page.locator('button.submit').click({ steps: 10 });
+
+// Fast click (fewer steps)
+await page.locator('button.cancel').click({ steps: 2 });
+```
+
+### Drag with Steps
+
+```typescript
+const source = page.locator('#draggable');
+const target = page.locator('#dropzone');
+
+// Smooth drag animation (20 steps)
+await source.dragTo(target, { steps: 20 });
+
+// Quick drag (5 steps)
+await source.dragTo(target, { steps: 5 });
+```
+
+**Anti-detection benefit**: Many bot detection systems look for instantaneous mouse movements. Using `steps: 10` or higher simulates realistic human mouse behavior.
 
 ---
 
@@ -694,6 +804,94 @@ chmod +x ~/.claude/skills/playwright-local/scripts/install-browsers.sh
 
 ## Advanced Topics
 
+### Playwright MCP Server (v1.56+)
+
+Microsoft provides an official [Playwright MCP Server](https://github.com/microsoft/playwright-mcp) for AI agent integration:
+
+```bash
+# Initialize AI agent configurations
+npx playwright init-agents
+```
+
+This generates configuration files for:
+- **VS Code** - Copilot integration
+- **Claude Desktop** - Claude MCP client
+- **opencode** - Open-source AI coding tools
+
+**Key Features**:
+- Uses accessibility tree instead of screenshots (faster, more reliable)
+- LLM-friendly structured data format
+- Integrated with GitHub Copilot's Coding Agent
+- Model Context Protocol (MCP) compliant
+
+**MCP Server Setup**:
+```bash
+# Install globally
+npm install -g @anthropic/mcp-playwright
+
+# Or add to Claude Desktop config
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@anthropic/mcp-playwright"]
+    }
+  }
+}
+```
+
+**When to use**: Building AI agents that need browser automation, integrating Playwright with Claude or other LLMs.
+
+---
+
+### Docker Deployment
+
+Official Docker images provide consistent, reproducible environments:
+
+**Current Image** (v1.57.0):
+```dockerfile
+FROM mcr.microsoft.com/playwright:v1.57.0-noble
+
+# Create non-root user for security
+RUN groupadd -r pwuser && useradd -r -g pwuser pwuser
+USER pwuser
+
+WORKDIR /app
+COPY --chown=pwuser:pwuser . .
+
+RUN npm ci
+
+CMD ["npx", "playwright", "test"]
+```
+
+**Available Tags**:
+- `:v1.57.0-noble` - Ubuntu 24.04 LTS (recommended)
+- `:v1.57.0-jammy` - Ubuntu 22.04 LTS
+
+**Run with Recommended Flags**:
+```bash
+docker run -it --init --ipc=host my-playwright-tests
+```
+
+| Flag | Purpose |
+|------|---------|
+| `--init` | Prevents zombie processes (handles PID=1) |
+| `--ipc=host` | Prevents Chromium memory exhaustion |
+| `--cap-add=SYS_ADMIN` | Only for local dev (enables sandbox) |
+
+**Python Image**:
+```dockerfile
+FROM mcr.microsoft.com/playwright/python:v1.57.0-noble
+```
+
+**Security Notes**:
+- Always create a non-root user inside the container
+- Root user disables Chromium sandbox (security risk)
+- Use seccomp profile for untrusted websites
+- Pin to specific version tags (avoid `:latest`)
+
+---
+
 ### Running Playwright in Claude Code via Bash Tool
 
 Claude Code can orchestrate browser automation:
@@ -893,7 +1091,7 @@ args: [
 
 **Required**:
 - **playwright@1.57.0** - Core browser automation library
-- **Node.js 18+** or **Python 3.8+** - Runtime
+- **Node.js 20+** (Node.js 18 deprecated) or **Python 3.9+** - Runtime
 
 **Optional (Node.js stealth)**:
 - **playwright-extra@4.3.6** - Plugin system for Playwright
@@ -901,6 +1099,10 @@ args: [
 
 **Optional (Python stealth)**:
 - **playwright-stealth@0.0.1** - Python stealth library
+
+**Docker Images**:
+- `mcr.microsoft.com/playwright:v1.57.0-noble` - Ubuntu 24.04, Node.js 22 LTS
+- `mcr.microsoft.com/playwright/python:v1.57.0-noble` - Python variant
 
 ---
 

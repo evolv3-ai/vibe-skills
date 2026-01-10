@@ -84,6 +84,20 @@ Claude Code automatically discovers this skill when you mention:
 - stealth plugins
 - anti-detection tools
 
+### New Features (v1.56-1.57)
+- playwright mcp server
+- playwright init-agents
+- consoleMessages
+- pageErrors
+- page.requests
+- chrome for testing
+- mouse steps
+- drag steps
+- playwright docker
+- playwright container
+- nodriver
+- undetected-chromedriver
+
 ---
 
 ## What This Skill Does
@@ -101,6 +115,10 @@ Provides comprehensive knowledge for building browser automation and web scrapin
 ✅ User agent rotation and fingerprint masking
 ✅ Retry patterns with exponential backoff
 ✅ Integration with Claude Code via Bash tool
+✅ **NEW**: Debug methods (consoleMessages, pageErrors, requests)
+✅ **NEW**: Advanced mouse control with `steps` option
+✅ **NEW**: Playwright MCP Server for AI agent integration
+✅ **NEW**: Docker deployment with official images
 
 ---
 
@@ -184,7 +202,7 @@ npx tsx scrape.ts
 
 ## Dependencies
 
-**Prerequisites**: Node.js 18+ or Python 3.8+
+**Prerequisites**: Node.js 20+ (Node.js 18 deprecated) or Python 3.9+
 
 **Integrates With**:
 - `cloudflare-browser-rendering` (serverless alternative)
