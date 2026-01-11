@@ -2,26 +2,46 @@
 
 This directory contains **orphan commands** - specialized commands for managing the claude-skills repository itself. These are niche tools not needed by most users.
 
-## ⚠️ Command Reorganization (2026-01-11)
+## ⚠️ Command Discovery: Plugin vs Symlinks (2026-01-11)
 
-Most slash commands have been moved into their appropriate skills:
+**Important Discovery**: Claude Code discovers slash commands from `~/.claude/commands/` directory, NOT from plugin bundles. Plugin bundles provide skills/agents/rules, but commands need symlinks.
 
-| Command | Now In | Installation |
-|---------|--------|--------------|
-| `/explore-idea` | `project-workflow` | `/plugin install project-workflow@claude-skills` |
-| `/plan-project` | `project-workflow` | `/plugin install project-workflow@claude-skills` |
-| `/plan-feature` | `project-workflow` | `/plugin install project-workflow@claude-skills` |
-| `/wrap-session` | `project-workflow` | `/plugin install project-workflow@claude-skills` |
-| `/continue-session` | `project-workflow` | `/plugin install project-workflow@claude-skills` |
-| `/workflow` | `project-workflow` | `/plugin install project-workflow@claude-skills` |
-| `/release` | `project-workflow` | `/plugin install project-workflow@claude-skills` |
-| `/brief` | `project-workflow` | `/plugin install project-workflow@claude-skills` |
-| `/reflect` | `project-workflow` | `/plugin install project-workflow@claude-skills` |
-| `/deploy` | `cloudflare-worker-base` | `/plugin install cloudflare-worker-base@claude-skills` |
-| `/docs` | `docs-workflow` | `/plugin install docs-workflow@claude-skills` |
-| `/docs-init` | `docs-workflow` | `/plugin install docs-workflow@claude-skills` |
-| `/docs-update` | `docs-workflow` | `/plugin install docs-workflow@claude-skills` |
-| `/docs-claude` | `docs-workflow` | `/plugin install docs-workflow@claude-skills` |
+Most slash commands have been moved into their appropriate skills for organization, but still need symlinks:
+
+| Command | Skill Location | Symlink Required |
+|---------|----------------|------------------|
+| `/explore-idea` | `project-workflow/commands/` | Yes |
+| `/plan-project` | `project-workflow/commands/` | Yes |
+| `/plan-feature` | `project-workflow/commands/` | Yes |
+| `/wrap-session` | `project-workflow/commands/` | Yes |
+| `/continue-session` | `project-workflow/commands/` | Yes |
+| `/workflow` | `project-workflow/commands/` | Yes |
+| `/release` | `project-workflow/commands/` | Yes |
+| `/brief` | `project-workflow/commands/` | Yes |
+| `/reflect` | `project-workflow/commands/` | Yes |
+| `/deploy` | `cloudflare-worker-base/commands/` | Yes |
+| `/docs` | `docs-workflow/commands/` | Yes |
+| `/docs-init` | `docs-workflow/commands/` | Yes |
+| `/docs-update` | `docs-workflow/commands/` | Yes |
+| `/docs-claude` | `docs-workflow/commands/` | Yes |
+
+### Creating Symlinks
+
+```bash
+# docs-workflow commands
+ln -sf /path/to/claude-skills/skills/docs-workflow/commands/docs.md ~/.claude/commands/
+ln -sf /path/to/claude-skills/skills/docs-workflow/commands/docs-init.md ~/.claude/commands/
+ln -sf /path/to/claude-skills/skills/docs-workflow/commands/docs-update.md ~/.claude/commands/
+ln -sf /path/to/claude-skills/skills/docs-workflow/commands/docs-claude.md ~/.claude/commands/
+
+# project-workflow commands
+ln -sf /path/to/claude-skills/skills/project-workflow/commands/brief.md ~/.claude/commands/
+ln -sf /path/to/claude-skills/skills/project-workflow/commands/reflect.md ~/.claude/commands/
+# ... etc for other commands
+
+# cloudflare-worker-base commands
+ln -sf /path/to/claude-skills/skills/cloudflare-worker-base/commands/deploy.md ~/.claude/commands/
+```
 
 ## Orphan Commands (This Directory)
 
@@ -114,13 +134,29 @@ cp commands/deep-audit.md ~/.claude/commands/
 | `docs-workflow` | Documentation lifecycle | 4 commands (docs, docs-init, docs-update, docs-claude) |
 | `cloudflare-worker-base` | Cloudflare Workers setup | 1 command (deploy) |
 
-Install skills via marketplace:
+### Setup for Full Command Access
+
+Skills provide context (templates, rules, agents), but commands need symlinks:
 
 ```bash
-/plugin marketplace add https://github.com/jezweb/claude-skills
-/plugin install project-workflow@claude-skills
-/plugin install docs-workflow@claude-skills
-/plugin install cloudflare-worker-base@claude-skills
+# 1. Clone the repo (if not already)
+git clone https://github.com/jezweb/claude-skills ~/Documents/claude-skills
+
+# 2. Create symlinks for all skill commands
+cd ~/.claude/commands
+
+# docs-workflow
+for cmd in docs docs-init docs-update docs-claude; do
+  ln -sf ~/Documents/claude-skills/skills/docs-workflow/commands/${cmd}.md .
+done
+
+# project-workflow
+for cmd in brief reflect workflow explore-idea plan-project plan-feature wrap-session continue-session release; do
+  ln -sf ~/Documents/claude-skills/skills/project-workflow/commands/${cmd}.md .
+done
+
+# cloudflare-worker-base
+ln -sf ~/Documents/claude-skills/skills/cloudflare-worker-base/commands/deploy.md .
 ```
 
 ---
