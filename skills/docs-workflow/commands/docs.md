@@ -4,13 +4,12 @@ Main entry point for documentation management. Shows available subcommands and q
 
 ## Command Usage
 
-`/docs [action]`
+`/docs`
 
-**Actions:**
-- (no action) - Show available commands and project status
-- `init` - Create documentation for new project
-- `update` - Audit and maintain all documentation
-- `claude` - Smart CLAUDE.md maintenance
+**Related Commands:**
+- `/docs-init` - Create documentation for new project
+- `/docs-update` - Audit and maintain all documentation
+- `/docs-claude` - Smart CLAUDE.md maintenance
 
 ## Process
 
@@ -35,23 +34,19 @@ Based on what exists, show relevant options:
 
 | File | Status |
 |------|--------|
-| CLAUDE.md | ✅ Exists (Last updated: 2025-12-01) |
-| README.md | ✅ Exists |
-| docs/ | ❌ Missing |
-| SESSION.md | ✅ Exists |
+| CLAUDE.md | Exists (Last updated: 2025-12-01) |
+| README.md | Exists |
+| docs/ | Missing |
+| SESSION.md | Exists |
 
 ## Available Commands
 
-1. `/docs/init` - Create missing documentation (will scaffold docs/)
-2. `/docs/update` - Audit all docs for staleness and issues
-3. `/docs/claude` - Check and update CLAUDE.md
+1. `/docs-init` - Create missing documentation (will scaffold docs/)
+2. `/docs-update` - Audit all docs for staleness and issues
+3. `/docs-claude` - Check and update CLAUDE.md
 
 What would you like to do?
 ```
-
-### 3. Handle Inline Action
-
-If an action was provided (e.g., `/docs update`), redirect to that command.
 
 ## Quick Actions
 
@@ -64,13 +59,13 @@ If user just wants a quick status without running full commands:
 **README.md**: 124 lines, matches package.json name
 **docs/**: 4 files (ARCHITECTURE.md, API.md, DATABASE.md, TESTING.md)
 
-No obvious issues detected. Run `/docs/update` for full audit.
+No obvious issues detected. Run `/docs-update` for full audit.
 ```
 
 ## Integration
 
-This command is the entry point. For detailed work, use the specific subcommands:
+This command is the entry point. For detailed work, use the specific commands:
 
-- `/docs/init` - Full initialization workflow
-- `/docs/update` - Full audit workflow
-- `/docs/claude` - CLAUDE.md-specific maintenance
+- `/docs-init` - Full initialization workflow
+- `/docs-update` - Full audit workflow
+- `/docs-claude` - CLAUDE.md-specific maintenance

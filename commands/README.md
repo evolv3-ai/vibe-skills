@@ -19,9 +19,9 @@ Most slash commands have been moved into their appropriate skills:
 | `/reflect` | `project-workflow` | `/plugin install project-workflow@claude-skills` |
 | `/deploy` | `cloudflare-worker-base` | `/plugin install cloudflare-worker-base@claude-skills` |
 | `/docs` | `docs-workflow` | `/plugin install docs-workflow@claude-skills` |
-| `/docs/init` | `docs-workflow` | `/plugin install docs-workflow@claude-skills` |
-| `/docs/update` | `docs-workflow` | `/plugin install docs-workflow@claude-skills` |
-| `/docs/claude` | `docs-workflow` | `/plugin install docs-workflow@claude-skills` |
+| `/docs-init` | `docs-workflow` | `/plugin install docs-workflow@claude-skills` |
+| `/docs-update` | `docs-workflow` | `/plugin install docs-workflow@claude-skills` |
+| `/docs-claude` | `docs-workflow` | `/plugin install docs-workflow@claude-skills` |
 
 ## Orphan Commands (This Directory)
 
@@ -111,7 +111,7 @@ cp commands/deep-audit.md ~/.claude/commands/
 | Skill | Description | Commands Included |
 |-------|-------------|-------------------|
 | `project-workflow` | Project lifecycle management | 9 commands (explore-idea, plan-project, etc.) |
-| `docs-workflow` | Documentation lifecycle | 4 commands (docs, init, update, claude) |
+| `docs-workflow` | Documentation lifecycle | 4 commands (docs, docs-init, docs-update, docs-claude) |
 | `cloudflare-worker-base` | Cloudflare Workers setup | 1 command (deploy) |
 
 Install skills via marketplace:

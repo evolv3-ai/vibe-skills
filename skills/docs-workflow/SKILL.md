@@ -26,9 +26,9 @@ This skill helps you:
 | Command | Purpose |
 |---------|---------|
 | `/docs` | Main entry - shows available subcommands |
-| `/docs/init` | Create CLAUDE.md + README.md + docs/ structure |
-| `/docs/update` | Audit and maintain all documentation |
-| `/docs/claude` | Smart CLAUDE.md maintenance only |
+| `/docs-init` | Create CLAUDE.md + README.md + docs/ structure |
+| `/docs-update` | Audit and maintain all documentation |
+| `/docs-claude` | Smart CLAUDE.md maintenance only |
 
 ## Quick Start
 
@@ -36,7 +36,7 @@ This skill helps you:
 
 ```bash
 # In a new project directory
-/docs/init
+/docs-init
 ```
 
 This will:
@@ -49,10 +49,10 @@ This will:
 
 ```bash
 # Audit all documentation
-/docs/update
+/docs-update
 
 # Or just maintain CLAUDE.md
-/docs/claude
+/docs-claude
 ```
 
 ---
@@ -93,7 +93,7 @@ Scaffolded documentation structure:
 
 ## Smart Maintenance
 
-### /docs/claude Features
+### /docs-claude Features
 
 The CLAUDE.md maintenance command checks:
 
@@ -113,7 +113,7 @@ The CLAUDE.md maintenance command checks:
    - For detected tech stack, are important rules present?
    - E.g., Cloudflare project should mention wrangler.jsonc patterns
 
-### /docs/update Features
+### /docs-update Features
 
 Full documentation audit including:
 
@@ -158,7 +158,7 @@ Additional indicators influence template content:
 
 ## Integration with Other Skills
 
-- **project-workflow**: Use `/docs/init` after `/plan-project` to add documentation
+- **project-workflow**: Use `/docs-init` after `/plan-project` to add documentation
 - **project-planning**: Generated `IMPLEMENTATION_PHASES.md` referenced in CLAUDE.md
 - **cloudflare-worker-base**: Cloudflare template includes Workers-specific patterns
 
@@ -170,10 +170,10 @@ Additional indicators influence template content:
 
 | Situation | Command |
 |-----------|---------|
-| New project | `/docs/init` |
-| After major changes | `/docs/claude` |
-| Before release | `/docs/update` |
-| Monthly maintenance | `/docs/update` |
+| New project | `/docs-init` |
+| After major changes | `/docs-claude` |
+| Before release | `/docs-update` |
+| Monthly maintenance | `/docs-update` |
 
 ### CLAUDE.md Guidelines
 
