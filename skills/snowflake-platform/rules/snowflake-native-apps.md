@@ -90,6 +90,52 @@ Include all 5 statuses:
 - `REJECTED` - Failed
 - `MANUAL_REVIEW` - Human reviewing (can take business days)
 
+## Development Cycle
+
+- `snow app deploy` - Upload files to stage
+- `snow app run` - Create/upgrade application (needed after deploy to see changes)
+
+## Publishing Workflow
+
+1. Create version: `snow app version create v1_0 --skip-git-check --force`
+2. Set distribution: `ALTER APPLICATION PACKAGE pkg_name SET DISTRIBUTION = 'EXTERNAL'`
+3. Wait for security scan: Check `review_status` in `SHOW VERSIONS IN APPLICATION PACKAGE pkg_name`
+4. Set release directive: `snow app release-directive set default --version V1_0 --patch 0 --channel DEFAULT`
+5. Create listing in Snowsight Provider Studio (UI only, not CLI)
+6. Attach package, fill details, submit for review
+
+## External Database Access (shared_data Pattern)
+
+When your Native App needs to access data from an external database (not bundled with the app):
+
+**Error without proper setup:**
+> "A view that is added to the shared content cannot reference objects from other databases"
+
+**Solution:**
+```sql
+-- 1. Create shared_data schema in app package
+CREATE SCHEMA IF NOT EXISTS MY_APP_PKG.SHARED_DATA;
+
+-- 2. Create views that reference external database
+CREATE OR REPLACE VIEW MY_APP_PKG.SHARED_DATA.MY_VIEW AS
+SELECT * FROM EXTERNAL_DB.SCHEMA.TABLE;
+
+-- 3. Grant REFERENCE_USAGE on the source database (CRITICAL!)
+GRANT REFERENCE_USAGE ON DATABASE EXTERNAL_DB
+  TO SHARE IN APPLICATION PACKAGE MY_APP_PKG;
+
+-- 4. Grant access to share
+GRANT USAGE ON SCHEMA MY_APP_PKG.SHARED_DATA
+  TO SHARE IN APPLICATION PACKAGE MY_APP_PKG;
+GRANT SELECT ON ALL VIEWS IN SCHEMA MY_APP_PKG.SHARED_DATA
+  TO SHARE IN APPLICATION PACKAGE MY_APP_PKG;
+```
+
+| If Claude suggests... | Use instead... |
+|----------------------|----------------|
+| Direct reference to external DB in setup_script | Reference `shared_data.view_name` |
+| Skipping REFERENCE_USAGE grant | Always grant REFERENCE_USAGE before `snow app run` |
+
 ## Provider Studio
 
 - Description field uses WYSIWYG editor - cannot paste raw HTML

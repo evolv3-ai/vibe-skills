@@ -1,5 +1,5 @@
 ---
-paths: "**/*.ts", "**/*vector*.ts", wrangler.jsonc
+globs: ["**/*.ts", "**/*vector*.ts", "wrangler.jsonc"]
 ---
 
 # Cloudflare Vectorize Corrections
@@ -44,6 +44,27 @@ await env.VECTORIZE.insert([{ id: '1', values, metadata: { category: 'A' } }])
 // 2. Then insert vectors
 await env.VECTORIZE.insert([{ id: '1', values, metadata: { category: 'A' } }])
 // Now filtering works
+```
+
+**Symptoms of missing index**:
+- Query returns 0 matches despite vectors existing
+- Same query without filter returns results
+- No error thrown
+
+**Key insight**: Creating the index doesn't retroactively index existing vectors. You must re-embed/re-insert vectors after creating the index.
+
+## Metadata Index Types
+
+| Type | Use for |
+|------|---------|
+| `string` | Text fields, IDs, categories |
+| `number` | Integers, scores, timestamps |
+| `boolean` | True/false flags |
+
+```bash
+# Create metadata index
+npx wrangler vectorize create-metadata-index my-index --property-name=type --type=string
+npx wrangler vectorize create-metadata-index my-index --property-name=score --type=number
 ```
 
 ## Match Embedding Dimensions
