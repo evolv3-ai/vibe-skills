@@ -127,9 +127,10 @@ claude-skills/
 /plugin marketplace add jezweb/claude-skills
 
 # Install plugin bundles
-/plugin install cloudflare-skills
-/plugin install ai-skills
-/plugin install frontend-skills
+/plugin install project         # Most-used: plan-feature, docs-init, etc.
+/plugin install cloudflare      # Cloudflare platform skills
+/plugin install ai              # AI/LLM integration
+/plugin install frontend        # UI/frontend skills
 # etc.
 
 # Update to get latest changes
@@ -143,7 +144,7 @@ claude-skills/
 
 # Or add local repo as marketplace
 /plugin marketplace add ./
-/plugin install cloudflare-skills
+/plugin install cloudflare
 ```
 
 **Agents**: Plugins can include agents in their `agents/` directory. The cloudflare-worker-base skill includes 4 agents (cloudflare-deploy, d1-migration, cloudflare-debug, worker-scaffold) that are auto-discovered when the plugin is installed.
@@ -451,9 +452,10 @@ cp ~/.claude/skills/tailwind-v4-shadcn/rules/tailwind-v4-shadcn.md .claude/rules
 /plugin marketplace add jezweb/claude-skills
 
 # Install plugin bundles
-/plugin install cloudflare-skills       # All Cloudflare skills + agents
-/plugin install ai-skills               # AI/LLM integration skills
-/plugin install frontend-skills         # UI/frontend skills
+/plugin install project                 # Project lifecycle commands
+/plugin install cloudflare              # All Cloudflare skills + agents
+/plugin install ai                      # AI/LLM integration skills
+/plugin install frontend                # UI/frontend skills
 
 # Install individual skill (for local development)
 /plugin install ./skills/cloudflare-worker-base

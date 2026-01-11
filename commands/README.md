@@ -2,50 +2,48 @@
 
 This directory contains **orphan commands** - specialized commands for managing the claude-skills repository itself. These are niche tools not needed by most users.
 
-## ⚠️ Command Discovery: Plugin vs Symlinks (2026-01-11)
+## Plugin System (2026-01-11)
 
-**Important Discovery**: Claude Code discovers slash commands from `~/.claude/commands/` directory, NOT from plugin bundles. Plugin bundles provide skills/agents/rules, but commands need symlinks.
+Commands are accessed via the plugin system with namespaced format:
 
-Most slash commands have been moved into their appropriate skills for organization, but still need symlinks:
+```
+/bundle-name:command-name
+```
 
-| Command | Skill Location | Symlink Required |
-|---------|----------------|------------------|
-| `/explore-idea` | `project-workflow/commands/` | Yes |
-| `/plan-project` | `project-workflow/commands/` | Yes |
-| `/plan-feature` | `project-workflow/commands/` | Yes |
-| `/wrap-session` | `project-workflow/commands/` | Yes |
-| `/continue-session` | `project-workflow/commands/` | Yes |
-| `/workflow` | `project-workflow/commands/` | Yes |
-| `/release` | `project-workflow/commands/` | Yes |
-| `/brief` | `project-workflow/commands/` | Yes |
-| `/reflect` | `project-workflow/commands/` | Yes |
-| `/deploy` | `cloudflare-worker-base/commands/` | Yes |
-| `/docs` | `docs-workflow/commands/` | Yes |
-| `/docs-init` | `docs-workflow/commands/` | Yes |
-| `/docs-update` | `docs-workflow/commands/` | Yes |
-| `/docs-claude` | `docs-workflow/commands/` | Yes |
+### Bundle → Command Examples
 
-### Creating Symlinks
+| Bundle | Command | Access |
+|--------|---------|--------|
+| `project` | plan-feature | `/project:plan-feature` |
+| `project` | docs-init | `/project:docs-init` |
+| `cloudflare` | deploy | `/cloudflare:deploy` |
+| `frontend` | setup | `/frontend:setup` |
+| `auth` | setup | `/auth:setup` |
+| `database` | init | `/database:init` |
+| `mcp` | init | `/mcp:init` |
+
+### Installing Bundles
 
 ```bash
-# docs-workflow commands
-ln -sf /path/to/claude-skills/skills/docs-workflow/commands/docs.md ~/.claude/commands/
-ln -sf /path/to/claude-skills/skills/docs-workflow/commands/docs-init.md ~/.claude/commands/
-ln -sf /path/to/claude-skills/skills/docs-workflow/commands/docs-update.md ~/.claude/commands/
-ln -sf /path/to/claude-skills/skills/docs-workflow/commands/docs-claude.md ~/.claude/commands/
+# Add marketplace (one-time)
+/plugin marketplace add jezweb/claude-skills
 
-# project-workflow commands
-ln -sf /path/to/claude-skills/skills/project-workflow/commands/brief.md ~/.claude/commands/
-ln -sf /path/to/claude-skills/skills/project-workflow/commands/reflect.md ~/.claude/commands/
-# ... etc for other commands
-
-# cloudflare-worker-base commands
-ln -sf /path/to/claude-skills/skills/cloudflare-worker-base/commands/deploy.md ~/.claude/commands/
+# Install bundles you need
+/plugin install project      # Most-used: plan-feature, docs-init, etc.
+/plugin install cloudflare   # Cloudflare Workers development
+/plugin install ai           # AI/LLM integration
+/plugin install frontend     # UI development
+/plugin install auth         # Authentication
+/plugin install database     # Database/storage
+/plugin install mcp          # MCP server development
+/plugin install cms          # Content management
+/plugin install backend      # Python backends
+/plugin install contrib      # Skill/open-source development
 ```
 
 ## Orphan Commands (This Directory)
 
-These commands are specific to the claude-skills repository and not bundled with any skill:
+These commands are specific to the claude-skills repository and not bundled with any plugin:
 
 ### `/create-skill`
 
@@ -115,7 +113,7 @@ These commands are specific to the claude-skills repository and not bundled with
 
 ---
 
-## Installation
+## Installation (Orphan Commands Only)
 
 For orphan commands, copy to your `.claude/commands/` directory:
 
@@ -126,41 +124,19 @@ cp commands/audit.md ~/.claude/commands/
 cp commands/deep-audit.md ~/.claude/commands/
 ```
 
-## Related Skills
+## Related Bundles
 
-| Skill | Description | Commands Included |
-|-------|-------------|-------------------|
-| `project-workflow` | Project lifecycle management | 9 commands (explore-idea, plan-project, etc.) |
-| `docs-workflow` | Documentation lifecycle | 4 commands (docs, docs-init, docs-update, docs-claude) |
-| `cloudflare-worker-base` | Cloudflare Workers setup | 1 command (deploy) |
-
-### Setup for Full Command Access
-
-Skills provide context (templates, rules, agents), but commands need symlinks:
-
-```bash
-# 1. Clone the repo (if not already)
-git clone https://github.com/jezweb/claude-skills ~/Documents/claude-skills
-
-# 2. Create symlinks for all skill commands
-cd ~/.claude/commands
-
-# docs-workflow
-for cmd in docs docs-init docs-update docs-claude; do
-  ln -sf ~/Documents/claude-skills/skills/docs-workflow/commands/${cmd}.md .
-done
-
-# project-workflow
-for cmd in brief reflect workflow explore-idea plan-project plan-feature wrap-session continue-session release; do
-  ln -sf ~/Documents/claude-skills/skills/project-workflow/commands/${cmd}.md .
-done
-
-# cloudflare-worker-base
-ln -sf ~/Documents/claude-skills/skills/cloudflare-worker-base/commands/deploy.md .
-```
+| Bundle | Description | Commands |
+|--------|-------------|----------|
+| `project` | Project lifecycle management | 13 commands (plan-feature, docs-init, etc.) |
+| `cloudflare` | Cloudflare platform | 3 commands (deploy, init, mcp-init) |
+| `frontend` | UI development | 2 commands (setup, init) |
+| `auth` | Authentication | 2 commands (setup) |
+| `database` | Database/storage | 1 command (init) |
+| `mcp` | MCP server development | 1 command (init) |
 
 ---
 
-**Version**: 6.0.0
+**Version**: 7.0.0
 **Last Updated**: 2026-01-11
 **Author**: Jeremy Dawes | Jezweb

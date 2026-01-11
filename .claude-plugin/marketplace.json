@@ -6,13 +6,24 @@
   },
   "metadata": {
     "description": "Production-tested skills for Claude Code - Cloudflare, AI, React, Tailwind v4, and modern web development",
-    "version": "2.2.0",
+    "version": "3.0.0",
     "updated": "2026-01-11"
   },
   "plugins": [
     {
-      "name": "cloudflare-skills",
-      "description": "Complete Cloudflare platform skills - Workers, D1, R2, KV, AI, Queues, Durable Objects, and more. 16 production-tested skills for edge computing.",
+      "name": "project",
+      "description": "Project lifecycle skills - planning, session management, documentation, and workflow automation. 13 commands for /project:plan-feature, /project:docs-init, etc.",
+      "source": "./",
+      "skills": [
+        "./skills/project-workflow",
+        "./skills/docs-workflow",
+        "./skills/project-planning",
+        "./skills/project-session-management"
+      ]
+    },
+    {
+      "name": "cloudflare",
+      "description": "Cloudflare platform skills - Workers, D1, R2, KV, AI, Queues, Durable Objects, MCP servers, and more. 17 production-tested skills for edge computing.",
       "source": "./",
       "skills": [
         "./skills/cloudflare-worker-base",
@@ -34,7 +45,7 @@
       ]
     },
     {
-      "name": "ai-skills",
+      "name": "ai",
       "description": "AI and LLM integration skills - Vercel AI SDK, OpenAI, Google Gemini, Claude API, ElevenLabs. 14 skills for building AI applications.",
       "source": "./",
       "skills": [
@@ -55,7 +66,7 @@
       ]
     },
     {
-      "name": "frontend-skills",
+      "name": "frontend",
       "description": "Frontend and UI skills - Tailwind v4, shadcn/ui, TanStack suite, animations, and React Native. 13 skills for modern web and mobile UIs.",
       "source": "./",
       "skills": [
@@ -75,7 +86,7 @@
       ]
     },
     {
-      "name": "auth-skills",
+      "name": "auth",
       "description": "Authentication skills - Clerk and Better Auth integrations for user management and security.",
       "source": "./",
       "skills": [
@@ -84,17 +95,7 @@
       ]
     },
     {
-      "name": "cms-skills",
-      "description": "Content management skills - TinaCMS, Sveltia CMS, and WordPress plugin development.",
-      "source": "./",
-      "skills": [
-        "./skills/tinacms",
-        "./skills/sveltia-cms",
-        "./skills/wordpress-plugin-core"
-      ]
-    },
-    {
-      "name": "database-skills",
+      "name": "database",
       "description": "Database and storage skills - Drizzle ORM, Neon Postgres, Vercel KV, and Vercel Blob.",
       "source": "./",
       "skills": [
@@ -105,7 +106,17 @@
       ]
     },
     {
-      "name": "backend-skills",
+      "name": "cms",
+      "description": "Content management skills - TinaCMS, Sveltia CMS, and WordPress plugin development.",
+      "source": "./",
+      "skills": [
+        "./skills/tinacms",
+        "./skills/sveltia-cms",
+        "./skills/wordpress-plugin-core"
+      ]
+    },
+    {
+      "name": "backend",
       "description": "Backend framework skills - FastAPI and Flask for Python web services.",
       "source": "./",
       "skills": [
@@ -114,17 +125,20 @@
       ]
     },
     {
-      "name": "tooling-skills",
-      "description": "Development tooling skills - MCP servers, project planning, session management, workflow automation, documentation, and skill development.",
+      "name": "mcp",
+      "description": "MCP server development skills - TypeScript MCP, FastMCP (Python), and agent SDK for building Model Context Protocol servers.",
       "source": "./",
       "skills": [
         "./skills/typescript-mcp",
         "./skills/fastmcp",
-        "./skills/ts-agent-sdk",
-        "./skills/project-planning",
-        "./skills/project-session-management",
-        "./skills/project-workflow",
-        "./skills/docs-workflow",
+        "./skills/ts-agent-sdk"
+      ]
+    },
+    {
+      "name": "contrib",
+      "description": "Contribution and skill development tools - creating skills, reviewing skills, and open-source contribution patterns.",
+      "source": "./",
+      "skills": [
         "./skills/skill-creator",
         "./skills/skill-review",
         "./skills/open-source-contributions"
