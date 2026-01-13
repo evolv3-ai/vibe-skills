@@ -2,7 +2,7 @@
 name: image-prompter
 description: |
   Image prompt crafting specialist. MUST BE USED when creating prompts for Gemini image generation, refining image descriptions, or troubleshooting image quality issues. Use PROACTIVELY for any image generation task.
-tools: Read, Write, Edit, Glob, Grep, Bash, WebFetch
+tools: Read, Glob, Grep, WebFetch
 model: sonnet
 ---
 

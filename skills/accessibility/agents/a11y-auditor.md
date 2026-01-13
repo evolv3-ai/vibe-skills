@@ -2,7 +2,7 @@
 name: a11y-auditor
 description: |
   Accessibility auditor specialist. MUST BE USED when analyzing pages for WCAG compliance. Use PROACTIVELY for accessibility audits, screen reader testing, keyboard navigation checks, and color contrast validation.
-tools: Read, Grep, Bash
+tools: Read, Glob, Grep
 model: sonnet
 ---
 
