@@ -1,7 +1,7 @@
 {
   "name": "office",
-  "description": "Generate Office documents (DOCX, XLSX, PDF) with TypeScript. Pure JS libraries that work everywhere: Claude Code CLI, Cloudflare Workers, browsers. Uses docx (Word), xlsx/SheetJS (Excel), pdf-lib (PDF). Use when: creating invoices, reports, spreadsheets, form filling, exporting data to Office formats, or troubleshooting Packer.toBuffer, XLSX.utils, PDFDocument errors.",
-  "version": "1.0.0",
+  "description": "Generate Office documents (DOCX, XLSX, PDF, PPTX) with TypeScript. Pure JS libraries that work everywhere: Claude Code CLI, Cloudflare Workers, browsers. Uses docx (Word), xlsx/SheetJS (Excel), pdf-lib (PDF), pptxgenjs (PowerPoint). Use when: creating presentations, invoices, reports, spreadsheets, or troubleshooting Packer.toBuffer, XLSX.utils, PDFDocument, pptxgenjs errors.",
+  "version": "1.1.0",
   "author": {
     "name": "Jeremy Dawes",
     "email": "jeremy@jezweb.net"
@@ -12,14 +12,19 @@
     "docx",
     "xlsx",
     "pdf",
+    "pptx",
     "office",
     "word",
     "excel",
+    "powerpoint",
     "spreadsheet",
+    "presentation",
     "document",
     "invoice",
     "report",
+    "slides",
     "pdf-lib",
+    "pptxgenjs",
     "sheetjs",
     "cloudflare-workers"
   ]

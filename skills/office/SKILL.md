@@ -1,9 +1,9 @@
 ---
 name: office
 description: |
-  Generate Office documents (DOCX, XLSX, PDF) with TypeScript. Pure JS libraries that work everywhere: Claude Code CLI, Cloudflare Workers, browsers. Uses docx (Word), xlsx/SheetJS (Excel), pdf-lib (PDF).
+  Generate Office documents (DOCX, XLSX, PDF, PPTX) with TypeScript. Pure JS libraries that work everywhere: Claude Code CLI, Cloudflare Workers, browsers. Uses docx (Word), xlsx/SheetJS (Excel), pdf-lib (PDF), pptxgenjs (PowerPoint).
 
-  Use when: creating invoices, reports, spreadsheets, form filling, exporting data to Office formats, or troubleshooting "Packer.toBuffer", "XLSX.utils", "PDFDocument" errors.
+  Use when: creating invoices, reports, spreadsheets, presentations, form filling, exporting data to Office formats, or troubleshooting "Packer.toBuffer", "XLSX.utils", "PDFDocument", "pptxgenjs" errors.
 ---
 
 # Office Document Generation
@@ -11,7 +11,7 @@ description: |
 **Status**: Production Ready
 **Last Updated**: 2026-01-12
 **Dependencies**: None (pure JavaScript libraries)
-**Latest Versions**: docx@9.5.0, xlsx@0.18.5, pdf-lib@1.17.1
+**Latest Versions**: docx@9.5.0, xlsx@0.18.5, pdf-lib@1.17.1, pptxgenjs@4.0.1
 
 ---
 
@@ -24,6 +24,9 @@ Generate Microsoft Office documents and PDFs programmatically with TypeScript. A
 | **DOCX** | `docx` | ✅ | ✅ | ✅ |
 | **XLSX** | `xlsx` (SheetJS) | ✅ | ✅ | ✅ |
 | **PDF** | `pdf-lib` | ✅ | ✅ | ✅ |
+| **PPTX** | `pptxgenjs` | ⚠️* | ✅ | ✅ |
+
+*PPTX in Workers: Works for local images/data. Remote image fetching needs workaround (uses `https` module).
 
 ---
 
@@ -32,8 +35,8 @@ Generate Microsoft Office documents and PDFs programmatically with TypeScript. A
 ### Installation
 
 ```bash
-# Install all three (or pick what you need)
-npm install docx xlsx pdf-lib
+# Install all four (or pick what you need)
+npm install docx xlsx pdf-lib pptxgenjs
 ```
 
 ### Create a Word Document (30 seconds)
@@ -107,6 +110,29 @@ const pdfBytes = await pdfDoc.save();
 
 // Node.js: Save to file
 writeFileSync('hello.pdf', pdfBytes);
+```
+
+### Create a PowerPoint (30 seconds)
+
+```typescript
+import pptxgen from 'pptxgenjs';
+
+const pptx = new pptxgen();
+pptx.author = 'Your Name';
+pptx.title = 'Sample Presentation';
+
+// Add a slide
+const slide = pptx.addSlide();
+slide.addText('Hello World', {
+  x: 1, y: 1, w: 8, h: 1.5,
+  fontSize: 36, bold: true, color: '363636',
+});
+
+// Node.js: Save to file
+await pptx.writeFile({ fileName: 'hello.pptx' });
+
+// Browser: Trigger download
+await pptx.writeFile({ fileName: 'hello.pptx' });
 ```
 
 ---
@@ -451,9 +477,211 @@ const mergedBytes = await mergedPdf.save();
 
 ---
 
+## PPTX: PowerPoint Presentations
+
+### Key Concepts
+
+pptxgenjs uses a slide-based approach:
+- **Presentation** - The PPTX file (new pptxgen())
+- **Slide** - Individual slide (addSlide())
+- **Elements** - Text, images, shapes, tables, charts
+- **Units** - Inches by default (can change to cm/points)
+
+### Basic Presentation
+
+```typescript
+import pptxgen from 'pptxgenjs';
+
+const pptx = new pptxgen();
+pptx.author = 'Author Name';
+pptx.title = 'Presentation Title';
+pptx.subject = 'Subject';
+pptx.company = 'Company';
+
+// Title slide
+const titleSlide = pptx.addSlide();
+titleSlide.addText('Quarterly Report', {
+  x: 0.5, y: 2, w: 9, h: 1,
+  fontSize: 44, bold: true, color: '0066CC', align: 'center',
+});
+titleSlide.addText('Q1 2026', {
+  x: 0.5, y: 3.5, w: 9, h: 0.5,
+  fontSize: 24, color: '666666', align: 'center',
+});
+```
+
+### Slide with Bullet Points
+
+```typescript
+const contentSlide = pptx.addSlide();
+
+// Title
+contentSlide.addText('Key Highlights', {
+  x: 0.5, y: 0.5, w: 9, h: 0.8,
+  fontSize: 32, bold: true, color: '333333',
+});
+
+// Bullet points
+contentSlide.addText([
+  { text: 'Revenue up 25% YoY', options: { bullet: true, fontSize: 20 } },
+  { text: 'Customer base grew to 10,000', options: { bullet: true, fontSize: 20 } },
+  { text: 'New product launch successful', options: { bullet: true, fontSize: 20 } },
+  { text: 'Expanded to 5 new markets', options: { bullet: true, fontSize: 20 } },
+], { x: 0.5, y: 1.5, w: 8, h: 4, valign: 'top' });
+```
+
+### Tables
+
+```typescript
+const tableSlide = pptx.addSlide();
+
+tableSlide.addText('Sales Summary', {
+  x: 0.5, y: 0.5, w: 9, h: 0.8,
+  fontSize: 28, bold: true,
+});
+
+const tableData = [
+  [{ text: 'Region', options: { bold: true, fill: '0066CC', color: 'FFFFFF' } },
+   { text: 'Q1', options: { bold: true, fill: '0066CC', color: 'FFFFFF' } },
+   { text: 'Q2', options: { bold: true, fill: '0066CC', color: 'FFFFFF' } }],
+  ['North America', '$2.5M', '$2.8M'],
+  ['Europe', '$1.8M', '$2.1M'],
+  ['Asia Pacific', '$1.2M', '$1.5M'],
+];
+
+tableSlide.addTable(tableData, {
+  x: 0.5, y: 1.5, w: 9,
+  border: { pt: 1, color: 'CCCCCC' },
+  fontFace: 'Arial',
+  fontSize: 14,
+  align: 'center',
+  valign: 'middle',
+});
+```
+
+### Charts
+
+```typescript
+const chartSlide = pptx.addSlide();
+
+chartSlide.addText('Revenue Trend', {
+  x: 0.5, y: 0.5, w: 9, h: 0.6,
+  fontSize: 28, bold: true,
+});
+
+chartSlide.addChart(pptx.ChartType.line, [
+  { name: 'Revenue', labels: ['Jan', 'Feb', 'Mar', 'Apr'], values: [100, 120, 150, 180] },
+  { name: 'Expenses', labels: ['Jan', 'Feb', 'Mar', 'Apr'], values: [80, 85, 90, 95] },
+], {
+  x: 0.5, y: 1.2, w: 9, h: 4,
+  showLegend: true,
+  legendPos: 'b',
+  showTitle: false,
+});
+```
+
+### Images
+
+```typescript
+import { readFileSync } from 'fs';
+
+const imageSlide = pptx.addSlide();
+
+// From file (Node.js)
+imageSlide.addImage({
+  path: 'logo.png',
+  x: 0.5, y: 0.5, w: 2, h: 1,
+});
+
+// From base64
+const imageBase64 = readFileSync('chart.png').toString('base64');
+imageSlide.addImage({
+  data: `image/png;base64,${imageBase64}`,
+  x: 0.5, y: 2, w: 4, h: 3,
+});
+
+// From URL (Node.js only - uses https module)
+imageSlide.addImage({
+  path: 'https://example.com/image.png',
+  x: 5, y: 2, w: 4, h: 3,
+});
+```
+
+### Shapes
+
+```typescript
+const shapeSlide = pptx.addSlide();
+
+// Rectangle
+shapeSlide.addShape(pptx.ShapeType.rect, {
+  x: 0.5, y: 0.5, w: 3, h: 2,
+  fill: { color: '0066CC' },
+  line: { color: '004499', pt: 2 },
+});
+
+// Circle/Oval
+shapeSlide.addShape(pptx.ShapeType.ellipse, {
+  x: 4, y: 0.5, w: 2, h: 2,
+  fill: { color: '00AA00' },
+});
+
+// Arrow
+shapeSlide.addShape(pptx.ShapeType.rightArrow, {
+  x: 1, y: 3, w: 3, h: 1,
+  fill: { color: 'FF6600' },
+});
+```
+
+### Slide Layouts and Masters
+
+```typescript
+// Define a master slide
+pptx.defineSlideMaster({
+  title: 'COMPANY_MASTER',
+  background: { color: 'FFFFFF' },
+  objects: [
+    { text: { text: 'Company Name', options: { x: 0.5, y: 0.2, w: 4, h: 0.3, fontSize: 10, color: '999999' } } },
+    { line: { x: 0.5, y: 0.6, w: 9, h: 0, line: { color: '0066CC', pt: 2 } } },
+  ],
+});
+
+// Use the master
+const slide = pptx.addSlide({ masterName: 'COMPANY_MASTER' });
+```
+
+### Export Patterns
+
+```typescript
+// Node.js - Save to file
+await pptx.writeFile({ fileName: 'presentation.pptx' });
+
+// Browser - Trigger download
+await pptx.writeFile({ fileName: 'presentation.pptx' });
+
+// Get as base64 (for email, API, etc.)
+const base64 = await pptx.write({ outputType: 'base64' });
+
+// Get as Blob (browser)
+const blob = await pptx.write({ outputType: 'blob' });
+
+// Get as ArrayBuffer
+const arrayBuffer = await pptx.write({ outputType: 'arraybuffer' });
+
+// Cloudflare Workers - Return as Response
+const arrayBuffer = await pptx.write({ outputType: 'arraybuffer' });
+return new Response(arrayBuffer, {
+  headers: {
+    'Content-Type': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'Content-Disposition': 'attachment; filename="presentation.pptx"',
+  },
+});
+```
+
+---
+
 ## Cloudflare Workers Integration
 
-All three libraries work in Cloudflare Workers without modification.
+All four libraries work in Cloudflare Workers (PPTX with caveats for remote images).
 
 ### DOCX Generation Endpoint
 
@@ -555,6 +783,8 @@ export default {
 ✅ Use `type: 'buffer'` for XLSX in Workers/browser
 ✅ Embed fonts in PDF before using them
 ✅ Set proper Content-Type headers for downloads
+✅ Use `await pptx.writeFile()` or `await pptx.write()` for PPTX
+✅ Use base64 images in PPTX for Workers (avoid remote URLs)
 
 ### Never Do
 
@@ -563,6 +793,7 @@ export default {
 ❌ Use `writeFile` in Workers (use Response instead)
 ❌ Forget to set Content-Disposition for downloads
 ❌ Use Node.js fs module in browser/Workers
+❌ Use PPTX path URLs in Workers (https module not available)
 
 ---
 
@@ -588,6 +819,11 @@ export default {
 **Why**: Returning wrong type or missing Content-Type header
 **Prevention**: Return buffer directly with proper headers
 
+### Issue #5: PPTX Remote Images Fail in Workers
+**Error**: `https is not defined` or image not appearing
+**Why**: pptxgenjs uses Node.js `https` module for remote images
+**Prevention**: Use base64 data URIs or local images in Workers environment
+
 ---
 
 ## Using Bundled Resources
@@ -597,14 +833,15 @@ export default {
 - `docx-basic.ts` - Complete Word document with headings, tables, images
 - `xlsx-basic.ts` - Excel workbook with formulas and formatting
 - `pdf-basic.ts` - PDF with text, images, shapes
-- `pdf-form-fill.ts` - Fill existing PDF forms
-- `workers-pdf.ts` - Browser Rendering HTML→PDF example
+- `pptx-basic.ts` - PowerPoint with slides, charts, tables
+- `workers-pdf.ts` - Cloudflare Workers PDF generation example
 
 ### References (references/)
 
 - `docx-api.md` - Quick reference for docx npm package
 - `xlsx-api.md` - Quick reference for SheetJS functions
 - `pdf-lib-api.md` - Quick reference for pdf-lib methods
+- `pptxgenjs-api.md` - Quick reference for pptxgenjs
 
 ### Scripts (scripts/)
 
@@ -618,13 +855,13 @@ This skill focuses on **document creation** with portable TypeScript libraries:
 
 | Feature | This Skill | Anthropic's Skills |
 |---------|------------|-------------------|
-| Create DOCX/XLSX/PDF | ✅ | ✅ |
+| Create DOCX/XLSX/PDF/PPTX | ✅ | ✅ |
 | Works in Cloudflare Workers | ✅ | ❌ |
 | Plugin installable | ✅ | ❌ |
+| TypeScript-first | ✅ | ❌ (Python) |
 | Edit existing DOCX with tracked changes | ❌ | ✅ |
 | Excel formula validation | ❌ | ✅ |
 | OCR scanned PDFs | ❌ | ✅ |
-| PowerPoint (PPTX) | ❌ (Phase 2) | ✅ |
 
 For advanced editing scenarios (tracked changes, formula validation), consider Anthropic's official skills with Python tooling.
 
@@ -637,7 +874,8 @@ For advanced editing scenarios (tracked changes, formula validation), consider A
   "dependencies": {
     "docx": "^9.5.0",
     "xlsx": "^0.18.5",
-    "pdf-lib": "^1.17.1"
+    "pdf-lib": "^1.17.1",
+    "pptxgenjs": "^4.0.1"
   }
 }
 ```
@@ -649,6 +887,7 @@ For advanced editing scenarios (tracked changes, formula validation), consider A
 - **docx**: https://docx.js.org/
 - **SheetJS (xlsx)**: https://docs.sheetjs.com/
 - **pdf-lib**: https://pdf-lib.js.org/
+- **pptxgenjs**: https://gitbrent.github.io/PptxGenJS/
 - **Cloudflare Browser Rendering**: https://developers.cloudflare.com/browser-rendering/
 
 ---
