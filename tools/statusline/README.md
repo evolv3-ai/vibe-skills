@@ -7,10 +7,14 @@ A custom status line for Claude Code CLI that displays real-time context trackin
 ## ✨ Features
 
 ### Real-Time Context Tracking
-- **Accurate context tracking** using `current_usage` API (Claude Code 2.0.70+)
+- **Official percentage fields** (Claude Code 2.1.6+) for most accurate display
+- **Fallback calculation** using `current_usage` API (Claude Code 2.0.70+)
 - **Brick visualization** showing context usage at a glance
 - **Session duration** - track how long you've been working
 - **Session cost** - API users see spending (hidden for Max subscribers)
+
+### Workspace Context
+- **Working directory** (tilde-compressed, e.g., `~/Documents/project`)
 
 ### Git Integration
 - Current **repo name and branch**
@@ -75,9 +79,9 @@ The installer will:
 
 ## 🎨 What It Looks Like
 
-### Line 1: Git + Model + Changes
+### Line 1: Path + Git + Model + Changes
 ```
-[Sonnet 4.5] claude-skills:main [5f2ce67] Remove auth-js skill | jezweb/claude-skills *↑2 | +145/-23
+[Sonnet 4.5] ~/Documents/claude-skills claude-skills:main [5f2ce67] Remove auth-js skill | jezweb/claude-skills *↑2 | +145/-23
 ```
 
 ### Line 2: Context Bricks + Duration + Cost
@@ -111,9 +115,24 @@ For Max subscribers (no API cost):
 
 ## 📖 How It Works
 
-### Context Tracking (v3.1+)
+### Context Tracking (v3.3.0+)
 
-**Claude Code 2.0.70+** provides accurate context data via the `current_usage` field:
+**Claude Code 2.1.6+** provides pre-calculated percentage fields for the most accurate display:
+```json
+{
+  "context_window": {
+    "context_window_size": 200000,
+    "used_percentage": 43.5,
+    "remaining_percentage": 56.5
+  }
+}
+```
+
+The status line uses these official percentages directly, avoiding any calculation drift.
+
+### Fallback: Token Calculation (v2.0.70+)
+
+For Claude Code 2.0.70 - 2.1.5 without percentage fields, falls back to `current_usage`:
 ```json
 {
   "context_window": {
@@ -127,16 +146,14 @@ For Max subscribers (no API cost):
 }
 ```
 
-The status line calculates current context as:
+Calculates as:
 ```
 used_tokens = input_tokens + cache_creation_input_tokens + cache_read_input_tokens
 ```
 
-This provides accurate usage that properly reflects context state after compaction.
-
 ### Older Versions
 
-For Claude Code < 2.0.70 without `current_usage`, the status line shows 0% until data becomes available.
+For Claude Code < 2.0.70, the status line shows 0% until data becomes available.
 
 ### Git Information
 
@@ -159,7 +176,10 @@ Queries git commands in the current workspace:
 # Check if jq is installed
 which jq
 
-# Test with current_usage data (2.0.70+)
+# Test with percentage fields (2.1.6+)
+echo '{"context_window":{"context_window_size":200000,"used_percentage":43.5,"remaining_percentage":56.5},"model":{"display_name":"Sonnet 4.5"},"workspace":{"current_dir":"'"$PWD"'"},"cost":{"total_duration_ms":300000}}' | ~/.claude/statusline.sh
+
+# Test with current_usage data (2.0.70 - 2.1.5)
 echo '{"context_window":{"context_window_size":200000,"current_usage":{"input_tokens":50000,"cache_creation_input_tokens":3000,"cache_read_input_tokens":2000}},"model":{"display_name":"Sonnet 4.5"},"workspace":{"current_dir":"'"$PWD"'"},"cost":{"total_duration_ms":300000}}' | ~/.claude/statusline.sh
 ```
 
@@ -230,6 +250,12 @@ rm ~/.claude/statusline.sh
 ```
 
 ## 📋 Changelog
+
+### v3.4.0 (2026-01-13)
+- **Working directory display** - Shows tilde-compressed path (e.g., `~/Documents/project`)
+- **Official percentage fields** - Uses `used_percentage` and `remaining_percentage` (Claude Code 2.1.6+)
+- **More accurate context display** - No calculation drift, uses official values directly
+- **Backwards compatible** - Falls back to token calculation for older versions
 
 ### v3.1.0 (2025-12-16)
 - **Re-enabled context tracking** - Uses new `current_usage` API (Claude Code 2.0.70+)

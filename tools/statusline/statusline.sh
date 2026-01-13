@@ -1,11 +1,12 @@
 #!/bin/bash
 
 # Claude Code Custom Status Line
-# v3.2.0 - Context tracking RE-ENABLED with current_usage API
-# Shows: Model | Repo:Branch [commit] message | GitHub | git status | lines changed
+# v3.4.0 - Working directory display + percentage fields (Claude Code 2.1.6+)
+# Shows: Model | Path | Repo:Branch [commit] message | GitHub | git status | lines changed
 #        Context bricks | percentage | duration | cost
 #
-# Uses new current_usage field (Claude Code 2.0.70+) for accurate context tracking.
+# Uses new percentage fields (Claude Code 2.1.6+) for accurate context display.
+# Falls back to current_usage calculation for older versions.
 # See: https://code.claude.com/docs/en/statusline#context-window-usage
 
 # Read JSON from stdin
@@ -64,6 +65,10 @@ line1=""
 # Model in brackets
 line1+="\033[1;36m[$model]\033[0m "
 
+# Working directory (tilde-compressed)
+display_dir="${current_dir/#$HOME/\~}"
+line1+="\033[2;37m$display_dir\033[0m "
+
 # Repo:Branch
 if [[ -n "$repo_name" && "$repo_name" != "no-repo" ]]; then
     line1+="\033[1;32m$repo_name\033[0m"
@@ -104,29 +109,40 @@ duration_min=$(((duration_ms % 3600000) / 60000))
 # Get session cost (only show if > 0, for API users)
 cost_usd=$(echo "$input" | jq -r '.cost.total_cost_usd // 0')
 
-# Get context window data using new current_usage field (Claude Code 2.0.70+)
+# Get context window data - prefer v2.1.6+ percentage fields, fallback to calculation
 total_tokens=$(echo "$input" | jq -r '.context_window.context_window_size // 200000')
-current_usage=$(echo "$input" | jq -r '.context_window.current_usage // null')
 
-if [[ "$current_usage" != "null" ]]; then
-    # Use accurate current_usage data
-    input_tokens=$(echo "$current_usage" | jq -r '.input_tokens // 0')
-    cache_creation=$(echo "$current_usage" | jq -r '.cache_creation_input_tokens // 0')
-    cache_read=$(echo "$current_usage" | jq -r '.cache_read_input_tokens // 0')
+# Try new percentage fields first (Claude Code 2.1.6+)
+used_pct_raw=$(echo "$input" | jq -r '.context_window.used_percentage // null')
+remaining_pct_raw=$(echo "$input" | jq -r '.context_window.remaining_percentage // null')
 
-    # Calculate actual current context usage
-    used_tokens=$((input_tokens + cache_creation + cache_read))
+if [[ "$used_pct_raw" != "null" && -n "$used_pct_raw" ]]; then
+    # Use official percentage (more accurate)
+    usage_pct=${used_pct_raw%.*}  # Truncate to integer for display
+    remaining_pct=${remaining_pct_raw%.*}
+
+    # Calculate tokens from percentages for display
+    used_tokens=$(( (total_tokens * usage_pct) / 100 ))
+    free_tokens=$(( (total_tokens * remaining_pct) / 100 ))
 else
-    # Fallback: no current_usage available yet (first message or older version)
-    used_tokens=0
-fi
+    # Fallback: Calculate from current_usage (Claude Code 2.0.70+)
+    current_usage=$(echo "$input" | jq -r '.context_window.current_usage // null')
 
-# Calculate metrics
-free_tokens=$((total_tokens - used_tokens))
-if [[ $total_tokens -gt 0 ]]; then
-    usage_pct=$(( (used_tokens * 100) / total_tokens ))
-else
-    usage_pct=0
+    if [[ "$current_usage" != "null" ]]; then
+        input_tokens=$(echo "$current_usage" | jq -r '.input_tokens // 0')
+        cache_creation=$(echo "$current_usage" | jq -r '.cache_creation_input_tokens // 0')
+        cache_read=$(echo "$current_usage" | jq -r '.cache_read_input_tokens // 0')
+        used_tokens=$((input_tokens + cache_creation + cache_read))
+    else
+        used_tokens=0
+    fi
+
+    free_tokens=$((total_tokens - used_tokens))
+    if [[ $total_tokens -gt 0 ]]; then
+        usage_pct=$(( (used_tokens * 100) / total_tokens ))
+    else
+        usage_pct=0
+    fi
 fi
 
 # Convert to 'k' format for display
