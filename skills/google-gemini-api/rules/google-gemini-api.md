@@ -94,3 +94,19 @@ const cache = await ai.caches.create({
 | Disabling thinking | Adjust `thinkingBudget` instead |
 | `gemini-pro` | `gemini-2.5-pro` or `gemini-2.5-flash` |
 | Generic model for caching | Explicit version (e.g., `gemini-2.5-flash-001`) |
+| `genai.getGenerativeModel()` | `ai.models.generateContent()` |
+
+## Image Generation Models
+
+| Model ID | Codename | Use For |
+|----------|----------|---------|
+| `gemini-2.0-flash-exp-image-generation` | Nano Banana | Fast, 1024px |
+| `gemini-2.5-flash-preview-image-generation` | Nano Banana | Fast iteration |
+| `gemini-2.5-pro-preview-image-generation` | Nano Banana Pro | 4K, complex, text |
+
+## NEVER
+
+- Never use `@google/generative-ai` package
+- Never use `GoogleGenerativeAI` class
+- Never use `.getGenerativeModel()` pattern
+- These are all deprecated patterns from the old SDK
