@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [2.12.0] - 2026-01-20
+
+### Added - Developer Toolbox 🛠️
+
+**Change**: New skill with 7 essential development workflow agents
+
+**Agents** (7 total):
+- `commit-helper` - Generate conventional commit messages from staged changes
+- `build-verifier` - Verify dist/ matches source after builds
+- `code-reviewer` - Security audits, OWASP checks, code quality reviews
+- `debugger` - Systematic debugging with root cause analysis
+- `test-runner` - TDD workflow, test creation, coverage improvement
+- `orchestrator` - Coordinate complex multi-step projects
+- `documentation-expert` - README, API docs, architecture diagrams
+
+**Rules** (1):
+- `agent-first-thinking` - Behavioral interrupt to consider agents before manual work
+
+**Installation**:
+```bash
+/plugin install developer-toolbox@claude-skills
+```
+
+### Added - Agent Development Skills 🤖
+
+- `agent-development` - Building custom Claude Code agents with proper frontmatter
+- `oauth-integrations` - OAuth patterns for MCP servers and Workers
+
+### Updated - AI Model References 🧠
+
+Updated all AI skills to current models (January 2026):
+- OpenAI: GPT-5.1, GPT-5.2, o3, o3-mini
+- Anthropic: Claude 4.5 Opus, Sonnet, Haiku
+- Google: Gemini 2.5 Pro/Flash
+
+---
+
 ## [2.11.0] - 2026-01-14
 
 ### Added - Design Bundle 🎨
