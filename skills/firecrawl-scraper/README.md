@@ -1,7 +1,7 @@
 # Firecrawl Web Scraper
 
-**Status**: ✅ Production Ready
-**Last Updated**: 2025-10-24
+**Status**: Production Ready
+**Last Updated**: 2026-01-20
 **API Version**: v2
 **Official Docs**: https://docs.firecrawl.dev
 
@@ -9,17 +9,21 @@
 
 ## What This Skill Does
 
-Provides complete knowledge for using Firecrawl v2 API - a web scraping service that converts websites into LLM-ready markdown or structured data. This skill covers:
+Provides complete knowledge for using Firecrawl API - a web data platform that converts websites into LLM-ready markdown or structured data. This skill covers:
 
-- **Single page scraping** with `/v2/scrape` endpoint
-- **Full site crawling** with `/v2/crawl` endpoint
-- **URL discovery** with `/v2/map` endpoint
-- **Structured data extraction** with `/v2/extract` endpoint
-- **Python SDK** (firecrawl-py v4.5.0+)
-- **TypeScript/Node.js SDK** (firecrawl-js v1.7.x+)
-- **JavaScript rendering**, anti-bot bypass, screenshot capture
-- **Error handling**, rate limits, and best practices
-- **Cloudflare Workers integration**
+- **Single page scraping** with `/scrape` endpoint
+- **Full site crawling** with `/crawl` endpoint
+- **URL discovery** with `/map` endpoint
+- **Web search + scrape** with `/search` endpoint (NEW)
+- **Structured data extraction** with `/extract` endpoint
+- **Autonomous AI agent** with `/agent` endpoint (NEW)
+- **Batch operations** for multiple URLs (NEW)
+- **Change tracking** to monitor content changes (NEW)
+- **Branding extraction** for design systems (NEW)
+- **Python SDK** (firecrawl-py v4.13.0+)
+- **TypeScript/Node.js SDK** (@mendable/firecrawl-js v4.11.1+)
+- **JavaScript rendering**, anti-bot bypass, PDF/DOCX parsing
+- **Cloudflare Workers integration** (REST API)
 
 **Prevents common issues** with API authentication, rate limiting, timeout errors, and content extraction failures.
 
@@ -40,6 +44,8 @@ Claude automatically uses this skill when you mention:
 - scrape website
 - crawl website
 - web scraper
+- firecrawl agent
+- firecrawl search
 
 ### Secondary Triggers (Use Cases)
 - extract web content
@@ -57,6 +63,14 @@ Claude automatically uses this skill when you mention:
 - scrape articles
 - extract product data
 - map website urls
+- batch scrape
+- scrape multiple urls
+- monitor website changes
+- track content changes
+- extract brand colors
+- extract design system
+- autonomous web scraping
+- ai web agent
 
 ### Error-Based Triggers
 - "content not loading"
@@ -87,12 +101,26 @@ Claude automatically uses this skill when you mention:
 
 | Issue | Error Message | Prevention |
 |-------|---------------|------------|
-| **#1: API Key Not Set** | "Invalid API Key" | Proper environment variable setup with examples |
-| **#2: Rate Limits** | "Rate limit exceeded" | Best practices for credit optimization |
-| **#3: Timeout Errors** | "Request timeout" | `waitFor` parameter configuration |
-| **#4: Empty Content** | "Content is empty" | JavaScript rendering with actions/wait strategies |
-| **#5: Bot Detection** | "Access denied" | Firecrawl's built-in anti-bot bypass |
+| **#1: API Key Not Set** | "Invalid API Key" | Proper environment variable setup |
+| **#2: Rate Limits** | "Rate limit exceeded" | Credit optimization best practices |
+| **#3: Timeout Errors** | "Request timeout" | `waitFor` and `timeout` configuration |
+| **#4: Empty Content** | "Content is empty" | JS rendering with actions/wait |
+| **#5: Bot Detection** | "Access denied" | Stealth mode and location options |
 | **#6: Hardcoded API Keys** | Security vulnerability | Environment variable patterns |
+
+---
+
+## API Endpoints Overview
+
+| Endpoint | Purpose | Use Case |
+|----------|---------|----------|
+| `/scrape` | Single page | Extract article, product page |
+| `/crawl` | Full site | Index docs, archive sites |
+| `/map` | URL discovery | Find all pages, plan strategy |
+| `/search` | Web search + scrape | Research with live data |
+| `/extract` | Structured data | Product prices, contacts |
+| `/agent` | Autonomous AI | No URLs needed, AI navigates |
+| `/batch-scrape` | Multiple URLs | Bulk processing |
 
 ---
 
@@ -101,47 +129,38 @@ Claude automatically uses this skill when you mention:
 ### Python
 
 ```bash
-# Install
 pip install firecrawl-py
-
-# Set API key
 export FIRECRAWL_API_KEY=fc-your-api-key
 ```
 
 ```python
+from firecrawl import Firecrawl
 import os
-from firecrawl import FirecrawlApp
 
-app = FirecrawlApp(api_key=os.environ.get("FIRECRAWL_API_KEY"))
+app = Firecrawl(api_key=os.environ.get("FIRECRAWL_API_KEY"))
 
 # Scrape single page
-result = app.scrape_url("https://example.com", params={
-    "formats": ["markdown"],
-    "onlyMainContent": True
-})
+doc = app.scrape(
+    url="https://example.com",
+    formats=["markdown"],
+    only_main_content=True
+)
 
-print(result.get("markdown"))
+print(doc.markdown)
 ```
 
 ### TypeScript/Node.js
 
 ```bash
-# Install
 npm install @mendable/firecrawl-js
-# or: npm install firecrawl
-
-# Set API key
 export FIRECRAWL_API_KEY=fc-your-api-key
 ```
 
 ```typescript
 import FirecrawlApp from '@mendable/firecrawl-js';
 
-const app = new FirecrawlApp({
-  apiKey: process.env.FIRECRAWL_API_KEY
-});
+const app = new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY });
 
-// Scrape single page
 const result = await app.scrapeUrl('https://example.com', {
   formats: ['markdown'],
   onlyMainContent: true
@@ -154,152 +173,63 @@ console.log(result.markdown);
 
 ---
 
-## ⚠️ Cloudflare Workers Compatibility
+## Cloudflare Workers Compatibility
 
-**Important**: The Firecrawl SDK uses Node.js dependencies (`axios`) and **cannot run in Cloudflare Workers**.
+**The Firecrawl SDK cannot run in Cloudflare Workers** (requires Node.js).
 
-**For Cloudflare Workers**, use one of these approaches:
-- ✅ **Direct REST API** with `fetch` (recommended - see `templates/firecrawl-worker-fetch.ts`)
-- ✅ **Self-hosted**: [workers-firecrawl](https://github.com/G4brym/workers-firecrawl) (requires Workers Paid Plan)
+**For Cloudflare Workers**, use the REST API directly with `fetch`:
 
-**For other environments** (Node.js, serverless functions, Python):
-- ✅ Use the SDK normally as documented above
-
-See the **Cloudflare Workers Integration** section in `SKILL.md` for complete working examples.
-
----
-
-## Token Savings Estimate
-
-**Without this skill**: ~10,000 tokens (API docs lookup + trial-and-error + debugging)
-**With this skill**: ~4,000 tokens (direct implementation with best practices)
-
-**Savings**: ~60% token reduction + prevents all 6 common issues
-
----
-
-## File Structure
-
-```
-firecrawl-scraper/
-├── SKILL.md                           # Full instructions (read this first)
-├── README.md                          # This file
-├── templates/                         # Copy-ready code templates
-│   ├── firecrawl-scrape-python.py     # Basic Python scraping (Node.js/Python)
-│   ├── firecrawl-scrape-typescript.ts # Basic TypeScript scraping (Node.js)
-│   ├── firecrawl-worker-fetch.ts      # Cloudflare Workers (fetch API)
-│   └── firecrawl-crawl-example.py     # Full crawl with storage
-└── reference/                         # Deep-dive documentation
-    ├── endpoints.md                   # All 4 API endpoints explained
-    └── common-patterns.md             # Error handling, retries, batching
+```typescript
+const response = await fetch('https://api.firecrawl.dev/v2/scrape', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${env.FIRECRAWL_API_KEY}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ url, formats: ['markdown'] })
+});
 ```
 
+See **Cloudflare Workers Integration** section in `SKILL.md` for complete examples.
+
 ---
 
-## Package Versions (Verified 2025-10-24)
+## Package Versions (Verified 2026-01-20)
 
 | Package | Version | Status |
 |---------|---------|--------|
-| firecrawl-py | 4.5.0+ | ✅ Latest stable |
-| @mendable/firecrawl-js (or firecrawl) | 4.4.1+ | ✅ Latest stable (Node.js >=22.0.0) |
-| API Version | v2 | ✅ Current |
-
-**Note**: Node.js SDK cannot run in Cloudflare Workers. Use direct REST API (see templates/firecrawl-worker-fetch.ts).
+| firecrawl-py | 4.13.0+ | Latest stable |
+| @mendable/firecrawl-js | 4.11.1+ | Latest stable |
+| API Version | v2 | Current |
 
 ---
 
 ## When to Use This Skill
 
-✅ **Use this skill when:**
+**Use this skill when:**
 - Scraping modern websites with JavaScript
 - Converting websites to markdown for RAG/LLMs
 - Extracting structured data from web pages
-- Building documentation scrapers
+- Performing web search + scrape in one call
+- Autonomous data gathering without URLs (Agent)
+- Monitoring content changes over time
+- Batch processing multiple URLs
+- Extracting brand/design systems
 - Need to bypass bot protection
-- Crawling entire sites
-- Handling dynamic content
 
-❌ **Don't use this skill for:**
+**Don't use this skill for:**
 - Simple static HTML scraping (use BeautifulSoup/Cheerio)
 - APIs with official SDKs (use the SDK directly)
 - Sites you control (just export the data)
-- Real-time live data (consider WebSockets/SSE)
 
 ---
 
-## API Endpoints Overview
+## Token Savings Estimate
 
-1. **`/v2/scrape`** - Scrape a single webpage
-   - Best for: Articles, product pages, specific URLs
-   - Returns: Markdown, HTML, screenshot
+**Without this skill**: ~10,000 tokens (API docs lookup + trial-and-error)
+**With this skill**: ~3,500 tokens (direct implementation)
 
-2. **`/v2/crawl`** - Crawl entire website
-   - Best for: Documentation sites, full site archives
-   - Returns: Array of scraped pages
-
-3. **`/v2/map`** - Discover all URLs on site
-   - Best for: Sitemap generation, planning crawls
-   - Returns: List of URLs found
-
-4. **`/v2/extract`** - Extract structured data with AI
-   - Best for: Product catalogs, directory listings
-   - Returns: JSON matching your schema
-
----
-
-## Common Use Cases
-
-### 1. Documentation Scraping for RAG
-```python
-docs = app.crawl_url("https://docs.example.com", params={
-    "limit": 500,
-    "scrapeOptions": {"formats": ["markdown"]}
-})
-```
-
-### 2. Product Data Extraction
-```typescript
-const schema = z.object({
-  title: z.string(),
-  price: z.number(),
-  in_stock: z.boolean()
-});
-
-const products = await app.extract({
-  urls: productUrls,
-  schema: schema
-});
-```
-
-### 3. News Article Scraping
-```python
-article = app.scrape_url("https://news.com/article", params={
-    "formats": ["markdown"],
-    "onlyMainContent": True
-})
-```
-
----
-
-## Cloudflare Workers Integration
-
-Works seamlessly with Cloudflare Workers for serverless scraping:
-
-```typescript
-export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    const app = new FirecrawlApp({ apiKey: env.FIRECRAWL_API_KEY });
-
-    const { url } = await request.json();
-    const result = await app.scrapeUrl(url, {
-      formats: ['markdown'],
-      onlyMainContent: true
-    });
-
-    return Response.json({ markdown: result.markdown });
-  }
-};
-```
+**Savings**: ~65% token reduction + prevents common issues
 
 ---
 
@@ -314,16 +244,6 @@ export default {
 
 ---
 
-## Research Validation
-
-- ✅ API v2 verified (2025-10-20)
-- ✅ Python SDK v4.5.0+ verified on PyPI
-- ✅ Node.js SDK v1.7.x+ verified on npm
-- ✅ All endpoints documented from official docs
-- ✅ Rate limits and best practices confirmed
-
----
-
 ## Next Steps After Using This Skill
 
 1. **Store scraped data**: Use `cloudflare-d1` skill for database storage
@@ -333,9 +253,7 @@ export default {
 
 ---
 
-**Production Tested**: ✅
-**Token Efficiency**: ~60% savings
+**Production Tested**: Yes
+**Token Efficiency**: ~65% savings
 **Error Prevention**: 6 common issues prevented
 **Composable**: Works with other Cloudflare skills
-
-**Ready to use!** Start with `SKILL.md` for complete instructions.

@@ -1,644 +1,586 @@
 ---
 name: firecrawl-scraper
 description: |
-  Convert websites into LLM-ready markdown with Firecrawl v4 API. Handles JavaScript rendering, anti-bot bypass, and structured data extraction for RAG and AI applications.
+  Convert websites into LLM-ready data with Firecrawl API. Features: scrape, crawl, map, search, extract, agent (autonomous), batch operations, and change tracking. Handles JavaScript, anti-bot bypass, PDF/DOCX parsing, and branding extraction.
 
-  Use when: scraping websites, crawling sites, or troubleshooting content not loading, JavaScript rendering, or bot detection.
+  Use when: scraping websites, crawling sites, web search + scrape, autonomous data gathering, monitoring content changes, extracting brand/design systems, or troubleshooting content not loading, JavaScript rendering, or bot detection.
 user-invocable: true
 ---
 
 # Firecrawl Web Scraper Skill
 
-**Status**: Production Ready ✅
-**Last Updated**: 2026-01-09
+**Status**: Production Ready
+**Last Updated**: 2026-01-20
 **Official Docs**: https://docs.firecrawl.dev
-**API Version**: v4 (firecrawl-py 4.12.0+)
+**API Version**: v2
+**SDK Versions**: firecrawl-py 4.13.0+, @mendable/firecrawl-js 4.11.1+
 
 ---
 
 ## What is Firecrawl?
 
-Firecrawl is a **Web Data API for AI** that turns entire websites into LLM-ready markdown or structured data. It handles:
+Firecrawl is a **Web Data API for AI** that turns websites into LLM-ready markdown or structured data. It handles:
 
 - **JavaScript rendering** - Executes client-side JavaScript to capture dynamic content
 - **Anti-bot bypass** - Gets past CAPTCHA and bot detection systems
-- **Format conversion** - Outputs as markdown, JSON, or structured data
-- **Screenshot capture** - Saves visual representations of pages
-- **Browser automation** - Full headless browser capabilities
+- **Format conversion** - Outputs as markdown, HTML, JSON, screenshots, summaries
+- **Document parsing** - Processes PDFs, DOCX files, and images
+- **Autonomous agents** - AI-powered web data gathering without URLs
+- **Change tracking** - Monitor content changes over time
+- **Branding extraction** - Extract color schemes, typography, logos
 
 ---
 
-## API Endpoints
+## API Endpoints Overview
 
-### 1. `/v2/scrape` - Single Page Scraping
+| Endpoint | Purpose | Use Case |
+|----------|---------|----------|
+| `/scrape` | Single page | Extract article, product page |
+| `/crawl` | Full site | Index docs, archive sites |
+| `/map` | URL discovery | Find all pages, plan strategy |
+| `/search` | Web search + scrape | Research with live data |
+| `/extract` | Structured data | Product prices, contacts |
+| `/agent` | Autonomous gathering | No URLs needed, AI navigates |
+| `/batch-scrape` | Multiple URLs | Bulk processing |
+
+---
+
+## 1. Scrape Endpoint (`/v2/scrape`)
+
 Scrapes a single webpage and returns clean, structured content.
 
-**Use Cases**:
-- Extract article content
-- Get product details
-- Scrape specific pages
-- Convert HTML to markdown
-
-**Key Options**:
-- `formats`: ["markdown", "html", "screenshot"]
-- `onlyMainContent`: true/false (removes nav, footer, ads)
-- `waitFor`: milliseconds to wait before scraping
-- `actions`: browser automation actions (click, scroll, etc.)
-
-### 2. `/v2/crawl` - Full Site Crawling
-Crawls all accessible pages from a starting URL.
-
-**Use Cases**:
-- Index entire documentation sites
-- Archive website content
-- Build knowledge bases
-- Scrape multi-page content
-
-**Key Options**:
-- `limit`: max pages to crawl
-- `maxDepth`: how many links deep to follow
-- `allowedDomains`: restrict to specific domains
-- `excludePaths`: skip certain URL patterns
-
-### 3. `/v2/map` - URL Discovery
-Maps all URLs on a website without scraping content.
-
-**Use Cases**:
-- Find sitemap
-- Discover all pages
-- Plan crawling strategy
-- Audit website structure
-
-### 4. `/v2/extract` - Structured Data Extraction
-Uses AI to extract specific data fields from pages.
-
-**Use Cases**:
-- Extract product prices and names
-- Parse contact information
-- Build structured datasets
-- Custom data schemas
-
-**Key Options**:
-- `schema`: Zod or JSON schema defining desired structure
-- `systemPrompt`: guide AI extraction behavior
-
----
-
-## Authentication
-
-Firecrawl requires an API key for all requests.
-
-### Get API Key
-1. Sign up at https://www.firecrawl.dev
-2. Go to dashboard → API Keys
-3. Copy your API key (starts with `fc-`)
-
-### Store Securely
-**NEVER hardcode API keys in code!**
-
-```bash
-# .env file
-FIRECRAWL_API_KEY=fc-your-api-key-here
-```
-
-```bash
-# .env.local (for local development)
-FIRECRAWL_API_KEY=fc-your-api-key-here
-```
-
----
-
-## Python SDK Usage
-
-### Installation
-
-```bash
-pip install firecrawl-py
-```
-
-**Latest Version**: `firecrawl-py v4.12.0+` (Jan 2026)
-
-### Basic Scrape (v4 API)
+### Basic Usage
 
 ```python
-import os
 from firecrawl import Firecrawl
+import os
 
-# Initialize client (reads FIRECRAWL_API_KEY from env automatically)
 app = Firecrawl(api_key=os.environ.get("FIRECRAWL_API_KEY"))
 
-# Scrape a single page - returns Pydantic Document object
+# Basic scrape
 doc = app.scrape(
     url="https://example.com/article",
     formats=["markdown", "html"],
     only_main_content=True
 )
 
-# Access content via attributes (not .get())
 print(doc.markdown)
-print(doc.metadata)  # Page metadata (title, description, etc.)
+print(doc.metadata)
 ```
-
-### Crawl Multiple Pages
-
-```python
-import os
-from firecrawl import Firecrawl
-
-app = Firecrawl(api_key=os.environ.get("FIRECRAWL_API_KEY"))
-
-# Start crawl - returns Pydantic CrawlResult
-result = app.crawl(
-    url="https://docs.example.com",
-    limit=100,
-    scrape_options={
-        "formats": ["markdown"]
-    }
-)
-
-# Process results - result.data is list of Document objects
-for page in result.data:
-    print(f"Scraped: {page.metadata.source_url}")
-    print(f"Content: {page.markdown[:200]}...")
-```
-
-### Extract Structured Data
-
-```python
-import os
-from firecrawl import Firecrawl
-
-app = Firecrawl(api_key=os.environ.get("FIRECRAWL_API_KEY"))
-
-# Define schema (JSON Schema format)
-schema = {
-    "type": "object",
-    "properties": {
-        "company_name": {"type": "string"},
-        "product_price": {"type": "number"},
-        "availability": {"type": "string"}
-    },
-    "required": ["company_name", "product_price"]
-}
-
-# Extract data
-result = app.extract(
-    urls=["https://example.com/product"],
-    schema=schema,
-    system_prompt="Extract product information from the page"
-)
-
-print(result)
-```
-
----
-
-## TypeScript/Node.js SDK Usage
-
-### Installation
-
-```bash
-npm install @mendable/firecrawl-js
-# or
-pnpm add @mendable/firecrawl-js
-# or use the unscoped package:
-npm install firecrawl
-```
-
-**Latest Version**: `@mendable/firecrawl-js v4.4.1+` (or `firecrawl v4.4.1+`)
-
-### Basic Scrape
 
 ```typescript
 import FirecrawlApp from '@mendable/firecrawl-js';
 
-// Initialize client
-const app = new FirecrawlApp({
-  apiKey: process.env.FIRECRAWL_API_KEY
-});
+const app = new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY });
 
-// Scrape a single page
 const result = await app.scrapeUrl('https://example.com/article', {
   formats: ['markdown', 'html'],
   onlyMainContent: true
 });
 
-// Access markdown content
-const markdown = result.markdown;
-console.log(markdown);
+console.log(result.markdown);
 ```
 
-### Crawl Multiple Pages
+### Output Formats
 
-```typescript
-import FirecrawlApp from '@mendable/firecrawl-js';
+| Format | Description |
+|--------|-------------|
+| `markdown` | LLM-optimized content |
+| `html` | Full HTML |
+| `rawHtml` | Unprocessed HTML |
+| `screenshot` | Page capture (with viewport options) |
+| `links` | All URLs on page |
+| `json` | Structured data extraction |
+| `summary` | AI-generated summary |
+| `branding` | Design system data |
+| `changeTracking` | Content change detection |
 
-const app = new FirecrawlApp({
-  apiKey: process.env.FIRECRAWL_API_KEY
-});
-
-// Start crawl
-const crawlResult = await app.crawlUrl('https://docs.example.com', {
-  limit: 100,
-  scrapeOptions: {
-    formats: ['markdown']
-  }
-});
-
-// Process results
-for (const page of crawlResult.data) {
-  console.log(`Scraped: ${page.url}`);
-  console.log(page.markdown);
-}
-```
-
-### Extract Structured Data with Zod
-
-```typescript
-import FirecrawlApp from '@mendable/firecrawl-js';
-import { z } from 'zod';
-
-const app = new FirecrawlApp({
-  apiKey: process.env.FIRECRAWL_API_KEY
-});
-
-// Define schema with Zod
-const schema = z.object({
-  company_name: z.string(),
-  product_price: z.number(),
-  availability: z.string()
-});
-
-// Extract data
-const result = await app.extract({
-  urls: ['https://example.com/product'],
-  schema: schema,
-  systemPrompt: 'Extract product information from the page'
-});
-
-console.log(result);
-```
-
----
-
-## Common Use Cases
-
-### 1. Documentation Scraping
-
-**Scenario**: Convert entire documentation site to markdown for RAG/chatbot
+### Advanced Options
 
 ```python
-app = FirecrawlApp(api_key=os.environ.get("FIRECRAWL_API_KEY"))
-
-docs = app.crawl_url(
-    url="https://docs.myapi.com",
-    params={
-        "limit": 500,
-        "scrapeOptions": {
-            "formats": ["markdown"],
-            "onlyMainContent": True
-        },
-        "allowedDomains": ["docs.myapi.com"]
-    }
+doc = app.scrape(
+    url="https://example.com",
+    formats=["markdown", "screenshot"],
+    only_main_content=True,
+    remove_base64_images=True,
+    wait_for=5000,  # Wait 5s for JS
+    timeout=30000,
+    # Location & language
+    location={"country": "AU", "languages": ["en-AU"]},
+    # Cache control
+    max_age=0,  # Fresh content (no cache)
+    store_in_cache=True,
+    # Stealth mode for complex sites
+    stealth=True,
+    # Custom headers
+    headers={"User-Agent": "Custom Bot 1.0"}
 )
-
-# Save to files
-for page in docs.get("data", []):
-    filename = page["url"].replace("https://", "").replace("/", "_") + ".md"
-    with open(f"docs/{filename}", "w") as f:
-        f.write(page["markdown"])
 ```
-
-### 2. Product Data Extraction
-
-**Scenario**: Extract structured product data for e-commerce
-
-```typescript
-const schema = z.object({
-  title: z.string(),
-  price: z.number(),
-  description: z.string(),
-  images: z.array(z.string()),
-  in_stock: z.boolean()
-});
-
-const products = await app.extract({
-  urls: productUrls,
-  schema: schema,
-  systemPrompt: 'Extract all product details including price and availability'
-});
-```
-
-### 3. News Article Scraping
-
-**Scenario**: Extract clean article content without ads/navigation
-
-```python
-article = app.scrape_url(
-    url="https://news.com/article",
-    params={
-        "formats": ["markdown"],
-        "onlyMainContent": True,
-        "removeBase64Images": True
-    }
-)
-
-# Get clean markdown
-content = article.get("markdown")
-```
-
----
-
-## Error Handling
-
-### Python
-
-```python
-from firecrawl import FirecrawlApp
-from firecrawl.exceptions import FirecrawlException
-
-app = FirecrawlApp(api_key=os.environ.get("FIRECRAWL_API_KEY"))
-
-try:
-    result = app.scrape_url("https://example.com")
-except FirecrawlException as e:
-    print(f"Firecrawl error: {e}")
-except Exception as e:
-    print(f"Unexpected error: {e}")
-```
-
-### TypeScript
-
-```typescript
-import FirecrawlApp from '@mendable/firecrawl-js';
-
-const app = new FirecrawlApp({
-  apiKey: process.env.FIRECRAWL_API_KEY
-});
-
-try {
-  const result = await app.scrapeUrl('https://example.com');
-} catch (error) {
-  if (error.response) {
-    // API error
-    console.error('API Error:', error.response.data);
-  } else {
-    // Network or other error
-    console.error('Error:', error.message);
-  }
-}
-```
-
----
-
-## Rate Limits & Best Practices
-
-### Rate Limits
-- **Free tier**: 500 credits/month
-- **Paid tiers**: Higher limits based on plan
-- Credits consumed vary by endpoint and options
-
-### Best Practices
-
-1. **Use `onlyMainContent: true`** to reduce credits and get cleaner data
-2. **Set reasonable limits** on crawls to avoid excessive costs
-3. **Handle retries** with exponential backoff for transient errors
-4. **Cache results** locally to avoid re-scraping same content
-5. **Use `map` endpoint first** to plan crawling strategy
-6. **Batch extract calls** when processing multiple URLs
-7. **Monitor credit usage** in dashboard
-
----
-
-## Cloudflare Workers Integration
-
-### ⚠️ Important: SDK Compatibility
-
-**The Firecrawl SDK cannot run in Cloudflare Workers** due to Node.js dependencies (specifically `axios` which uses Node.js `http` module). Workers require Web Standard APIs.
-
-**✅ Use the direct REST API with `fetch` instead** (see example below).
-
-**Alternative**: Self-host with [workers-firecrawl](https://github.com/G4brym/workers-firecrawl) - a Workers-native implementation (requires Workers Paid Plan, only implements `/search` endpoint).
-
----
-
-### Workers Example: Direct REST API
-
-This example uses the `fetch` API to call Firecrawl directly - works perfectly in Cloudflare Workers:
-
-```typescript
-interface Env {
-  FIRECRAWL_API_KEY: string;
-  SCRAPED_CACHE?: KVNamespace; // Optional: for caching results
-}
-
-interface FirecrawlScrapeResponse {
-  success: boolean;
-  data: {
-    markdown?: string;
-    html?: string;
-    metadata: {
-      title?: string;
-      description?: string;
-      language?: string;
-      sourceURL: string;
-    };
-  };
-}
-
-export default {
-  async fetch(request: Request, env: Env): Promise<Response> {
-    if (request.method !== 'POST') {
-      return Response.json({ error: 'Method not allowed' }, { status: 405 });
-    }
-
-    try {
-      const { url } = await request.json<{ url: string }>();
-
-      if (!url) {
-        return Response.json({ error: 'URL is required' }, { status: 400 });
-      }
-
-      // Check cache (optional)
-      if (env.SCRAPED_CACHE) {
-        const cached = await env.SCRAPED_CACHE.get(url, 'json');
-        if (cached) {
-          return Response.json({ cached: true, data: cached });
-        }
-      }
-
-      // Call Firecrawl API directly using fetch
-      const response = await fetch('https://api.firecrawl.dev/v2/scrape', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${env.FIRECRAWL_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          url: url,
-          formats: ['markdown'],
-          onlyMainContent: true,
-          removeBase64Images: true
-        })
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Firecrawl API error (${response.status}): ${errorText}`);
-      }
-
-      const result = await response.json<FirecrawlScrapeResponse>();
-
-      // Cache for 1 hour (optional)
-      if (env.SCRAPED_CACHE && result.success) {
-        await env.SCRAPED_CACHE.put(
-          url,
-          JSON.stringify(result.data),
-          { expirationTtl: 3600 }
-        );
-      }
-
-      return Response.json({
-        cached: false,
-        data: result.data
-      });
-
-    } catch (error) {
-      console.error('Scraping error:', error);
-      return Response.json(
-        { error: error instanceof Error ? error.message : 'Unknown error' },
-        { status: 500 }
-      );
-    }
-  }
-};
-```
-
-**Environment Setup**: Add `FIRECRAWL_API_KEY` in Wrangler secrets:
-
-```bash
-npx wrangler secret put FIRECRAWL_API_KEY
-```
-
-**Optional KV Binding** (for caching - add to `wrangler.jsonc`):
-
-```jsonc
-{
-  "kv_namespaces": [
-    {
-      "binding": "SCRAPED_CACHE",
-      "id": "your-kv-namespace-id"
-    }
-  ]
-}
-```
-
-See `templates/firecrawl-worker-fetch.ts` for a complete production-ready example.
-
----
-
-## When to Use This Skill
-
-✅ **Use Firecrawl when:**
-- Scraping modern websites with JavaScript
-- Need clean markdown output for LLMs
-- Building RAG systems from web content
-- Extracting structured data at scale
-- Dealing with bot protection
-- Need reliable, production-ready scraping
-
-❌ **Don't use Firecrawl when:**
-- Scraping simple static HTML (use cheerio/beautifulsoup)
-- Have existing Puppeteer/Playwright setup working well
-- Working with APIs (use direct API calls instead)
-- Budget constraints (free tier has limits)
-
----
-
-## Common Issues & Solutions
-
-### Issue: "Invalid API Key"
-**Cause**: API key not set or incorrect
-**Fix**:
-```bash
-# Check env variable is set
-echo $FIRECRAWL_API_KEY
-
-# Verify key format (should start with fc-)
-```
-
-### Issue: "Rate limit exceeded"
-**Cause**: Exceeded monthly credits
-**Fix**:
-- Check usage in dashboard
-- Upgrade plan or wait for reset
-- Use `onlyMainContent: true` to reduce credits
-
-### Issue: "Timeout error"
-**Cause**: Page takes too long to load
-**Fix**:
-```python
-result = app.scrape_url(url, params={"waitFor": 10000})  # Wait 10s
-```
-
-### Issue: "Content is empty"
-**Cause**: Content loaded via JavaScript after initial render
-**Fix**:
-```python
-result = app.scrape_url(url, params={
-    "waitFor": 5000,
-    "actions": [{"type": "wait", "milliseconds": 3000}]
-})
-```
-
----
-
-## Advanced Features
 
 ### Browser Actions
 
 Perform interactions before scraping:
 
 ```python
-result = app.scrape_url(
+doc = app.scrape(
     url="https://example.com",
-    params={
-        "actions": [
-            {"type": "click", "selector": "button.load-more"},
-            {"type": "wait", "milliseconds": 2000},
-            {"type": "scroll", "direction": "down"}
-        ]
-    }
+    actions=[
+        {"type": "click", "selector": "button.load-more"},
+        {"type": "wait", "milliseconds": 2000},
+        {"type": "scroll", "direction": "down"},
+        {"type": "write", "selector": "input#search", "text": "query"},
+        {"type": "press", "key": "Enter"},
+        {"type": "screenshot"}  # Capture state mid-action
+    ]
 )
 ```
 
-### Custom Headers
+### JSON Mode (Structured Extraction)
 
 ```python
-result = app.scrape_url(
-    url="https://example.com",
-    params={
-        "headers": {
-            "User-Agent": "Custom Bot 1.0",
-            "Accept-Language": "en-US"
+# With schema
+doc = app.scrape(
+    url="https://example.com/product",
+    formats=["json"],
+    json_options={
+        "schema": {
+            "type": "object",
+            "properties": {
+                "title": {"type": "string"},
+                "price": {"type": "number"},
+                "in_stock": {"type": "boolean"}
+            }
         }
     }
 )
-```
 
-### Webhooks for Long Crawls
-
-Instead of polling, receive results via webhook:
-
-```python
-crawl = app.crawl_url(
-    url="https://docs.example.com",
-    params={
-        "limit": 1000,
-        "webhook": "https://your-domain.com/webhook"
+# Without schema (prompt-only)
+doc = app.scrape(
+    url="https://example.com/product",
+    formats=["json"],
+    json_options={
+        "prompt": "Extract the product name, price, and availability"
     }
 )
 ```
+
+### Branding Extraction
+
+Extract design system and brand identity:
+
+```python
+doc = app.scrape(
+    url="https://example.com",
+    formats=["branding"]
+)
+
+# Returns:
+# - Color schemes and palettes
+# - Typography (fonts, sizes, weights)
+# - Spacing and layout metrics
+# - UI component styles
+# - Logo and imagery URLs
+# - Brand personality traits
+```
+
+---
+
+## 2. Crawl Endpoint (`/v2/crawl`)
+
+Crawls all accessible pages from a starting URL.
+
+```python
+result = app.crawl(
+    url="https://docs.example.com",
+    limit=100,
+    max_depth=3,
+    allowed_domains=["docs.example.com"],
+    exclude_paths=["/api/*", "/admin/*"],
+    scrape_options={
+        "formats": ["markdown"],
+        "only_main_content": True
+    }
+)
+
+for page in result.data:
+    print(f"Scraped: {page.metadata.source_url}")
+    print(f"Content: {page.markdown[:200]}...")
+```
+
+### Async Crawl with Webhooks
+
+```python
+# Start crawl (returns immediately)
+job = app.start_crawl(
+    url="https://docs.example.com",
+    limit=1000,
+    webhook="https://your-domain.com/webhook"
+)
+
+print(f"Job ID: {job.id}")
+
+# Or poll for status
+status = app.check_crawl_status(job.id)
+```
+
+---
+
+## 3. Map Endpoint (`/v2/map`)
+
+Rapidly discover all URLs on a website without scraping content.
+
+```python
+urls = app.map(url="https://example.com")
+
+print(f"Found {len(urls)} pages")
+for url in urls[:10]:
+    print(url)
+```
+
+Use for: sitemap discovery, crawl planning, website audits.
+
+---
+
+## 4. Search Endpoint (`/search`) - NEW
+
+Perform web searches and optionally scrape the results in one operation.
+
+```python
+# Basic search
+results = app.search(
+    query="best practices for React server components",
+    limit=10
+)
+
+for result in results:
+    print(f"{result.title}: {result.url}")
+
+# Search + scrape results
+results = app.search(
+    query="React server components tutorial",
+    limit=5,
+    scrape_options={
+        "formats": ["markdown"],
+        "only_main_content": True
+    }
+)
+
+for result in results:
+    print(f"{result.title}")
+    print(result.markdown[:500])
+```
+
+### Search Options
+
+```python
+results = app.search(
+    query="machine learning papers",
+    limit=20,
+    # Filter by source type
+    sources=["web", "news", "images"],
+    # Filter by category
+    categories=["github", "research", "pdf"],
+    # Location
+    location={"country": "US"},
+    # Time filter
+    tbs="qdr:m",  # Past month (qdr:h=hour, qdr:d=day, qdr:w=week, qdr:y=year)
+    timeout=30000
+)
+```
+
+**Cost**: 2 credits per 10 results + scraping costs if enabled.
+
+---
+
+## 5. Extract Endpoint (`/v2/extract`)
+
+AI-powered structured data extraction from single pages, multiple pages, or entire domains.
+
+### Single Page
+
+```python
+from pydantic import BaseModel
+
+class Product(BaseModel):
+    name: str
+    price: float
+    description: str
+    in_stock: bool
+
+result = app.extract(
+    urls=["https://example.com/product"],
+    schema=Product,
+    system_prompt="Extract product information"
+)
+
+print(result.data)
+```
+
+### Multi-Page / Domain Extraction
+
+```python
+# Extract from entire domain using wildcard
+result = app.extract(
+    urls=["example.com/*"],  # All pages on domain
+    schema=Product,
+    system_prompt="Extract all products"
+)
+
+# Enable web search for additional context
+result = app.extract(
+    urls=["example.com/products"],
+    schema=Product,
+    enable_web_search=True  # Follow external links
+)
+```
+
+### Prompt-Only Extraction (No Schema)
+
+```python
+result = app.extract(
+    urls=["https://example.com/about"],
+    prompt="Extract the company name, founding year, and key executives"
+)
+# LLM determines output structure
+```
+
+---
+
+## 6. Agent Endpoint (`/agent`) - NEW
+
+Autonomous web data gathering without requiring specific URLs. The agent searches, navigates, and gathers data using natural language prompts.
+
+```python
+# Basic agent usage
+result = app.agent(
+    prompt="Find the pricing plans for the top 3 headless CMS platforms and compare their features"
+)
+
+print(result.data)
+
+# With schema for structured output
+from pydantic import BaseModel
+from typing import List
+
+class CMSPricing(BaseModel):
+    name: str
+    free_tier: bool
+    starter_price: float
+    features: List[str]
+
+result = app.agent(
+    prompt="Find pricing for Contentful, Sanity, and Strapi",
+    schema=CMSPricing
+)
+
+# Optional: focus on specific URLs
+result = app.agent(
+    prompt="Extract the enterprise pricing details",
+    urls=["https://contentful.com/pricing", "https://sanity.io/pricing"]
+)
+```
+
+### Agent Models
+
+| Model | Best For | Cost |
+|-------|----------|------|
+| `spark-1-mini` (default) | Simple extractions, high volume | Standard |
+| `spark-1-pro` | Complex analysis, ambiguous data | 60% more |
+
+```python
+result = app.agent(
+    prompt="Analyze competitive positioning...",
+    model="spark-1-pro"  # For complex tasks
+)
+```
+
+### Async Agent
+
+```python
+# Start agent (returns immediately)
+job = app.start_agent(
+    prompt="Research market trends..."
+)
+
+# Poll for results
+status = app.check_agent_status(job.id)
+if status.status == "completed":
+    print(status.data)
+```
+
+**Note**: Agent is in Research Preview. 5 free daily requests, then credit-based billing.
+
+---
+
+## 7. Batch Scrape - NEW
+
+Process multiple URLs efficiently in a single operation.
+
+### Synchronous (waits for completion)
+
+```python
+results = app.batch_scrape(
+    urls=[
+        "https://example.com/page1",
+        "https://example.com/page2",
+        "https://example.com/page3"
+    ],
+    formats=["markdown"],
+    only_main_content=True
+)
+
+for page in results.data:
+    print(f"{page.metadata.source_url}: {len(page.markdown)} chars")
+```
+
+### Asynchronous (with webhooks)
+
+```python
+job = app.start_batch_scrape(
+    urls=url_list,
+    formats=["markdown"],
+    webhook="https://your-domain.com/webhook"
+)
+
+# Webhook receives events: started, page, completed, failed
+```
+
+```typescript
+const job = await app.startBatchScrape(urls, {
+  formats: ['markdown'],
+  webhook: 'https://your-domain.com/webhook'
+});
+
+// Poll for status
+const status = await app.checkBatchScrapeStatus(job.id);
+```
+
+---
+
+## 8. Change Tracking - NEW
+
+Monitor content changes over time by comparing scrapes.
+
+```python
+# Enable change tracking
+doc = app.scrape(
+    url="https://example.com/pricing",
+    formats=["markdown", "changeTracking"]
+)
+
+# Response includes:
+print(doc.change_tracking.status)  # new, same, changed, removed
+print(doc.change_tracking.previous_scrape_at)
+print(doc.change_tracking.visibility)  # visible, hidden
+```
+
+### Comparison Modes
+
+```python
+# Git-diff mode (default)
+doc = app.scrape(
+    url="https://example.com/docs",
+    formats=["markdown", "changeTracking"],
+    change_tracking_options={
+        "mode": "diff"
+    }
+)
+print(doc.change_tracking.diff)  # Line-by-line changes
+
+# JSON mode (structured comparison)
+doc = app.scrape(
+    url="https://example.com/pricing",
+    formats=["markdown", "changeTracking"],
+    change_tracking_options={
+        "mode": "json",
+        "schema": {"type": "object", "properties": {"price": {"type": "number"}}}
+    }
+)
+# Costs 5 credits per page
+```
+
+**Change States**:
+- `new` - Page not seen before
+- `same` - No changes since last scrape
+- `changed` - Content modified
+- `removed` - Page no longer accessible
+
+---
+
+## Authentication
+
+```bash
+# Get API key from https://www.firecrawl.dev/app
+# Store in environment
+FIRECRAWL_API_KEY=fc-your-api-key-here
+```
+
+**Never hardcode API keys!**
+
+---
+
+## Cloudflare Workers Integration
+
+**The Firecrawl SDK cannot run in Cloudflare Workers** (requires Node.js). Use the REST API directly:
+
+```typescript
+interface Env {
+  FIRECRAWL_API_KEY: string;
+}
+
+export default {
+  async fetch(request: Request, env: Env): Promise<Response> {
+    const { url } = await request.json<{ url: string }>();
+
+    const response = await fetch('https://api.firecrawl.dev/v2/scrape', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.FIRECRAWL_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        url,
+        formats: ['markdown'],
+        onlyMainContent: true
+      })
+    });
+
+    const result = await response.json();
+    return Response.json(result);
+  }
+};
+```
+
+---
+
+## Rate Limits & Pricing
+
+| Tier | Credits/Month | Notes |
+|------|---------------|-------|
+| Free | 500 | Good for testing |
+| Hobby | 3,000 | $19/month |
+| Standard | 100,000 | $99/month |
+| Growth | 500,000 | $399/month |
+
+**Credit Costs**:
+- Scrape: 1-4 credits (depends on options)
+- Crawl: 1 credit per page
+- Search: 2 credits per 10 results
+- Extract: 5 credits per page
+- Agent: Dynamic (complexity-based)
+- Change Tracking JSON mode: +5 credits
+
+---
+
+## Common Issues & Solutions
+
+| Issue | Cause | Solution |
+|-------|-------|----------|
+| Empty content | JS not loaded | Add `wait_for: 5000` or use `actions` |
+| Rate limit exceeded | Over quota | Check dashboard, upgrade plan |
+| Timeout error | Slow page | Increase `timeout`, use `stealth: true` |
+| Bot detection | Anti-scraping | Use `stealth: true`, add `location` |
+| Invalid API key | Wrong format | Must start with `fc-` |
 
 ---
 
@@ -646,11 +588,9 @@ crawl = app.crawl_url(
 
 | Package | Version | Last Checked |
 |---------|---------|--------------|
-| firecrawl-py | 4.5.0+ | 2025-10-20 |
-| @mendable/firecrawl-js (or firecrawl) | 4.4.1+ | 2025-10-24 |
+| firecrawl-py | 4.13.0+ | 2026-01-20 |
+| @mendable/firecrawl-js | 4.11.1+ | 2026-01-20 |
 | API Version | v2 | Current |
-
-**Note**: The Node.js SDK requires Node.js >=22.0.0 and cannot run in Cloudflare Workers. Use direct REST API calls in Workers (see Cloudflare Workers Integration section).
 
 ---
 
@@ -665,15 +605,6 @@ crawl = app.crawl_url(
 
 ---
 
-## Next Steps After Using This Skill
-
-1. **Store scraped data**: Use Cloudflare D1, R2, or KV to persist results
-2. **Build RAG system**: Combine with Vectorize for semantic search
-3. **Add scheduling**: Use Cloudflare Queues for recurring scrapes
-4. **Process content**: Use Workers AI to analyze scraped data
-
----
-
-**Token Savings**: ~60% vs manual integration
-**Error Prevention**: API authentication, rate limiting, format handling
-**Production Ready**: ✅
+**Token Savings**: ~65% vs manual integration
+**Error Prevention**: API auth, rate limiting, format handling, JS rendering
+**Production Ready**: Yes
