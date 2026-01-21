@@ -1,9 +1,9 @@
 ---
 name: tinacms
 description: |
-  Build content-heavy sites with Git-backed TinaCMS. Provides visual editing for blogs, documentation, and marketing sites. Supports Next.js, Vite+React, and Astro with self-hosting options.
+  Build content-heavy sites with Git-backed TinaCMS. Provides visual editing for blogs, documentation, and marketing sites. Supports Next.js, Vite+React, and Astro with TinaCloud or Node.js self-hosting. Prevents 10 documented errors.
 
-  Use when setting up CMS with non-technical editors or troubleshooting ESbuild compilation, module resolution, or Docker binding issues.
+  Use when setting up CMS with non-technical editors or troubleshooting ESbuild compilation, module resolution, package manager compatibility, edge runtime limitations, or media upload timeouts.
 user-invocable: true
 allowed-tools: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep']
 ---
@@ -12,16 +12,26 @@ allowed-tools: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep']
 
 Git-backed headless CMS with visual editing for content-heavy sites.
 
-**Last Updated**: 2026-01-09
-**Versions**: tinacms@3.2.0, @tinacms/cli@2.0.7
+**Last Updated**: 2026-01-21
+**Versions**: tinacms@3.3.1, @tinacms/cli@2.1.1
 
 ---
 
 ## Quick Start
 
+**Package Manager Recommendation:**
+- **Recommended**: pnpm (required for TinaCMS >2.7.3)
+- **Alternative**: npm or yarn (may have module resolution issues in newer versions)
+
 ```bash
+# Install pnpm (if needed)
+npm install -g pnpm
+
 # Initialize TinaCMS
 npx @tinacms/cli@latest init
+
+# Install dependencies with pnpm
+pnpm install
 
 # Update package.json scripts
 {
@@ -34,11 +44,28 @@ NEXT_PUBLIC_TINA_CLIENT_ID=your_client_id
 TINA_TOKEN=your_read_only_token
 
 # Start dev server
-npm run dev
+pnpm run dev
 
 # Access admin interface
 http://localhost:3000/admin/index.html
 ```
+
+**Version Locking (Recommended):**
+
+Pin exact versions to prevent breaking changes from automatic CLI/UI updates:
+
+```json
+{
+  "dependencies": {
+    "tinacms": "3.3.1",  // NOT "^3.3.1"
+    "@tinacms/cli": "2.1.1"
+  }
+}
+```
+
+**Why**: TinaCMS UI assets are served from CDN and may update before your local CLI, causing incompatibilities.
+
+**Source**: [GitHub Issue #5838](https://github.com/tinacms/tinacms/issues/5838)
 
 ---
 
@@ -125,6 +152,19 @@ export default defineConfig({
 ```
 
 **Field Types**: `string`, `rich-text`, `number`, `datetime`, `boolean`, `image`, `reference`, `object`
+
+**Reference Field Note**: When a reference field references multiple collection types with shared field names, ensure the field types match. Conflicting types (e.g., `bio: string` vs `bio: rich-text`) cause GraphQL schema errors.
+
+```typescript
+// Example: Reference field referencing multiple collections
+{
+  type: 'reference',
+  name: 'contributor',
+  collections: ['author', 'editor']  // Ensure shared fields have same type
+}
+```
+
+**Source**: [Community-sourced](https://adamcogan.com/2024/08/27/7-important-updates-to-tinacms-2-0/)
 
 ---
 
@@ -421,13 +461,20 @@ http://localhost:4001/...
 ```
 
 **For Subdirectory Deployments:**
+
+> **⚠️ Sub-path Deployment Limitation**: TinaCMS has known issues loading assets correctly when deployed to a sub-path (e.g., `example.com/cms/admin` instead of `example.com/admin`). This is a limitation even with `basePath` configuration.
+>
+> **Workaround**: Deploy TinaCMS admin at root path (`/admin`) or use reverse proxy rewrite rules.
+>
+> **Source**: [Community-sourced](https://adamcogan.com/2024/08/27/7-important-updates-to-tinacms-2-0/)
+
 ```typescript
 // tina/config.ts
 export default defineConfig({
   build: {
     outputFolder: 'admin',
     publicFolder: 'public',
-    basePath: 'your-subdirectory'  // ← Set if site not at domain root
+    basePath: 'your-subdirectory'  // ← May have asset loading issues on sub-paths
   }
 })
 ```
@@ -492,6 +539,32 @@ export default defineConfig({
 
 ---
 
+### 10. ❌ Media Manager Upload Timeouts (Ghost Uploads)
+
+**Error Message:**
+```
+Upload failed
+Error uploading image
+```
+
+**Cause:**
+- Media Manager shows error but image uploads successfully in background
+- UI timeout doesn't reflect actual upload status
+- Similar issue occurs with deletion (error shown but deletion succeeds)
+
+**Solution:**
+
+If upload shows error:
+1. Wait 5-10 seconds
+2. Close and reopen Media Manager
+3. Check if image already uploaded before retrying
+4. Avoid duplicate upload attempts
+
+**Status**: Known issue (high priority)
+**Source**: [GitHub Issue #6325](https://github.com/tinacms/tinacms/issues/6325)
+
+---
+
 ## Deployment Options
 
 ### TinaCloud (Managed) - Recommended
@@ -506,14 +579,24 @@ export default defineConfig({
 
 ---
 
-### Self-Hosted on Cloudflare Workers
+### Self-Hosted on Node.js
+
+> **⚠️ Edge Runtime Limitation**: Self-hosted TinaCMS does NOT work in Edge Runtime environments (Cloudflare Workers, Vercel Edge Functions) due to Node.js dependencies in `@tinacms/datalayer` and `@tinacms/graphql`. Use TinaCloud (managed service) for edge deployments.
+>
+> **Source**: [GitHub Issue #4363](https://github.com/tinacms/tinacms/issues/4363) (labeled "wontfix")
+
+> **⚠️ Self-Hosted Examples May Be Outdated**: Official self-hosted examples in the TinaCMS repository are acknowledged by the team as "quite out of date". Always cross-reference with latest documentation instead of relying solely on example repos.
+>
+> **Source**: [GitHub Issue #6365](https://github.com/tinacms/tinacms/issues/6365)
+
+**For Node.js environments only** (not edge runtime):
 
 ```bash
-npm install @tinacms/datalayer tinacms-authjs
+pnpm install @tinacms/datalayer tinacms-authjs
 npx @tinacms/cli@latest init backend
 ```
 
-**workers/src/index.ts**:
+**Example (Node.js server, not Workers)**:
 ```typescript
 import { TinaNodeBackend, LocalBackendAuthProvider } from '@tinacms/datalayer'
 import { AuthJsBackendAuthProvider, TinaAuthJSOptions } from 'tinacms-authjs'
@@ -521,22 +604,19 @@ import databaseClient from '../../tina/__generated__/databaseClient'
 
 const isLocal = process.env.TINA_PUBLIC_IS_LOCAL === 'true'
 
-export default {
-  async fetch(request: Request, env: Env) {
-    const handler = TinaNodeBackend({
-      authProvider: isLocal
-        ? LocalBackendAuthProvider()
-        : AuthJsBackendAuthProvider({
-            authOptions: TinaAuthJSOptions({
-              databaseClient,
-              secret: env.NEXTAUTH_SECRET,
-            }),
-          }),
-      databaseClient,
-    })
-    return handler(request)
-  }
-}
+// This ONLY works in Node.js runtime, NOT edge runtime
+const handler = TinaNodeBackend({
+  authProvider: isLocal
+    ? LocalBackendAuthProvider()
+    : AuthJsBackendAuthProvider({
+        authOptions: TinaAuthJSOptions({
+          databaseClient,
+          secret: process.env.NEXTAUTH_SECRET,
+        }),
+      }),
+  databaseClient,
+})
 ```
 
-**Pros**: Full control, 100k requests/day free tier, global edge network
+**Pros**: Full control, self-hosted
+**Cons**: Requires Node.js runtime (cannot use edge computing)

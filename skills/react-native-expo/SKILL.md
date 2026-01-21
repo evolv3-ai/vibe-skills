@@ -1,18 +1,18 @@
 ---
 name: react-native-expo
 description: |
-  Build React Native 0.76+ apps with Expo SDK 52+. Covers mandatory New Architecture (0.82+), React 19 changes, new CSS properties, and Swift iOS template.
+  Build React Native 0.76+ apps with Expo SDK 52-54. Covers mandatory New Architecture (0.82+/SDK 55+), React 19 changes, SDK 54 breaking changes (expo-av, expo-file-system, Reanimated v4), and Swift iOS template. Prevents 16 documented errors.
 
-  Use when building Expo apps, migrating to New Architecture, or fixing Fabric, TurboModule, propTypes, or Swift AppDelegate errors.
+  Use when building Expo apps, migrating to New Architecture, upgrading to SDK 54+, or fixing Fabric, TurboModule, propTypes, expo-updates crashes, or Swift AppDelegate errors.
 user-invocable: true
 ---
 
 # React Native Expo (0.76-0.82+ / SDK 52+)
 
 **Status**: Production Ready
-**Last Updated**: 2026-01-09
-**Dependencies**: Node.js 18+, Expo CLI
-**Latest Versions**: react-native@0.83.1, expo@~54.0.31, react@19.2.3
+**Last Updated**: 2026-01-21
+**Dependencies**: Node.js 20.19.4+, Expo CLI, Xcode 16.1+ (iOS)
+**Latest Versions**: react-native@0.81.5, expo@~54.0.31, react@19.2.3
 
 ---
 
@@ -69,13 +69,17 @@ npx expo start
 
 ### 🔴 New Architecture Mandatory (0.82+)
 
+**SDK Timeline:**
+- **Expo SDK 54** (React Native 0.81): Last release supporting Legacy Architecture
+- **Expo SDK 55** (React Native 0.83): New Architecture mandatory, Legacy completely removed
+
 **What Changed:**
-- **0.76-0.81**: New Architecture default, legacy frozen (no new features)
-- **0.82+**: Legacy Architecture **completely removed** from codebase
+- **0.76-0.81 / SDK 52-54**: New Architecture default, legacy frozen (no new features)
+- **0.82+ / SDK 55+**: Legacy Architecture **completely removed** from codebase
 
 **Impact:**
 ```bash
-# This will FAIL in 0.82+:
+# This will FAIL in 0.82+ / SDK 55+:
 # gradle.properties (Android)
 newArchEnabled=false  # ❌ Ignored, build fails
 
@@ -84,10 +88,12 @@ RCT_NEW_ARCH_ENABLED=0  # ❌ Ignored, build fails
 ```
 
 **Migration Path:**
-1. Upgrade to 0.76-0.81 first (if on 0.75 or earlier)
+1. Upgrade to 0.76-0.81 / SDK 54 first (if on 0.75 or earlier)
 2. Test with New Architecture enabled
-3. Fix incompatible dependencies (Redux, i18n, CodePush)
-4. Then upgrade to 0.82+
+3. Fix incompatible dependencies (Redux, i18n, CodePush, Reanimated v3 → v4)
+4. Then upgrade to 0.82+ / SDK 55+
+
+**Source:** [Expo SDK 54 Changelog](https://expo.dev/changelog/sdk-54)
 
 ### 🔴 propTypes Removed (React 19 / RN 0.78+)
 
@@ -242,27 +248,26 @@ Old Chrome debugger (`chrome://inspect`) removed. Use React Native DevTools inst
 ### 🔴 JSC Engine Moved to Community (0.79+)
 
 **What Changed:**
-JavaScriptCore (JSC) moved out of React Native core, Hermes is default.
+JavaScriptCore (JSC) first-party support removed from React Native 0.81+ core. Moved to community package.
 
 **Before (0.78):**
-- Both Hermes and JSC bundled
+- Both Hermes and JSC bundled in React Native
 - JSC available in Expo Go
 
-**After (0.79+):**
-```json
-// If you still need JSC (rare):
-{
-  "dependencies": {
-    "@react-native-community/javascriptcore": "^1.0.0"
-  }
-}
+**After (0.79+ / React Native 0.81+ / SDK 54):**
+```bash
+# JSC removed from React Native core
+# If you still need JSC (rare):
+npm install @react-native-community/javascriptcore
 ```
 
 **Expo Go:**
-- JSC completely removed from Expo Go (SDK 52+)
-- Hermes only
+- SDK 52+: JSC completely removed from Expo Go
+- Hermes only supported
 
 **Note:** JSC will eventually be removed entirely from React Native.
+
+**Source:** [Expo SDK 54 Changelog](https://expo.dev/changelog/sdk-54)
 
 ### 🔴 Deep Imports Deprecated (0.80+)
 
@@ -283,6 +288,42 @@ import { Button, Platform } from 'react-native';
 ```
 
 **Source:** [React Native 0.80 Release Notes](https://reactnative.dev/blog/2025/06/release-0.80)
+
+### 🔴 Android Edge-to-Edge Mandatory (SDK 54+)
+
+**What Changed:**
+Edge-to-edge display is **enabled in all Android apps by default in SDK 54 and cannot be disabled**.
+
+**Impact:**
+```json
+// app.json or app.config.js
+{
+  "expo": {
+    "android": {
+      // This setting is now IGNORED - edge-to-edge always enabled
+      "edgeToEdgeEnabled": false  // ❌ No effect in SDK 54+
+    }
+  }
+}
+```
+
+**UI Impact:**
+Content now extends behind system status bar and navigation bar. You must account for insets manually using `react-native-safe-area-context`.
+
+**Solution:**
+```typescript
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+function App() {
+  return (
+    <SafeAreaView style={{ flex: 1 }}>
+      {/* Content respects system bars */}
+    </SafeAreaView>
+  );
+}
+```
+
+**Source:** [Expo SDK 54 Changelog](https://expo.dev/changelog/sdk-54)
 
 ---
 
@@ -487,7 +528,7 @@ function UserProfile({ userPromise }) {
 
 ## Known Issues Prevention
 
-This skill prevents **12** documented issues:
+This skill prevents **16** documented issues:
 
 ### Issue #1: propTypes Silently Ignored
 **Error:** No error - `propTypes` just doesn't work
@@ -560,6 +601,117 @@ This skill prevents **12** documented issues:
 **Source:** [CodePush GitHub Issues](https://github.com/microsoft/react-native-code-push/issues)
 **Why It Happens:** Known incompatibility with New Architecture
 **Prevention:** Avoid CodePush with New Architecture, or wait for official support
+
+### Issue #13: expo-file-system Legacy API Removed (SDK 55+)
+**Error:** `Module not found: expo-file-system/legacy`
+**Source:** [Expo SDK 54 Changelog](https://expo.dev/changelog/sdk-54), [GitHub Issue #39056](https://github.com/expo/expo/issues/39056)
+**Why It Happens:** Legacy API removed in SDK 55, must migrate to new File/Directory class API
+**Prevention:** Migrate to new API before upgrading to SDK 55
+
+**Migration Timeline:**
+- SDK 53 and earlier: Legacy API at `expo-file-system`
+- SDK 54: Legacy API at `expo-file-system/legacy`, new API at `expo-file-system` (default)
+- SDK 55: Legacy API removed completely
+
+**Old Code (SDK 54 with legacy import):**
+```typescript
+import * as FileSystem from 'expo-file-system/legacy';
+await FileSystem.writeAsStringAsync(uri, content);
+```
+
+**New Code (SDK 54+ new API):**
+```typescript
+import { File } from 'expo-file-system';
+const file = new File(uri);
+await file.writeString(content);
+```
+
+### Issue #14: expo-av Removed (SDK 55+)
+**Error:** `Module not found: expo-av`
+**Source:** [Expo SDK 54 Changelog](https://expo.dev/changelog/sdk-54), [expo-av GitHub](https://github.com/expo/expo-av)
+**Why It Happens:** Package deprecated in SDK 53, removed in SDK 55
+**Prevention:** Migrate to expo-audio and expo-video before SDK 55
+
+**Migration Timeline:**
+- SDK 52: `expo-video` introduced
+- SDK 53: `expo-audio` introduced, `expo-av` deprecated
+- SDK 54: Last release with `expo-av` (no patches)
+- SDK 55: `expo-av` removed
+
+**Migration - Audio:**
+```typescript
+// OLD: expo-av
+import { Audio } from 'expo-av';
+const { sound } = await Audio.Sound.createAsync(require('./audio.mp3'));
+await sound.playAsync();
+
+// NEW: expo-audio
+import { useAudioPlayer } from 'expo-audio';
+const player = useAudioPlayer(require('./audio.mp3'));
+player.play();
+```
+
+**Migration - Video:**
+```typescript
+// OLD: expo-av
+import { Video } from 'expo-av';
+<Video source={require('./video.mp4')} />
+
+// NEW: expo-video
+import { VideoView } from 'expo-video';
+<VideoView source={require('./video.mp4')} />
+```
+
+### Issue #15: Reanimated v4 Requires New Architecture
+**Error:** Build fails or crashes with Reanimated v4 on Legacy Architecture
+**Source:** [Expo SDK 54 FYI](https://github.com/expo/fyi/blob/main/expo-54-reanimated.md)
+**Why It Happens:** Reanimated v4 exclusively requires New Architecture
+**Prevention:** Use Reanimated v3 with Legacy Architecture, or migrate to New Architecture first
+
+**Version Matrix:**
+| Reanimated Version | Architecture Support | Expo SDK |
+|-------------------|---------------------|----------|
+| v3 | Legacy + New Architecture | SDK 52-54 |
+| v4 | New Architecture ONLY | SDK 54+ |
+
+**NativeWind Incompatibility:**
+```bash
+# NativeWind does not support Reanimated v4 yet (as of Jan 2026)
+# If using NativeWind, must stay on Reanimated v3
+npm install react-native-reanimated@^3
+```
+
+**Migration to v4 (New Architecture only):**
+1. Install `react-native-worklets` (required for v4)
+2. Follow [official Reanimated v3 → v4 migration guide](https://docs.swmansion.com/react-native-reanimated/docs/fundamentals/getting-started/)
+3. Skip babel.config.js changes if using `babel-preset-expo` (auto-configured)
+
+### Issue #16: iOS Crashes on Launch with Hermes + New Architecture (SDK 54) - Community-sourced
+**Error:**
+```
+hermes::vm::JSObject::putComputed_RJS
+hermes::vm::arrayPrototypePush
+```
+**Source:** [GitHub Issue #41824](https://github.com/expo/expo/issues/41824), [Medium Post](https://medium.com/@shanavascruise/new-architecture-by-default-hermes-ios-expo-updates-can-break-your-ios-builds-4e98d89a1648)
+**Verified:** Reproduction available
+**Why It Happens:** Expo Updates requires explicit `:hermes_enabled` flag in Podfile when using New Architecture on iOS
+**Prevention:** Add explicit Hermes flag to ios/Podfile
+
+**Conditions:**
+- Expo SDK 54
+- New Architecture enabled
+- Hermes enabled (default)
+- Using `expo-updates`
+- iOS only (Android unaffected)
+
+**Workaround:**
+```ruby
+# ios/Podfile
+use_frameworks! :linkage => :static
+ENV['HERMES_ENABLED'] = '1'  # ⚠️ CRITICAL: Must be explicit with New Arch + expo-updates
+```
+
+**Note:** This is a community-sourced finding with reproduction repository, not yet officially documented in Expo changelog.
 
 ---
 
@@ -842,14 +994,21 @@ npm install @react-navigation/native@^7.0.0
 
 ---
 
-## Package Versions (Verified 2025-11-22)
+## Package Versions (Verified 2026-01-21)
+
+**Build Tool Requirements (SDK 54+):**
+- **Xcode**: Minimum 16.1, Xcode 16 recommended
+- **Node.js**: Minimum 20.19.4
+- **iOS Deployment Target**: iOS 15.1+
+
+**Source:** [Expo SDK 54 Changelog](https://expo.dev/changelog/sdk-54)
 
 ```json
 {
   "dependencies": {
     "react": "^19.2.3",
-    "react-native": "^0.82.0",
-    "expo": "~52.0.0",
+    "react-native": "^0.81.5",
+    "expo": "~54.0.31",
     "@react-navigation/native": "^7.0.0",
     "@reduxjs/toolkit": "^2.0.0",
     "react-i18next": "^15.0.0"

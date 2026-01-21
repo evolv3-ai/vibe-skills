@@ -1,11 +1,15 @@
 ---
 name: streamlit-snowflake
 description: |
-  Build and deploy Streamlit apps natively in Snowflake. Covers snowflake.yml scaffolding, Snowpark sessions, multi-page structure, and Marketplace publishing as Native Apps.
+  Build and deploy Streamlit apps natively in Snowflake. Covers snowflake.yml scaffolding, Snowpark sessions, multi-page structure, Marketplace publishing as Native Apps, and caller's rights connections (v1.53.0+).
 
-  Use when building data apps on Snowflake, deploying SiS, or fixing package channel errors, authentication issues.
+  Use when building data apps on Snowflake, deploying SiS, fixing package channel errors, authentication issues, cache key bugs, or path resolution errors.
 user-invocable: true
 license: MIT
+metadata:
+  last_verified: 2026-01-21
+  streamlit_version: 1.53.0
+  errors_prevented: 14
 ---
 
 # Streamlit in Snowflake Skill
@@ -105,7 +109,9 @@ See: [Runtime Environments](https://docs.snowflake.com/en/developer-guide/stream
 
 ## Security Model
 
-Streamlit apps run under **owner's rights** (like stored procedures):
+Streamlit apps support **two privilege models**:
+
+### Owner's Rights (Default)
 
 - Apps execute with the **owner's privileges**, not the viewer's
 - Apps use the warehouse provisioned by the owner
@@ -115,6 +121,20 @@ Streamlit apps run under **owner's rights** (like stored procedures):
 - Exercise caution when granting write privileges to app roles
 - Use dedicated roles for app creation/viewing
 - Viewers can access any data the owner role can access
+- Best for: Internal tools with trusted users
+
+### Caller's Rights (v1.53.0+)
+
+- Apps execute with the **viewer's privileges**
+- Each viewer sees only data they have permission to access
+- Provides data isolation in multi-tenant scenarios
+
+**Use caller's rights when:**
+- Building public or external-facing apps
+- Need per-user data access control
+- Multi-tenant applications requiring data isolation
+
+See [Caller's Rights Connection](#callers-rights-connection-v1530) pattern below.
 
 ## Project Structure
 
@@ -146,6 +166,30 @@ df = session.sql("SELECT * FROM my_table LIMIT 100").to_pandas()
 st.dataframe(df)
 ```
 
+### Caller's Rights Connection (v1.53.0+)
+
+Execute queries with viewer's privileges instead of owner's privileges:
+
+```python
+import streamlit as st
+
+# Use caller's rights for data isolation
+conn = st.connection("snowflake", type="callers_rights")
+
+# Each viewer sees only data they have permission to access
+df = conn.query("SELECT * FROM sensitive_customer_data")
+st.dataframe(df)
+```
+
+**Security comparison:**
+
+| Connection Type | Privilege Model | Use Case |
+|-----------------|-----------------|----------|
+| `type="snowflake"` (default) | Owner's rights | Internal tools, trusted users |
+| `type="callers_rights"` (v1.53.0+) | Caller's rights | Public apps, data isolation |
+
+**Source**: [Streamlit v1.53.0 Release](https://github.com/streamlit/streamlit/releases/tag/1.53.0)
+
 ### Caching Expensive Queries
 
 ```python
@@ -157,6 +201,25 @@ def load_data(query: str):
 # Use cached function
 df = load_data("SELECT * FROM large_table")
 ```
+
+**Warning**: In Streamlit v1.22.0-1.53.0, `params` argument is not included in cache key. Use `ttl=0` to disable caching when using parametrized queries, or upgrade to 1.54.0+ when available ([Issue #13644](https://github.com/streamlit/streamlit/issues/13644)).
+
+### Optimizing Snowpark DataFrame Performance
+
+When using Snowpark DataFrames with charts or tables, select only required columns to avoid fetching unnecessary data:
+
+```python
+# ❌ Fetches all 50 columns even though chart only needs 2
+df = session.table("wide_table")  # 50 columns
+st.line_chart(df, x="date", y="value")
+
+# ✅ Fetch only needed columns for better performance
+df = session.table("wide_table").select("date", "value")
+st.line_chart(df, x="date", y="value")
+# 5-10x faster for wide tables
+```
+
+**Why it matters**: `st.dataframe()` and chart components call `df.to_pandas()` which evaluates ALL columns, even if the visualization only needs some. Pre-selecting columns reduces data transfer and improves performance ([Issue #11701](https://github.com/streamlit/streamlit/issues/11701)).
 
 ### Environment Configuration
 
@@ -176,6 +239,8 @@ dependencies:
 
 ## Error Prevention
 
+This skill prevents **14 documented errors**:
+
 | Error | Cause | Prevention |
 |-------|-------|------------|
 | `PackageNotFoundError` | Using conda-forge or external channel | Use `channels: - snowflake` (or Container Runtime for PyPI) |
@@ -186,7 +251,12 @@ dependencies:
 | DataFrame display fails | Data >32MB | Paginate or limit data before display |
 | `page_title not supported` | SiS limitation | Don't use `page_title`, `page_icon`, or `menu_items` in `st.set_page_config()` |
 | Custom component error | SiS limitation | Only components without external service calls work |
-| `_snowflake module not found` | Container Runtime | Use `from snowflake.snowpark.context import get_active_session` instead |
+| `_snowflake module not found` | Container Runtime migration | Use `from snowflake.snowpark.context import get_active_session` instead of `from _snowflake import get_active_session` ([Migration Guide](https://docs.snowflake.com/en/developer-guide/streamlit/migrations-and-upgrades/runtime-migration)) |
+| Cached query returns wrong data with different params | `params` not in cache key (v1.22.0-1.53.0) | Use `ttl=0` to disable caching for parametrized queries, or upgrade to 1.54.0+ when available ([Issue #13644](https://github.com/streamlit/streamlit/issues/13644)) |
+| `Invalid connection_name 'default'` with kwargs only | Missing secrets.toml or connections.toml | Create minimal `.streamlit/secrets.toml` with `[connections.snowflake]` section ([Issue #9016](https://github.com/streamlit/streamlit/issues/9016)) |
+| Native App upgrades unexpectedly | Implicit default Streamlit version (BCR-1857) | Explicitly set `streamlit=1.35.0` in environment.yml to prevent automatic version changes ([BCR-1857](https://docs.snowflake.com/en/release-notes/bcr-bundles/2025_01/bcr-1857)) |
+| File paths fail in Container Runtime subdirectories | Some commands use entrypoint-relative paths | Use `pathlib` to resolve absolute paths: `Path(__file__).parent / "assets/logo.png"` ([Runtime Docs](https://docs.snowflake.com/en/developer-guide/streamlit/app-development/runtime-environments)) |
+| Slow performance with wide Snowpark DataFrames | `st.dataframe()` fetches all columns even if unused | Pre-select only needed columns: `df.select("col1", "col2")` before passing to Streamlit ([Issue #11701](https://github.com/streamlit/streamlit/issues/11701)) |
 
 ## Deployment Commands
 

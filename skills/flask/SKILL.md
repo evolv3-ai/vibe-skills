@@ -1,9 +1,9 @@
 ---
 name: flask
 description: |
-  Build Python web apps with Flask using application factory pattern, Blueprints, and Flask-SQLAlchemy. Covers project structure, authentication, and configuration management.
+  Build Python web apps with Flask using application factory pattern, Blueprints, and Flask-SQLAlchemy. Prevents 9 documented errors including stream_with_context teardown issues, async/gevent conflicts, and CSRF cache problems.
 
-  Use when: creating Flask projects, organizing blueprints, or troubleshooting circular imports, context errors, or registration.
+  Use when: creating Flask projects, organizing blueprints, or troubleshooting circular imports, context errors, registration, streaming, or authentication.
 user-invocable: true
 ---
 
@@ -17,6 +17,7 @@ Production-tested patterns for Flask with the application factory pattern, Bluep
 - Flask-Login: 0.6.3
 - Flask-WTF: 1.2.2
 - Werkzeug: 3.1.5
+- **Python**: 3.9+ required (3.8 dropped in Flask 3.1.0)
 
 ---
 
@@ -53,6 +54,228 @@ if __name__ == "__main__":
 ```
 
 Run: `uv run flask --app app run --debug`
+
+---
+
+## Known Issues Prevention
+
+This skill prevents **9** documented issues:
+
+### Issue #1: stream_with_context Teardown Regression (Flask 3.1.2)
+**Error**: `KeyError` in teardown functions when using `stream_with_context`
+**Source**: [GitHub Issue #5804](https://github.com/pallets/flask/issues/5804)
+**Why It Happens**: Flask 3.1.2 introduced a regression where `stream_with_context` triggers `teardown_request()` calls multiple times before response generation completes. If teardown callbacks use `g.pop(key)` without a default, they fail on the second call.
+
+**Prevention**:
+```python
+# WRONG - fails on second teardown call
+@app.teardown_request
+def _teardown_request(_):
+    g.pop("hello")  # KeyError on second call
+
+# RIGHT - idempotent teardown
+@app.teardown_request
+def _teardown_request(_):
+    g.pop("hello", None)  # Provide default value
+```
+
+**Status**: Will be fixed in Flask 3.2.0 as side effect of PR #5812. Until then, ensure all teardown callbacks are idempotent.
+
+---
+
+### Issue #2: Async Views with Gevent Incompatibility
+**Error**: `RuntimeError` when handling concurrent async requests with gevent
+**Source**: [GitHub Issue #5881](https://github.com/pallets/flask/issues/5881)
+**Why It Happens**: Asgiref fails when gevent monkey-patching is active. Asyncio expects a single event loop per OS thread, but gevent's monkey-patching makes `threading.Thread` create greenlets instead of real threads, causing both loops to run on the same physical thread and block each other.
+
+**Prevention**: Choose either async (with asyncio/uvloop) OR gevent, not both. If you must use both:
+
+```python
+import asyncio
+import gevent.monkey
+import gevent.selectors
+from flask import Flask
+
+gevent.monkey.patch_all()
+loop = asyncio.EventLoop(gevent.selectors.DefaultSelector())
+gevent.spawn(loop.run_forever)
+
+class GeventFlask(Flask):
+    def async_to_sync(self, func):
+        def run(*args, **kwargs):
+            coro = func(*args, **kwargs)
+            future = asyncio.run_coroutine_threadsafe(coro, loop)
+            return future.result()
+        return run
+
+app = GeventFlask(__name__)
+```
+
+**Note**: This "defeats the whole purpose of both" (maintainer comment). Individual async requests work, but concurrent requests fail without this workaround.
+
+---
+
+### Issue #3: Test Client Session Not Updated on Redirect
+**Error**: Session state incorrect after `follow_redirects=True` in tests
+**Source**: [GitHub Issue #5786](https://github.com/pallets/flask/issues/5786)
+**Why It Happens**: In Flask < 3.1.2, the test client's session wasn't correctly updated after following redirects.
+
+**Prevention**:
+```python
+# If using Flask >= 3.1.2, follow_redirects works correctly
+def test_login_redirect(client):
+    response = client.post('/login',
+        data={'email': 'test@example.com', 'password': 'pass'},
+        follow_redirects=True)
+    assert 'user_id' in session  # Works in 3.1.2+
+
+# For Flask < 3.1.2, make separate requests
+response = client.post('/login', data={...})
+assert response.status_code == 302
+response = client.get(response.location)  # Explicit redirect follow
+```
+
+**Status**: Fixed in Flask 3.1.2. Upgrade to latest version.
+
+---
+
+### Issue #4: Application Context Lost in Threads (Community-sourced)
+**Error**: `RuntimeError: Working outside of application context` in background threads
+**Source**: [Sentry.io Guide](https://sentry.io/answers/working-outside-of-application-context/)
+**Why It Happens**: When passing `current_app` to a new thread, you must unwrap the proxy object using `_get_current_object()` and push app context in the thread.
+
+**Prevention**:
+```python
+from flask import current_app
+import threading
+
+# WRONG - current_app is a proxy, loses context in thread
+def background_task():
+    app_name = current_app.name  # Fails!
+
+@app.route('/start')
+def start_task():
+    thread = threading.Thread(target=background_task)
+    thread.start()
+
+# RIGHT - unwrap proxy and push context
+def background_task(app):
+    with app.app_context():
+        app_name = app.name  # Works!
+
+@app.route('/start')
+def start_task():
+    app = current_app._get_current_object()
+    thread = threading.Thread(target=background_task, args=(app,))
+    thread.start()
+```
+
+**Verified**: Common pattern in production applications, documented in official Flask docs.
+
+---
+
+### Issue #5: Flask-Login Session Protection Unexpected Logouts (Community-sourced)
+**Error**: Users logged out unexpectedly when IP address changes
+**Source**: [Flask-Login Docs](https://flask-login.readthedocs.io/)
+**Why It Happens**: Flask-Login's "strong" session protection mode deletes the entire session if session identifiers (like IP address) change. This affects users on mobile networks or VPNs.
+
+**Prevention**:
+```python
+# app/extensions.py
+from flask_login import LoginManager
+
+login_manager = LoginManager()
+login_manager.session_protection = "basic"  # Default, less strict
+# login_manager.session_protection = "strong"  # Strict, may logout on IP change
+# login_manager.session_protection = None  # Disabled (not recommended)
+```
+
+**Note**: By default, Flask-Login allows concurrent sessions (same user on multiple browsers). To prevent this, implement custom session tracking.
+
+**Verified**: Official Flask-Login documentation, multiple 2024 blog posts.
+
+---
+
+### Issue #6: CSRF Protection Cache Interference (Community-sourced)
+**Error**: Form submissions fail with "CSRF token missing/invalid" on cached pages
+**Source**: [Flask-WTF Docs](https://flask-wtf.readthedocs.io/en/latest/csrf/)
+**Why It Happens**: If webserver cache policy caches pages longer than `WTF_CSRF_TIME_LIMIT`, browsers serve cached pages with expired CSRF tokens.
+
+**Prevention**:
+```python
+# Option 1: Align cache duration with token lifetime
+WTF_CSRF_TIME_LIMIT = None  # Never expire (less secure)
+
+# Option 2: Exclude forms from cache
+@app.after_request
+def add_cache_headers(response):
+    if request.method == 'GET' and 'form' in request.endpoint:
+        response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    return response
+
+# Option 3: Configure webserver to not cache POST targets
+# In Nginx: add "proxy_cache_bypass $cookie_session" for form routes
+```
+
+**Verified**: Official Flask-WTF documentation warning, security best practices guides from 2024.
+
+---
+
+### Issue #7: Per-Request max_content_length Override (New Feature)
+**Feature**: Flask 3.1.0 added ability to customize `Request.max_content_length` per-request
+**Source**: [Flask 3.1.0 Release Notes](https://github.com/pallets/flask/releases/tag/3.1.0)
+
+**Usage**:
+```python
+from flask import Flask, request
+
+app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB default
+
+@app.route('/upload', methods=['POST'])
+def upload():
+    # Override for this specific route
+    request.max_content_length = 100 * 1024 * 1024  # 100MB for uploads
+    file = request.files['file']
+    # ...
+```
+
+**Note**: Also added `MAX_FORM_MEMORY_SIZE` and `MAX_FORM_PARTS` config options in 3.1.0. See [security documentation](https://flask.palletsprojects.com/en/stable/security/).
+
+---
+
+### Issue #8: SECRET_KEY Rotation (New Feature)
+**Feature**: Flask 3.1.0 added `SECRET_KEY_FALLBACKS` for key rotation
+**Source**: [Flask 3.1.0 Release Notes](https://github.com/pallets/flask/releases/tag/3.1.0)
+
+**Usage**:
+```python
+# config.py
+class Config:
+    SECRET_KEY = "new-secret-key-2024"
+    SECRET_KEY_FALLBACKS = [
+        "old-secret-key-2023",
+        "older-secret-key-2022"
+    ]
+```
+
+**Note**: Extensions need explicit support for this feature. Flask-Login and Flask-WTF may need updates to use fallback keys.
+
+---
+
+### Issue #9: Werkzeug 3.1+ Dependency Conflict
+**Error**: `flask==2.2.4 incompatible with werkzeug==3.1.3`
+**Source**: [Flask 3.1.0 Release Notes](https://github.com/pallets/flask/releases/tag/3.1.0) | [GitHub Issue #5652](https://github.com/pallets/flask/issues/5652)
+**Why It Happens**: Flask 3.1.0 updated minimum dependency versions: Werkzeug >= 3.1, ItsDangerous >= 2.2, Blinker >= 1.9. Projects pinned to older versions will have conflicts.
+
+**Prevention**:
+```bash
+# Update all Pallets projects together
+pip install flask>=3.1.0 werkzeug>=3.1.0 itsdangerous>=2.2.0 blinker>=1.9.0
+
+# Or with uv
+uv add "flask>=3.1.0" "werkzeug>=3.1.0" "itsdangerous>=2.2.0" "blinker>=1.9.0"
+```
 
 ---
 
@@ -626,5 +849,5 @@ FLASK_ENV=production
 
 ---
 
-**Last Updated**: December 2025
+**Last verified**: 2026-01-21 | **Skill version**: 2.0.0 | **Changes**: Added 9 known issues (stream_with_context regression, async/gevent conflicts, test client sessions, threading context, Flask-Login session protection, CSRF cache, new 3.1.0 features, Werkzeug dependencies)
 **Maintainer**: Jezweb | jeremy@jezweb.net

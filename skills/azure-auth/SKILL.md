@@ -1,17 +1,17 @@
 ---
 name: azure-auth
 description: |
-  Microsoft Entra ID (Azure AD) authentication for React SPAs with MSAL.js and Cloudflare Workers JWT validation using jose library. Full-stack pattern with Authorization Code Flow + PKCE.
+  Microsoft Entra ID (Azure AD) authentication for React SPAs with MSAL.js and Cloudflare Workers JWT validation using jose library. Full-stack pattern with Authorization Code Flow + PKCE. Prevents 8 documented errors.
 
-  Use when: implementing Microsoft SSO, troubleshooting AADSTS50058 loops, AADSTS700084 refresh token errors, React Router redirects, or validating Entra ID tokens in Workers.
+  Use when: implementing Microsoft SSO, troubleshooting AADSTS50058 loops, AADSTS700084 refresh token errors, React Router redirects, setActiveAccount re-render issues, or validating Entra ID tokens in Workers.
 user-invocable: true
 ---
 
 # Azure Auth - Microsoft Entra ID for React + Cloudflare Workers
 
-**Package Versions**: @azure/msal-react@3.0.23, @azure/msal-browser@4.27.0, jose@6.1.3
-**Breaking Changes**: Azure AD B2C sunset (May 2025 - complete), ADAL retirement (Sept 2025 - complete), MSAL v2→v3 migration
-**Last Updated**: 2026-01-09
+**Package Versions**: @azure/msal-react@5.0.2, @azure/msal-browser@5.0.2, jose@6.1.3
+**Breaking Changes**: MSAL v4→v5 migration (January 2026), Azure AD B2C sunset (May 2025 - new signups blocked, existing until 2030), ADAL retirement (Sept 2025 - complete)
+**Last Updated**: 2026-01-21
 
 ---
 
@@ -115,6 +115,7 @@ const msalInstance = new PublicClientApplication(msalConfig);
 // Handle redirect promise on page load
 msalInstance.initialize().then(() => {
   // Set active account after redirect
+  // IMPORTANT: Use getAllAccounts() (returns array), NOT getActiveAccount() (returns single account or null)
   const accounts = msalInstance.getAllAccounts();
   if (accounts.length > 0) {
     msalInstance.setActiveAccount(accounts[0]);
@@ -428,9 +429,13 @@ export default function App({ Component, pageProps }) {
 
 ### 5. Safari/Edge Cookie Issues
 
-**Error**: Auth state lost, infinite loop on Safari or Edge.
+**Error**: Auth state lost, infinite loop on Safari or Edge. On iOS 18 Safari specifically, silent token refresh fails with AADSTS50058 even when third-party cookies are enabled.
 
-**Cause**: These browsers have stricter cookie policies affecting session storage.
+**Source**: [GitHub Issue #7384](https://github.com/AzureAD/microsoft-authentication-library-for-js/issues/7384)
+
+**Cause**: These browsers have stricter cookie policies affecting session storage. iOS 18 Safari doesn't store the required session cookies for login.microsoftonline.com, even with third-party cookies explicitly allowed in settings.
+
+**Testing Note**: Works in Chrome on iOS 18, but fails in Safari on iOS 18.
 
 **Fix**: Enable cookie storage in MSAL config:
 ```typescript
@@ -439,6 +444,8 @@ cache: {
   storeAuthStateInCookie: true, // REQUIRED for Safari/Edge
 }
 ```
+
+**iOS 18 Safari Limitation**: If users still experience issues on iOS 18 Safari after enabling cookie storage, this is a known browser limitation with no current workaround. Recommend using Chrome on iOS or desktop browser.
 
 ### 6. JWKS URL Not Found (Workers)
 
@@ -458,6 +465,43 @@ const config = await fetch(
   `https://login.microsoftonline.com/${tenantId}/v2.0/.well-known/openid-configuration`
 ).then(r => r.json());
 const jwks = createRemoteJWKSet(new URL(config.jwks_uri));
+```
+
+### 7. React Router Loader State Conflict
+
+**Error**: React warning about updating state during render when using `acquireTokenSilent` in React Router loaders.
+
+**Source**: [GitHub Issue #7068](https://github.com/AzureAD/microsoft-authentication-library-for-js/issues/7068)
+
+**Cause**: Using the same `PublicClientApplication` instance in both the router loader and `MsalProvider` causes state updates during rendering.
+
+**Fix**: Call `initialize()` again in the loader:
+```typescript
+const protectedLoader = async () => {
+  await msalInstance.initialize(); // Prevents state conflict
+  const response = await msalInstance.acquireTokenSilent(request);
+  return { data };
+};
+```
+
+### 8. setActiveAccount Doesn't Trigger Re-render (Community-sourced)
+
+**Error**: Components using `useMsal()` don't update after calling `setActiveAccount()`.
+
+**Source**: [GitHub Issue #6989](https://github.com/AzureAD/microsoft-authentication-library-for-js/issues/6989)
+
+**Verified**: Multiple users confirmed in GitHub issue
+
+**Cause**: `setActiveAccount()` updates the MSAL instance but doesn't notify React of the change.
+
+**Fix**: Force re-render with state:
+```typescript
+const [accountKey, setAccountKey] = useState(0);
+
+const switchAccount = (newAccount) => {
+  msalInstance.setActiveAccount(newAccount);
+  setAccountKey(prev => prev + 1); // Force update
+};
 ```
 
 ---
@@ -519,20 +563,30 @@ VITE_AZURE_TENANT_ID=your-tenant-id-guid
 
 ---
 
-## Azure AD B2C Sunset (Complete)
+## Azure AD B2C Sunset
 
-**Status**: Azure AD B2C has been sunset as of May 1, 2025. New customers cannot sign up for B2C.
+**Timeline**:
+- **May 1, 2025**: Azure AD B2C no longer available for new customer signups
+- **March 15, 2026**: Azure AD B2C P2 discontinued for all customers
+- **May 2030**: Microsoft will continue supporting existing B2C customers with standard support
 
-**Existing B2C Customers**: Continue using B2C with standard support, but plan migration to Entra External ID.
+**Source**: [Microsoft Q&A](https://learn.microsoft.com/en-us/answers/questions/2119363/migrating-existing-azure-ad-b2c-to-microsoft-entra)
+
+**Existing B2C Customers**: Can continue using B2C until 2030, but should plan migration to Entra External ID.
 
 **New Projects**: Use **Microsoft Entra External ID** for consumer/customer identity scenarios.
+
+**Migration Status**: As of January 2026, automated migration tools are in testing phase. Manual migration guidance available at Microsoft Learn.
 
 **Migration Path**:
 - Different authority URL format (`{tenant}.ciamlogin.com` vs `{tenant}.b2clogin.com`)
 - Updated SDK support (same MSAL libraries)
 - New pricing model (consumption-based)
+- Self-Service Password Reset (SSPR) approach available for user migration
+- Seamless migration samples on GitHub (preview)
 
 See: https://learn.microsoft.com/en-us/entra/external-id/
+Migration Guide: https://learn.microsoft.com/en-us/entra/external-id/customers/how-to-migrate-users
 
 ---
 

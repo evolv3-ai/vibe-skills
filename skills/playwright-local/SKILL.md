@@ -1,16 +1,16 @@
 ---
 name: playwright-local
 description: |
-  Build browser automation and web scraping with Playwright on your local machine. Includes stealth mode for anti-bot bypass, authenticated sessions, infinite scroll handling, screenshot/PDF generation, and residential IP advantages.
+  Build browser automation and web scraping with Playwright on your local machine. Prevents 10 documented errors including CI timeout hangs, extension testing failures, and Ubuntu compatibility issues. Includes stealth mode for anti-bot bypass, authenticated sessions, infinite scroll handling, screenshot/PDF generation, and v1.57 Speedboard performance analysis.
 
-  Use when: automating browsers, scraping protected sites, testing with real IPs, bypassing bot detection, generating screenshots/PDFs, or troubleshooting "target closed", "element not found", or "navigation timeout" errors.
+  Use when: automating browsers, scraping protected sites, testing with real IPs, bypassing bot detection, generating screenshots/PDFs, or troubleshooting "target closed", "page.pause() hangs CI", "permission prompts block tests", or "Ubuntu 25.10 installation" errors.
 user-invocable: true
 ---
 
 # Playwright Local Browser Automation
 
 **Status**: Production Ready ✅
-**Last Updated**: 2026-01-10
+**Last Updated**: 2026-01-21
 **Dependencies**: Node.js 20+ (Node.js 18 deprecated) or Python 3.9+
 **Latest Versions**: playwright@1.57.0, playwright-stealth@0.0.1, puppeteer-extra-plugin-stealth@2.11.2
 **Browser Versions**: Chromium 143.0.7499.4 | Firefox 144.0.2 | WebKit 26.0
@@ -373,7 +373,7 @@ await source.dragTo(target, { steps: 5 });
 
 ## Known Issues Prevention
 
-This skill prevents **8** documented issues:
+This skill prevents **10** documented issues:
 
 ### Issue #1: Target Closed Error
 **Error**: `Protocol error (Target.sendMessageToTarget): Target closed.`
@@ -497,6 +497,44 @@ const browser = await chromium.launch({
 });
 ```
 
+### Issue #9: page.pause() Disables Timeout in Headless Mode
+**Error**: Tests hang indefinitely in CI when `page.pause()` is present
+**Source**: [GitHub Issue #38754](https://github.com/microsoft/playwright/issues/38754)
+**Why It Happens**: `page.pause()` is ignored in headless mode but disables test timeout, causing subsequent failing assertions to hang forever
+**Prevention**:
+```typescript
+// Conditional debugging - only pause in local development
+if (!process.env.CI && !process.env.HEADLESS) {
+  await page.pause();
+}
+
+// Or use environment variable
+const shouldPause = process.env.DEBUG_MODE === 'true';
+if (shouldPause) {
+  await page.pause();
+}
+```
+**Impact**: HIGH - Can cause CI pipelines to hang indefinitely on failing assertions
+
+### Issue #10: Permission Prompts Block Extension Testing in CI
+**Error**: Tests hang on permission prompts when testing browser extensions
+**Source**: [GitHub Issue #38670](https://github.com/microsoft/playwright/issues/38670)
+**Why It Happens**: `launchPersistentContext` with extensions shows non-dismissible permission prompts (clipboard-read/write, local-network-access) that cannot be auto-granted
+**Prevention**:
+```typescript
+// Don't use persistent context for extensions in CI
+// Use regular context instead
+const context = await browser.newContext({
+  permissions: ['clipboard-read', 'clipboard-write']
+});
+
+// For extensions, pre-grant permissions where possible
+const context = await browser.newContext({
+  permissions: ['notifications', 'geolocation']
+});
+```
+**Impact**: HIGH - Blocks automated extension testing in CI/CD environments
+
 ---
 
 ## Configuration Files Reference
@@ -557,6 +595,39 @@ export default defineConfig({
 - `screenshot: 'only-on-failure'` - Saves disk space
 - `viewport: { width: 1920, height: 1080 }` - Common desktop resolution
 - `--disable-blink-features=AutomationControlled` - Removes webdriver flag
+
+### Dynamic Web Server Configuration (v1.57+)
+
+Wait for web server output before starting tests using regular expressions:
+
+```typescript
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  webServer: {
+    command: 'npm run dev',
+    // Wait for server to print port
+    wait: {
+      stdout: '/Server running on port (?<SERVER_PORT>\\d+)/'
+    },
+  },
+  use: {
+    // Use captured port in tests
+    baseURL: `http://localhost:${process.env.SERVER_PORT ?? 3000}`
+  }
+});
+```
+
+**Benefits**:
+- Handles dynamic ports from dev servers (Vite, Next.js dev mode)
+- No need for HTTP readiness checks
+- Named capture groups become environment variables
+- Works with services that only log readiness messages
+
+**When to Use**:
+- Dev servers with random ports
+- Services without HTTP endpoints
+- Containerized environments with port mapping
 
 ---
 
@@ -842,6 +913,37 @@ npm install -g @anthropic/mcp-playwright
 ```
 
 **When to use**: Building AI agents that need browser automation, integrating Playwright with Claude or other LLMs.
+
+---
+
+## Performance Analysis with Speedboard (v1.57+)
+
+Playwright v1.57 introduced Speedboard in the HTML reporter - a dedicated tab for identifying slow tests and performance bottlenecks.
+
+**Enable in Config**:
+```typescript
+export default defineConfig({
+  reporter: 'html',
+});
+```
+
+**View Speedboard**:
+```bash
+npx playwright test --reporter=html
+npx playwright show-report
+```
+
+**What Speedboard Shows**:
+- All tests sorted by execution time (slowest first)
+- Breakdown of wait times
+- Network request durations
+- Helps identify inefficient selectors and unnecessary waits
+
+**Use Cases**:
+- Optimize test suite runtime
+- Find tests with excessive `waitForTimeout()` calls
+- Identify slow API responses affecting tests
+- Prioritize refactoring efforts for slowest tests
 
 ---
 
@@ -1191,6 +1293,24 @@ const browser = await chromium.launch({
 3. Add random delays between actions
 4. Use residential proxy if needed
 
+### Problem: Ubuntu 25.10 installation fails
+**Error**: `Unable to locate package libicu74`, `Package 'libxml2' has no installation candidate`
+**Source**: [GitHub Issue #38874](https://github.com/microsoft/playwright/issues/38874)
+**Solution**:
+```bash
+# Use Ubuntu 24.04 Docker image (officially supported)
+docker pull mcr.microsoft.com/playwright:v1.57.0-noble
+
+# Or wait for Ubuntu 25.10 support in future releases
+# Track issue: https://github.com/microsoft/playwright/issues/38874
+```
+**Temporary workaround** (if Docker not an option):
+```bash
+# Manually install compatible libraries
+sudo apt-get update
+sudo apt-get install libicu72 libxml2
+```
+
 ---
 
 ## Complete Setup Checklist
@@ -1216,3 +1336,7 @@ Use this checklist to verify your setup:
 2. Verify stealth setup at https://bot.sannysoft.com/
 3. Check official docs: https://playwright.dev/docs/intro
 4. Ensure browser binaries are installed: `npx playwright install chromium`
+
+---
+
+**Last verified**: 2026-01-21 | **Skill version**: 3.1.0 | **Changes**: Added 2 critical CI issues (page.pause() timeout, extension permission prompts), v1.57 features (Speedboard, webServer wait config), Ubuntu 25.10 compatibility guidance

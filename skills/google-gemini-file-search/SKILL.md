@@ -3,7 +3,7 @@ name: google-gemini-file-search
 description: |
   Build document Q&A with Gemini File Search - fully managed RAG with automatic chunking, embeddings, and citations. Upload 100+ file formats, query with natural language.
 
-  Use when: document Q&A, searchable knowledge bases, semantic search. Troubleshoot: document immutability, storage quota (3x), chunking config, metadata limits (20 max), polling timeouts.
+  Use when: document Q&A, searchable knowledge bases, semantic search. Troubleshoot: document immutability, storage quota (3x), chunking config, metadata limits (20 max), polling timeouts, displayName dropped (Blob uploads), grounding lost (JSON mode), tool conflicts (googleSearch + fileSearch).
 user-invocable: true
 allowed-tools:
   - Bash
@@ -82,7 +82,7 @@ yarn add @google/genai
 
 ## Common Errors Prevented
 
-This skill prevents 8 common errors encountered when implementing File Search:
+This skill prevents 12 common errors encountered when implementing File Search:
 
 ### Error 1: Document Immutability
 
@@ -288,7 +288,7 @@ Query returns no results immediately after upload, or incomplete indexing.
 **Cause:** File uploads are processed asynchronously. Must poll operation until `done: true`.
 
 **Prevention:**
-Always poll operation status:
+Always poll operation status with timeout and fallback:
 
 ```typescript
 // ❌ WRONG: Assuming upload is instant
@@ -298,27 +298,51 @@ const operation = await ai.fileSearchStores.uploadToFileSearchStore({
 })
 // Immediately query → No results!
 
-// ✅ CORRECT: Poll until indexing complete
+// ✅ CORRECT: Poll until indexing complete with timeout
 const operation = await ai.fileSearchStores.uploadToFileSearchStore({
   name: fileStore.name,
   file: fs.createReadStream('large.pdf')
 })
 
-// Poll every 1 second
-while (!operation.done) {
-  await new Promise(resolve => setTimeout(resolve, 1000))
-  operation = await ai.operations.get({ name: operation.name })
-  console.log(`Indexing progress: ${operation.metadata?.progress || 'processing...'}`)
+// Poll with timeout and fallback
+const MAX_POLL_TIME = 60000 // 60 seconds
+const POLL_INTERVAL = 1000
+let elapsed = 0
+
+while (!operation.done && elapsed < MAX_POLL_TIME) {
+  await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL))
+  elapsed += POLL_INTERVAL
+
+  try {
+    operation = await ai.operations.get({ name: operation.name })
+    console.log(`Indexing progress: ${operation.metadata?.progress || 'processing...'}`)
+  } catch (error) {
+    console.warn('Polling failed, assuming complete:', error)
+    break
+  }
 }
 
 if (operation.error) {
   throw new Error(`Indexing failed: ${operation.error.message}`)
 }
 
-console.log('✅ Indexing complete:', operation.response.displayName)
+// ⚠️ Warning: operations.get() can be unreliable for large files
+// If timeout reached, verify document exists manually
+if (elapsed >= MAX_POLL_TIME) {
+  console.warn('Polling timeout - verifying document manually')
+  const docs = await ai.fileSearchStores.documents.list({ parent: fileStore.name })
+  const uploaded = docs.documents?.find(d => d.displayName === 'large.pdf')
+  if (uploaded) {
+    console.log('✅ Document found despite polling timeout')
+  } else {
+    throw new Error('Upload failed - document not found')
+  }
+}
+
+console.log('✅ Indexing complete:', operation.response?.displayName)
 ```
 
-**Source:** https://ai.google.dev/api/file-search/file-search-stores#uploadtofilesearchstore
+**Source:** https://ai.google.dev/api/file-search/file-search-stores#uploadtofilesearchstore, [GitHub Issue #1211](https://github.com/googleapis/js-genai/issues/1211)
 
 ### Error 7: Forgetting Force Delete
 
@@ -397,6 +421,218 @@ const response = await ai.models.generateContent({
 ```
 
 **Source:** https://ai.google.dev/gemini-api/docs/file-search
+
+### Error 9: displayName Not Preserved for Blob Sources (Fixed v1.34.0+)
+
+**Symptom:**
+```
+groundingChunks[0].title === null  // No document source shown
+```
+
+**Cause:** In @google/genai versions prior to v1.34.0, when uploading files as `Blob` objects (not file paths), the SDK dropped the `displayName` and `customMetadata` configuration fields.
+
+**Prevention:**
+```typescript
+// ✅ CORRECT: Upgrade to v1.34.0+ for automatic fix
+npm install @google/genai@latest  // v1.34.0+
+
+await ai.fileSearchStores.uploadToFileSearchStore({
+  name: storeName,
+  file: new Blob([arrayBuffer], { type: 'application/pdf' }),
+  config: {
+    displayName: 'Safety Manual.pdf',  // ✅ Now preserved
+    customMetadata: { version: '1.0' }  // ✅ Now preserved
+  }
+})
+
+// ⚠️ WORKAROUND for v1.33.0 and earlier: Use resumable upload
+const uploadUrl = `https://generativelanguage.googleapis.com/upload/v1beta/${storeName}:uploadToFileSearchStore?key=${API_KEY}`
+
+// Step 1: Initiate with displayName in body
+const initResponse = await fetch(uploadUrl, {
+  method: 'POST',
+  headers: {
+    'X-Goog-Upload-Protocol': 'resumable',
+    'X-Goog-Upload-Command': 'start',
+    'X-Goog-Upload-Header-Content-Length': numBytes.toString(),
+    'X-Goog-Upload-Header-Content-Type': 'application/pdf',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    displayName: 'Safety Manual.pdf'  // ✅ Works with resumable upload
+  })
+})
+
+// Step 2: Upload file bytes
+const uploadUrl2 = initResponse.headers.get('X-Goog-Upload-URL')
+await fetch(uploadUrl2, {
+  method: 'PUT',
+  headers: {
+    'Content-Length': numBytes.toString(),
+    'X-Goog-Upload-Offset': '0',
+    'X-Goog-Upload-Command': 'upload, finalize',
+    'Content-Type': 'application/pdf'
+  },
+  body: fileBytes
+})
+```
+
+**Source:** [GitHub Issue #1078](https://github.com/googleapis/js-genai/issues/1078)
+
+### Error 10: Grounding Metadata Ignored with JSON Response Mode
+
+**Symptom:**
+```
+response.candidates[0].groundingMetadata === undefined
+// Even though fileSearch tool is configured
+```
+
+**Cause:** When using `responseMimeType: 'application/json'` for structured output, the API ignores the `fileSearch` tool and returns no grounding metadata, even with Gemini 3 models.
+
+**Prevention:**
+```typescript
+// ❌ WRONG: Structured output overrides grounding
+const response = await ai.models.generateContent({
+  model: 'gemini-3-flash',
+  contents: 'Summarize guidelines',
+  config: {
+    responseMimeType: 'application/json',  // Loses grounding
+    tools: [{ fileSearch: { fileSearchStoreNames: [storeName] } }]
+  }
+})
+
+// ✅ CORRECT: Two-step approach
+// Step 1: Get grounded text response
+const textResponse = await ai.models.generateContent({
+  model: 'gemini-3-flash',
+  contents: 'Summarize guidelines',
+  config: {
+    tools: [{ fileSearch: { fileSearchStoreNames: [storeName] } }]
+  }
+})
+
+const grounding = textResponse.candidates[0].groundingMetadata
+
+// Step 2: Convert to structured format in prompt
+const jsonResponse = await ai.models.generateContent({
+  model: 'gemini-3-flash',
+  contents: `Convert to JSON: ${textResponse.text}
+
+Format:
+{
+  "summary": "...",
+  "key_points": ["..."]
+}`,
+  config: {
+    responseMimeType: 'application/json',
+    responseSchema: {
+      type: 'object',
+      properties: {
+        summary: { type: 'string' },
+        key_points: { type: 'array', items: { type: 'string' } }
+      }
+    }
+  }
+})
+
+// Combine results
+const result = {
+  data: JSON.parse(jsonResponse.text),
+  sources: grounding.groundingChunks
+}
+```
+
+**Source:** [GitHub Issue #829](https://github.com/googleapis/js-genai/issues/829)
+
+### Error 11: Google Search and File Search Tools Are Mutually Exclusive
+
+**Symptom:**
+```
+Error: "Search as a tool and file search tool are not supported together"
+Status: INVALID_ARGUMENT
+```
+
+**Cause:** The Gemini API does not allow using `googleSearch` and `fileSearch` tools in the same request.
+
+**Prevention:**
+```typescript
+// ❌ WRONG: Combining search tools
+const response = await ai.models.generateContent({
+  model: 'gemini-3-flash',
+  contents: 'What are the latest industry guidelines?',
+  config: {
+    tools: [
+      { googleSearch: {} },
+      { fileSearch: { fileSearchStoreNames: [storeName] } }
+    ]
+  }
+})
+
+// ✅ CORRECT: Use separate specialist agents
+async function searchWeb(query: string) {
+  return ai.models.generateContent({
+    model: 'gemini-3-flash',
+    contents: query,
+    config: { tools: [{ googleSearch: {} }] }
+  })
+}
+
+async function searchDocuments(query: string) {
+  return ai.models.generateContent({
+    model: 'gemini-3-flash',
+    contents: query,
+    config: { tools: [{ fileSearch: { fileSearchStoreNames: [storeName] } }] }
+  })
+}
+
+// Orchestrate based on query type
+const needsWeb = query.includes('latest') || query.includes('current')
+const response = needsWeb
+  ? await searchWeb(query)
+  : await searchDocuments(query)
+```
+
+**Source:** [GitHub Issue #435](https://github.com/googleapis/js-genai/issues/435), [Google Codelabs](https://codelabs.developers.google.com/gemini-file-search-for-rag)
+
+### Error 12: Batch API Missing Response Metadata (Community-sourced)
+
+**Symptom:**
+Cannot correlate batch responses with requests when using metadata field.
+
+**Cause:** When using Batch API with `InlinedRequest` that includes a `metadata` field, the corresponding `InlinedResponse` does not return the metadata.
+
+**Prevention:**
+```typescript
+// ❌ WRONG: Expecting metadata in response
+const batchRequest = {
+  metadata: { key: 'my-request-id' },
+  contents: [{ parts: [{ text: 'Question?' }], role: 'user' }],
+  config: {
+    tools: [{ fileSearch: { fileSearchStoreNames: [storeName] } }]
+  }
+}
+
+const batchResponse = await ai.batch.create({ requests: [batchRequest] })
+console.log(batchResponse.responses[0].metadata)  // ❌ undefined
+
+// ✅ CORRECT: Use array index to correlate
+const requests = [
+  { metadata: { id: 'req-1' }, contents: [...] },
+  { metadata: { id: 'req-2' }, contents: [...] }
+]
+
+const responses = await ai.batch.create({ requests })
+
+// Map by index (not ideal but works)
+responses.responses.forEach((response, i) => {
+  const requestMetadata = requests[i].metadata
+  console.log(`Response for ${requestMetadata.id}:`, response)
+})
+```
+
+**Community Verification:** Maintainer confirmed, internal bug filed.
+
+**Source:** [GitHub Issue #1191](https://github.com/googleapis/js-genai/issues/1191)
 
 ## Setup Instructions
 
@@ -900,6 +1136,34 @@ console.log(`✅ ${grounding?.groundingChunks?.length} citations returned`)
 
 ## Integration Examples
 
+### Streaming Support
+
+File Search supports streaming responses with `generateContentStream()`:
+
+```typescript
+// ✅ Streaming works with File Search (v1.34.0+)
+const stream = await ai.models.generateContentStream({
+  model: 'gemini-3-flash',
+  contents: 'Summarize the document',
+  config: {
+    tools: [{ fileSearch: { fileSearchStoreNames: [storeName] } }]
+  }
+})
+
+for await (const chunk of stream) {
+  process.stdout.write(chunk.text)
+}
+
+// Access grounding after stream completes
+const grounding = stream.candidates[0].groundingMetadata
+```
+
+**Note:** Early SDK versions (pre-v1.34.0) may have had streaming issues. Use v1.34.0+ for reliable streaming support.
+
+**Source:** [GitHub Issue #1221](https://github.com/googleapis/js-genai/issues/1221)
+
+### Working Templates
+
 This skill includes 3 working templates in the `templates/` directory:
 
 ### Template 1: basic-node-rag
@@ -984,8 +1248,9 @@ npm run dev
 
 ---
 
-**Skill Version:** 1.0.0
-**Last Verified:** 2026-01-09
-**Package Version:** @google/genai ^1.35.0 (minimum 1.29.0 required)
-**Token Savings:** ~65%
-**Errors Prevented:** 8
+**Skill Version:** 1.1.0
+**Last Verified:** 2026-01-21
+**Package Version:** @google/genai ^1.38.0 (minimum 1.29.0 required)
+**Token Savings:** ~67%
+**Errors Prevented:** 12
+**Changes:** Added 4 new errors from community research (displayName Blob issue, grounding with JSON mode, tool conflicts, batch API metadata), enhanced polling timeout pattern with fallback verification, added streaming support note

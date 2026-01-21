@@ -1,9 +1,9 @@
 ---
 name: cloudflare-python-workers
 description: |
-  Build Python APIs on Cloudflare Workers using pywrangler CLI and WorkerEntrypoint class pattern. Includes Python Workflows for multi-step DAG automation. Prevents 8 documented errors.
+  Build Python APIs on Cloudflare Workers using pywrangler CLI and WorkerEntrypoint class pattern. Includes Python Workflows for multi-step DAG automation. Prevents 11 documented errors.
 
-  Use when: building Python serverless APIs, migrating Python to edge, or troubleshooting async errors, package compatibility, handler pattern mistakes.
+  Use when: building Python serverless APIs, migrating Python to edge, or troubleshooting async errors, package compatibility, handler pattern mistakes, RPC communication issues.
 user-invocable: true
 ---
 
@@ -12,7 +12,7 @@ user-invocable: true
 **Status**: Beta (requires `python_workers` compatibility flag)
 **Runtime**: Pyodide (Python 3.12+ compiled to WebAssembly)
 **Package Versions**: workers-py@1.7.0, workers-runtime-sdk@0.3.1, wrangler@4.58.0
-**Last Verified**: 2026-01-09
+**Last Verified**: 2026-01-21
 
 ## Quick Start (5 Minutes)
 
@@ -73,6 +73,39 @@ uv run pywrangler dev
 ```bash
 uv run pywrangler deploy
 ```
+
+---
+
+## Migration from Pre-December 2025 Workers
+
+If you created a Python Worker before December 2025, you were limited to built-in packages. With pywrangler (Dec 2025), you can now deploy with external packages.
+
+**Old Approach** (no longer needed):
+```python
+# Limited to built-in packages only
+# Could only use httpx, aiohttp, beautifulsoup4, etc.
+# Error: "You cannot yet deploy Python Workers that depend on
+# packages defined in requirements.txt [code: 10021]"
+```
+
+**New Approach** (pywrangler):
+```toml
+# pyproject.toml
+[project]
+dependencies = ["fastapi", "any-pyodide-compatible-package"]
+```
+
+```bash
+uv tool install workers-py
+uv run pywrangler deploy  # Now works!
+```
+
+**Historical Timeline**:
+- **April 2024 - Dec 2025**: Package deployment completely blocked
+- **Dec 8, 2025**: Pywrangler released, enabling package deployment
+- **Jan 2026**: Open beta with full package support
+
+**See**: [Package deployment issue history](https://github.com/cloudflare/workers-sdk/issues/6613)
 
 ---
 
@@ -186,6 +219,54 @@ Configure in wrangler.jsonc:
 ## Python Workflows
 
 Python Workflows enable durable, multi-step automation with automatic retries and state persistence.
+
+### Why Decorator Pattern?
+
+Python Workflows use the `@step.do()` decorator pattern because **Python does not easily support anonymous callbacks** (unlike JavaScript/TypeScript which allows inline arrow functions). This is a fundamental language difference, not a limitation of Cloudflare's implementation.
+
+**JavaScript Pattern** (doesn't translate):
+```javascript
+await step.do("my step", async () => {
+  // Inline callback
+  return result;
+});
+```
+
+**Python Pattern** (required):
+```python
+@step.do("my step")
+async def my_step():
+    # Named function with decorator
+    return result
+
+result = await my_step()
+```
+
+**Source**: [Python Workflows Blog](https://blog.cloudflare.com/python-workflows/)
+
+### Concurrency with asyncio.gather
+
+Pyodide captures JavaScript promises (thenables) and proxies them as Python awaitables. This enables `Promise.all`-equivalent behavior using standard Python async patterns:
+
+```python
+import asyncio
+
+@step.do("step_a")
+async def step_a():
+    return "A"
+
+@step.do("step_b")
+async def step_b():
+    return "B"
+
+# Concurrent execution (like Promise.all)
+results = await asyncio.gather(step_a(), step_b())
+# results = ["A", "B"]
+```
+
+**Why This Works**: JavaScript promises from workflow steps are proxied as Python awaitables, allowing standard asyncio concurrency primitives.
+
+**Source**: [Python Workflows Blog](https://blog.cloudflare.com/python-workflows/)
 
 ### Basic Workflow
 
@@ -344,9 +425,20 @@ class Default(WorkerEntrypoint):
 
 ### Type Conversions
 
+**Important**: `to_py()` is a METHOD on JavaScript objects, not a standalone function. Only `to_js()` is a function.
+
 ```python
 from js import Object
 from pyodide.ffi import to_js
+
+# ❌ WRONG - ImportError!
+from pyodide.ffi import to_py
+python_data = to_py(js_data)
+
+# ✅ CORRECT - to_py() is a method
+async def fetch(self, request):
+    data = await request.json()  # Returns JS object
+    python_data = data.to_py()   # Convert to Python dict
 
 # Convert Python dict to JavaScript object
 python_dict = {"name": "test", "count": 42}
@@ -356,11 +448,13 @@ js_object = to_js(python_dict, dict_converter=Object.fromEntries)
 return Response(to_js({"status": "ok"}))
 ```
 
+**Source**: [GitHub Issue #3322](https://github.com/cloudflare/workerd/issues/3322) (Pyodide maintainer clarification)
+
 ---
 
 ## Known Issues Prevention
 
-This skill prevents **8 documented issues**:
+This skill prevents **11 documented issues**:
 
 ### Issue #1: Legacy Handler Pattern
 
@@ -456,12 +550,20 @@ async def process():
 
 ### Issue #7: Cold Start Performance
 
-**Note**: Python Workers have higher cold starts than JavaScript (~1s vs ~50ms).
+**Note**: Python Workers have higher cold starts than JavaScript. With Wasm memory snapshots (Dec 2025), heavy packages like FastAPI and Pydantic now load in **~1 second** (down from ~10 seconds previously), but this is still ~2x slower than JavaScript Workers (~50ms).
+
+**Performance Numbers** (as of Dec 2025):
+- **Before snapshots**: ~10 seconds for FastAPI/Pydantic
+- **After snapshots**: ~1 second (10x improvement)
+- **JavaScript equivalent**: ~50ms
 
 **Mitigation**:
 - Minimize top-level imports
 - Use lazy loading for heavy packages
 - Consider JavaScript Workers for latency-critical paths
+- Wasm snapshots automatically improve cold starts (no config needed)
+
+**Source**: [Python Workers Redux Blog](https://blog.cloudflare.com/python-workers-advancements/) | [InfoQ Coverage](https://www.infoq.com/news/2025/12/cloudflare-wasm-python-snapshot/)
 
 ### Issue #8: Package Installation Failures
 
@@ -473,6 +575,77 @@ async def process():
 - Network issues during bundling
 
 **Fix**: Check package compatibility, use alternatives, or request support.
+
+### Issue #9: Dev Registry Breaks JS-to-Python RPC
+
+**Error**: `Network connection lost` when calling Python Worker from JavaScript Worker
+**Source**: [GitHub Issue #11438](https://github.com/cloudflare/workers-sdk/issues/11438)
+
+**Why It Happens**: Dev registry doesn't properly route RPC calls between separately-run Workers in different terminals.
+
+**Prevention**:
+```bash
+# ❌ Doesn't work - separate terminals
+# Terminal 1: npx wrangler dev (JS worker)
+# Terminal 2: npx wrangler dev (Python worker)
+# Result: Network connection lost error
+
+# ✅ Works - single wrangler instance
+npx wrangler dev -c ts/wrangler.jsonc -c py/wrangler.jsonc
+```
+
+Run both workers in a single wrangler instance to enable proper RPC communication.
+
+### Issue #10: HTMLRewriter Memory Limit with Data URLs
+
+**Error**: `TypeError: Parser error: The memory limit has been exceeded`
+**Source**: [GitHub Issue #10814](https://github.com/cloudflare/workers-sdk/issues/10814)
+
+**Why It Happens**: Large inline `data:` URLs (>10MB) in HTML trigger parser memory limits. This is NOT about response size—10MB plain text works fine, but 10MB HTML with embedded data URLs fails. Common with Python Jupyter Notebooks that use inline images for plots.
+
+**Prevention**:
+```python
+# ❌ FAILS - HTMLRewriter triggered on notebook HTML with data: URLs
+response = await fetch("https://origin.example.com/notebook.html")
+return response  # Crashes if HTML contains large data: URLs
+
+# ✅ WORKS - Stream directly or use text/plain
+response = await fetch("https://origin.example.com/notebook.html")
+headers = {"Content-Type": "text/plain"}  # Bypass parser
+return Response(await response.text(), headers=headers)
+```
+
+**Workarounds**:
+- Avoid HTMLRewriter on notebook content (stream directly)
+- Pre-process notebooks to extract data URLs to external files
+- Use `text/plain` content-type to bypass parser
+
+### Issue #11: PRNG Cannot Be Seeded During Initialization
+
+**Error**: Deployment fails with user error
+**Source**: [Python Workers Redux Blog](https://blog.cloudflare.com/python-workers-advancements/)
+
+**Why It Happens**: Wasm snapshots don't support PRNG initialization before request handlers. If you call pseudorandom number generator APIs (like `random.seed()`) during module initialization, deployment FAILS.
+
+**Prevention**:
+```python
+import random
+
+# ❌ FAILS deployment - module-level PRNG call
+random.seed(42)
+
+class Default(WorkerEntrypoint):
+    async def fetch(self, request):
+        return Response(str(random.randint(1, 100)))
+
+# ✅ WORKS - PRNG calls inside handlers
+class Default(WorkerEntrypoint):
+    async def fetch(self, request):
+        random.seed(42)  # Initialize inside handler
+        return Response(str(random.randint(1, 100)))
+```
+
+Only call PRNG functions inside request handlers, not at module level.
 
 ---
 

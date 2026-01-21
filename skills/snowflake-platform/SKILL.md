@@ -1,9 +1,9 @@
 ---
 name: snowflake-platform
 description: |
-  Build on Snowflake's AI Data Cloud with snow CLI, Cortex AI (COMPLETE, SUMMARIZE, AI_FILTER), Native Apps, and Snowpark. Covers JWT auth, account identifiers, Marketplace publishing.
+  Build on Snowflake's AI Data Cloud with snow CLI, Cortex AI (COMPLETE, SUMMARIZE, AI_FILTER), Native Apps, and Snowpark. Covers JWT auth, account identifiers, Marketplace publishing. Prevents 11 documented errors.
 
-  Use when: Snowflake apps, Cortex AI SQL, Native App publishing. Troubleshoot: JWT auth failures, account locator confusion, release channel errors.
+  Use when: Snowflake apps, Cortex AI SQL, Native App publishing. Troubleshoot: JWT auth failures, account locator confusion, memory leaks, AI throttling.
 user-invocable: true
 license: MIT
 ---
@@ -106,6 +106,22 @@ SELECT SNOWFLAKE.CORTEX.COMPLETE(
 - `mistral-large2`, `mistral-7b`
 - `snowflake-arctic`
 - `gemma-7b`
+- `claude-3-5-sonnet` (200K context)
+
+**Model Context Windows** (Updated 2025):
+
+| Model | Context Window | Best For |
+|-------|----------------|----------|
+| Claude 3.5 Sonnet | 200,000 tokens | Large documents, long conversations |
+| Llama3.1-70b | 128,000 tokens | Complex reasoning, medium documents |
+| Llama3.1-8b | 8,000 tokens | Simple tasks, short text |
+| Llama3.2-3b | 8,000 tokens | Fast inference, minimal text |
+| Mistral-large2 | Variable | Check current docs |
+| Snowflake Arctic | Variable | Check current docs |
+
+**Token Math**: ~4 characters = 1 token. A 32,000 character document ≈ 8,000 tokens.
+
+**Error**: `Input exceeds context window limit` → Use smaller model or chunk your input.
 
 ### SUMMARIZE Function
 
@@ -143,6 +159,8 @@ FROM spanish_products;
 
 ### AI_FILTER (Natural Language Filtering)
 
+**Performance**: As of September 2025, AI_FILTER includes automatic optimization delivering 2-10x speedup and up to 60% token reduction for suitable queries.
+
 ```sql
 -- Filter with plain English
 SELECT * FROM customer_feedback
@@ -151,11 +169,16 @@ WHERE AI_FILTER(
     'mentions shipping problems or delivery delays'
 );
 
--- Combine with SQL predicates
+-- Combine with SQL predicates for maximum optimization
+-- Query planner applies standard filters FIRST, then AI on smaller dataset
 SELECT * FROM support_tickets
-WHERE created_date > '2025-01-01'
+WHERE created_date > '2025-01-01'  -- Standard filter applied first
   AND AI_FILTER(description, 'customer is angry or frustrated');
 ```
+
+**Best Practice**: Always combine AI_FILTER with traditional SQL predicates (date ranges, categories, etc.) to reduce the dataset before AI processing. This maximizes the automatic optimization benefits.
+
+**Throttling**: During peak usage, AI function requests may be throttled with retry-able errors. Implement exponential backoff for production applications (see Known Issue #10).
 
 ### AI_CLASSIFY
 
@@ -176,6 +199,34 @@ Cortex AI functions bill based on tokens:
 - ~4 characters = 1 token
 - Both input AND output tokens are billed
 - Rates vary by model (larger models cost more)
+
+**Cost Management at Scale** (Community-sourced):
+
+Real-world production case study showed a single AI_COMPLETE query processing 1.18 billion records cost nearly $5K in credits. Cost drivers to watch:
+
+1. **Cross-region inference**: Models not available in your region incur additional data transfer costs
+2. **Warehouse idle time**: Unused compute still bills, but aggressive auto-suspend adds resume overhead
+3. **Large table joins**: Complex queries with AI functions multiply costs
+
+```sql
+-- This seemingly simple query can be expensive at scale
+SELECT
+    product_id,
+    AI_COMPLETE('mistral-large2', 'Summarize: ' || review_text) as summary
+FROM product_reviews  -- 1 billion rows
+WHERE created_date > '2024-01-01';
+
+-- Cost = (input tokens + output tokens) × row count × model rate
+-- At scale, this adds up fast
+```
+
+**Best Practices**:
+- Filter datasets BEFORE applying AI functions
+- Right-size warehouses (don't over-provision)
+- Monitor credit consumption with QUERY_HISTORY views
+- Consider batch processing instead of row-by-row AI operations
+
+**Source**: [The Hidden Cost of Snowflake Cortex AI](https://seemoredata.io/blog/snowflake-cortex-ai/) (Community blog with billing evidence)
 
 ## Authentication
 
@@ -229,6 +280,22 @@ sub: ACCOUNT_LOCATOR.USERNAME
 iss: NZ90655.JEZWEB.SHA256:jpZO6LvU2SpKd8tE61OGfas5ZXpfHloiJd7XHLPDEEA=
 sub: NZ90655.JEZWEB
 ```
+
+### SPCS Container Authentication (v4.2.0+)
+
+**New in January 2026**: Connector automatically detects and uses SPCS service identifier tokens when running inside Snowpark Container Services.
+
+```python
+# No special configuration needed inside SPCS containers
+import snowflake.connector
+
+# Auto-detects SPCS_TOKEN environment variable
+conn = snowflake.connector.connect()
+```
+
+This enables seamless authentication from containerized Snowpark services without explicit credentials.
+
+**Source**: [Release v4.2.0](https://github.com/snowflakedb/snowflake-connector-python/releases/tag/v4.2.0)
 
 ## Snow CLI Commands
 
@@ -498,6 +565,22 @@ config = {
 }
 ```
 
+### DML Statistics (v4.2.0+)
+
+**New in January 2026**: `SnowflakeCursor.stats` property exposes granular DML statistics for operations where `rowcount` is insufficient (e.g., CTAS queries).
+
+```python
+# Before v4.2.0 - rowcount returns -1 for CTAS
+cursor.execute("CREATE TABLE new_table AS SELECT * FROM source WHERE active = true")
+print(cursor.rowcount)  # Returns -1 (not helpful!)
+
+# After v4.2.0 - stats property shows actual row counts
+cursor.execute("CREATE TABLE new_table AS SELECT * FROM source WHERE active = true")
+print(cursor.stats)  # Returns {'rows_inserted': 1234, 'duplicates': 0, ...}
+```
+
+**Source**: [Release v4.2.0](https://github.com/snowflakedb/snowflake-connector-python/releases/tag/v4.2.0)
+
 ### UDFs and Stored Procedures
 
 ```python
@@ -660,6 +743,69 @@ See `templates/snowflake-rest-client.ts` for complete implementation.
 **Cause**: `090001` means "running" not error. Warehouse IS resuming, just takes time.
 
 **Fix**: Auto-resume works. Wait longer or explicitly resume first: `POST /api/v2/warehouses/{wh}:resume`
+
+### 10. Memory Leaks in Connector 4.x (Active Issue)
+
+**Error**: Long-running Python applications show memory growth over time
+**Source**: [GitHub Issue #2727](https://github.com/snowflakedb/snowflake-connector-python/issues/2727), [#2725](https://github.com/snowflakedb/snowflake-connector-python/issues/2725)
+**Affects**: snowflake-connector-python 4.0.0 - 4.2.0
+
+**Why It Happens**:
+- `SessionManager` uses `defaultdict` which prevents garbage collection
+- `SnowflakeRestful.fetch()` holds references that leak during query execution
+
+**Prevention**:
+Reuse connections rather than creating new ones repeatedly. Fix is in progress via [PR #2741](https://github.com/snowflakedb/snowflake-connector-python/pull/2741) and [PR #2726](https://github.com/snowflakedb/snowflake-connector-python/pull/2726).
+
+```python
+# AVOID - creates new connection each iteration
+for i in range(1000):
+    conn = snowflake.connector.connect(...)
+    cursor = conn.cursor()
+    cursor.execute("SELECT 1")
+    cursor.close()
+    conn.close()
+
+# BETTER - reuse connection
+conn = snowflake.connector.connect(...)
+cursor = conn.cursor()
+for i in range(1000):
+    cursor.execute("SELECT 1")
+cursor.close()
+conn.close()
+```
+
+**Status**: Fix expected in connector v4.3.0 or later
+
+### 11. AI Function Throttling During Peak Usage
+
+**Error**: "Request throttled due to high usage. Please retry."
+**Source**: [Snowflake Cortex Documentation](https://docs.snowflake.com/en/user-guide/snowflake-cortex/aisql)
+**Affects**: All Cortex AI functions (COMPLETE, FILTER, CLASSIFY, etc.)
+
+**Why It Happens**:
+AI/LLM requests may be throttled during high usage periods to manage platform capacity. Throttled requests return errors and require manual retries.
+
+**Prevention**:
+Implement retry logic with exponential backoff:
+
+```python
+import time
+import snowflake.connector
+
+def execute_with_retry(cursor, query, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            return cursor.execute(query).fetchall()
+        except snowflake.connector.errors.DatabaseError as e:
+            if "throttled" in str(e).lower() and attempt < max_retries - 1:
+                wait_time = 2 ** attempt  # Exponential backoff
+                time.sleep(wait_time)
+            else:
+                raise
+```
+
+**Status**: Documented behavior, no fix planned
 
 ## References
 

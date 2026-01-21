@@ -1,9 +1,9 @@
 ---
 name: sveltia-cms
 description: |
-  Set up Sveltia CMS - lightweight Git-backed CMS successor to Decap/Netlify CMS (300KB bundle, 270+ fixes). Framework-agnostic for Hugo, Jekyll, 11ty, Astro.
+  Set up Sveltia CMS - lightweight Git-backed CMS successor to Decap/Netlify CMS (300KB bundle, 270+ fixes). Framework-agnostic for Hugo, Jekyll, 11ty, Astro. Prevents 10 documented errors.
 
-  Use when adding CMS to static sites, migrating from Decap CMS, or fixing OAuth, YAML parse, CORS/COOP errors.
+  Use when adding CMS to static sites, migrating from Decap CMS, or fixing OAuth, YAML parse, datetime timezone, GDPR font loading, or CORS/COOP errors.
 user-invocable: true
 allowed-tools: ['Read', 'Write', 'Edit', 'Bash', 'Glob', 'Grep']
 ---
@@ -16,7 +16,7 @@ Complete skill for integrating Sveltia CMS into static site projects.
 
 ## Current Versions
 
-- **@sveltia/cms**: 0.127.0 (verified January 2026)
+- **@sveltia/cms**: 0.128.5 (verified January 2026)
 - **Status**: Public Beta (v1.0 expected early 2026)
 - **Maturity**: Production-ready (270+ issues solved from predecessor)
 
@@ -40,6 +40,28 @@ Complete skill for integrating Sveltia CMS into static site projects.
 ---
 
 ## Breaking Changes & Updates (v0.105.0+)
+
+### v0.127.0 (December 29, 2025) - slug_length Deprecation
+
+**DEPRECATION**: The `slug_length` collection option is deprecated and will be removed in v1.0.
+
+**Migration**:
+```yaml
+# ❌ Deprecated (pre-v0.127.0)
+collections:
+  - name: posts
+    slug_length: 50
+
+# ✅ New (v0.127.0+)
+slug:
+  maxlength: 50
+```
+
+**Timeline**: Will be removed in Sveltia CMS 1.0 (expected early 2026).
+
+**Source**: [Release v0.127.0](https://github.com/sveltia/sveltia-cms/releases/tag/v0.127.0)
+
+---
 
 ### v0.120.0 (November 24, 2025) - Author Template Tags
 
@@ -180,6 +202,121 @@ collections:
 
 ---
 
+## Configuration Options
+
+### Global Slug Options (v0.128.0+)
+
+Configure slug generation behavior globally:
+
+```yaml
+slug:
+  encoding: unicode-normalized
+  clean_accents: false
+  sanitize_replacement: '-'
+  lowercase: true   # Default: convert to lowercase (v0.128.0+)
+  maxlength: 50     # Default: unlimited (v0.127.0+)
+```
+
+**lowercase** (v0.128.0+): Set to `false` to preserve original casing in slugs (e.g., "MyBlogPost" instead of "myblogpost").
+
+**Use case**: Mixed-case URLs or file names where case matters.
+
+**Source**: [Release v0.128.0](https://github.com/sveltia/sveltia-cms/releases/tag/v0.128.0), [GitHub Issue #594](https://github.com/sveltia/sveltia-cms/issues/594)
+
+---
+
+### Raw Format for Text Files (v0.126.0+)
+
+New `raw` format allows editing files without front matter (CSV, JSON, YAML, plain text). Must have single `body` field with widget type: `code`, `markdown`, `richtext`, or `text`.
+
+**Use Cases**:
+- Edit configuration files (JSON, YAML)
+- Manage CSV data
+- Edit plain text files
+
+**Configuration**:
+```yaml
+collections:
+  - name: config
+    label: Configuration Files
+    files:
+      - label: Site Config
+        name: site_config
+        file: config.json
+        format: raw  # ← NEW format type
+        fields:
+          - label: Config
+            name: body
+            widget: code
+            default_language: json
+```
+
+**Restrictions**:
+- Only one field allowed (must be named `body`)
+- Widget must be: `code`, `markdown`, `richtext`, or `text`
+- No front matter parsing
+
+**Source**: [Release v0.126.0](https://github.com/sveltia/sveltia-cms/releases/tag/v0.126.0)
+
+---
+
+### Number Field String Encoding (v0.125.0+)
+
+New `value_type` option for Number field accepts `int/string` and `float/string` to save numbers as strings instead of numbers in front matter.
+
+**Use Case**: Some static site generators or schemas require numeric values stored as strings (e.g., `age: "25"` instead of `age: 25`).
+
+**Configuration**:
+```yaml
+fields:
+  - label: Age
+    name: age
+    widget: number
+    value_type: int/string  # Saves as "25" not 25
+
+  - label: Price
+    name: price
+    widget: number
+    value_type: float/string  # Saves as "19.99" not 19.99
+```
+
+**Source**: [Release v0.125.0](https://github.com/sveltia/sveltia-cms/releases/tag/v0.125.0), [GitHub Issue #574](https://github.com/sveltia/sveltia-cms/issues/574)
+
+---
+
+### Editor Pane Locale via URL Query (v0.126.0+)
+
+Override editor locale via URL query parameter `?_locale=fr` to get edit links for specific locales.
+
+**Use Case**: Generate direct edit links for translators or content editors for specific languages.
+
+**Example**:
+```
+https://yourdomain.com/admin/#/collections/posts/entries/my-post?_locale=fr
+```
+
+**Source**: [Release v0.126.0](https://github.com/sveltia/sveltia-cms/releases/tag/v0.126.0), [GitHub Issue #585](https://github.com/sveltia/sveltia-cms/issues/585)
+
+---
+
+### Richtext Field Type Alias (v0.124.0+)
+
+Added `richtext` as an alias for `markdown` widget to align with Decap CMS terminology. Both work identically.
+
+**Configuration**:
+```yaml
+fields:
+  - label: Body
+    name: body
+    widget: richtext  # ← NEW alias for markdown
+```
+
+**Future**: HTML output support planned for `richtext` field type.
+
+**Source**: [Release v0.124.0](https://github.com/sveltia/sveltia-cms/releases/tag/v0.124.0)
+
+---
+
 ## Setup Pattern (Framework-Agnostic)
 
 **All frameworks follow the same pattern:**
@@ -201,7 +338,7 @@ collections:
        <title>Content Manager</title>
      </head>
      <body>
-       <script src="https://unpkg.com/@sveltia/cms@0.127.0/dist/sveltia-cms.js" type="module"></script>
+       <script src="https://unpkg.com/@sveltia/cms@0.128.5/dist/sveltia-cms.js" type="module"></script>
      </body>
    </html>
    ```
@@ -283,7 +420,7 @@ collections:
 
 ## Common Errors & Solutions
 
-This skill prevents **8 common errors** encountered when setting up Sveltia CMS.
+This skill prevents **10 common errors** encountered when setting up Sveltia CMS.
 
 ### 1. ❌ OAuth Authentication Failures
 
@@ -458,7 +595,7 @@ collections:
 
 **Use version pinning (recommended):**
 ```html
-<script src="https://unpkg.com/@sveltia/cms@0.127.0/dist/sveltia-cms.js" type="module"></script>
+<script src="https://unpkg.com/@sveltia/cms@0.128.5/dist/sveltia-cms.js" type="module"></script>
 ```
 
 ---
@@ -528,7 +665,129 @@ media_libraries:
 
 ---
 
-### 8. ❌ CORS / COOP Policy Errors
+### 8. ❌ Datetime Widget Format Strictness
+
+**Error Message:**
+- Silent data loss (no error shown)
+- Date fields show blank in CMS
+
+**Symptoms:**
+- Posts with existing dates appear blank when editing
+- Saving overwrites dates with blank values
+- Hugo marks posts as "future" and skips building them
+
+**Causes:**
+- Default datetime widget outputs timestamps WITHOUT timezone suffix
+- When `format` is specified, Sveltia becomes **strict** - existing entries with different formats show as blank
+- Hugo infers UTC when timezone missing, causing timezone issues
+
+**⚠️ CRITICAL: Format Strictness Warning (v0.124.1+)**
+
+When you specify a `format` option, Sveltia becomes **strict**:
+- Existing entries with different formats show as **blank**
+- Saving will **overwrite** with blank value (SILENT DATA LOSS)
+- No error message shown
+
+**Solution:**
+
+**Option 1: Use picker_utc (Recommended)**
+```yaml
+fields:
+  - label: Date
+    name: date
+    widget: datetime
+    picker_utc: true  # Most flexible - outputs with timezone
+```
+
+**Option 2: Specify format with timezone (RISKY - see warning above)**
+```yaml
+fields:
+  - label: Date
+    name: date
+    widget: datetime
+    format: "YYYY-MM-DDTHH:mm:ss.SSSZ"  # Only if ALL existing dates match this format
+```
+
+**Option 3: Configure Hugo to accept missing timezone**
+```toml
+# config.toml
+[frontmatter]
+  date = [":default", ":fileModTime"]
+```
+
+**Prevention**:
+1. Don't specify `format` if you have mixed date formats
+2. Normalize all dates first before adding `format`
+3. Use `picker_utc: true` instead (more flexible)
+
+**Source**: [GitHub Issue #565](https://github.com/sveltia/sveltia-cms/issues/565), fixed in v0.126.0 (improved date parser but format strictness remains)
+
+---
+
+### 9. ❌ GDPR Violation: Google Fonts CDN
+
+**Error Message:**
+- No error shown (privacy compliance issue)
+
+**Symptoms:**
+- Privacy-focused sites blocked from using Sveltia
+- EU public sector cannot adopt
+- GDPR non-compliance
+
+**Causes:**
+- Sveltia loads Google Fonts and Material Symbols from Google CDN without user consent
+- Google tracks font usage and collects IP addresses
+- Violates EU data protection law
+
+**⚠️ Impact**: Blocking issue for EU public sector and privacy-focused sites
+
+**Solution (Vite Plugin - Recommended)**:
+
+```typescript
+// vite.config.ts
+import { defineConfig, type Plugin } from 'vite'
+
+function ensureGDPRCompliantFonts(): Plugin {
+  const fontsURLRegex = /fonts\.googleapis\.com\/css2/g
+  const replacement = 'fonts.bunny.net/css'
+  return {
+    name: 'gdpr-compliant-fonts',
+    enforce: 'post',
+    transform(code) {
+      if (fontsURLRegex.test(code)) {
+        return code.replaceAll(fontsURLRegex, replacement)
+      }
+    },
+  }
+}
+
+export default defineConfig({
+  plugins: [ensureGDPRCompliantFonts()],
+})
+```
+
+**Alternative Solutions**:
+
+**Option 2: Bunny Fonts** (1:1 Google Fonts replacement)
+- Use https://fonts.bunny.net instead of fonts.googleapis.com
+- EU-based, GDPR-compliant
+- Same API as Google Fonts
+
+**Option 3: Self-hosted fonts**
+- Use `@fontsource` npm packages
+- Bundle fonts with application
+- No external requests
+
+**Maintainer Response**:
+- Acknowledged issue
+- Plans to add system font option (post-v1.0)
+- Sveltia itself collects no data (fonts are only concern)
+
+**Source**: [GitHub Issue #443](https://github.com/sveltia/sveltia-cms/issues/443)
+
+---
+
+### 10. ❌ CORS / COOP Policy Errors
 
 **Error Message:**
 - "Authentication Aborted"
@@ -574,6 +833,59 @@ media_libraries:
 
 ---
 
+## Fixed Issues (Historical Reference)
+
+These issues were present in earlier versions but have been fixed. Documented here for reference.
+
+### ✅ Paths with Parentheses Break Entry Loading (Fixed in v0.128.1)
+
+**Issue**: Sveltia CMS failed to load existing entries when the `path` option contains parentheses `()`. This affected Next.js/Nextra users using route groups like `app/(content)/(writing)/`.
+
+**Symptoms** (pre-v0.128.1):
+- Creating new entries worked
+- Loading/listing existing entries failed silently
+- CMS showed "No entries found" despite files existing
+
+**Example that failed**:
+```yaml
+collections:
+  - name: pages
+    folder: app/(pages)
+    path: "{{slug}}/page"  # ← Failed to load existing entries
+    extension: mdx
+```
+
+**Status**: Fixed in v0.128.1 (January 13, 2026)
+
+**Source**: [GitHub Issue #596](https://github.com/sveltia/sveltia-cms/issues/596)
+
+---
+
+### ✅ Root Folder Collections Break GitHub Backend (Fixed in v0.125.0)
+
+**Issue**: Collections with `folder: ""` or `folder: "."` or `folder: "/"` failed when creating new entries via GitHub backend. GraphQL query incorrectly constructed path starting with `/` (absolute) instead of relative path.
+
+**Symptoms** (pre-v0.125.0):
+- Worked locally via browser File API
+- Failed with GitHub backend (GraphQL error)
+- Leading slash broke GraphQL mutation
+
+**Example that failed**:
+```yaml
+collections:
+  - name: root-pages
+    folder: ""  # or "." or "/"
+    # ← Broke when creating entries via GitHub backend
+```
+
+**Use Case**: VitePress and other frameworks storing content at repository root.
+
+**Status**: Fixed in v0.125.0 (December 20, 2025)
+
+**Source**: [GitHub Issue #580](https://github.com/sveltia/sveltia-cms/issues/580)
+
+---
+
 ## Migration from Decap CMS
 
 Sveltia CMS is a **drop-in replacement** for Decap CMS.
@@ -585,7 +897,7 @@ Sveltia CMS is a **drop-in replacement** for Decap CMS.
 <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
 
 <!-- NEW: Sveltia CMS -->
-<script src="https://unpkg.com/@sveltia/cms@0.127.0/dist/sveltia-cms.js" type="module"></script>
+<script src="https://unpkg.com/@sveltia/cms@0.128.5/dist/sveltia-cms.js" type="module"></script>
 ```
 
 **Step 2: Keep existing config.yml** (no changes needed)
@@ -628,10 +940,13 @@ Sveltia CMS is a **drop-in replacement** for Decap CMS.
 
 ### Official Documentation
 
+- **Documentation Site**: https://sveltiacms.app/en/docs (under active development - some sections may be incomplete)
 - **GitHub**: https://github.com/sveltia/sveltia-cms
 - **OAuth Worker**: https://github.com/sveltia/sveltia-cms-auth
 - **npm Package**: https://www.npmjs.com/package/@sveltia/cms
 - **Discussions**: https://github.com/sveltia/sveltia-cms/discussions
+
+**Note**: The official documentation site is being actively developed. GitHub README remains a useful fallback for some topics.
 
 ---
 
@@ -654,7 +969,7 @@ Sveltia CMS is a **drop-in replacement** for Decap CMS.
 
 ## Errors Prevented
 
-This skill prevents **8 common errors** (100% prevention rate):
+This skill prevents **10 common errors** (100% prevention rate):
 
 1. ✅ OAuth authentication failures
 2. ✅ TOML front matter generation bugs
@@ -663,11 +978,14 @@ This skill prevents **8 common errors** (100% prevention rate):
 5. ✅ "SVELTIA is not defined" errors
 6. ✅ 404 on /admin page
 7. ✅ Image upload failures (HEIC format)
-8. ✅ CORS / COOP policy errors
+8. ✅ Datetime widget format strictness / timezone issues
+9. ✅ GDPR violation (Google Fonts CDN)
+10. ✅ CORS / COOP policy errors
 
 ---
 
-**Last Updated**: 2026-01-09
-**Skill Version**: 2.0.1
-**Sveltia CMS Version**: 0.127.0 (Beta)
+**Last Updated**: 2026-01-21
+**Skill Version**: 2.1.0
+**Sveltia CMS Version**: 0.128.5 (Beta)
 **Status**: Production-ready, v1.0 GA expected early 2026
+**Changes**: Added 6 new configuration options (slug lowercase, raw format, number string encoding, locale URL param, richtext alias, Gemini 2.5 Flash-Lite support), updated datetime error with format strictness warning, added GDPR Google Fonts workaround, documented 2 fixed historical issues, deprecated slug_length option

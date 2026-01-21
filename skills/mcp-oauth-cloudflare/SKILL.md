@@ -1,9 +1,9 @@
 ---
 name: MCP OAuth Cloudflare
 description: |
-  Add OAuth authentication to MCP servers on Cloudflare Workers. Uses @cloudflare/workers-oauth-provider with Google OAuth for Claude.ai-compatible authentication.
+  Add OAuth authentication to MCP servers on Cloudflare Workers. Uses @cloudflare/workers-oauth-provider with Google OAuth for Claude.ai-compatible authentication. Prevents 9 documented errors including RFC 8707 audience bugs, Claude.ai connection failures, and CSRF vulnerabilities.
 
-  Use when building MCP servers that need user authentication, implementing Dynamic Client Registration (DCR) for Claude.ai, or replacing static auth tokens with OAuth flows. Prevents CSRF vulnerabilities, state validation errors, and OAuth misconfiguration.
+  Use when building MCP servers that need user authentication, implementing Dynamic Client Registration (DCR) for Claude.ai, or replacing static auth tokens with OAuth flows. Includes workarounds for production redirect URI mismatches and re-auth loop issues.
 user-invocable: true
 license: MIT
 ---
@@ -27,6 +27,16 @@ Production-ready OAuth authentication for MCP servers on Cloudflare Workers.
 - Local-only MCP development (use tokens for simplicity)
 
 ## Architecture Overview
+
+### Dual OAuth Role Pattern
+
+When using a third-party OAuth provider (like Google), the MCP Server acts as **both an OAuth client (to upstream service) and as an OAuth server (to MCP clients)**. The Worker:
+
+1. Stores encrypted access token in Workers KV
+2. Issues its own token to the client
+3. `workers-oauth-provider` handles spec compliance
+
+**Critical**: The MCP server **generates and issues its own token** rather than passing through the third-party token. This is essential for security and spec compliance.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
@@ -447,6 +457,14 @@ export async function addApprovedClient(request: Request, clientId: string, cook
 }
 ```
 
+### PKCE Methods (Current Limitation)
+
+**Note**: The library currently accepts both `plain` and `S256` PKCE methods. There is no configuration option to enforce S256-only, which is the OAuth 2.1 recommended method.
+
+**Security Consideration**: For maximum security, you may want S256-only. This is tracked in [GitHub Issue #113](https://github.com/cloudflare/workers-oauth-provider/issues/113) as a feature request.
+
+**Workaround**: Until this is configurable, the library will accept both methods. Modern OAuth clients (including Claude.ai) use S256 by default.
+
 ## Google Cloud Console Setup
 
 1. Go to [console.cloud.google.com](https://console.cloud.google.com)
@@ -499,6 +517,16 @@ echo "openid email profile https://www.googleapis.com/auth/drive" | npx wrangler
 ## Refresh Token Lifecycle (v0.2.0+)
 
 For long-lived sessions (Google APIs, Gmail, Drive), you need refresh tokens.
+
+### Design Decision: Two Valid Refresh Tokens
+
+**Note**: `@cloudflare/workers-oauth-provider` implements a non-standard refresh token rotation strategy. At any time, a grant may have **two valid refresh tokens**. When the client uses one, the other is invalidated and a new one is generated.
+
+**Why It Differs from OAuth 2.1**: OAuth 2.1 requires single-use refresh tokens for public clients. However, the library author argues that single-use tokens are fundamentally flawed because they assume every refresh request completes with no errors. In the real world, network errors or software faults could mean the client fails to store the new refresh token.
+
+**Security Trade-off**: Allowing the previous refresh token disables replay attack detection. For confidential clients (most MCP servers), this is compliant with OAuth 2.1. For public clients, consider stricter rotation if needed.
+
+**Source**: [GitHub Issue #43](https://github.com/cloudflare/workers-oauth-provider/issues/43), documented in [README](https://github.com/cloudflare/workers-oauth-provider?tab=readme-ov-file#single-use-refresh-tokens)
 
 ### Requesting Refresh Tokens
 
@@ -665,18 +693,204 @@ npx wrangler deploy  # Required to activate
 |---------------|------------|---------|
 | ~20k tokens, 3-5 attempts | ~6k tokens, first try | ~70% |
 
+## Known Issues Prevention
+
+This skill prevents **9** documented errors.
+
+### Issue #1: RFC 8707 Audience Validation Fails with Path Components (v0.1.0+)
+
+**Error**: `invalid_token: Token audience does not match resource server`
+**Source**: [GitHub Issue #108](https://github.com/cloudflare/workers-oauth-provider/issues/108)
+**Affects**: v0.1.0+ when using RFC 8707 resource indicators with paths (e.g., ChatGPT custom connectors)
+
+**Why It Happens**: The `resourceServer` is computed using only the origin (`https://example.com`) but RFC 8707 recommends using full URLs with paths (`https://example.com/api`). The strict equality check in `audienceMatches` fails when:
+- Token audience: `https://example.com/api` (from `resource` parameter)
+- Resource server: `https://example.com` (computed from request URL origin only)
+
+**Prevention**:
+
+If using RFC 8707 resource indicators with paths, vendor the library and modify `handleApiRequest`:
+
+```typescript
+// Workaround: Include pathname in resourceServer computation
+const resourceServer = `${requestUrl.protocol}//${requestUrl.host}${requestUrl.pathname}`;
+```
+
+Or avoid using paths in resource indicators until this is fixed upstream.
+
+---
+
+### Issue #2: Claude.ai Client Cannot Connect (v0.2.2)
+
+**Error**: Claude.ai MCP client fails to connect during OAuth flow
+**Source**: [GitHub Issue #133](https://github.com/cloudflare/workers-oauth-provider/issues/133)
+**Affects**: v0.2.2, Claude.ai MCP clients
+
+**Why It Happens**: There is a '/' character in the `audienceMatches` function that prevents Claude.ai from connecting. Likely related to Issue #1 (RFC 8707 path handling).
+
+**Prevention**: Monitor [Issue #133](https://github.com/cloudflare/workers-oauth-provider/issues/133) for updates. This may require a library update or vendoring the library with a fix.
+
+---
+
+### Issue #3: Props Not Updated After Re-authorization (Upstream OAuth Expiry)
+
+**Error**: Infinite re-auth loop when upstream OAuth provider doesn't provide refresh tokens
+**Source**: [GitHub Issue #34](https://github.com/cloudflare/workers-oauth-provider/issues/34)
+**Affects**: MCP servers using upstream OAuth providers without refresh tokens
+
+**Why It Happens**: Throwing `invalid_grant` in `tokenExchangeCallback` triggers re-authorization, but `completeAuthorization()` doesn't update props. Stale props cause repeated auth failures until the OAuth client restarts.
+
+**Prevention**:
+
+If your upstream OAuth provider doesn't issue refresh tokens:
+
+1. Implement a fallback strategy (store token expiry, re-auth before expiration)
+2. Monitor [Issue #34](https://github.com/cloudflare/workers-oauth-provider/issues/34) for official fix
+3. Consider client restart as temporary workaround
+
+**Problematic Pattern:**
+```typescript
+tokenExchangeCallback: async (options) => {
+  if (options.grantType === "refresh_token") {
+    const response = await fetchNewToken(options.props.accessToken);
+
+    if (!response.ok) {
+      // Triggers re-auth but props remain stale
+      throw new Error(JSON.stringify({
+        error: "invalid_grant",
+        error_description: "access token expired"
+      }));
+    }
+  }
+}
+```
+
+---
+
+### Issue #4: Redirect URI Mismatch in Production (Development vs Production Behavior)
+
+**Error**: `Invalid redirect URI. The redirect URI provided does not match any registered URI for this client`
+**Source**: [GitHub Issue #29](https://github.com/cloudflare/workers-oauth-provider/issues/29) (Community-sourced)
+**Affects**: Production deployments; works fine in local `wrangler dev`
+
+**Why It Happens**: Dynamic Client Registration (DCR) behavior differs between local and production environments. Redirect URIs auto-register during DCR, but something fails in production. Root cause unclear but affecting multiple users with MCP clients (Cursor, Windsurf, PyCharm).
+
+**Prevention**:
+
+- Explicitly register redirect URIs when possible instead of relying on DCR auto-registration
+- Test OAuth flow in production environment before deploying to Claude.ai
+- Monitor [Issue #29](https://github.com/cloudflare/workers-oauth-provider/issues/29) for resolution
+
+---
+
+### Issue #5: CSRF Vulnerabilities
+
+**Error**: Session hijacking, OAuth callback interception
+**Prevention**: HttpOnly cookies with SameSite attribute
+
+```typescript
+const setCookie = `__Host-CSRF_TOKEN=${token}; HttpOnly; Secure; Path=/; SameSite=Lax; Max-Age=600`;
+```
+
+---
+
+### Issue #6: State Replay Attacks
+
+**Error**: OAuth state reused across multiple authorization attempts
+**Prevention**: One-time-use KV state with 10-minute TTL
+
+```typescript
+await kv.put(`oauth:state:${stateToken}`, JSON.stringify(oauthReqInfo), {
+  expirationTtl: 600,
+});
+```
+
+---
+
+### Issue #7: Token Theft via Session Fixation
+
+**Error**: OAuth state stolen and used from different browser session
+**Prevention**: Session binding via SHA-256 hash
+
+```typescript
+const hashBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(stateToken));
+const hashHex = Array.from(new Uint8Array(hashBuffer))
+  .map(b => b.toString(16).padStart(2, '0')).join('');
+```
+
+---
+
+### Issue #8: Missing Dynamic Client Registration (DCR)
+
+**Error**: Claude.ai shows "Connection Failed" when trying to connect
+**Prevention**: OAuthProvider handles DCR automatically via `clientRegistrationEndpoint: '/register'`
+
+---
+
+### Issue #9: Cookie Tampering
+
+**Error**: Approved clients list modified to bypass consent
+**Prevention**: HMAC signatures on approval cookies
+
+```typescript
+const signature = await signData(payload, cookieSecret);
+const cookie = `__Host-APPROVED_CLIENTS=${signature}.${btoa(payload)}`;
+```
+
+## Version History & Breaking Changes
+
+### v0.2.2 (2025-12-20) - Current
+
+**New Features**:
+- Client ID Metadata Document (CIMD) support - allows HTTPS URLs as `client_id` values
+- Matches new MCP authorization spec: https://modelcontextprotocol.io/specification/draft/basic/authorization
+
+**Migration**: No breaking changes. CIMD support is additive.
+
+---
+
+### v0.1.0 (2025-11-07)
+
+**New Features**:
+- Audience validation for OAuth tokens per RFC 7519
+
+**Breaking Changes**:
+- Tokens now require correct `aud` claim
+- May break existing deployments without audience validation
+- See Issue #108 for RFC 8707 path handling bug
+
+**Migration**:
+1. Ensure all tokens include correct `aud` claim
+2. Test audience validation thoroughly
+3. If using resource indicators with paths, apply workaround from Issue #108
+
+---
+
+### v0.0.x (Pre-November 2025)
+
+Initial releases without audience validation.
+
 ## Errors Prevented
 
-1. **CSRF vulnerabilities** - HttpOnly cookies with SameSite
-2. **State replay attacks** - One-time-use KV state
-3. **Token theft** - Session binding via SHA-256
-4. **Missing DCR** - OAuthProvider handles automatically
-5. **Cookie tampering** - HMAC signatures
-6. **Hardcoded scopes** - Configurable via environment variable
+1. **RFC 8707 audience path bugs** - Workaround for path component validation
+2. **Claude.ai connection failures** - Known issue tracking
+3. **Re-auth loops** - Props update handling
+4. **Production redirect URI mismatches** - Testing and explicit registration
+5. **CSRF vulnerabilities** - HttpOnly cookies with SameSite
+6. **State replay attacks** - One-time-use KV state
+7. **Token theft** - Session binding via SHA-256
+8. **Missing DCR** - OAuthProvider handles automatically
+9. **Cookie tampering** - HMAC signatures
 
 ## References
 
 - [Cloudflare Workers OAuth Provider](https://developers.cloudflare.com/workers/examples/oauth/)
+- [GitHub - cloudflare/workers-oauth-provider](https://github.com/cloudflare/workers-oauth-provider)
 - [MCP Specification](https://spec.modelcontextprotocol.io/)
+- [MCP Authorization Spec](https://modelcontextprotocol.io/specification/draft/basic/authorization)
 - [Google OAuth Documentation](https://developers.google.com/identity/protocols/oauth2)
 - [Cloudflare Agents SDK](https://developers.cloudflare.com/agents/)
+
+---
+
+**Last verified**: 2026-01-21 | **Skill version**: 2.0.0 | **Changes**: Added 4 new known issues from post-training-cutoff research (RFC 8707 audience bugs, Claude.ai connection failures, re-auth loops, production redirect URI mismatches), version history section, refresh token rotation design decision, dual OAuth role pattern emphasis, and PKCE limitation note. Updated from 6 to 9 documented error preventions.

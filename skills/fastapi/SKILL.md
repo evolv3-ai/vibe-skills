@@ -1,9 +1,9 @@
 ---
 name: fastapi
 description: |
-  Build Python APIs with FastAPI, Pydantic v2, and SQLAlchemy 2.0 async. Covers project structure, JWT auth, validation, and database integration with uv package manager.
+  Build Python APIs with FastAPI, Pydantic v2, and SQLAlchemy 2.0 async. Covers project structure, JWT auth, validation, and database integration with uv package manager. Prevents 7 documented errors.
 
-  Use when: creating Python APIs, implementing JWT auth, or troubleshooting 422 validation, CORS, or async blocking errors.
+  Use when: creating Python APIs, implementing JWT auth, or troubleshooting 422 validation, CORS, async blocking, form data, background tasks, or OpenAPI schema errors.
 user-invocable: true
 ---
 
@@ -17,6 +17,10 @@ Production-tested patterns for FastAPI with Pydantic v2, SQLAlchemy 2.0 async, a
 - SQLAlchemy: 2.0.30
 - Uvicorn: 0.35.0
 - python-jose: 3.3.0
+
+**Requirements**:
+- Python 3.9+ (Python 3.8 support dropped in FastAPI 0.125.0)
+- Pydantic v2.7.0+ (Pydantic v1 support completely removed in FastAPI 0.128.0)
 
 ---
 
@@ -502,6 +506,266 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 
 ---
 
+## Known Issues Prevention
+
+This skill prevents **7** documented issues from official FastAPI GitHub and release notes.
+
+### Issue #1: Form Data Loses Field Set Metadata
+
+**Error**: `model.model_fields_set` includes default values when using `Form()`
+**Source**: [GitHub Issue #13399](https://github.com/fastapi/fastapi/issues/13399)
+**Why It Happens**: Form data parsing preloads default values and passes them to the validator, making it impossible to distinguish between fields explicitly set by the user and fields using defaults. This bug ONLY affects Form data, not JSON body data.
+
+**Prevention**:
+```python
+# ✗ AVOID: Pydantic model with Form when you need field_set metadata
+from typing import Annotated
+from fastapi import Form
+
+@app.post("/form")
+async def endpoint(model: Annotated[MyModel, Form()]):
+    fields = model.model_fields_set  # Unreliable! ❌
+
+# ✓ USE: Individual form fields or JSON body instead
+@app.post("/form-individual")
+async def endpoint(
+    field_1: Annotated[bool, Form()] = True,
+    field_2: Annotated[str | None, Form()] = None
+):
+    # You know exactly what was provided ✓
+
+# ✓ OR: Use JSON body when metadata matters
+@app.post("/json")
+async def endpoint(model: MyModel):
+    fields = model.model_fields_set  # Works correctly ✓
+```
+
+### Issue #2: BackgroundTasks Silently Overwritten by Custom Response
+
+**Error**: Background tasks added via `BackgroundTasks` dependency don't run
+**Source**: [GitHub Issue #11215](https://github.com/fastapi/fastapi/issues/11215)
+**Why It Happens**: When you return a custom `Response` with a `background` parameter, it overwrites all tasks added to the injected `BackgroundTasks` dependency. This is not documented and causes silent failures.
+
+**Prevention**:
+```python
+# ✗ WRONG: Mixing both mechanisms
+from fastapi import BackgroundTasks
+from starlette.responses import Response, BackgroundTask
+
+@app.get("/")
+async def endpoint(tasks: BackgroundTasks):
+    tasks.add_task(send_email)  # This will be lost! ❌
+    return Response(
+        content="Done",
+        background=BackgroundTask(log_event)  # Only this runs
+    )
+
+# ✓ RIGHT: Use only BackgroundTasks dependency
+@app.get("/")
+async def endpoint(tasks: BackgroundTasks):
+    tasks.add_task(send_email)
+    tasks.add_task(log_event)
+    return {"status": "done"}  # All tasks run ✓
+
+# ✓ OR: Use only Response background (but can't inject dependencies)
+@app.get("/")
+async def endpoint():
+    return Response(
+        content="Done",
+        background=BackgroundTask(log_event)
+    )
+```
+
+**Rule**: Pick ONE mechanism and stick with it. Don't mix injected `BackgroundTasks` with `Response(background=...)`.
+
+### Issue #3: Optional Form Fields Break with TestClient (Regression)
+
+**Error**: `422: "Input should be 'abc' or 'def'"` for optional Literal fields
+**Source**: [GitHub Issue #12245](https://github.com/fastapi/fastapi/issues/12245)
+**Why It Happens**: Starting in FastAPI 0.114.0, optional form fields with `Literal` types fail validation when passed `None` via TestClient. Worked in 0.113.0.
+
+**Prevention**:
+```python
+from typing import Annotated, Literal, Optional
+from fastapi import Form
+from fastapi.testclient import TestClient
+
+# ✗ PROBLEMATIC: Optional Literal with Form (breaks in 0.114.0+)
+@app.post("/")
+async def endpoint(
+    attribute: Annotated[Optional[Literal["abc", "def"]], Form()]
+):
+    return {"attribute": attribute}
+
+client = TestClient(app)
+data = {"attribute": None}  # or omit the field
+response = client.post("/", data=data)  # Returns 422 ❌
+
+# ✓ WORKAROUND 1: Don't pass None explicitly, omit the field
+data = {}  # Omit instead of None
+response = client.post("/", data=data)  # Works ✓
+
+# ✓ WORKAROUND 2: Avoid Literal types with optional form fields
+@app.post("/")
+async def endpoint(attribute: Annotated[str | None, Form()] = None):
+    # Validate in application logic instead
+    if attribute and attribute not in ["abc", "def"]:
+        raise HTTPException(400, "Invalid attribute")
+```
+
+### Issue #4: Pydantic Json Type Doesn't Work with Form Data
+
+**Error**: `"JSON object must be str, bytes or bytearray"`
+**Source**: [GitHub Issue #10997](https://github.com/fastapi/fastapi/issues/10997)
+**Why It Happens**: Using Pydantic's `Json` type directly with `Form()` fails. You must accept the field as `str` and parse manually.
+
+**Prevention**:
+```python
+from typing import Annotated
+from fastapi import Form
+from pydantic import Json, BaseModel
+
+# ✗ WRONG: Json type directly with Form
+@app.post("/broken")
+async def broken(json_list: Annotated[Json[list[str]], Form()]) -> list[str]:
+    return json_list  # Returns 422 ❌
+
+# ✓ RIGHT: Accept as str, parse with Pydantic
+class JsonListModel(BaseModel):
+    json_list: Json[list[str]]
+
+@app.post("/working")
+async def working(json_list: Annotated[str, Form()]) -> list[str]:
+    model = JsonListModel(json_list=json_list)  # Pydantic parses here
+    return model.json_list  # Works ✓
+```
+
+### Issue #5: Annotated with ForwardRef Breaks OpenAPI Generation
+
+**Error**: Missing or incorrect OpenAPI schema for dependency types
+**Source**: [GitHub Issue #13056](https://github.com/fastapi/fastapi/issues/13056)
+**Why It Happens**: When using `Annotated` with `Depends()` and a forward reference (from `__future__ import annotations`), OpenAPI schema generation fails or produces incorrect schemas.
+
+**Prevention**:
+```python
+# ✗ PROBLEMATIC: Forward reference with Depends
+from __future__ import annotations
+from dataclasses import dataclass
+from typing import Annotated
+from fastapi import Depends, FastAPI
+
+app = FastAPI()
+
+def get_potato() -> Potato:  # Forward reference
+    return Potato(color='red', size=10)
+
+@app.get('/')
+async def read_root(potato: Annotated[Potato, Depends(get_potato)]):
+    return {'Hello': 'World'}
+# OpenAPI schema doesn't include Potato definition correctly ❌
+
+@dataclass
+class Potato:
+    color: str
+    size: int
+
+# ✓ WORKAROUND 1: Don't use __future__ annotations in route files
+# Remove: from __future__ import annotations
+
+# ✓ WORKAROUND 2: Use string literals for type hints
+def get_potato() -> "Potato":
+    return Potato(color='red', size=10)
+
+# ✓ WORKAROUND 3: Define classes before they're used in dependencies
+@dataclass
+class Potato:
+    color: str
+    size: int
+
+def get_potato() -> Potato:  # Now works ✓
+    return Potato(color='red', size=10)
+```
+
+### Issue #6: Pydantic v2 Path Parameter Union Type Breaking Change
+
+**Error**: Path parameters with `int | str` always parse as `str` in Pydantic v2
+**Source**: [GitHub Issue #11251](https://github.com/fastapi/fastapi/issues/11251) | Community-sourced
+**Why It Happens**: Major breaking change when migrating from Pydantic v1 to v2. Union types with `str` in path/query parameters now always parse as `str` (worked correctly in v1).
+
+**Prevention**:
+```python
+from uuid import UUID
+
+# ✗ PROBLEMATIC: Union with str in path parameter
+@app.get("/int/{path}")
+async def int_path(path: int | str):
+    return str(type(path))
+    # Pydantic v1: returns <class 'int'> for "123"
+    # Pydantic v2: returns <class 'str'> for "123" ❌
+
+@app.get("/uuid/{path}")
+async def uuid_path(path: UUID | str):
+    return str(type(path))
+    # Pydantic v1: returns <class 'uuid.UUID'> for valid UUID
+    # Pydantic v2: returns <class 'str'> ❌
+
+# ✓ RIGHT: Avoid union types with str in path/query parameters
+@app.get("/int/{path}")
+async def int_path(path: int):
+    return str(type(path))  # Works correctly ✓
+
+# ✓ ALTERNATIVE: Use validators if type coercion needed
+from pydantic import field_validator
+
+class PathParams(BaseModel):
+    path: int | str
+
+    @field_validator('path')
+    def coerce_to_int(cls, v):
+        if isinstance(v, str) and v.isdigit():
+            return int(v)
+        return v
+```
+
+### Issue #7: ValueError in field_validator Returns 500 Instead of 422
+
+**Error**: `500 Internal Server Error` when raising `ValueError` in custom validators
+**Source**: [GitHub Discussion #10779](https://github.com/fastapi/fastapi/discussions/10779) | Community-sourced
+**Why It Happens**: When raising `ValueError` inside a Pydantic `@field_validator` with Form fields, FastAPI returns 500 Internal Server Error instead of the expected 422 Unprocessable Entity validation error.
+
+**Prevention**:
+```python
+from typing import Annotated
+from fastapi import Form
+from pydantic import BaseModel, field_validator, ValidationError, Field
+
+# ✗ WRONG: ValueError in validator
+class MyForm(BaseModel):
+    value: int
+
+    @field_validator('value')
+    def validate_value(cls, v):
+        if v < 0:
+            raise ValueError("Value must be positive")  # Returns 500! ❌
+        return v
+
+# ✓ RIGHT 1: Raise ValidationError instead
+class MyForm(BaseModel):
+    value: int
+
+    @field_validator('value')
+    def validate_value(cls, v):
+        if v < 0:
+            raise ValidationError("Value must be positive")  # Returns 422 ✓
+        return v
+
+# ✓ RIGHT 2: Use Pydantic's built-in constraints
+class MyForm(BaseModel):
+    value: Annotated[int, Field(gt=0)]  # Built-in validation, returns 422 ✓
+```
+
+---
+
 ## Common Errors & Fixes
 
 ### 422 Unprocessable Entity
@@ -543,28 +807,60 @@ app.add_middleware(
 
 ### Async Blocking Event Loop
 
-**Cause**: Blocking call in async route (e.g., `time.sleep()`, sync database)
+**Cause**: Blocking call in async route (e.g., `time.sleep()`, sync database client, CPU-bound operations)
 
-**Symptoms**: All requests hang, timeout errors
+**Symptoms** (production-scale):
+- Throughput plateaus far earlier than expected
+- Latency "balloons" as concurrency increases
+- Request pattern looks almost serial under load
+- Requests queue indefinitely when event loop is saturated
+- Small scattered blocking calls that aren't obvious (not infinite loops)
 
 **Fix**: Use async alternatives:
 ```python
-# Wrong
+# ✗ WRONG: Blocks event loop
 import time
-@app.get("/")
-async def slow():
-    time.sleep(5)  # Blocks entire event loop!
-    return {"done": True}
+from sqlalchemy import create_engine  # Sync client
 
-# Right
+@app.get("/users")
+async def get_users():
+    time.sleep(0.1)  # Even small blocking adds up at scale!
+    result = sync_db_client.query("SELECT * FROM users")  # Blocks!
+    return result
+
+# ✓ RIGHT 1: Use async database driver
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+
+@app.get("/users")
+async def get_users(db: AsyncSession = Depends(get_db)):
+    await asyncio.sleep(0.1)  # Non-blocking
+    result = await db.execute(select(User))
+    return result.scalars().all()
+
+# ✓ RIGHT 2: Use def (not async def) for CPU-bound routes
+# FastAPI runs def routes in thread pool automatically
+@app.get("/cpu-heavy")
+def cpu_heavy_task():  # Note: def not async def
+    return expensive_cpu_work()  # Runs in thread pool ✓
+
+# ✓ RIGHT 3: Use run_in_executor for blocking calls in async routes
 import asyncio
-@app.get("/")
-async def slow():
-    await asyncio.sleep(5)  # Non-blocking
-    return {"done": True}
+from concurrent.futures import ThreadPoolExecutor
+
+executor = ThreadPoolExecutor()
+
+@app.get("/mixed")
+async def mixed_task():
+    # Run blocking function in thread pool
+    result = await asyncio.get_event_loop().run_in_executor(
+        executor,
+        blocking_function  # Your blocking function
+    )
+    return result
 ```
 
-For CPU-bound work, use background tasks or sync routes (run in thread pool).
+**Sources**: [Production Case Study (Jan 2026)](https://www.techbuddies.io/2026/01/10/case-study-fixing-fastapi-event-loop-blocking-in-a-high-traffic-api/) | Community-sourced
 
 ### "Field required" for Optional Fields
 
@@ -659,5 +955,5 @@ CMD ["uv", "run", "uvicorn", "src.main:app", "--host", "0.0.0.0", "--port", "800
 
 ---
 
-**Last Updated**: December 2025
+**Last verified**: 2026-01-21 | **Skill version**: 1.1.0 | **Changes**: Added 7 known issues (form data bugs, background tasks, Pydantic v2 migration gotchas), expanded async blocking guidance with production patterns
 **Maintainer**: Jezweb | jeremy@jezweb.net
