@@ -1,6 +1,6 @@
 {
   "name": "cloudflare-queues",
-  "description": "Build async message queues with Cloudflare Queues for background processing. Use when: handling async tasks, batch processing, implementing retries, configuring dead letter queues, managing consumer concurrency, or troubleshooting queue timeout, batch retry, message loss, or throughput exceeded. async queue(batch: MessageBatch, env: Env): Promise<void> { for (const message of batch.messages) { await processMessage(message.body); message.ack(); // Explicit acknowledgement } } { body: { userId: 1 ",
+  "description": "Build async message queues with Cloudflare Queues for background processing. Use when: handling async tasks, batch processing, implementing retries, configuring dead letter queues, managing consumer concurrency, or troubleshooting queue timeout, batch retry, message loss, or throughput exceeded. Prevents 13 documented errors including multi-dev limitations, remote binding conflicts, and DLQ issues.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,6 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": []
+  "keywords": [],
+  "agents": []
 }

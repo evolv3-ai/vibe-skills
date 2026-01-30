@@ -1,6 +1,6 @@
 {
   "name": "firecrawl-scraper",
-  "description": "Convert websites into LLM-ready markdown with Firecrawl v4 API. Handles JavaScript rendering, anti-bot bypass, and structured data extraction for RAG and AI applications. Use when: scraping websites, crawling sites, or troubleshooting content not loading, JavaScript rendering, or bot detection.",
+  "description": "Convert websites into LLM-ready data with Firecrawl API. Features: scrape, crawl, map, search, extract, agent (autonomous), batch operations, and change tracking. Handles JavaScript, anti-bot bypass, PDF/DOCX parsing, and branding extraction. Prevents 10 documented errors. Use when: scraping websites, crawling sites, web search + scrape, autonomous data gathering, monitoring content changes, extracting brand/design systems, or troubleshooting content not loading, JavaScript rendering, bot detect",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,6 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": []
+  "keywords": [],
+  "agents": []
 }

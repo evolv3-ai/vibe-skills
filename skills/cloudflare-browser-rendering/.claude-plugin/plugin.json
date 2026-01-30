@@ -1,6 +1,6 @@
 {
   "name": "cloudflare-browser-rendering",
-  "description": "Add headless Chrome automation with Puppeteer/Playwright on Cloudflare Workers. Use when: taking screenshots, generating PDFs, web scraping, crawling sites, browser automation, or troubleshooting XPath errors, browser timeouts, binding not passed errors, or session limits. name: browser-worker, main: src/index.ts, compatibility_date: 2023-03-14, compatibility_flags: [nodejs_compat], browser: { binding: MYBROWSER } MYBROWSER: Fetcher; async fetch(request: Request, env: Env): Promise<Response> { c",
+  "description": "Add headless Chrome automation with Puppeteer/Playwright on Cloudflare Workers. Use when: taking screenshots, generating PDFs, web scraping, crawling sites, browser automation, or troubleshooting XPath errors, browser timeouts, binding not passed errors, session limits, page.evaluate __name errors, or waitForSelector timeout issues.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,6 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": []
+  "keywords": [],
+  "agents": []
 }

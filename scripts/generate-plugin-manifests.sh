@@ -90,6 +90,23 @@ for skill_dir in "$SKILLS_DIR"/*; do
   # Now clean up description (remove Keywords line, trim, limit to 500 chars)
   description=$(echo "$description" | sed 's/Keywords:.*$//' | tr -d '"' | tr -d "'" | sed 's/  */ /g' | sed 's/^ *//;s/ *$//' | head -c 500)
 
+  # Detect agents in skill's agents/ directory
+  agents_json="[]"
+  agents_dir="$skill_dir/agents"
+  if [ -d "$agents_dir" ]; then
+    agent_list=$(find "$agents_dir" -maxdepth 1 -name "*.md" -type f 2>/dev/null | while read -r agent_file; do
+      basename "$agent_file" .md
+    done | sort)
+    if [ -n "$agent_list" ]; then
+      agents_json=$(echo "$agent_list" | awk '
+        BEGIN { printf "[" }
+        { if (NR > 1) printf ","; printf "\"%s\"", $0 }
+        END { printf "]" }
+      ')
+      echo "  📦 Found agents: $(echo "$agent_list" | tr '\n' ' ')"
+    fi
+  fi
+
   # Generate plugin.json
   cat > "$plugin_json" << EOF
 {
@@ -102,7 +119,8 @@ for skill_dir in "$SKILLS_DIR"/*; do
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": $keywords_json
+  "keywords": $keywords_json,
+  "agents": $agents_json
 }
 EOF
 

@@ -1,6 +1,6 @@
 {
   "name": "tanstack-router",
-  "description": "Build type-safe, file-based React routing with TanStack Router. Supports client-side navigation, route loaders, and TanStack Query integration. Use when implementing file-based routing patterns, building SPAs with TypeScript routing, or troubleshooting devtools dependency errors, type safety issues, or Vite bundling problems. plugins: [TanStackRouterVite(), react()], // Order matters! loader: async ({ params }) => ({ post: await fetchPost(params.postId) }), component: ({ useLoaderData }) => { co",
+  "description": "Build type-safe, file-based React routing with TanStack Router. Supports client-side navigation, route loaders, and TanStack Query integration. Prevents 20 documented errors including validation structure loss, param parsing bugs, and SSR streaming crashes. Use when implementing file-based routing patterns, building SPAs with TypeScript routing, or troubleshooting devtools dependency errors, type safety issues, Vite bundling problems, or Docker deployment issues.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,6 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": []
+  "keywords": [],
+  "agents": []
 }

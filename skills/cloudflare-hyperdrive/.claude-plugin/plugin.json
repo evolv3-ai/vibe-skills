@@ -1,6 +1,6 @@
 {
   "name": "cloudflare-hyperdrive",
-  "description": "Connect Workers to PostgreSQL/MySQL with Hyperdrives global pooling and caching. Use when: connecting to existing databases, setting up connection pools, using node-postgres/mysql2, integrating Drizzle/Prisma, or troubleshooting pool acquisition failures, TLS errors, nodejs_compat missing, or eval() disallowed. --connection-string=postgres://user:password@db-host.cloud:5432/database --connection-string=mysql://user:password@db-host.cloud:3306/database name: my-worker, main: src/index.ts, compati",
+  "description": "Connect Workers to PostgreSQL/MySQL with Hyperdrives global pooling and caching. Use when: connecting to existing databases, setting up connection pools, using node-postgres/mysql2, integrating Drizzle/Prisma, or troubleshooting pool acquisition failures, TLS errors, or nodejs_compat missing. Prevents 11 documented errors.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,6 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": []
+  "keywords": [],
+  "agents": []
 }

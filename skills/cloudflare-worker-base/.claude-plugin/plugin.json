@@ -1,6 +1,6 @@
 {
   "name": "cloudflare-worker-base",
-  "description": "Set up Cloudflare Workers with Hono routing, Vite plugin, and Static Assets. Prevents 8 errors including export syntax, routing conflicts, HMR crashes, and free tier 429s. Use when: creating Workers projects, configuring Hono/Vite, or troubleshooting export syntax, API route conflicts, or HMR issues.",
+  "description": "Set up Cloudflare Workers with Hono routing, Vite plugin, and Static Assets. Prevents 10 errors including export syntax, routing conflicts, Vite 8 nodejs_compat, base option regression, and cache corruption. Use when: creating Workers projects, configuring Hono/Vite, or troubleshooting export syntax, API route conflicts, HMR issues, or Vite 8+ compatibility.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,6 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": []
+  "keywords": [],
+  "agents": ["cloudflare-debug","cloudflare-deploy","d1-migration","worker-scaffold"]
 }

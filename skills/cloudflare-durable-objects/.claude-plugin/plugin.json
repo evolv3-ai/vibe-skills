@@ -1,6 +1,6 @@
 {
   "name": "cloudflare-durable-objects",
-  "description": "Build stateful Durable Objects for real-time apps, WebSocket servers, coordination, and persistent state. Use when: implementing chat rooms, multiplayer games, rate limiting, session management, WebSocket hibernation, or troubleshooting class export, migration, WebSocket state loss, or binding errors. async increment(): Promise<number> { let value = (await this.ctx.storage.get<number>(value)) || 0; await this.ctx.storage.put(value, ++value); return value; } durable_objects: { bindings: [{ name: ",
+  "description": "Build stateful Durable Objects for real-time apps, WebSocket servers, coordination, and persistent state. Prevents 20 documented errors. Use when: implementing chat rooms, multiplayer games, rate limiting, session management, WebSocket hibernation, or troubleshooting class export, migration, WebSocket state loss, boolean binding, RPC streams, or binding errors.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,6 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": []
+  "keywords": [],
+  "agents": []
 }

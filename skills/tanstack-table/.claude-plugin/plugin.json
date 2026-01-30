@@ -1,6 +1,6 @@
 {
   "name": "tanstack-table",
-  "description": "Build headless data tables with TanStack Table v8. Server-side pagination, filtering, sorting, and virtualization for Cloudflare Workers + D1. Use when building tables with large datasets, coordinating with TanStack Query, or fixing state management or performance issues.",
+  "description": "Build headless data tables with TanStack Table v8. Server-side pagination, filtering, sorting, and virtualization for Cloudflare Workers + D1. Prevents 12 documented errors. Use when building tables with large datasets, coordinating with TanStack Query, or fixing state management, performance, or React 19+ compatibility issues.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,6 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": []
+  "keywords": [],
+  "agents": []
 }

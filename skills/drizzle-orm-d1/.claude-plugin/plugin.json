@@ -1,6 +1,6 @@
 {
   "name": "drizzle-orm-d1",
-  "description": "Build type-safe D1 databases with Drizzle ORM. Includes schema definition, migrations with Drizzle Kit, relations, and D1 batch API patterns. Prevents 12 errors including SQL BEGIN failures and foreign key issues. Use when: defining D1 schemas, managing migrations, or troubleshooting D1_ERROR, BEGIN TRANSACTION, foreign keys.",
+  "description": "Build type-safe D1 databases with Drizzle ORM. Includes schema definition, migrations with Drizzle Kit, relations, and D1 batch API patterns. Prevents 18 errors including SQL BEGIN failures, cascade data loss, 100-parameter limits, and foreign key issues. Use when: defining D1 schemas, managing migrations, bulk inserts, or troubleshooting D1_ERROR, BEGIN TRANSACTION, foreign keys, too many SQL variables.",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,5 +8,6 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": []
+  "keywords": [],
+  "agents": ["drizzle-migrate"]
 }
