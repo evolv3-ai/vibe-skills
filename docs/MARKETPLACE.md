@@ -1,6 +1,6 @@
 # Claude Skills Marketplace
 
-Welcome to the **claude-skills** marketplace - a curated collection of 62 production-ready skills for Claude Code CLI, organized into 7 plugins.
+Welcome to the **jezweb-skills** marketplace - a curated collection of 62 production-ready skills for Claude Code CLI, organized into 7 plugins.
 
 ## Quick Start
 
@@ -16,16 +16,16 @@ Skills are grouped into logical plugins. Install the ones you need:
 
 ```bash
 # Install all Cloudflare skills (22 skills)
-/plugin install cloudflare-skills@claude-skills
+/plugin install cloudflare-skills@jezweb-skills
 
 # Install AI/LLM skills (15 skills)
-/plugin install ai-skills@claude-skills
+/plugin install ai-skills@jezweb-skills
 
 # Install frontend/UI skills (7 skills)
-/plugin install frontend-skills@claude-skills
+/plugin install frontend-skills@jezweb-skills
 
 # Install all plugins at once
-/plugin install cloudflare-skills@claude-skills ai-skills@claude-skills frontend-skills@claude-skills auth-skills@claude-skills cms-skills@claude-skills database-skills@claude-skills tooling-skills@claude-skills
+/plugin install cloudflare-skills@jezweb-skills ai-skills@jezweb-skills frontend-skills@jezweb-skills auth-skills@jezweb-skills cms-skills@jezweb-skills database-skills@jezweb-skills tooling-skills@jezweb-skills
 ```
 
 ### Step 3: Use the Skills
@@ -197,10 +197,10 @@ Development tools and workflow automation:
 
 ```bash
 # Update single plugin
-/plugin update cloudflare-skills@claude-skills
+/plugin update cloudflare-skills@jezweb-skills
 
 # Update all plugins from marketplace
-/plugin update-all@claude-skills
+/plugin update-all@jezweb-skills
 ```
 
 ### List Installed Plugins
@@ -212,7 +212,7 @@ Development tools and workflow automation:
 ### Remove Plugins
 
 ```bash
-/plugin uninstall cloudflare-skills@claude-skills
+/plugin uninstall cloudflare-skills@jezweb-skills
 ```
 
 ---
@@ -275,7 +275,7 @@ Make sure you've added the marketplace first:
 
 Then install the plugin (not individual skills):
 ```bash
-/plugin install frontend-skills@claude-skills
+/plugin install frontend-skills@jezweb-skills
 ```
 
 ---

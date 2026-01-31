@@ -27,7 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **Installation**:
 ```bash
-/plugin install developer-toolbox@claude-skills
+/plugin install developer-toolbox@jezweb-skills
 ```
 
 ### Added - Agent Development Skills 🤖
@@ -70,7 +70,7 @@ Updated all AI skills to current models (January 2026):
 
 **Installation**:
 ```bash
-/plugin install design@claude-skills
+/plugin install design@jezweb-skills
 ```
 
 **Sub-Agent Patterns Updated**:
@@ -154,7 +154,7 @@ Updated all AI skills to current models (January 2026):
 **Installation** (official method):
 ```bash
 /plugin marketplace add jezweb/claude-skills
-/plugin install cloudflare-skills@claude-skills
+/plugin install cloudflare-skills@jezweb-skills
 ```
 
 ---

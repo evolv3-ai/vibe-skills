@@ -15,7 +15,7 @@ user-invocable: true
 
 ## Installation
 
-**Marketplace**: `/plugin install project-workflow@claude-skills`
+**Marketplace**: `/plugin install project-workflow@jezweb-skills`
 
 **Manual**: Copy `commands/*.md` to `~/.claude/commands/`
 

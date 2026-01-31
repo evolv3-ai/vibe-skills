@@ -136,7 +136,7 @@ claude-skills/
 # etc.
 
 # Update to get latest changes
-/plugin marketplace update claude-skills
+/plugin marketplace update jezweb-skills
 ```
 
 **For Development (this repo):**
@@ -218,7 +218,7 @@ This repository has three types of files:
 5. Audit skill → ./scripts/review-skill.sh new-skill (updates SKILL.md)
 6. Track work → Update SESSION.md (working file, not committed)
 7. Commit & push → git add skills/new-skill && git commit && git push
-8. Update marketplace → /plugin marketplace update claude-skills
+8. Update marketplace → /plugin marketplace update jezweb-skills
 ```
 
 ---
@@ -330,7 +330,7 @@ git add skills/my-skill && git commit -m "Add my-skill" && git push
 git add skills/my-skill/.claude-plugin/ && git commit -m "Add marketplace manifest" && git push
 
 # 7. Update marketplace (after push)
-/plugin marketplace update claude-skills
+/plugin marketplace update jezweb-skills
 ```
 
 ---
@@ -463,10 +463,10 @@ cp ~/.claude/skills/tailwind-v4-shadcn/rules/tailwind-v4-shadcn.md .claude/rules
 /plugin install ./skills/cloudflare-worker-base
 
 # Update to get latest changes
-/plugin marketplace update claude-skills
+/plugin marketplace update jezweb-skills
 
 # Verify installation
-ls ~/.claude/plugins/cache/claude-skills/
+ls ~/.claude/plugins/cache/jezweb-skills/
 ```
 
 ### Development

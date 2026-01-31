@@ -11,7 +11,7 @@ Automate exploration, planning, session management, and release safety for Claud
 ```bash
 # Via marketplace (recommended)
 /plugin marketplace add https://github.com/jezweb/claude-skills
-/plugin install project-workflow@claude-skills
+/plugin install project-workflow@jezweb-skills
 ```
 
 All 7 slash commands will be immediately available.

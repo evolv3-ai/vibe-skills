@@ -461,7 +461,7 @@ Guidelines for contributing to open source projects. **Best practices.**
 
 ```bash
 # Marketplace (recommended)
-/plugin install cloudflare-worker-base@claude-skills
+/plugin install cloudflare-worker-base@jezweb-skills
 
 # Manual
 ./scripts/install-skill.sh cloudflare-worker-base

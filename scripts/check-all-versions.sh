@@ -73,7 +73,7 @@ cat > "$REPORT_FILE" << EOF
 # Version Check Report
 
 **Generated**: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
-**Repository**: claude-skills
+**Repository**: jezweb-skills
 **Checked By**: check-all-versions.sh
 
 EOF

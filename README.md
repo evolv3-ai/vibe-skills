@@ -4,7 +4,14 @@
 [![GitHub stars](https://img.shields.io/github/stars/jezweb/claude-skills?style=social)](https://github.com/jezweb/claude-skills)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
-**87 production-ready skills** for Claude Code CLI — Cloudflare, React, AI integrations, and more.
+> **Marketplace Renamed (v3.4.0)**: The marketplace name changed from `claude-skills` to `jezweb-skills`.
+> If you had the old version installed, run:
+> ```bash
+> /plugin marketplace remove claude-skills
+> /plugin marketplace add jezweb/claude-skills
+> ```
+
+**95 production-ready skills** for Claude Code CLI — Cloudflare, React, AI integrations, and more.
 
 ~60% token savings | 400+ errors prevented | Auto-discovered by Claude
 
@@ -16,7 +23,7 @@
 
 ```bash
 /plugin marketplace add https://github.com/jezweb/claude-skills
-/plugin install cloudflare-worker-base@claude-skills
+/plugin install cloudflare-worker-base@jezweb-skills
 ```
 
 ### Manual
