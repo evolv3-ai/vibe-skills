@@ -35,6 +35,57 @@ Running 50 tests in the main conversation would consume your entire context wind
 - Results come back as a summary
 - Failed tests get detailed investigation
 
+## Getting Started in a New Project
+
+This skill provides the **pattern and format**. Claude designs the actual tests based on your project context.
+
+**What happens when you ask "Create tests for this project":**
+
+1. **Discovery** - Claude examines the project:
+   - What MCP servers are configured?
+   - What APIs or tools exist?
+   - What does the code do?
+
+2. **Test Design** - Claude creates project-specific tests:
+   - Test cases for the actual tools/endpoints
+   - Expected values based on real behavior
+   - Edge cases relevant to this domain
+
+3. **Structure** - Using patterns from this skill:
+   - YAML specs in `tests/` directory
+   - Optional testing agent in `.claude/agents/`
+   - Results saved to `tests/results/`
+
+**Example:**
+
+```
+You: "Create tests for this MCP server"
+
+Claude: [Discovers this is a Google Calendar MCP]
+        [Sees tools: calendar_events, calendar_create, calendar_delete]
+        [Designs test cases:]
+
+        tests/calendar-events.yaml:
+        - list_upcoming_events (expect: array, count_gte 0)
+        - search_by_keyword (expect: contains search term)
+        - invalid_date_range (expect: error status)
+
+        tests/calendar-mutations.yaml:
+        - create_event (expect: success, returns event_id)
+        - delete_nonexistent (expect: error, contains "not found")
+```
+
+**The skill teaches Claude:**
+- How to structure YAML test specs
+- What validation rules are available
+- How to create testing agents
+- When to use parallel execution
+
+**Your project provides:**
+- What to actually test
+- Expected values and behaviors
+- Domain-specific edge cases
+
 ## YAML Test Spec Format
 
 ```yaml
