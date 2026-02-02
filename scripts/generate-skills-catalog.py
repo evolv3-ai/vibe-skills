@@ -77,6 +77,7 @@ CATEGORY_PATTERNS = {
         r"^docs-workflow$",
         r"^skill-",
         r"^sub-agent-",
+        r"^context-mate$",
     ],
     "Google Cloud & Workspace": [
         r"^google-",

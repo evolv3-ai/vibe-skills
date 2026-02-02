@@ -11,9 +11,15 @@
 > /plugin marketplace add jezweb/claude-skills
 > ```
 
-**96 production-ready skills** for Claude Code CLI — Cloudflare, React, AI integrations, and more.
+**97 production-ready skills** for Claude Code CLI — Cloudflare, React, AI integrations, and more.
 
 ~60% token savings | 400+ errors prevented | Auto-discovered by Claude
+
+### Context Mate
+
+New here? Start with **Context Mate** (`skills/context-mate`) - the entry point to understanding how these tools fit together. It covers the project lifecycle, session management, and when to use what.
+
+*"It's all about the context, maaate!"*
 
 ---
 

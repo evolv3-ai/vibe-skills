@@ -3,7 +3,7 @@
 **Repository**: https://github.com/jezweb/claude-skills
 **Purpose**: Production-ready skills for Claude Code CLI
 **Owner**: Jeremy Dawes (Jez) | Jezweb
-**Status**: Active Development | 96 Skills (13 archived)
+**Status**: Active Development | 97 Skills (13 archived)
 **Last Updated**: 2026-02-02
 
 ---
@@ -20,6 +20,7 @@ This is a curated collection of **production-tested Claude Code skills** for bui
 
 ## Quick Navigation
 
+**🧭 New Here?** → Start with [Context Mate](skills/context-mate/SKILL.md) - the entry point to the toolkit
 **🔨 Building a Skill?** → See [CONTRIBUTING.md](CONTRIBUTING.md)
 **✅ Verifying Work?** → Check [ONE_PAGE_CHECKLIST.md](ONE_PAGE_CHECKLIST.md)
 **📚 All Skills** → See [docs/SKILLS_CATALOG.md](docs/SKILLS_CATALOG.md)
@@ -268,8 +269,8 @@ All 96 skills are production-ready and organized by domain:
 **Database & ORM** (4 skills):
 - drizzle-orm-d1, neon-vercel-postgres, vercel-kv, vercel-blob
 
-**Tooling & Planning** (5 skills):
-- typescript-mcp, fastmcp, ts-agent-sdk, project-planning, project-session-management
+**Tooling & Planning** (6 skills):
+- typescript-mcp, fastmcp, ts-agent-sdk, project-planning, project-session-management, context-mate
 
 **Quality Standards**:
 - ✅ All production-tested

@@ -1,6 +1,6 @@
 # Skills Catalog
 
-**96 production-ready skills** organized by category.
+**97 production-ready skills** organized by category.
 
 Total errors prevented: **611+**
 
@@ -17,7 +17,7 @@ Total errors prevented: **611+**
 - [Database & Storage](#database--storage) (6 skills)
 - [Content Management](#content-management) (3 skills)
 - [MCP & Tooling](#mcp--tooling) (5 skills)
-- [Planning & Workflow](#planning--workflow) (8 skills)
+- [Planning & Workflow](#planning--workflow) (9 skills)
 - [Google Cloud & Workspace](#google-cloud--workspace) (6 skills)
 - [Desktop & Mobile](#desktop--mobile) (2 skills)
 - [Python](#python) (2 skills)
@@ -458,7 +458,12 @@ Build MCP servers with TypeScript on Cloudflare Workers. Covers tools, resources
 
 ---
 
-## Planning & Workflow (8 skills)
+## Planning & Workflow (9 skills)
+
+### context-mate
+Entry point to the Context Mate toolkit - skills, agents, and commands that work with Claude Code's
+
+---
 
 ### docs-workflow
 Four slash commands for documentation lifecycle: /docs, /docs-init, /docs-update, /docs-claude. Create, maintain, and audit CLAUDE.md, README.md, and docs/ structure with smart templates.

@@ -8,6 +8,6 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": [],
+  "keywords": ["[trigger words] [Role] specialist. MUST BE USED when [triggers]. Use PROACTIVELY for [task category]. Keywords: [trigger words]"],
   "agents": []
 }
