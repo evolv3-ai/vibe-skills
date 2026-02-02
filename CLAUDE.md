@@ -3,8 +3,8 @@
 **Repository**: https://github.com/jezweb/claude-skills
 **Purpose**: Production-ready skills for Claude Code CLI
 **Owner**: Jeremy Dawes (Jez) | Jezweb
-**Status**: Active Development | 95 Skills (13 archived)
-**Last Updated**: 2026-01-20
+**Status**: Active Development | 96 Skills (13 archived)
+**Last Updated**: 2026-02-02
 
 ---
 
@@ -36,7 +36,7 @@ This repo aligns with **official Anthropic standards**:
 - **Our Standards Doc**: [planning/claude-code-skill-standards.md](planning/claude-code-skill-standards.md)
 - **Comparison**: [planning/STANDARDS_COMPARISON.md](planning/STANDARDS_COMPARISON.md)
 
-**Last Verified**: 2025-10-29
+**Last Verified**: 2026-02-02
 
 ---
 
@@ -70,29 +70,36 @@ claude-skills/
 │   └── doc-validator.md             # Documentation quality
 │
 ├── docs/                         # Extended documentation
-│   ├── SKILLS_CATALOG.md         # Full skill details
+│   ├── SKILLS_CATALOG.md         # Full skill details (auto-generated)
 │   ├── MARKETPLACE.md            # Marketplace installation
 │   ├── GEMINI_GUIDE.md           # AI agent onboarding
-│   └── SKILLS_COMMANDS_ARCHITECTURE.md  # v2.1.3+ unified architecture
+│   ├── SKILLS_COMMANDS_ARCHITECTURE.md  # v2.1.3+ unified architecture
+│   ├── QA_AGENTS_GUIDE.md        # Testing and QA with agents
+│   ├── JEZWEB_WORKFLOW.md        # Internal Jezweb workflows
+│   └── context-bricks-*.png      # Statusline screenshots
 │
 ├── tools/                        # Utility scripts
 │   ├── statusline/               # Custom statusline scripts
 │   └── statusline-npm/           # NPM-based statusline
 │
 ├── archive/                      # Archived content
-│   ├── low-priority-skills/      # 13 skills archived 2025-11-17 (in git branch)
+│   ├── audit-cache/              # Deep-audit scraped docs cache (gitignored)
 │   ├── deprecated-scripts/       # Old symlink scripts (replaced by plugin system)
-│   └── session-logs/             # Working audit logs (gitignored, archived when needed)
+│   └── session-logs/             # Working audit logs (gitignored)
+│   # Note: 13 archived skills in separate git branch 'archive/low-priority-skills'
 │
 ├── templates/                    # ← Templates for new skills
 │   ├── SKILL-TEMPLATE.md         # Copy-paste SKILL.md starter
 │   ├── README-TEMPLATE.md        # Copy-paste README starter
+│   ├── RESEARCH_FINDINGS_TEMPLATE.md  # Research findings template
+│   ├── CONTENT_AUDIT_TEMPLATE.md # Content audit checklist
+│   ├── skill-metadata-v2.yaml    # YAML frontmatter reference
 │   └── skill-skeleton/           # Complete directory to copy
 │       ├── SKILL.md
 │       ├── README.md
-│       ├── scripts/
-│       ├── references/
-│       └── assets/
+│       ├── scripts/example-script.sh
+│       ├── references/example-reference.md
+│       └── assets/example-template.txt
 │
 ├── planning/                     # Planning & research docs
 │   ├── claude-code-skill-standards.md
@@ -111,6 +118,7 @@ claude-skills/
 │   ├── check-all-versions.sh     # Comprehensive checker (runs all)
 │   ├── check-marketplace-sync.sh # Verify marketplace.json matches skills/
 │   ├── generate-plugin-manifests.sh  # Generate marketplace manifests
+│   ├── generate-skills-catalog.py # Auto-generate docs/SKILLS_CATALOG.md
 │   ├── release-check.sh          # Pre-release safety checks
 │   ├── review-skill.sh           # Skill audit/review automation
 │   └── check-versions.sh         # Legacy checker (deprecated)
@@ -223,11 +231,11 @@ This repository has three types of files:
 
 ---
 
-## Current Status (2025-12-15)
+## Current Status (2026-02-02)
 
 ### ✅ Active Skills (95)
 
-All 95 skills are production-ready and organized by domain:
+All 96 skills are production-ready and organized by domain:
 
 **Cloudflare Platform** (20 skills):
 - cloudflare-worker-base, cloudflare-d1, cloudflare-r2, cloudflare-kv
@@ -497,6 +505,10 @@ cp -r templates/skill-skeleton/ skills/new-skill-name/
 # Generate manifest for specific skill
 ./scripts/generate-plugin-manifests.sh <skill-name>
 
+# Regenerate skills catalog (after adding/modifying skills)
+python3 scripts/generate-skills-catalog.py
+python3 scripts/generate-skills-catalog.py --dry-run  # Preview without writing
+
 # Pre-release safety checks (secrets, docs, config)
 ./scripts/release-check.sh
 
@@ -714,6 +726,6 @@ See [planning/COMMON_MISTAKES.md](planning/COMMON_MISTAKES.md) for detailed exam
 
 ---
 
-**Last Updated**: 2026-01-31
-**Next Review**: 2026-03-15 (Quarterly)
+**Last Updated**: 2026-02-02
+**Next Review**: 2026-05-02 (Quarterly)
 **Maintainer**: Jeremy Dawes | jeremy@jezweb.net | https://jezweb.com.au

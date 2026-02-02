@@ -138,7 +138,7 @@ Report any issues found.
 ### Step 8: Install the Skill
 
 ```bash
-./scripts/install-skill.sh <skill-name>
+/plugin install ./skills/<skill-name>
 ```
 
 ---
@@ -218,11 +218,10 @@ Run: ls templates/
 ```
 ⚠️  Skill created but install failed.
 
-Manual install:
-ln -s $(pwd)/skills/<skill-name> ~/.claude/skills/<skill-name>
+Manual install using plugin system:
+/plugin install ./skills/<skill-name>
 
-Or fix the issue and run:
-./scripts/install-skill.sh <skill-name>
+Then restart Claude Code to load the skill.
 ```
 
 **If metadata check fails:**
@@ -295,7 +294,7 @@ Would you like me to open SKILL.md to start filling in the TODOs?
 |------|----------|
 | Template | `templates/skill-skeleton/` |
 | Skills | `skills/` |
-| Install script | `scripts/install-skill.sh` |
+| Install command | `/plugin install ./skills/<name>` |
 | Metadata check | `scripts/check-metadata.sh` |
 | Checklist | `ONE_PAGE_CHECKLIST.md` |
 | Standards | `planning/claude-code-skill-standards.md` |

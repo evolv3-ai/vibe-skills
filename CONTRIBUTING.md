@@ -231,8 +231,8 @@ touch skills/my-skill/SKILL.md
 ### 2. Test Locally
 
 ```bash
-# Install skill to ~/.claude/skills/
-./scripts/install-skill.sh my-skill
+# Install skill locally for testing
+/plugin install ./skills/my-skill
 
 # Test auto-discovery
 # Ask Claude to perform a task that should trigger your skill

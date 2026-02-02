@@ -11,7 +11,7 @@
 > /plugin marketplace add jezweb/claude-skills
 > ```
 
-**95 production-ready skills** for Claude Code CLI — Cloudflare, React, AI integrations, and more.
+**96 production-ready skills** for Claude Code CLI — Cloudflare, React, AI integrations, and more.
 
 ~60% token savings | 400+ errors prevented | Auto-discovered by Claude
 
@@ -31,7 +31,7 @@
 ```bash
 git clone https://github.com/jezweb/claude-skills.git ~/Documents/claude-skills
 cd ~/Documents/claude-skills
-./scripts/install-skill.sh cloudflare-worker-base  # or ./scripts/install-all.sh
+/plugin install ./skills/cloudflare-worker-base  # Install specific skill
 ```
 
 ---
@@ -51,7 +51,7 @@ cd ~/Documents/claude-skills
 | **CMS** | 3 | TinaCMS, Sveltia, WordPress |
 | **Developer Workflow** | 1 | Developer Toolbox (7 agents for code review, debugging, testing) |
 
-**📋 Full list**: [SKILLS_CATALOG.md](SKILLS_CATALOG.md)
+**📋 Full list**: [SKILLS_CATALOG.md](docs/SKILLS_CATALOG.md)
 
 ---
 
@@ -123,7 +123,7 @@ This works well if you maintain skills across multiple machines or want to publi
 ```bash
 cp -r templates/skill-skeleton/ skills/my-skill/
 # Edit SKILL.md and README.md
-./scripts/install-skill.sh my-skill
+/plugin install ./skills/my-skill  # Test locally
 ```
 
 **Guides**: [CONTRIBUTING.md](CONTRIBUTING.md) | [templates/](templates/) | [ONE_PAGE_CHECKLIST.md](ONE_PAGE_CHECKLIST.md)

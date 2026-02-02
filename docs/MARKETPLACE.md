@@ -42,17 +42,18 @@ Claude: [Automatically uses tailwind-v4-shadcn skill]
 
 ### Alternative: Manual Installation
 
-For development or if you prefer symlinks:
+For development or local testing:
 
 ```bash
 git clone https://github.com/jezweb/claude-skills.git
 cd claude-skills
 
-# Install single skill
-./scripts/install-skill.sh cloudflare-worker-base
+# Install single skill for testing
+/plugin install ./skills/cloudflare-worker-base
 
-# Install all skills
-./scripts/install-all.sh
+# Or add local repo as marketplace
+/plugin marketplace add ./
+/plugin install cloudflare
 ```
 
 ---
@@ -245,14 +246,14 @@ If you prefer manual installation or want to contribute:
 git clone https://github.com/jezweb/claude-skills.git
 cd claude-skills
 
-# Install single skill
-./scripts/install-skill.sh cloudflare-worker-base
+# Install single skill for testing
+/plugin install ./skills/cloudflare-worker-base
 
-# Install all skills
-./scripts/install-all.sh
+# Or add as local marketplace
+/plugin marketplace add ./
 ```
 
-See [README.md](README.md) for development workflow.
+See [README.md](../README.md) for development workflow.
 
 ---
 
@@ -306,7 +307,7 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ---
 
-**Last Updated**: 2025-12-12
+**Last Updated**: 2026-02-02
 **Marketplace Version**: 2.0.0
-**Plugins**: 7 (containing 62 skills)
+**Plugins**: 7 (containing 96 skills)
 **Maintainer**: Jeremy Dawes | Jezweb

@@ -4,7 +4,7 @@
 
 **Repository Path**: `/home/jez/Documents/claude-skills/`
 
-**Last Updated**: 2025-11-20
+**Last Updated**: 2026-02-02
 
 ---
 
@@ -1028,6 +1028,6 @@ cp -r /home/jez/Documents/claude-skills/skills/[name]/templates/* ./
 **End of Guide**
 
 **Version**: 1.0
-**Last Updated**: 2025-11-20
+**Last Updated**: 2026-02-02
 **Maintainer**: Jeremy Dawes | jeremy@jezweb.net
 **Repository**: https://github.com/jezweb/claude-skills
