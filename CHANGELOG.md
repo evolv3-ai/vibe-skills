@@ -9,8 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [2.15.0] - 2026-02-02
 
-### Added - New Skills (9)
+### Changed - Architecture Cleanup
 
+**Commands consolidated into skills** following [official Claude Code recommendation](https://code.claude.com/docs/en/skills):
+
+- **NEW**: `skill-development` skill with `/create-skill`, `/review-skill`, `/audit` commands
+- **MOVED**: Templates from `/templates/` to `skills/skill-development/templates/`
+- **MOVED**: `/context-mate` command into `skills/context-mate/commands/`
+- **DELETED**: Orphan `/commands/` directory (8 duplicates removed)
+- **DELETED**: Root `/templates/` directory (now in skill-development)
+- **UPDATED**: `context-mate` and `project-workflow` skills now have `user-invocable: true`
+
+**Why**: Slash commands are now part of skills, not separate files. This makes skills self-contained and gives forkers the same tooling as the main repo.
+
+**For forkers**: Install `skill-development` to get `/create-skill`, `/review-skill`, and audit commands.
+
+### Added - New Skills (10)
+
+- `skill-development` - Skill authoring tools: `/create-skill`, `/review-skill`, `/audit`, templates
 - `context-mate` - Toolkit entry point with dynamic project analysis ("It's all about the context, maaate!")
 - `deep-debug` - Multi-agent investigation for stubborn bugs
 - `project-health` - AI-agent readiness auditing (AI-Readability Score)
