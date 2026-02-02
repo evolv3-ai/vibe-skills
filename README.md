@@ -146,6 +146,8 @@ cp -r templates/skill-skeleton/ skills/my-skill/
 - [CLAUDE.md](CLAUDE.md) — Project context
 - [docs/SKILLS_CATALOG.md](docs/SKILLS_CATALOG.md) — Full skill details
 - [docs/MARKETPLACE.md](docs/MARKETPLACE.md) — Marketplace installation
+- [docs/PLUGIN_INSTALLATION_GUIDE.md](docs/PLUGIN_INSTALLATION_GUIDE.md) — Local testing workflow
+- [docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md) — Common issues and fixes
 
 ---
 

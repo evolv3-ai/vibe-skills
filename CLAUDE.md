@@ -72,6 +72,8 @@ claude-skills/
 ├── docs/                         # Extended documentation
 │   ├── SKILLS_CATALOG.md         # Full skill details (auto-generated)
 │   ├── MARKETPLACE.md            # Marketplace installation
+│   ├── PLUGIN_INSTALLATION_GUIDE.md  # Local testing workflow
+│   ├── TROUBLESHOOTING.md        # Common issues and fixes
 │   ├── GEMINI_GUIDE.md           # AI agent onboarding
 │   ├── SKILLS_COMMANDS_ARCHITECTURE.md  # v2.1.3+ unified architecture
 │   ├── QA_AGENTS_GUIDE.md        # Testing and QA with agents
