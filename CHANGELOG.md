@@ -57,6 +57,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `elevenlabs-agents` - Added Agent Versioning and MCP Security sections
 - All date references updated to 2026-02-02
 
+### Improved - Context Mate Toolkit
+
+- **Quick Reference**: Added scannable list of all 9 commands, 7 agents, and 6 skills
+- **Dynamic Analysis**: Claude analyzes your project and recommends relevant tools
+- **Knifey-Spooney Philosophy**: Added laid-back Aussie personality - "If Homer Simpson can't figure it out in 30 seconds, it's too complicated"
+- **Fixed**: `project-workflow` now correctly shows 9 commands (was showing 7, missing `/brief` and `/reflect`)
+
 ---
 
 ## [2.12.0] - 2026-01-20
