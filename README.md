@@ -17,11 +17,15 @@
 
 ### Context Mate
 
-New here? Start with **Context Mate** (`skills/context-mate`) - the entry point to understanding how these tools fit together. It covers the project lifecycle, session management, and when to use what.
+New here? Run `/context-mate` in any project - it scans what you've got and tells you what tools might help:
+
+![Context Mate project analysis](docs/context-mate-analysis.png)
 
 *"It's all about the context, maaate!"*
 
 **The philosophy**: Use what helps, ignore what doesn't. No 47-page methodology guides. No ceremonies. Just tools that help when you need them and stay out of the way when you don't. Homer Simpson could figure this out.
+
+**Full guide**: [skills/context-mate/SKILL.md](skills/context-mate/SKILL.md)
 
 ---
 
