@@ -1,6 +1,6 @@
 {
   "name": "context-mate",
-  "description": "Entry point to the Context Mate toolkit - skills, agents, and commands that work with Claude Codes natural flow. Project lifecycle (/explore-idea → /plan-project → /wrap-session), session handoff across context windows, developer agents for specialized tasks, and quality auditing. Use when: starting new projects, understanding the toolkit, needing workflow guidance. Its all about the context, maaate! # Work on Phase 1... # Continue working... # Implement...",
+  "description": "Entry point to the Context Mate toolkit - skills, agents, and slash commands that work with Claude Codes natural flow. Project lifecycle (/explore-idea → /plan-project → /wrap-session), session handoff across context windows, developer agents for specialized tasks, and quality auditing. Use when: starting new projects, understanding the toolkit, needing workflow guidance. Its all about the context, maaate!",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",

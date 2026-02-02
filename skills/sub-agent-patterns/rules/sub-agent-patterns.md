@@ -28,6 +28,25 @@ Operational knowledge for effective sub-agent delegation in Claude Code.
 
 ---
 
+## MCP Tool Inheritance (CRITICAL)
+
+**To access MCP tools, OMIT the `tools` field entirely.**
+
+When you specify ANY tools, it becomes an **allowlist**. The `"*"` is NOT a wildcard - it's interpreted literally.
+
+```yaml
+# ❌ WRONG - "*" is literal, not wildcard. Agent gets NO MCP tools.
+tools: Read, Grep, Glob, "*"
+
+# ✅ CORRECT - omit tools field to inherit ALL tools including MCP
+# tools field omitted
+model: sonnet
+```
+
+**Config changes require session restart** - agent files are loaded at start.
+
+---
+
 ## Model Selection (Quality-First)
 
 | Model | Best For |
@@ -123,4 +142,4 @@ Skills: [list of 5]
 
 ---
 
-**Last Updated**: 2026-01-14
+**Last Updated**: 2026-02-02
