@@ -27,6 +27,28 @@ New here? Run `/context-mate` in any project - it scans what you've got and tell
 
 **Full guide**: [skills/context-mate/SKILL.md](skills/context-mate/SKILL.md)
 
+### Where to Start
+
+| You want to... | Run this |
+|----------------|----------|
+| **Analyze an existing project** | `/context-mate` |
+| **Start a brand new project** | `/plan-project` |
+| **Resume work from last session** | `/continue-session` |
+| **Debug something stubborn** | Use `deep-debug` skill |
+| **Just explore** | `/workflow` (interactive guide) |
+
+### Terminology
+
+Three types of things in this toolkit:
+
+| Type | What it is | Example |
+|------|------------|---------|
+| **Commands** | Slash commands you type | `/context-mate`, `/plan-project` |
+| **Skills** | Knowledge bundles Claude loads automatically | `cloudflare-worker-base`, `tailwind-v4-shadcn` |
+| **Agents** | Sub-processes for specialized tasks | `commit-helper`, `debugger`, `test-runner` |
+
+Commands trigger actions. Skills provide knowledge. Agents do heavy lifting in the background.
+
 ---
 
 ## Quick Install

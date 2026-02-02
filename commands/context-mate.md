@@ -136,8 +136,8 @@ What would you like to work on?
 | `/continue-session` | Resume from last session |
 | `/docs-init` | Create initial project documentation |
 | `/docs-update` | Update docs after code changes |
-| `/brief` | Quick summary of current state |
-| `/reflect` | Review what you've accomplished |
+| `/brief` | Preserve context before clearing (creates docs/brief-*.md) |
+| `/reflect` | Capture learnings → routes to rules, docs, CLAUDE.md |
 
 ### Agents (Claude uses automatically or on request)
 | Agent | What it does |

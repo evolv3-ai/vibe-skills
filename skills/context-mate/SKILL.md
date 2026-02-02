@@ -98,7 +98,8 @@ This isn't "The Correct Way To Do Things" - these tools exist because context wi
 | `/continue-session` | Resume from last session |
 | `/docs-init` | Create project docs |
 | `/docs-update` | Update docs after changes |
-| `/reflect` | Review what you've done |
+| `/brief` | Preserve context before clearing |
+| `/reflect` | Capture learnings → rules, skills, memory |
 | `/release` | Prepare for deployment |
 
 ### Agents (Claude uses these automatically)
