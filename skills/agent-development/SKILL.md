@@ -202,6 +202,66 @@ Before completing any agent improvement:
 | Assuming knowledge from errors | Agent won't see your debugging |
 | "Just like the home page" | Agent hasn't built home page |
 
+## Flexibility vs Rigidity
+
+Match specification level to task type. Over-specifying flexible agents makes them brittle.
+
+| Task Type | Specification Level | Example |
+|-----------|---------------------|---------|
+| **Mechanical/repetitive** | High (rigid steps) | Version checker, file copier |
+| **Judgment-based** | Low (guidelines) | Docs auditor, code reviewer |
+| **Creative** | Minimal (goals only) | Content writer, brainstormer |
+
+### Signs You've Over-Specified
+
+- Agent fills in template sections with "N/A"
+- Agent tries to complete all phases even when irrelevant
+- Scoring systems produce meaningless numbers
+- Agent fails when scope doesn't match assumptions
+- Long agents (>150 lines) for simple tasks
+
+### Flexible Agent Guidelines
+
+**DO:**
+- Describe *what to look for*, not exact steps
+- Provide output *examples*, not rigid templates
+- Include scope control ("if >30 items, ask user")
+- Give escape hatches ("if unsure, flag for review")
+- Keep under 100 lines for judgment tasks
+
+**DON'T:**
+- Require filling every section of a template
+- Create elaborate weighted scoring systems
+- List every possible check exhaustively
+- Assume scope without asking
+
+### Example: Docs Auditor
+
+**Over-specified (bad):**
+```markdown
+## Phase 1: Discovery
+Execute Glob for all .md files...
+
+## Phase 6: Generate Report
+| Category | Weight | Score | Weighted |
+|----------|--------|-------|----------|
+| Links    | 20%    | X/100 | X        |
+```
+
+**Right-sized (good):**
+```markdown
+## What to Check
+- TODOs, broken links, stale versions
+
+## Output Format
+List issues by severity. Include file:line and fix.
+
+## Scope Control
+If >30 files, ask user which to focus on.
+```
+
+---
+
 ## Agent Prompt Structure
 
 Effective agent prompts include:
