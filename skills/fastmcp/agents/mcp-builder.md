@@ -202,13 +202,12 @@ Always include: `openid email profile`
 
 ## Reference Implementations
 
-- **Gmail MCP**: `/Users/jez/Documents/mcp/servers/gmail-mcp/` - 4 gateway tools, AI features
-- **Calendar MCP**: `/Users/jez/Documents/mcp/servers/google-calendar-mcp/` - 2 gateway tools
-- **Synergy MCP**: `/Users/jez/Documents/mcp/servers/synergy-wholesale-mcp/` - API key auth
+Example MCP server patterns:
+- **Gmail-style**: 4+ gateway tools, AI features, OAuth flow
+- **Calendar-style**: 2 gateway tools, date handling
+- **API-key auth**: Simple bearer token authentication
 
 ## Homepage Standard
-
-See `~/.claude/rules/mcp-server-homepage.md` for full design spec.
 
 Key sections:
 1. Sticky header with logo
