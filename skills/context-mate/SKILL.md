@@ -361,4 +361,16 @@ These tools don't fight that - they work with it:
 
 Use what helps. Ignore what doesn't.
 
-*It's all about the context, maaate.*
+This is the **knifey-spooney school of project management**:
+
+| Traditional PM | Context Mate |
+|----------------|--------------|
+| "Follow the methodology" | "She'll be right" |
+| "Update the Gantt chart" | `/wrap-session` |
+| "Consult the RACI matrix" | "Oi Claude, what next?" |
+
+No ceremonies. No standups with your AI. No burndown charts.
+
+If Homer Simpson can't figure it out in 30 seconds, it's too complicated.
+
+*It's all about the context, maaate.* 🥄

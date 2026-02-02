@@ -21,6 +21,8 @@ New here? Start with **Context Mate** (`skills/context-mate`) - the entry point 
 
 *"It's all about the context, maaate!"*
 
+**The philosophy**: Use what helps, ignore what doesn't. No 47-page methodology guides. No ceremonies. Just tools that help when you need them and stay out of the way when you don't. Homer Simpson could figure this out.
+
 ---
 
 ## Quick Install

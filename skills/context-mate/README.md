@@ -1,6 +1,12 @@
 # Context Mate
 
+*"It's all about the context, maaate!"*
+
 Entry point to the Context Mate toolkit - a collection of skills, agents, and commands that work with Claude Code's natural flow.
+
+**The philosophy**: Use what helps, ignore what doesn't. No complex frameworks. No 12-step methodologies. If Homer Simpson can't figure it out in 30 seconds, it's too complicated.
+
+This is the **knifey-spooney approach** to project management - laid back, practical, and doesn't take itself too seriously.
 
 ## Auto-trigger Keywords
 
