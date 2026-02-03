@@ -41,6 +41,7 @@ Running 50 tests in the main conversation would consume your entire context wind
 |---------|---------|
 | `/create-tests` | Discover project, generate test specs + testing agent |
 | `/run-tests` | Execute tests via agent(s), report results |
+| `/coverage` | Generate coverage report and identify uncovered code paths |
 
 **Quick workflow:**
 ```
@@ -48,6 +49,8 @@ Running 50 tests in the main conversation would consume your entire context wind
 /run-tests           → Spawns agent, runs all tests, saves results
 /run-tests api       → Run only specs matching "api"
 /run-tests --failed  → Re-run only failed tests
+/coverage            → Run tests with coverage, analyse gaps
+/coverage --threshold 80  → Fail if below 80%
 ```
 
 ## Getting Started in a New Project

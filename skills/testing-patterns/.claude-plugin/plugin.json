@@ -1,6 +1,6 @@
 {
   "name": "testing-patterns",
-  "description": "Agent-based declarative testing with YAML test specs. Tests run in sub-agents to preserve main context while executing many tests. Supports MCP servers, APIs, and browser automation. Use when: testing MCP servers, running integration tests, validating tool behavior after changes, or creating regression test suites.",
+  "description": "What these tests validate",
   "version": "1.0.0",
   "author": {
     "name": "Jeremy Dawes",
@@ -8,6 +8,6 @@
   },
   "license": "MIT",
   "repository": "https://github.com/jezweb/claude-skills",
-  "keywords": ["yaml tests", "agent testing", "mcp test", "integration tests", "test runner"],
+  "keywords": [],
   "agents": []
 }
