@@ -91,6 +91,30 @@ Extended deep audit with comprehensive doc scraping.
 
 ---
 
+### `/scrape-api <docs-url> [skill-name]`
+
+Generate a skill from API documentation URL.
+
+**What it does**:
+1. Validates the docs URL is accessible and contains API documentation
+2. Attempts WebFetch first for static docs
+3. Falls back to Playwright for JS-heavy sites (readme.io, GitBook)
+4. Extracts endpoints, authentication, request/response schemas
+5. Generates complete skill structure with SKILL.md, references/, templates/
+6. Runs plugin manifest generation
+
+**Usage**:
+- `/scrape-api https://api.example.com/docs my-api`
+- `/scrape-api https://rocketdotnet.readme.io/` (auto-detects name: rocket-net-api)
+
+**Supported Platforms**:
+- readme.io documentation sites
+- Swagger/OpenAPI specs
+- GitBook documentation
+- Standard HTML API docs
+
+---
+
 ## Templates
 
 This skill includes templates for creating new skills:
@@ -145,6 +169,7 @@ This skill provides agents for automated skill maintenance:
 | Agent | Purpose |
 |-------|---------|
 | `skill-creator` | Scaffold new skills with proper structure |
+| `api-doc-scraper` | Generate skills from API documentation URLs |
 | `version-checker` | Verify package versions are current |
 | `content-accuracy-auditor` | Compare skill content vs official docs |
 | `code-example-validator` | Validate code examples are syntactically correct |
@@ -152,7 +177,7 @@ This skill provides agents for automated skill maintenance:
 | `doc-validator` | Check documentation quality |
 | `bulk-updater` | Apply changes across multiple skills |
 
-These agents are in `.claude/agents/` and used by the audit commands.
+These agents are in `.claude/agents/` (repo-level) and `agents/` (skill-bundled) and used by the commands.
 
 ---
 
