@@ -61,7 +61,7 @@ Tell the user which preset you're recommending and why, then confirm.
 
 ### Step 4: Generate the Icons
 
-Generate every icon following the SVG Rules below. Work in `/home/claude/icons-work/` and output to `/mnt/user-data/outputs/icons/`.
+Generate every icon following the SVG Rules below. Output to an `icons/` directory in the project root (or the user's preferred location).
 
 Read `references/svg-examples.md` before generating — it contains reference implementations showing the right level of complexity and how to handle common icon shapes.
 
@@ -71,7 +71,7 @@ Generate in batches of ~5. After each batch, visually review for consistency bef
 
 Output structure:
 ```
-/mnt/user-data/outputs/icons/
+icons/
 ├── style-spec.json
 ├── preview.html
 ├── home.svg

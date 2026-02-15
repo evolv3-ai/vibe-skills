@@ -34,7 +34,7 @@ Workflow skills for [Claude Code](https://claude.com/claude-code) that produce t
 python3 skills/skill-creator/scripts/init_skill.py my-skill --path skills/
 ```
 
-Follows [Anthropic's official skill spec](https://github.com/anthropics/skills).
+Follows the [Agent Skills spec](https://agentskills.io/specification).
 
 ## Philosophy
 

@@ -9,7 +9,7 @@ Production workflow skills for Claude Code CLI. Each skill guides Claude through
 
 - Every skill must produce visible output (files, configurations, deployable projects)
 - "The context window is a public good" — only include what Claude doesn't already know
-- Follow Anthropic's official skill spec: https://github.com/anthropics/skills
+- Follow the Agent Skills spec: https://agentskills.io/specification
 
 ## Directory Structure
 
@@ -23,7 +23,8 @@ claude-skills/
 │   ├── favicon-gen/                # Generate favicon packages
 │   ├── icon-set-generator/         # Generate custom SVG icon sets
 │   ├── elevenlabs-agents/          # Build ElevenLabs voice agents
-│   └── mcp-builder/                # Build MCP servers with FastMCP
+│   ├── mcp-builder/                # Build MCP servers with FastMCP
+│   └── memory-manager/             # Audit and restructure CLAUDE.md hierarchy
 ├── CLAUDE.md                       # This file
 ├── README.md                       # Public-facing overview
 └── LICENSE                         # MIT
