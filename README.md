@@ -19,6 +19,7 @@ Workflow skills for [Claude Code](https://claude.com/claude-code) that produce t
 | **[web-design-patterns](skills/web-design-patterns)** | Heroes, cards, CTAs, trust signals, testimonials |
 | **[seo-local-business](skills/seo-local-business)** | SEO setup for local businesses (JSON-LD, meta, sitemap) |
 | **[google-chat-messages](skills/google-chat-messages)** | Google Chat webhooks (text, rich cards, threads) |
+| **[google-apps-script](skills/google-apps-script)** | Google Sheets Apps Script automation (menus, triggers, dialogs) |
 | **[elevenlabs-agents](skills/elevenlabs-agents)** | Configured ElevenLabs voice agents |
 | **[mcp-builder](skills/mcp-builder)** | MCP servers with FastMCP |
 | **[memory-manager](skills/memory-manager)** | Optimised CLAUDE.md memory hierarchy |
@@ -37,7 +38,7 @@ Workflow skills for [Claude Code](https://claude.com/claude-code) that produce t
 /plugin install cloudflare@jezweb-skills     # Workers + vite-flare-starter
 /plugin install frontend@jezweb-skills       # Tailwind + shadcn/ui
 /plugin install web@jezweb-skills            # web design + SEO
-/plugin install integrations@jezweb-skills   # Google Chat
+/plugin install integrations@jezweb-skills   # Google Chat, Apps Script
 /plugin install ai@jezweb-skills             # ElevenLabs agents
 /plugin install mcp@jezweb-skills            # MCP servers
 /plugin install development@jezweb-skills    # skill-creator + memory-manager

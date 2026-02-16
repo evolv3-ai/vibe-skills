@@ -12,7 +12,7 @@
   "plugins": [
     {
       "name": "all",
-      "description": "All 14 workflow skills: Cloudflare, web design, SEO, Google Chat, Tailwind, favicons, icons, colour palettes, ElevenLabs, MCP, memory management.",
+      "description": "All 15 workflow skills: Cloudflare, web design, SEO, Google Chat, Google Apps Script, Tailwind, favicons, icons, colour palettes, ElevenLabs, MCP, memory management.",
       "source": "./",
       "skills": [
         "./skills/skill-creator",
@@ -28,7 +28,8 @@
         "./skills/google-chat-messages",
         "./skills/elevenlabs-agents",
         "./skills/mcp-builder",
-        "./skills/memory-manager"
+        "./skills/memory-manager",
+        "./skills/google-apps-script"
       ]
     },
     {
@@ -72,10 +73,11 @@
     },
     {
       "name": "integrations",
-      "description": "Third-party integrations: Google Chat webhooks.",
+      "description": "Google Workspace integrations: Chat webhooks, Apps Script automation.",
       "source": "./",
       "skills": [
-        "./skills/google-chat-messages"
+        "./skills/google-chat-messages",
+        "./skills/google-apps-script"
       ]
     },
     {
