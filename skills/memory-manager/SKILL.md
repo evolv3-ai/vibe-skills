@@ -6,6 +6,7 @@ description: >
   files, and verify the hierarchy loads correctly. Use when CLAUDE.md exceeds
   100 lines, when a directory needs its own context, or when project memory
   needs restructuring.
+compatibility: claude-code-only
 ---
 
 # Memory Manager

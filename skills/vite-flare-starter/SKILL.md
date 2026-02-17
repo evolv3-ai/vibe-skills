@@ -1,6 +1,7 @@
 ---
 name: vite-flare-starter
 description: "Scaffold a full-stack Cloudflare app from vite-flare-starter — React 19, Hono, D1+Drizzle, better-auth, Tailwind v4+shadcn/ui, TanStack Query, R2, Workers AI. Run setup.sh to clone, configure, and deploy."
+compatibility: claude-code-only
 ---
 
 # Vite Flare Starter

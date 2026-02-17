@@ -1,6 +1,7 @@
 ---
 name: skill-creator
 description: Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.
+compatibility: claude-code-only
 ---
 
 # Skill Creator
@@ -340,6 +341,54 @@ The packaging script will:
 2. **Package** the skill if validation passes, creating a .skill file named after the skill (e.g., `my-skill.skill`) that includes all files and maintains the proper directory structure for distribution.
 
 If validation fails, the script will report the errors and exit without creating a package. Fix any validation errors and run the packaging command again.
+
+**Bulk packaging:**
+
+```bash
+# Package all Claude AI-compatible skills
+python3 skills/skill-creator/scripts/package_all.py --claude-ai-only
+
+# Package all skills
+python3 skills/skill-creator/scripts/package_all.py
+
+# List skills and compatibility
+python3 skills/skill-creator/scripts/package_all.py --list
+```
+
+### Dual-Environment Skills
+
+Skills can work in both Claude AI (web) and Claude Code (CLI). When building for both environments, be aware of these differences:
+
+| Capability | Claude AI | Claude Code |
+|-----------|-----------|-------------|
+| File output | `/mnt/user-data/outputs/` | Local filesystem |
+| User interaction | `ask_user_input` tool | Terminal prompts |
+| Web search | Built-in `web_search` tool | WebSearch tool |
+| Shell commands | Not available | Bash tool |
+| Subagents | Not available | Task tool (Explore, Plan, etc.) |
+| MCP tools | Same names if connected | Same names if connected |
+| Artifacts | HTML, React render inline | Not available |
+
+**Marking compatibility:** Add `compatibility: claude-code-only` to the frontmatter of skills that require local filesystem, bash, or CLI tools. Skills without this field are assumed to work in both environments.
+
+```yaml
+---
+name: my-cli-skill
+description: "..."
+compatibility: claude-code-only
+---
+```
+
+**Writing dual-environment skills:** If a skill should adapt its behaviour based on environment, add an "Environment Notes" section:
+
+```markdown
+## Environment Notes
+
+- **Claude AI:** Save output files to `/mnt/user-data/outputs/`. Use `present_files` to share.
+- **Claude Code:** Save output files to the project directory or path specified by the user.
+```
+
+**Trigger phrases in descriptions:** The `description` field is the primary trigger mechanism. Claude uses it to decide whether to activate the skill. Include specific phrases users might say, not just what the skill does. Example: "Use when the user says 'make a favicon', 'generate icons', 'create favicon package', or mentions missing favicons."
 
 ### Step 6: Iterate
 
