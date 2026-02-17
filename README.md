@@ -23,6 +23,8 @@ Workflow skills for [Claude Code](https://claude.com/claude-code) that produce t
 | **[elevenlabs-agents](skills/elevenlabs-agents)** | Configured ElevenLabs voice agents |
 | **[mcp-builder](skills/mcp-builder)** | MCP servers with FastMCP |
 | **[memory-manager](skills/memory-manager)** | Optimised CLAUDE.md memory hierarchy |
+| **[claude-capabilities](skills/claude-capabilities)** | Current Claude AI & Code capabilities reference |
+| **[aussie-business-english](skills/aussie-business-english)** | Australian business English writing style |
 
 ## Install
 
@@ -41,7 +43,8 @@ Workflow skills for [Claude Code](https://claude.com/claude-code) that produce t
 /plugin install integrations@jezweb-skills   # Google Chat, Apps Script
 /plugin install ai@jezweb-skills             # ElevenLabs agents
 /plugin install mcp@jezweb-skills            # MCP servers
-/plugin install development@jezweb-skills    # skill-creator + memory-manager
+/plugin install writing@jezweb-skills          # Australian business English
+/plugin install development@jezweb-skills    # skill-creator + memory-manager + capabilities ref
 ```
 
 ## Create Your Own

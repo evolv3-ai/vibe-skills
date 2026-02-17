@@ -6,13 +6,13 @@
   },
   "metadata": {
     "description": "Workflow skills for Claude Code - each produces tangible output",
-    "version": "5.0.0",
-    "updated": "2026-02-16"
+    "version": "6.0.0",
+    "updated": "2026-02-17"
   },
   "plugins": [
     {
       "name": "all",
-      "description": "All 15 workflow skills: Cloudflare, web design, SEO, Google Chat, Google Apps Script, Tailwind, favicons, icons, colour palettes, ElevenLabs, MCP, memory management.",
+      "description": "All 17 workflow skills: Cloudflare, web design, SEO, Google integrations, Tailwind, favicons, icons, colour palettes, ElevenLabs, MCP, memory management, capabilities reference, writing style.",
       "source": "./",
       "skills": [
         "./skills/skill-creator",
@@ -29,7 +29,9 @@
         "./skills/elevenlabs-agents",
         "./skills/mcp-builder",
         "./skills/memory-manager",
-        "./skills/google-apps-script"
+        "./skills/google-apps-script",
+        "./skills/claude-capabilities",
+        "./skills/aussie-business-english"
       ]
     },
     {
@@ -98,11 +100,20 @@
     },
     {
       "name": "development",
-      "description": "Skill creation and CLAUDE.md memory management.",
+      "description": "Skill creation, CLAUDE.md memory management, and Claude capabilities reference.",
       "source": "./",
       "skills": [
         "./skills/skill-creator",
-        "./skills/memory-manager"
+        "./skills/memory-manager",
+        "./skills/claude-capabilities"
+      ]
+    },
+    {
+      "name": "writing",
+      "description": "Australian business English writing style for professional communications.",
+      "source": "./",
+      "skills": [
+        "./skills/aussie-business-english"
       ]
     }
   ]
