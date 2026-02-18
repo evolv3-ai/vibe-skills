@@ -25,6 +25,11 @@ Workflow skills for [Claude Code](https://claude.com/claude-code) that produce t
 | **[memory-manager](skills/memory-manager)** | Optimised CLAUDE.md memory hierarchy |
 | **[claude-capabilities](skills/claude-capabilities)** | Current Claude AI & Code capabilities reference |
 | **[aussie-business-english](skills/aussie-business-english)** | Australian business English writing style |
+| **[d1-drizzle-schema](skills/d1-drizzle-schema)** | Drizzle ORM schemas for Cloudflare D1 |
+| **[hono-api-scaffolder](skills/hono-api-scaffolder)** | Hono API routes, middleware, endpoint documentation |
+| **[shadcn-ui](skills/shadcn-ui)** | shadcn/ui components with installation, customisation, recipes |
+| **[github-release](skills/github-release)** | Sanitized, tagged GitHub releases with safety checks |
+| **[gemini-peer-review](skills/gemini-peer-review)** | Second opinion from Gemini on code, architecture, security |
 
 ## Install
 
@@ -44,7 +49,7 @@ Workflow skills for [Claude Code](https://claude.com/claude-code) that produce t
 /plugin install ai@jezweb-skills             # ElevenLabs agents
 /plugin install mcp@jezweb-skills            # MCP servers
 /plugin install writing@jezweb-skills          # Australian business English
-/plugin install development@jezweb-skills    # skill-creator + memory-manager + capabilities ref
+/plugin install development@jezweb-skills    # skill-creator, memory-manager, releases, Gemini review
 ```
 
 ## Create Your Own
@@ -60,6 +65,17 @@ Follows the [Agent Skills spec](https://agentskills.io/specification).
 **Every skill must produce something.** No knowledge dumps — only workflow recipes that create files, projects, or configurations. Claude's training data handles the rest.
 
 See [CLAUDE.md](CLAUDE.md) for development details.
+
+## History
+
+This repo started as a collection of 105 skills — many were informational reference guides (CSS patterns, API docs, framework cheatsheets). With Claude Opus 4.6's expanded training data and built-in capabilities, those reference skills became redundant. Claude already knows the material.
+
+**v2** keeps only skills that produce tangible output: files, projects, configurations, deployments. The count dropped from 105 to 22, but each one earns its place.
+
+The full v1 collection is preserved:
+- **Tag `v1-final`** — all 105 skills at the point of transition
+- **Branch `archive/low-priority-skills`** — 13 previously archived skills
+- **Full git history** — `git log v1-final` to browse
 
 ## License
 

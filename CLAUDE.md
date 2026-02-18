@@ -15,11 +15,14 @@ Production workflow skills for Claude Code CLI. Each skill guides Claude through
 
 ```
 claude-skills/
-├── skills/                         # All skills (17)
+├── skills/                         # All skills (22)
 │   ├── skill-creator/              # Foundation: create new skills (Anthropic official)
 │   ├── cloudflare-worker-builder/  # Scaffold Cloudflare Worker projects
 │   ├── vite-flare-starter/         # Full-stack Cloudflare app from starter template
+│   ├── hono-api-scaffolder/        # Scaffold Hono API routes, middleware, endpoint docs
+│   ├── d1-drizzle-schema/          # Drizzle ORM schemas for Cloudflare D1
 │   ├── tailwind-theme-builder/     # Set up Tailwind v4 + shadcn/ui themes
+│   ├── shadcn-ui/                  # shadcn/ui component installation, recipes, customisation
 │   ├── color-palette/              # Generate colour palettes from brand hex
 │   ├── favicon-gen/                # Generate favicon packages
 │   ├── icon-set-generator/         # Generate custom SVG icon sets
@@ -31,6 +34,8 @@ claude-skills/
 │   ├── elevenlabs-agents/          # Build ElevenLabs voice agents
 │   ├── mcp-builder/                # Build MCP servers with FastMCP
 │   ├── memory-manager/             # Audit and restructure CLAUDE.md hierarchy
+│   ├── github-release/             # Sanitize and publish GitHub releases
+│   ├── gemini-peer-review/         # Second opinion from Gemini on code/architecture
 │   ├── claude-capabilities/        # Current Claude AI & Code capabilities reference
 │   └── aussie-business-english/    # Australian business English writing style
 ├── CLAUDE.md                       # This file

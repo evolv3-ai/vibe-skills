@@ -6,13 +6,13 @@
   },
   "metadata": {
     "description": "Workflow skills for Claude Code - each produces tangible output",
-    "version": "6.0.0",
-    "updated": "2026-02-17"
+    "version": "8.0.0",
+    "updated": "2026-02-18"
   },
   "plugins": [
     {
       "name": "all",
-      "description": "All 17 workflow skills: Cloudflare, web design, SEO, Google integrations, Tailwind, favicons, icons, colour palettes, ElevenLabs, MCP, memory management, capabilities reference, writing style.",
+      "description": "All 22 workflow skills: Cloudflare, Hono APIs, D1/Drizzle, web design, SEO, Google integrations, Tailwind, shadcn/ui, favicons, icons, colour palettes, ElevenLabs, MCP, memory management, GitHub releases, Gemini peer review, capabilities reference, writing style.",
       "source": "./",
       "skills": [
         "./skills/skill-creator",
@@ -31,7 +31,12 @@
         "./skills/memory-manager",
         "./skills/google-apps-script",
         "./skills/claude-capabilities",
-        "./skills/aussie-business-english"
+        "./skills/aussie-business-english",
+        "./skills/d1-drizzle-schema",
+        "./skills/hono-api-scaffolder",
+        "./skills/shadcn-ui",
+        "./skills/github-release",
+        "./skills/gemini-peer-review"
       ]
     },
     {
@@ -48,19 +53,22 @@
     },
     {
       "name": "cloudflare",
-      "description": "Cloudflare Workers: scaffold from scratch or clone vite-flare-starter.",
+      "description": "Cloudflare Workers: scaffold projects, Hono API routes, D1/Drizzle schemas.",
       "source": "./",
       "skills": [
         "./skills/cloudflare-worker-builder",
-        "./skills/vite-flare-starter"
+        "./skills/vite-flare-starter",
+        "./skills/hono-api-scaffolder",
+        "./skills/d1-drizzle-schema"
       ]
     },
     {
       "name": "frontend",
-      "description": "Set up Tailwind v4 + shadcn/ui with dark mode theming.",
+      "description": "Tailwind v4 theming + shadcn/ui component installation, customisation, and recipes.",
       "source": "./",
       "skills": [
-        "./skills/tailwind-theme-builder"
+        "./skills/tailwind-theme-builder",
+        "./skills/shadcn-ui"
       ]
     },
     {
@@ -100,12 +108,14 @@
     },
     {
       "name": "development",
-      "description": "Skill creation, CLAUDE.md memory management, and Claude capabilities reference.",
+      "description": "Skill creation, CLAUDE.md memory management, GitHub releases, Gemini peer review, and Claude capabilities reference.",
       "source": "./",
       "skills": [
         "./skills/skill-creator",
         "./skills/memory-manager",
-        "./skills/claude-capabilities"
+        "./skills/claude-capabilities",
+        "./skills/github-release",
+        "./skills/gemini-peer-review"
       ]
     },
     {
