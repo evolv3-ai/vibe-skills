@@ -128,9 +128,22 @@ No additional docs beyond CLAUDE.md — operational repos are typically self-doc
 [Standard error format, common error codes]
 ```
 
+## docs/ Directory
+
+Projects with a `docs/` folder get its contents scanned for staleness and overlap with CLAUDE.md. Common patterns:
+
+| Pattern | Example |
+|---------|---------|
+| Component docs | `docs/RICH_CONTENT_COMPONENTS.md` |
+| API guides | `docs/api-guide.md` |
+| Planning briefs | `docs/briefs/feature-x.md` |
+
+The audit doesn't manage docs/ content — it flags staleness (broken file references) and overlap (sections duplicated with CLAUDE.md).
+
 ## Rules
 
 - Only suggest docs that match detected project type
 - Simple projects (node-project, python-project) just need CLAUDE.md
 - Don't create empty template docs — only suggest when there's content to fill
 - Prefer one well-maintained doc over three sparse ones
+- If CLAUDE.md duplicates ARCHITECTURE.md or docs/, move the content to docs/ and keep CLAUDE.md concise

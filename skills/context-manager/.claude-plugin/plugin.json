@@ -1,0 +1,5 @@
+{
+  "name": "context-manager",
+  "description": "Audit project context: CLAUDE.md memory, project docs, markdown footprint, overlap detection.",
+  "skills": "./"
+}

@@ -1,20 +1,23 @@
 ---
-name: memory-manager
-description: "Audit, restructure, and maintain the full Claude Code memory hierarchy: CLAUDE.md files, .claude/rules/ topic files, auto-memory, and project documentation. Detects project type and suggests appropriate docs. Use when CLAUDE.md needs updating, memory needs restructuring, or a project needs its docs audited. Trigger with 'audit memory', 'update CLAUDE.md', 'restructure memory', 'session capture', 'memory cleanup', 'check project docs', or 'what docs does this project need'."
+name: context-manager
+description: "Audit and manage the full project context landscape: CLAUDE.md memory hierarchy, project documentation, markdown footprint, and content overlap. Detects project type, scores quality, flags stale docs, and reports total context cost. Trigger with 'audit context', 'audit memory', 'update CLAUDE.md', 'restructure memory', 'session capture', 'check project docs', 'markdown footprint', or 'what docs does this project need'."
 compatibility: claude-code-only
 ---
 
-# Memory Manager
+# Context Manager
 
-Manage the full Claude Code memory hierarchy across three layers. Produces well-organised, correctly-placed memory files that follow size guidelines and progressive disclosure.
+Manage the Claude Code memory hierarchy and audit the full markdown landscape of a project. Produces well-organised memory files, detects documentation overlap, and reports the total context footprint.
 
-## Three Memory Layers
+## Four Context Layers
 
-| Layer | Location | Purpose | Managed by this skill |
-|-------|----------|---------|----------------------|
-| CLAUDE.md hierarchy | `./CLAUDE.md`, subdirs, parent dirs | Project context, commands, architecture, rules | Yes |
-| Rules topic files | `.claude/rules/*.md` | Correction rules, patterns, technical facts | Yes |
-| Auto-memory | `~/.claude/projects/*/memory/MEMORY.md` | Session-specific patterns | No (Claude manages automatically) |
+| Layer | Location | Purpose | What this skill does |
+|-------|----------|---------|---------------------|
+| **Memory** | `./CLAUDE.md`, subdirs, `.claude/rules/*.md` | Project context, commands, architecture, rules | Audit, score, maintain |
+| **Project docs** | `ARCHITECTURE.md`, `DATABASE_SCHEMA.md`, `API_ENDPOINTS.md`, `docs/**/*.md` | Technical documentation | Check existence per project type, flag staleness, detect CLAUDE.md overlap |
+| **Session** | `SESSION.md`, `PROJECT_BRIEF.md` | Temporary progress tracking | Report presence + size (managed by dev-session) |
+| **Public** | `README.md`, `CONTRIBUTING.md`, other root `.md` | Public-facing docs | Detect CLAUDE.md duplication |
+
+Auto-memory (`~/.claude/projects/*/memory/MEMORY.md`) is also scanned for awareness but managed by Claude automatically.
 
 ## Operating Modes
 
@@ -36,13 +39,18 @@ Manage the full Claude Code memory hierarchy across three layers. Produces well-
 
 ### Mode 2: Full Audit
 
-**When**: "audit memory", "check project docs", periodic maintenance, working in a neglected project
+**When**: "audit context", "audit memory", "check project docs", periodic maintenance, working in a neglected project
 
 1. Run the audit script:
    ```bash
-   python3 skills/memory-manager/scripts/audit_memory.py [repo-path]
+   python3 skills/context-manager/scripts/audit_memory.py [repo-path]
    ```
-2. Review the output: sizes, quality scores, project type, missing docs, stale references
+2. Review the output:
+   - **Memory layer**: CLAUDE.md sizes, quality scores, rules file sizes
+   - **Project docs**: existence, staleness, overlap with CLAUDE.md
+   - **Session/public**: presence and size
+   - **Markdown footprint**: total KB by layer
+   - **Overlap warnings**: sections duplicated between files
 3. Generate changes autonomously — create, update, or flag files as needed
 4. Present all changes as a single batch for approval
 5. Apply approved changes
@@ -50,7 +58,7 @@ Manage the full Claude Code memory hierarchy across three layers. Produces well-
 For large repos, delegate to a sub-agent:
 ```
 Task(subagent_type: "general-purpose",
-  prompt: "Run python3 skills/memory-manager/scripts/audit_memory.py /path/to/repo
+  prompt: "Run python3 skills/context-manager/scripts/audit_memory.py /path/to/repo
            and summarise the findings.")
 ```
 
@@ -62,8 +70,10 @@ Task(subagent_type: "general-purpose",
 2. Split oversized files:
    - Extract topic sections from root CLAUDE.md into `.claude/rules/<topic>.md`
    - Extract directory-specific content into sub-directory CLAUDE.md files
-3. Create missing documentation files based on project type
-4. Present the restructure plan, apply after approval
+   - Move detailed technical content from CLAUDE.md to `docs/` or `ARCHITECTURE.md` if it's reference material, not operational context
+3. Resolve overlaps: if CLAUDE.md duplicates ARCHITECTURE.md or docs/, remove the duplication
+4. Create missing documentation files based on project type
+5. Present the restructure plan, apply after approval
 
 ## Placement Decision Tree
 
@@ -74,8 +84,11 @@ Would this still apply if I switched to a completely different project?
 └── NO  → Is it specific to a subdirectory?
     ├── YES → <dir>/CLAUDE.md
     │         (integrations, directory-specific gotchas)
-    └── NO  → ./CLAUDE.md (project root)
-              (identity, stack, commands, architecture, critical rules)
+    └── NO  → Is it reference documentation or operational context?
+        ├── Reference → ARCHITECTURE.md or docs/
+        │               (system design, schemas, detailed flows)
+        └── Operational → ./CLAUDE.md (project root)
+                          (identity, stack, commands, critical rules)
 ```
 
 ## Size Targets
@@ -110,11 +123,19 @@ Would this still apply if I switched to a completely different project?
 - Platform-specific formatting rules
 - Error prevention patterns
 
+### docs/ and ARCHITECTURE.md
+- Detailed system architecture (component diagrams, data flows)
+- Database schemas and migration guides
+- API endpoint catalogues
+- Content that Claude should read on demand, not every session
+
+**Rule of thumb**: If it's needed every session, put it in CLAUDE.md. If it's reference material consulted occasionally, put it in docs/.
+
 ### What to delete
 - Content Claude already knows from training
 - Verbose explanations of standard frameworks
 - Changelogs or version history (use git)
-- Duplicated content from parent CLAUDE.md files
+- Duplicated content (between CLAUDE.md and docs/, ARCHITECTURE.md, or README.md)
 - "TODO" items that were never completed
 - Generic advice not specific to the project
 
@@ -164,6 +185,6 @@ See [references/quality-criteria.md](references/quality-criteria.md) for the ful
 
 ## Scripts
 
-- `scripts/audit_memory.py` — Scan all three layers, score quality, detect project type, flag issues
+- `scripts/audit_memory.py` — Scan all four layers, score quality, detect project type, report footprint and overlap
   - `python3 audit_memory.py [repo-path]` — human-readable report
   - `python3 audit_memory.py [repo-path] --json` — structured JSON output

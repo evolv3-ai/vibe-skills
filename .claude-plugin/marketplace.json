@@ -6,8 +6,8 @@
   },
   "metadata": {
     "description": "Workflow skills for Claude Code - each produces tangible output",
-    "version": "10.0.0",
-    "updated": "2026-02-18"
+    "version": "11.0.0",
+    "updated": "2026-02-19"
   },
   "plugins": [
     {
@@ -28,7 +28,7 @@
         "./skills/google-chat-messages",
         "./skills/elevenlabs-agents",
         "./skills/mcp-builder",
-        "./skills/memory-manager",
+        "./skills/context-manager",
         "./skills/google-apps-script",
         "./skills/claude-capabilities",
         "./skills/aussie-business-english",
@@ -110,11 +110,11 @@
     },
     {
       "name": "development",
-      "description": "Skill creation, CLAUDE.md memory management, dev session tracking, GitHub releases, Gemini peer review, and Claude capabilities reference.",
+      "description": "Skill creation, project context management, dev session tracking, GitHub releases, Gemini peer review, and Claude capabilities reference.",
       "source": "./",
       "skills": [
         "./skills/skill-creator",
-        "./skills/memory-manager",
+        "./skills/context-manager",
         "./skills/claude-capabilities",
         "./skills/github-release",
         "./skills/gemini-peer-review",

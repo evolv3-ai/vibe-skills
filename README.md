@@ -22,7 +22,7 @@ Workflow skills for [Claude Code](https://claude.com/claude-code) that produce t
 | **[google-apps-script](skills/google-apps-script)** | Google Sheets Apps Script automation (menus, triggers, dialogs) |
 | **[elevenlabs-agents](skills/elevenlabs-agents)** | Configured ElevenLabs voice agents |
 | **[mcp-builder](skills/mcp-builder)** | MCP servers with FastMCP |
-| **[memory-manager](skills/memory-manager)** | Optimised CLAUDE.md memory hierarchy |
+| **[context-manager](skills/context-manager)** | Project context audit: memory, docs, footprint, overlap detection |
 | **[claude-capabilities](skills/claude-capabilities)** | Current Claude AI & Code capabilities reference |
 | **[aussie-business-english](skills/aussie-business-english)** | Australian business English writing style |
 | **[d1-drizzle-schema](skills/d1-drizzle-schema)** | Drizzle ORM schemas for Cloudflare D1 |

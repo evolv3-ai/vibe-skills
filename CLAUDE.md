@@ -33,7 +33,7 @@ claude-skills/
 │   ├── google-apps-script/         # Google Sheets Apps Script automation
 │   ├── elevenlabs-agents/          # Build ElevenLabs voice agents
 │   ├── mcp-builder/                # Build MCP servers with FastMCP
-│   ├── memory-manager/             # Audit and restructure CLAUDE.md hierarchy
+│   ├── context-manager/             # Audit project context: memory, docs, footprint, overlap
 │   ├── dev-session/                # Multi-session progress tracking and handoff
 │   ├── ux-audit/                   # UX walkthroughs and QA sweeps via browser automation
 │   ├── github-release/             # Sanitize and publish GitHub releases
