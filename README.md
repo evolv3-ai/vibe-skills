@@ -72,10 +72,22 @@ This repo started as a collection of 105 skills — many were informational refe
 
 **v2** keeps only skills that produce tangible output: files, projects, configurations, deployments. The count dropped from 105 to 22, but each one earns its place.
 
-The full v1 collection is preserved:
+The full v1 collection is preserved and usable:
+
+```bash
+# Browse the v1 skills
+git log v1-final -- skills/
+
+# Use a specific v1 skill locally
+git checkout v1-final -- skills/css-grid/
+claude --plugin-dir ./skills/css-grid
+
+# Or check out the whole v1 collection
+git checkout v1-final -- skills/
+```
+
 - **Tag `v1-final`** — all 105 skills at the point of transition
 - **Branch `archive/low-priority-skills`** — 13 previously archived skills
-- **Full git history** — `git log v1-final` to browse
 
 ## License
 
