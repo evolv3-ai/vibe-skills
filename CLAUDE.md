@@ -15,7 +15,7 @@ Production workflow skills for Claude Code CLI. Each skill guides Claude through
 
 ```
 claude-skills/
-├── skills/                         # All skills (23)
+├── skills/                         # All skills (24)
 │   ├── skill-creator/              # Foundation: create new skills (Anthropic official)
 │   ├── cloudflare-worker-builder/  # Scaffold Cloudflare Worker projects
 │   ├── vite-flare-starter/         # Full-stack Cloudflare app from starter template
@@ -35,6 +35,7 @@ claude-skills/
 │   ├── mcp-builder/                # Build MCP servers with FastMCP
 │   ├── memory-manager/             # Audit and restructure CLAUDE.md hierarchy
 │   ├── dev-session/                # Multi-session progress tracking and handoff
+│   ├── ux-audit/                   # UX walkthroughs and QA sweeps via browser automation
 │   ├── github-release/             # Sanitize and publish GitHub releases
 │   ├── gemini-peer-review/         # Second opinion from Gemini on code/architecture
 │   ├── claude-capabilities/        # Current Claude AI & Code capabilities reference
@@ -77,7 +78,7 @@ Key principle: **every skill must produce something.** If it's just reference ma
 # Install all skills
 /plugin install all@jezweb-skills
 
-# Or by category: design, cloudflare, frontend, web, integrations, ai, mcp, development, writing
+# Or by category: design, cloudflare, frontend, web, integrations, ai, mcp, development, testing, writing
 /plugin install design@jezweb-skills
 
 # Local dev (loads without install)
