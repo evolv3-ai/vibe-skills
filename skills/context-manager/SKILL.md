@@ -54,6 +54,7 @@ Auto-memory (`~/.claude/projects/*/memory/MEMORY.md`) is also scanned for awaren
 3. Generate changes autonomously — create, update, or flag files as needed
 4. Present all changes as a single batch for approval
 5. Apply approved changes
+6. Check if the commit capture hook is installed — if not, offer to set it up (see [references/commit-hook.md](references/commit-hook.md))
 
 For large repos, delegate to a sub-agent:
 ```
@@ -182,6 +183,7 @@ See [references/quality-criteria.md](references/quality-criteria.md) for the ful
 | Scoring CLAUDE.md quality | [references/quality-criteria.md](references/quality-criteria.md) |
 | Detecting project type and expected docs | [references/project-types.md](references/project-types.md) |
 | Creating new CLAUDE.md or rules files | [references/templates.md](references/templates.md) |
+| Setting up automatic capture on commit | [references/commit-hook.md](references/commit-hook.md) |
 
 ## Scripts
 
