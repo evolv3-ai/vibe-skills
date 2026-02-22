@@ -15,6 +15,7 @@ Workflow skills for [Claude Code](https://claude.com/claude-code) that produce t
 | **integrations** | google-chat-messages, google-apps-script, elevenlabs-agents, mcp-builder | Google Chat webhooks, Apps Script, ElevenLabs agents, MCP servers |
 | **dev-tools** | skill-creator, context-manager, dev-session, github-release, gemini-peer-review, claude-capabilities, ux-audit | Skill creation, context audits, session tracking, releases, peer review, UX audits |
 | **shopify** | shopify-setup, shopify-products, shopify-content | Shopify API setup, product management, content pages, blog posts |
+| **wordpress** | wordpress-setup, wordpress-content, wordpress-elementor | WordPress WP-CLI access, content management, Elementor page editing |
 | **writing** | aussie-business-english | Australian business English writing style |
 
 ## Install
@@ -31,6 +32,7 @@ Workflow skills for [Claude Code](https://claude.com/claude-code) that produce t
 /plugin install design-assets@jezweb-skills
 /plugin install integrations@jezweb-skills
 /plugin install shopify@jezweb-skills
+/plugin install wordpress@jezweb-skills
 /plugin install writing@jezweb-skills
 ```
 

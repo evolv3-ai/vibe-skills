@@ -54,6 +54,12 @@
       "description": "Manage Shopify stores: product creation, bulk imports, content pages, blog posts, and SEO metadata.",
       "source": "./plugins/shopify",
       "category": "productivity"
+    },
+    {
+      "name": "wordpress",
+      "description": "Manage WordPress sites: content creation, blog posts, media, Elementor page editing, and WP-CLI workflows.",
+      "source": "./plugins/wordpress",
+      "category": "productivity"
     }
   ]
 }
