@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "1.0",
+  "lastUpdated": "",
+  "clients": {
+    "claude-desktop": {
+      "name": "Claude Desktop",
+      "detected": false,
+      "configPath": "",
+      "configFormat": "claude-desktop-v1",
+      "lastScanned": ""
+    },
+    "cursor": {
+      "name": "Cursor",
+      "detected": false,
+      "configPath": "",
+      "configFormat": "cursor-mcp-v1",
+      "lastScanned": ""
+    },
+    "claude-code": {
+      "name": "Claude Code CLI",
+      "detected": false,
+      "configPath": "",
+      "configFormat": "claude-code-v1",
+      "lastScanned": ""
+    }
+  },
+  "servers": {},
+  "installMethods": {
+    "npx": {
+      "description": "Run via npx (recommended)",
+      "commandTemplate": "npx -y ${package}",
+      "requiresGlobalInstall": false
+    },
+    "npm-global": {
+      "description": "Global npm install",
+      "commandTemplate": "npm install -g ${package}",
+      "requiresGlobalInstall": true
+    },
+    "local-clone": {
+      "description": "Git clone and build",
+      "commandTemplate": "git clone ${repo} && npm install && npm run build",
+      "requiresGlobalInstall": false
+    }
+  },
+  "syncHistory": []
+}

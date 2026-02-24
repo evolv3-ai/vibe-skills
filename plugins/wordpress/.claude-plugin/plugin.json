@@ -1,8 +1,0 @@
-{
-  "name": "wordpress",
-  "description": "Manage WordPress sites: content creation, blog posts, media, Elementor page editing, and WP-CLI workflows.",
-  "author": {
-    "name": "Jeremy Dawes / Jezweb",
-    "email": "jeremy@jezweb.net"
-  }
-}

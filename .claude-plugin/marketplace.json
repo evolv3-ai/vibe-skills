@@ -1,29 +1,23 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "jezweb-skills",
+  "name": "evolv3ai-skills",
   "description": "Workflow skills for Claude Code — each produces tangible output",
   "owner": {
-    "name": "Jeremy Dawes / Jezweb",
-    "email": "jeremy@jezweb.net"
+    "name": "evolv3ai",
+    "email": "hello@evolv3.ai"
   },
   "plugins": [
     {
-      "name": "cloudflare",
-      "description": "Scaffold Cloudflare Workers, Hono APIs, D1/Drizzle schemas, and full-stack Vite+Workers apps.",
-      "source": "./plugins/cloudflare",
+      "name": "admin",
+      "description": "Local machine administration for Windows, WSL, macOS, Linux. Install tools, manage packages, configure dev environments. Profile-aware.",
+      "source": "./plugins/admin",
       "category": "development"
     },
     {
-      "name": "web-design",
-      "description": "Web design methodology, component patterns (heroes, cards, CTAs), and local business SEO.",
-      "source": "./plugins/web-design",
-      "category": "design"
-    },
-    {
-      "name": "frontend",
-      "description": "Tailwind v4 theming and shadcn/ui component installation, customisation, and recipes.",
-      "source": "./plugins/frontend",
-      "category": "design"
+      "name": "cloudflare",
+      "description": "Manage Cloudflare DNS records and zones from the terminal with the cf CLI. Full DNS CRUD, zone listing, and JSON output for scripting.",
+      "source": "./plugins/cloudflare",
+      "category": "development"
     },
     {
       "name": "design-assets",
@@ -32,33 +26,21 @@
       "category": "design"
     },
     {
-      "name": "integrations",
-      "description": "Google Chat webhooks, Google Apps Script automation, ElevenLabs voice agents, and MCP server building.",
-      "source": "./plugins/integrations",
-      "category": "productivity"
-    },
-    {
       "name": "dev-tools",
-      "description": "Skill creation, project context management, dev sessions, GitHub releases, Gemini peer review, capabilities reference, and UX audits.",
+      "description": "Stream Deck profiles, mock REST APIs, Ralphban task boards, and pi_agent_rust development workflows.",
       "source": "./plugins/dev-tools",
       "category": "development"
     },
     {
-      "name": "writing",
-      "description": "Australian business English writing style for professional communications.",
-      "source": "./plugins/writing",
-      "category": "productivity"
+      "name": "devops",
+      "description": "Remote infrastructure: cloud provisioning (OCI, Hetzner, Linode, DigitalOcean, Contabo, Vultr), app deployment (Coolify, KASM, OpenClaw).",
+      "source": "./plugins/devops",
+      "category": "deployment"
     },
     {
-      "name": "shopify",
-      "description": "Manage Shopify stores: product creation, bulk imports, content pages, blog posts, and SEO metadata.",
-      "source": "./plugins/shopify",
-      "category": "productivity"
-    },
-    {
-      "name": "wordpress",
-      "description": "Manage WordPress sites: content creation, blog posts, media, Elementor page editing, and WP-CLI workflows.",
-      "source": "./plugins/wordpress",
+      "name": "integrations",
+      "description": "iii cross-language engine, SimpleMem agent memory, and Obsidian RLM large-file processing.",
+      "source": "./plugins/integrations",
       "category": "productivity"
     }
   ]

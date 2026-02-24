@@ -1,7 +1,7 @@
 # Claude Skills
 
-**Repository**: https://github.com/jezweb/claude-skills
-**Owner**: Jeremy Dawes (Jez) | Jezweb
+**Repository**: https://github.com/evolv3ai/claude-skills
+**Owner**: evolv3ai | https://evolv3.ai
 
 Production workflow skills for Claude Code CLI. Each skill guides Claude through a recipe to produce tangible output — not knowledge dumps, but working deliverables.
 
@@ -15,55 +15,40 @@ Production workflow skills for Claude Code CLI. Each skill guides Claude through
 
 ```
 claude-skills/
-├── plugins/                                # 9 installable plugins (30 skills)
-│   ├── cloudflare/                         # Cloudflare Workers, Hono, D1/Drizzle, Vite
+├── plugins/                                # 6 installable plugins (21 skills)
+│   ├── admin/                              # Local machine admin, session discovery
 │   │   └── skills/
-│   │       ├── cloudflare-worker-builder/
-│   │       ├── vite-flare-starter/
-│   │       ├── hono-api-scaffolder/
-│   │       └── d1-drizzle-schema/
-│   ├── web-design/                         # Web design methodology, patterns, SEO
+│   │       ├── admin/
+│   │       └── session-scout/
+│   ├── cloudflare/                         # Cloudflare DNS CLI
 │   │   └── skills/
-│   │       ├── web-design-methodology/
-│   │       ├── web-design-patterns/
-│   │       └── seo-local-business/
-│   ├── frontend/                           # Tailwind v4 + shadcn/ui
-│   │   └── skills/
-│   │       ├── tailwind-theme-builder/
-│   │       └── shadcn-ui/
+│   │       └── cloudflare-cli/
 │   ├── design-assets/                      # Colour palettes, favicons, icons
 │   │   └── skills/
-│   │       ├── color-palette/
-│   │       ├── favicon-gen/
-│   │       └── icon-set-generator/
-│   ├── integrations/                       # Google, ElevenLabs, MCP
+│   ├── dev-tools/                          # Stream Deck, mock APIs, Kanban, pi_agent
 │   │   └── skills/
-│   │       ├── google-chat-messages/
-│   │       ├── google-apps-script/
-│   │       ├── elevenlabs-agents/
-│   │       └── mcp-builder/
-│   ├── dev-tools/                          # Skill creation, context, sessions, releases
+│   │       ├── deckmate/
+│   │       ├── mockoon-cli/
+│   │       ├── pi-agent-rust/
+│   │       └── ralphban/
+│   ├── devops/                             # Cloud provisioning + app deployment
 │   │   └── skills/
-│   │       ├── skill-creator/
-│   │       ├── context-manager/
-│   │       ├── dev-session/
-│   │       ├── github-release/
-│   │       ├── gemini-peer-review/
-│   │       ├── claude-capabilities/
-│   │       └── ux-audit/
-│   ├── shopify/                            # Shopify store management
-│   │   └── skills/
-│   │       ├── shopify-setup/
-│   │       ├── shopify-products/
-│   │       └── shopify-content/
-│   ├── wordpress/                          # WordPress content & Elementor
-│   │   └── skills/
-│   │       ├── wordpress-setup/
-│   │       ├── wordpress-content/
-│   │       └── wordpress-elementor/
-│   └── writing/                            # Australian business English
+│   │       ├── contabo/
+│   │       ├── coolify/
+│   │       ├── coolify-cli/
+│   │       ├── devops/
+│   │       ├── digital-ocean/
+│   │       ├── hetzner/
+│   │       ├── kasm/
+│   │       ├── linode/
+│   │       ├── oci/
+│   │       ├── openclaw/
+│   │       └── vultr/
+│   └── integrations/                       # iii engine, SimpleMem, Obsidian RLM
 │       └── skills/
-│           └── aussie-business-english/
+│           ├── iii/
+│           ├── obsidian-rlm/
+│           └── simplemem/
 ├── .claude-plugin/                         # Marketplace + plugin config
 │   ├── marketplace.json
 │   └── plugin.json
@@ -100,7 +85,7 @@ plugin-name/
    {
      "name": "my-plugin",
      "description": "What this plugin does.",
-     "author": { "name": "Jeremy Dawes / Jezweb", "email": "jeremy@jezweb.net" }
+     "author": { "name": "evolv3ai", "email": "hello@evolv3.ai" }
    }
    ```
 
@@ -117,13 +102,7 @@ plugin-name/
 
 ## Creating a Skill
 
-Use the skill-creator skill:
-
-```bash
-python3 plugins/dev-tools/skills/skill-creator/scripts/init_skill.py my-skill --path plugins/my-plugin/skills/
-```
-
-Or ask Claude: "Create a new skill for [use case]"
+Ask Claude: "Create a new skill for [use case]"
 
 Key principle: **every skill must produce something.** If it's just reference material Claude already knows, it doesn't earn a place here.
 
@@ -131,12 +110,12 @@ Key principle: **every skill must produce something.** If it's just reference ma
 
 ```bash
 # Add marketplace (one-time)
-/plugin marketplace add jezweb/claude-skills
+/plugin marketplace add evolv3ai/claude-skills
 
 # Install individual plugins
-/plugin install cloudflare@jezweb-skills
-/plugin install dev-tools@jezweb-skills
-/plugin install frontend@jezweb-skills
+/plugin install admin@evolv3ai-skills
+/plugin install cloudflare@evolv3ai-skills
+/plugin install devops@evolv3ai-skills
 
 # Local dev (loads a single plugin without install)
 claude --plugin-dir ./plugins/cloudflare
@@ -150,12 +129,4 @@ Before committing a skill:
 - [ ] SKILL.md has valid YAML frontmatter (name + description)
 - [ ] Under 500 lines
 - [ ] Produces tangible output (not just reference material)
-- [ ] Passes validation: `python3 plugins/dev-tools/skills/skill-creator/scripts/quick_validate.py plugins/category/skills/my-skill`
 - [ ] Tested by actually using it on a real task
-
-## Git History
-
-All 105 skills from the v1 era are preserved:
-- Tag `v1-final` — the complete 105-skill collection
-- Branch `archive/low-priority-skills` — 13 previously archived skills
-- Full git history available via `git log v1-final`

@@ -1,0 +1,301 @@
+# KASM Workspaces Environment Configuration Template
+# Copy this to project root as .env.local and fill in your values
+# WARNING: Never commit .env.local to version control!
+
+# =============================================================================
+# Server Connection
+# =============================================================================
+
+# Server IP Address - Where KASM will be installed
+SERVER_IP=
+
+# SSH Configuration
+SSH_USER=ubuntu
+SSH_PRIVATE_KEY_PATH=~/.ssh/id_rsa
+SSH_PORT=22
+
+# =============================================================================
+# KASM Installation Configuration
+# =============================================================================
+
+# KASM Admin Credentials
+KASM_ADMIN_USER=admin@kasm.local
+KASM_ADMIN_PASSWORD=your_secure_password_here
+KASM_USER_PASSWORD=your_user_password_here
+
+# KASM Database Password
+# Leave empty for auto-generated password
+KASM_DATABASE_PASSWORD=
+
+# KASM Redis Password
+# Leave empty for auto-generated password
+KASM_REDIS_PASSWORD=
+
+# =============================================================================
+# KASM Port Configuration
+# =============================================================================
+
+# KASM Web Interface Port (HTTPS)
+# Default KASM installation uses port 443 (standard HTTPS)
+# Custom installations may use 8443
+KASM_PORT=443
+
+# RDP Gateway Port (for Windows apps)
+RDP_PORT=3389
+
+# Session Ports Range
+# KASM allocates ports for each workspace session
+# Default: 3000-4000 (supports 1000 concurrent sessions)
+SESSION_PORT_START=3000
+SESSION_PORT_END=4000
+
+# =============================================================================
+# KASM Version
+# =============================================================================
+
+# KASM Workspaces Version
+# Leave empty for latest stable version
+# Or specify version (e.g., "1.15.0")
+KASM_VERSION=
+
+# =============================================================================
+# System Configuration
+# =============================================================================
+
+# Swap Space Size
+# Recommended: 4G for 12GB RAM, 8G for 24GB RAM
+# Format: <size>G (e.g., 4G, 8G)
+KASM_SWAP_SIZE=4G
+
+# Enable Swap (recommended for systems with <16GB RAM)
+ENABLE_SWAP=true
+
+# =============================================================================
+# Firewall Configuration
+# =============================================================================
+
+# Enable automatic firewall configuration
+AUTO_CONFIGURE_FIREWALL=true
+
+# Firewall Ports to Open
+# Default: 22 (SSH), 8443 (KASM UI), 3389 (RDP), 3000-4000 (Sessions)
+FIREWALL_ALLOWED_PORTS=22,8443,3389,3000:4000
+
+# =============================================================================
+# Cloudflare Tunnel Integration (Optional)
+# =============================================================================
+
+# Enable Cloudflare Tunnel for secure external access
+ENABLE_CLOUDFLARE_TUNNEL=false
+
+# Cloudflare Tunnel Configuration (if ENABLE_CLOUDFLARE_TUNNEL=true)
+TUNNEL_NAME=kasm-tunnel
+TUNNEL_HOSTNAME=kasm.yourdomain.com
+
+# Cloudflare API Configuration (if using tunnel)
+CLOUDFLARE_API_TOKEN=
+CLOUDFLARE_ACCOUNT_ID=
+CLOUDFLARE_ZONE_ID=
+
+# =============================================================================
+# KASM Advanced Configuration (Optional)
+# =============================================================================
+
+# Default Workspace Images
+# Comma-separated list of workspace images to install
+# Options: ubuntu, kali, windows, chrome, firefox, etc.
+# Leave empty to install default set
+KASM_DEFAULT_IMAGES=
+
+# Enable GPU Acceleration
+# Requires NVIDIA GPU and drivers
+ENABLE_GPU=false
+
+# Persistent Profiles
+# Enable persistent user profiles across sessions
+ENABLE_PERSISTENT_PROFILES=true
+
+# Persistent Profile Storage Path
+PERSISTENT_PROFILE_PATH=/mnt/kasm_profiles
+
+# Session Timeout (minutes)
+# Idle sessions will be terminated after this duration
+# Default: 60 minutes
+SESSION_TIMEOUT=60
+
+# Max Concurrent Sessions Per User
+# Limit number of simultaneous sessions per user
+# Default: 5
+MAX_SESSIONS_PER_USER=5
+
+# =============================================================================
+# KASM Zone Configuration
+# =============================================================================
+
+# Zone Name
+# Used for multi-server deployments
+# Default: default
+KASM_ZONE_NAME=default
+
+# =============================================================================
+# Authentication Configuration (Optional)
+# =============================================================================
+
+# Enable SSO (Single Sign-On)
+ENABLE_SSO=false
+
+# SSO Provider (if ENABLE_SSO=true)
+# Options: saml, oidc, ldap
+SSO_PROVIDER=
+
+# LDAP Configuration (if SSO_PROVIDER=ldap)
+LDAP_SERVER=
+LDAP_PORT=389
+LDAP_BASE_DN=
+LDAP_BIND_USER=
+LDAP_BIND_PASSWORD=
+
+# =============================================================================
+# KASM Backup Configuration (Module 03 - Optional)
+# =============================================================================
+
+# Enable automated backups (Module 03)
+# Set to true to enable the backup module during post-install wizard
+KASM_BACKUP_ENABLED=false
+
+# Rclone Configuration (for S3-compatible backups)
+# Remote name configured in rclone (run: rclone config)
+KASM_BACKUP_RCLONE_REMOTE=backblaze
+
+# Bucket name for backups
+KASM_BACKUP_RCLONE_BUCKET=kasm-s3
+
+# Backup root directory on server
+# Where kasm_profiles and dev_shared are mounted
+KASM_BACKUP_ROOT=/mnt
+
+# Backup frequency (in minutes)
+# Default: 240 (4 hours) - recommended to reduce API calls
+KASM_BACKUP_INTERVAL_MINUTES=240
+
+# Backup retry settings
+# Maximum number of retry attempts on failure
+KASM_BACKUP_MAX_RETRIES=3
+
+# Delay between retries (in seconds)
+KASM_BACKUP_RETRY_DELAY=300
+
+# Log file location
+KASM_BACKUP_LOG_FILE=/var/log/kasm-backup.log
+
+# Backup paths (comma-separated)
+# Format: "source_dir:remote_path,source_dir2:remote_path2"
+# Example: "kasm_profiles:profiles,dev_shared:dev-shared"
+# Leave empty to use defaults
+KASM_BACKUP_PATHS=
+
+# Additional backup configuration files
+KASM_BACKUP_STATS_FILE=/var/log/kasm-backup-stats.json
+KASM_BACKUP_REPORT_FILE=/var/log/kasm-backup-report.txt
+
+# Backup script installation paths
+KASM_BACKUP_SCRIPT_PATH=/opt/kasm-sync/kasm-backup-manager.sh
+KASM_BACKUP_MONITOR_PATH=/opt/kasm-sync/kasm-backup-monitor.sh
+KASM_BACKUP_SYNC_DIR=/opt/kasm-sync
+KASM_BACKUP_LOG_DIR=/var/log
+
+# Wizard state file
+KASM_WIZARD_STATE_FILE=/opt/kasm-sync/configs/interview-state.json
+
+# =============================================================================
+# Auto-Generated Variables (populated by installation script)
+# =============================================================================
+
+# Server Public IP (auto-detected during installation)
+# SERVER_PUBLIC_IP=
+
+# Installation Completion Timestamp
+# INSTALL_COMPLETED_AT=
+
+# KASM Installation Directory
+# KASM_INSTALL_DIR=/opt/kasm/current
+
+# KASM Service Manager Token
+# KASM_MANAGER_TOKEN=
+
+# =============================================================================
+# Example Configurations
+# =============================================================================
+
+# Example 1: Basic KASM installation (development)
+# SERVER_IP=192.168.1.100
+# KASM_PORT=8443
+# ENABLE_CLOUDFLARE_TUNNEL=false
+# KASM_SWAP_SIZE=4G
+
+# Example 2: Production KASM with Cloudflare Tunnel
+# SERVER_IP=203.0.113.10
+# KASM_PORT=8443
+# ENABLE_CLOUDFLARE_TUNNEL=true
+# TUNNEL_HOSTNAME=kasm.mycompany.com
+# SESSION_PORT_START=3000
+# SESSION_PORT_END=5000
+# KASM_SWAP_SIZE=8G
+
+# Example 3: High-capacity KASM server
+# SERVER_IP=198.51.100.20
+# KASM_PORT=8443
+# SESSION_PORT_START=3000
+# SESSION_PORT_END=10000
+# MAX_SESSIONS_PER_USER=10
+# KASM_SWAP_SIZE=16G
+# ENABLE_GPU=true
+
+# =============================================================================
+# Post-Installation Steps
+# =============================================================================
+
+# After installation:
+# 1. Access KASM at https://SERVER_IP:8443 (or https://TUNNEL_HOSTNAME)
+# 2. Accept the self-signed certificate warning (first time only)
+# 3. Login with KASM_ADMIN_USER and KASM_ADMIN_PASSWORD
+# 4. Install workspace images from Workspace Registry
+# 5. Create user accounts or configure SSO
+# 6. Assign workspaces to users
+# 7. Start using virtual desktops and applications!
+
+# =============================================================================
+# Workspace Image Examples
+# =============================================================================
+
+# Popular KASM Workspaces:
+# - Ubuntu Desktop: Full Linux desktop environment
+# - Kali Linux: Penetration testing and security tools
+# - Windows: Windows desktop (requires license)
+# - Chrome: Isolated browser for secure browsing
+# - Firefox: Isolated browser alternative
+# - VS Code: Web-based development environment
+# - GIMP: Image editing
+# - LibreOffice: Office suite
+
+# =============================================================================
+# Troubleshooting
+# =============================================================================
+
+# Check KASM services status:
+# ssh SERVER_IP "sudo /opt/kasm/bin/stop && sudo /opt/kasm/bin/start"
+
+# View KASM logs:
+# ssh SERVER_IP "sudo tail -f /opt/kasm/current/log/kasm_*.log"
+
+# Check database connectivity:
+# ssh SERVER_IP "sudo docker ps | grep kasm"
+
+# Restart KASM services:
+# ssh SERVER_IP "sudo systemctl restart kasm"
+
+# Check firewall status:
+# ssh SERVER_IP "sudo ufw status"
+
+# Test KASM access:
+# curl -k https://SERVER_IP:8443

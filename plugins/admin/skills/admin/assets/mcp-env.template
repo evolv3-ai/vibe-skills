@@ -1,0 +1,67 @@
+# MCP Server Management Environment Configuration
+# Copy this file to .env.local in your admin project directory
+# DO NOT commit .env.local to version control
+
+# =============================================================================
+# MCP DIRECTORIES
+# =============================================================================
+# Root directory for locally cloned MCP servers
+MCP_ROOT=D:/mcp/
+
+# =============================================================================
+# CLAUDE DESKTOP CONFIGURATION
+# =============================================================================
+# Claude Desktop config file (auto-detected on Windows)
+CLAUDE_DESKTOP_CONFIG=${APPDATA}/Claude/claude_desktop_config.json
+
+# Claude Desktop executable
+CLAUDE_DESKTOP_EXE=${LOCALAPPDATA}/Programs/Claude/Claude.exe
+
+# =============================================================================
+# MCP REGISTRY (for tracking installations)
+# =============================================================================
+# Central registry file for tracking installed MCP servers
+# Can be local or on shared storage (Dropbox, OneDrive, etc.)
+MCP_REGISTRY=${ADMIN_ROOT}/registries/mcp-registry.json
+
+# =============================================================================
+# NODE.JS CONFIGURATION
+# =============================================================================
+# Node.js executable (use absolute path for MCP configs)
+NODE_PATH=C:/Program Files/nodejs/node.exe
+
+# NPM global modules directory
+NPM_GLOBAL_MODULES=${APPDATA}/npm/node_modules
+
+# =============================================================================
+# CLAUDE CODE MCP (if using)
+# =============================================================================
+# Claude CLI path for Claude Code MCP server
+CLAUDE_CLI_PATH=${APPDATA}/npm/claude.cmd
+
+# =============================================================================
+# WIN-CLI CONFIGURATION (if using)
+# =============================================================================
+# Win-CLI server location
+WIN_CLI_PATH=${MCP_ROOT}/win-cli-mcp-server/
+
+# Win-CLI config file
+WIN_CLI_CONFIG=${WIN_CLI_PATH}/config.json
+
+# =============================================================================
+# BACKUP SETTINGS
+# =============================================================================
+# Directory for config backups
+BACKUP_DIR=${APPDATA}/Claude/backups/
+
+# Number of backups to retain
+BACKUP_RETAIN_COUNT=10
+
+# =============================================================================
+# LOGGING
+# =============================================================================
+# Log MCP operations to device logs
+DEVICE_LOGS=${ADMIN_ROOT}/devices/${COMPUTERNAME}/logs.txt
+
+# Log MCP installations to central log
+INSTALLATIONS_LOG=${ADMIN_ROOT}/logs/central/installations.log

@@ -1,0 +1,40 @@
+# Docker Compose for Mockoon CLI
+# Usage: docker-compose up -d
+
+version: '3.8'
+
+services:
+  # Single mock API
+  mock-api:
+    image: mockoon/cli:latest
+    container_name: mockoon-api
+    command: --data /data/mock.json --port 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./mock-data.json:/data/mock.json:ro
+    restart: unless-stopped
+
+  # Example: Multiple mock APIs
+  # users-api:
+  #   image: mockoon/cli:latest
+  #   container_name: mockoon-users
+  #   command: --data /data/users.json --port 3001
+  #   ports:
+  #     - "3001:3001"
+  #   volumes:
+  #     - ./users-mock.json:/data/users.json:ro
+
+  # orders-api:
+  #   image: mockoon/cli:latest
+  #   container_name: mockoon-orders
+  #   command: --data /data/orders.json --port 3002
+  #   ports:
+  #     - "3002:3002"
+  #   volumes:
+  #     - ./orders-mock.json:/data/orders.json:ro
+
+# Networks (optional)
+# networks:
+#   mock-network:
+#     driver: bridge

@@ -1,0 +1,59 @@
+# Hetzner Cloud Infrastructure Configuration
+# Copy to .env.local and fill in your values
+
+# =============================================================================
+# Authentication
+# =============================================================================
+
+# API Token - Get from: https://console.hetzner.cloud/ → Project → Security → API Tokens
+# Create a "Read & Write" token
+HETZNER_API_TOKEN=your_api_token_here
+
+# =============================================================================
+# Server Configuration
+# =============================================================================
+
+# Location
+# Options: nbg1 (Nuremberg), fsn1 (Falkenstein), hel1 (Helsinki), ash (Ashburn), hil (Hillsboro)
+# Note: ARM (CAX) servers only available in European locations (nbg1, fsn1, hel1)
+HETZNER_LOCATION=nbg1
+
+# Server Type
+# ARM (best value): cax11 (2vCPU/4GB), cax21 (4vCPU/8GB), cax31 (8vCPU/16GB), cax41 (16vCPU/32GB)
+# x86: cx22 (2vCPU/4GB), cx32 (4vCPU/8GB), cx42 (8vCPU/16GB), cx52 (16vCPU/32GB)
+HETZNER_SERVER_TYPE=cax21
+
+# OS Image
+# Options: ubuntu-22.04, ubuntu-24.04, debian-12, debian-11
+HETZNER_IMAGE=ubuntu-22.04
+
+# Server Name
+SERVER_NAME=my-server
+
+# =============================================================================
+# SSH Configuration
+# =============================================================================
+
+# SSH Key Name (as registered in Hetzner)
+SSH_KEY_NAME=my-key
+
+# Local SSH Key Paths
+SSH_PUBLIC_KEY_PATH=~/.ssh/id_rsa.pub
+SSH_PRIVATE_KEY_PATH=~/.ssh/id_rsa
+
+# =============================================================================
+# Outputs (set after deployment)
+# =============================================================================
+
+# These will be set by the deployment process
+# SERVER_IP=
+# SSH_USER=root
+# SSH_KEY_PATH=~/.ssh/id_rsa
+
+# =============================================================================
+# Service-Specific (for downstream skills)
+# =============================================================================
+
+# These will be set to SERVER_IP after deployment
+# COOLIFY_SERVER_IP=
+# KASM_SERVER_IP=

@@ -1,8 +1,0 @@
-{
-  "name": "cloudflare",
-  "description": "Scaffold Cloudflare Workers, Hono APIs, D1/Drizzle schemas, and full-stack Vite+Workers apps.",
-  "author": {
-    "name": "Jeremy Dawes / Jezweb",
-    "email": "jeremy@jezweb.net"
-  }
-}

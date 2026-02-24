@@ -1,0 +1,201 @@
+# ============================================================================
+# ADMIN SKILLS SUITE - ENVIRONMENT VARIABLE SPECIFICATION
+# ============================================================================
+# Version: 2.0
+# Updated: 2025-12-08
+#
+# This is the CANONICAL specification for all admin-* skills.
+# All .env.template files MUST comply with this spec.
+# ============================================================================
+
+# ----------------------------------------------------------------------------
+# VARIABLE REQUIREMENTS BY SKILL
+# ----------------------------------------------------------------------------
+#
+# Legend: req=required, opt=optional, auto=auto-detected, uses=inherits, -=not used
+#
+# Variable            | admin | servers | windows | wsl | mcp | infra-* | app-*
+# --------------------|-------|---------|---------|-----|-----|---------|-------
+# DEVICE_NAME         | req   | opt     | opt     | opt | opt | -       | -
+# ADMIN_USER          | req   | opt     | opt     | opt | opt | -       | -
+# ADMIN_PLATFORM      | auto  | -       | -       | -   | -   | -       | -
+# ADMIN_ROOT          | req   | opt     | opt     | opt | opt | -       | -
+# ADMIN_LOG_PATH      | req   | uses    | uses    | uses| uses| uses    | uses
+# WIN_USER_HOME       | win   | -       | req     | -   | req | -       | -
+# WSL_ADMIN_PATH      | wsl   | -       | -       | req | -   | -       | -
+# SSH_KEY_PATH        | opt   | req     | opt     | opt | -   | req     | req
+# Provider creds      | -     | -       | -       | -   | -   | req     | -
+# App domains         | -     | -       | -       | -   | -   | -       | req
+
+# ----------------------------------------------------------------------------
+# CORE IDENTITY
+# ----------------------------------------------------------------------------
+
+# DEVICE_NAME
+# Purpose: Unique identifier for this device
+# Default: $(hostname)
+# Example: example-device, macbook-pro, dev-server-01
+# Used by: Logging, profile management, multi-device sync
+# Format: alphanumeric + hyphens, no spaces
+
+# ADMIN_USER
+# Purpose: Primary admin username
+# Default: $(whoami)
+# Used by: SSH connections, file ownership, logging attribution
+# Format: valid Unix username
+
+# ADMIN_PLATFORM
+# Purpose: Operating platform identifier
+# Values: windows | wsl | linux | macos
+# Default: Auto-detected via:
+#   - /proc/version containing "Microsoft" → wsl
+#   - $OS == "Windows_NT" → windows
+#   - uname -s == "Darwin" → macos
+#   - else → linux
+# Override: Set explicitly to skip auto-detection
+
+# ----------------------------------------------------------------------------
+# PATHS - CORE
+# ----------------------------------------------------------------------------
+
+# ADMIN_ROOT
+# Purpose: Central admin directory for all data
+# Default: ~/.admin
+# Contains: logs/, profiles/, config/
+# Can be: Local path OR synced folder (Dropbox, OneDrive, etc.)
+# Example: /home/user/.admin or /mnt/d/Dropbox/Admin
+
+# ADMIN_LOG_PATH
+# Purpose: Directory for all log files
+# Default: $ADMIN_ROOT/logs
+# Structure:
+#   operations.log     - General operations
+#   installations.log  - Software installations
+#   system-changes.log - Configuration changes
+#   handoffs.log       - Cross-platform handoffs
+#   devices/$DEVICE_NAME/history.log - Per-device history
+
+# ADMIN_PROFILE_PATH
+# Purpose: Directory for device profile JSON files
+# Default: $ADMIN_ROOT/profiles
+# Contains: $DEVICE_NAME.json for each device
+
+# ----------------------------------------------------------------------------
+# PATHS - PLATFORM SPECIFIC
+# ----------------------------------------------------------------------------
+
+# WIN_USER_HOME
+# Purpose: Windows user home directory
+# Default: $USERPROFILE or C:\Users\$USERNAME
+# WSL access: /mnt/c/Users/$WIN_USERNAME
+# Used when: Running Windows tasks or accessing Windows files from WSL
+
+# WIN_ADMIN_PATH
+# Purpose: Windows admin workspace
+# Default: $WIN_USER_HOME\.admin
+# Used when: Storing Windows-specific admin data
+
+# WSL_ADMIN_PATH
+# Purpose: WSL admin workspace
+# Default: ~/dev/admin
+# From Windows: \\wsl$\$WSL_DISTRO\home\$ADMIN_USER\dev\admin
+# Used when: Running WSL/Linux tasks
+
+# WSL_DISTRO
+# Purpose: WSL distribution name
+# Default: Ubuntu-24.04
+# Used for: wsl -d commands, UNC path construction
+# Example: Ubuntu-24.04, Debian, Ubuntu
+
+# ----------------------------------------------------------------------------
+# SSH
+# ----------------------------------------------------------------------------
+
+# SSH_KEY_PATH
+# Purpose: Default private key for SSH connections
+# Default: ~/.ssh/id_rsa
+# Used by: Server provisioning, remote administration
+# Alternatives: ~/.ssh/id_ed25519
+
+# SSH_PUBLIC_KEY_PATH
+# Purpose: Default public key (for adding to servers)
+# Default: ${SSH_KEY_PATH}.pub
+
+# SSH_CONFIG_PATH
+# Purpose: SSH config file location
+# Default: ~/.ssh/config
+# Used for: Host aliases, connection settings
+
+# ----------------------------------------------------------------------------
+# SYNC (Optional)
+# ----------------------------------------------------------------------------
+
+# ADMIN_SYNC_ENABLED
+# Purpose: Enable cross-device synchronization
+# Values: true | false
+# Default: false
+# When true: Logs and profiles sync to ADMIN_SYNC_PATH
+
+# ADMIN_SYNC_PATH
+# Purpose: Synced folder for multi-device setups
+# Example: /mnt/d/Dropbox/Admin (WSL)
+# Example: ~/Dropbox/Admin (macOS/Linux)
+# Example: C:\Users\<WIN_USER>\Dropbox\Admin (Windows)
+# Only used if: ADMIN_SYNC_ENABLED=true
+
+# ----------------------------------------------------------------------------
+# CLOUD PROVIDERS (admin-infra-*)
+# ----------------------------------------------------------------------------
+
+# OCI (Oracle Cloud Infrastructure)
+# OCI_CONFIG_PATH     - OCI CLI config file (default: ~/.oci/config)
+# OCI_TENANCY_OCID    - Tenancy OCID
+# OCI_USER_OCID       - User OCID
+# OCI_REGION          - Default region (e.g., us-ashburn-1)
+# OCI_COMPARTMENT_OCID - Default compartment OCID
+
+# Hetzner Cloud
+# HCLOUD_TOKEN        - API token
+# HCLOUD_CONTEXT      - CLI context name
+
+# DigitalOcean
+# DIGITALOCEAN_TOKEN  - API token
+
+# Vultr
+# VULTR_API_KEY       - API key
+
+# Linode/Akamai
+# LINODE_TOKEN        - API token
+
+# Contabo
+# CONTABO_CLIENT_ID     - OAuth client ID
+# CONTABO_CLIENT_SECRET - OAuth client secret
+# CONTABO_USER          - Account username
+# CONTABO_PASS          - Account password
+
+# ----------------------------------------------------------------------------
+# APPLICATIONS (admin-app-*)
+# ----------------------------------------------------------------------------
+
+# Coolify
+# COOLIFY_DOMAIN          - e.g., coolify.yourdomain.com
+# COOLIFY_ADMIN_EMAIL     - Admin email for SSL certs
+# COOLIFY_WILDCARD_DOMAIN - e.g., *.yourdomain.com
+
+# KASM Workspaces
+# KASM_DOMAIN         - e.g., kasm.yourdomain.com
+# KASM_ADMIN_PASSWORD - Admin console password
+
+# ----------------------------------------------------------------------------
+# CLOUDFLARE (tunnels and DNS)
+# ----------------------------------------------------------------------------
+
+# CLOUDFLARE_API_TOKEN   - API token with Zone:DNS and Tunnel permissions
+# CLOUDFLARE_ZONE_ID     - Zone ID for DNS management
+# CLOUDFLARE_ACCOUNT_ID  - Account ID for tunnels
+# CLOUDFLARE_TUNNEL_NAME - Tunnel name
+# CLOUDFLARE_TUNNEL_ID   - Tunnel ID (after creation)
+
+# ============================================================================
+# END OF SPECIFICATION
+# ============================================================================

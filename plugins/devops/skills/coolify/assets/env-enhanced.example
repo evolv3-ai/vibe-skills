@@ -1,0 +1,141 @@
+# Enhanced Coolify Installation Environment Variables
+# Copy this file to .env and customize for your setup
+
+# =============================================================================
+# Domain Configuration
+# =============================================================================
+
+# Main Coolify domain (where you'll access the dashboard)
+COOLIFY_DOMAIN="coolify.yourdomain.com"
+
+# Wildcard domain for deployed applications
+WILDCARD_DOMAIN="*.yourdomain.com"
+
+# Example:
+# COOLIFY_DOMAIN="coolify.yourdomain.com"
+# WILDCARD_DOMAIN="*.yourdomain.com"
+# Deployed apps will be at: myapp.yourdomain.com
+
+# =============================================================================
+# Admin Credentials
+# =============================================================================
+
+# Admin username for Coolify login
+ADMIN_USERNAME="admin"
+
+# Admin email address
+ADMIN_EMAIL="admin@yourdomain.com"
+
+# Admin password (leave empty for auto-generation)
+# If empty, a secure password will be generated automatically
+ROOT_USER_PASSWORD=""
+
+# Auto-generated password will be saved to /opt/coolify-credentials.txt
+
+# =============================================================================
+# Coolify Installer Variables
+# =============================================================================
+
+# These are used by the official Coolify installer
+# They're automatically set from the admin credentials above
+export COOLIFY_ROOT_USERNAME="$ADMIN_USERNAME"
+export COOLIFY_ROOT_EMAIL="$ADMIN_EMAIL"
+export COOLIFY_ROOT_PASSWORD="$ROOT_USER_PASSWORD"
+export COOLIFY_WILDCARD_DOMAIN="$WILDCARD_DOMAIN"
+
+# =============================================================================
+# Server Configuration (for remote installation)
+# =============================================================================
+
+# Server IP address (for remote installation via SSH)
+COOLIFY_SERVER_IP=""
+
+# SSH user (usually 'ubuntu' on OCI/AWS, 'root' on some providers)
+SSH_USER="ubuntu"
+
+# Path to SSH private key
+SSH_KEY_PATH="~/.ssh/id_rsa"
+
+# Coolify web interface port (default: 8000)
+COOLIFY_PORT="8000"
+
+# =============================================================================
+# Cloudflare Tunnel Configuration (Optional)
+# =============================================================================
+
+# Required only if setting up Cloudflare Tunnel
+CLOUDFLARE_API_TOKEN=""
+CLOUDFLARE_ACCOUNT_ID=""
+CLOUDFLARE_ZONE_ID=""
+TUNNEL_NAME="coolify-tunnel"
+TUNNEL_HOSTNAME="coolify.yourdomain.com"
+SERVICE_IP="127.0.0.1"
+SERVICE_PORT="8000"
+SERVICE_PROTOCOL="http"
+
+# =============================================================================
+# Usage Examples
+# =============================================================================
+
+# Example 1: Basic local installation
+# export COOLIFY_DOMAIN="coolify.yourdomain.com"
+# export ADMIN_EMAIL="admin@yourdomain.com"
+# ./scripts/coolify-enhanced-setup.sh
+
+# Example 2: Custom domain with auto-generated password
+# export COOLIFY_DOMAIN="coolify.mycompany.com"
+# export WILDCARD_DOMAIN="*.mycompany.com"
+# export ADMIN_EMAIL="devops@mycompany.com"
+# ./scripts/coolify-enhanced-setup.sh
+
+# Example 3: Full remote installation
+# export COOLIFY_SERVER_IP="123.456.789.0"
+# export SSH_USER="ubuntu"
+# export SSH_KEY_PATH="~/.ssh/oci_key"
+# export COOLIFY_DOMAIN="coolify.yourdomain.com"
+# export ADMIN_EMAIL="admin@yourdomain.com"
+# ./scripts/oci-coolify-infrastructure-setup.sh
+
+# =============================================================================
+# Security Notes
+# =============================================================================
+
+# 1. DO NOT commit this file with real credentials to version control
+# 2. Generated password will be saved to /opt/coolify-credentials.txt
+# 3. Credentials file is automatically secured with 600 permissions
+# 4. Backup credentials securely before destroying instances
+# 5. Use strong passwords in production environments
+
+# =============================================================================
+# DNS Setup Instructions
+# =============================================================================
+
+# After installation, configure these DNS records at your DNS provider:
+#
+# 1. Main Coolify access:
+#    Type: A
+#    Name: coolify (or subdomain from COOLIFY_DOMAIN)
+#    Value: YOUR_SERVER_IP
+#    TTL: 300
+#
+# 2. Wildcard for applications:
+#    Type: A
+#    Name: *
+#    Value: YOUR_SERVER_IP
+#    TTL: 300
+#
+# Example for yourdomain.com:
+#    A    coolify    123.456.789.0
+#    A    *          123.456.789.0
+
+# =============================================================================
+# Firewall Ports
+# =============================================================================
+
+# Automatically configured by enhanced setup script:
+# - 22   : SSH
+# - 8000 : Coolify Web Interface
+# - 80   : HTTP (Traefik Proxy)
+# - 443  : HTTPS (Traefik Proxy)
+# - 6001 : Coolify Proxy HTTP
+# - 6002 : Coolify Proxy HTTPS

@@ -1,8 +1,8 @@
 {
-  "name": "jezweb-skills",
+  "name": "evolv3ai-skills",
   "description": "Workflow skills for Claude Code — each produces tangible output",
   "author": {
-    "name": "Jeremy Dawes / Jezweb",
-    "email": "jeremy@jezweb.net"
+    "name": "evolv3ai",
+    "email": "hello@evolv3.ai"
   }
 }

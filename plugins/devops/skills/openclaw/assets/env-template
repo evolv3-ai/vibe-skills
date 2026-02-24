@@ -1,0 +1,209 @@
+###############################################################################
+# OpenClaw Environment Configuration
+# Source: https://github.com/coollabsio/openclaw
+#
+# USAGE:
+#   1. Copy this file: cp env-template .env
+#   2. Fill in required values (marked REQUIRED)
+#   3. Run: docker compose up -d
+#
+# MERGE ORDER (lowest to highest priority):
+#   1. Custom JSON config file (base)
+#   2. Persisted state from previous runs
+#   3. Environment variables (THIS FILE - highest priority)
+#
+# IMPORTANT:
+#   - API keys are environment-only (never put in JSON config)
+#   - WhatsApp uses FULL-OVERWRITE mode (entire block replaced)
+#   - Other channels MERGE env vars onto JSON config
+###############################################################################
+
+#==============================================================================
+# SECURITY (REQUIRED)
+#==============================================================================
+
+# CRITICAL: Always set to loopback. Default 0.0.0.0 exposes gateway publicly.
+OPENCLAW_GATEWAY_BIND=loopback
+
+# nginx basic auth credentials
+AUTH_USERNAME=admin
+AUTH_PASSWORD=              # REQUIRED - set a strong password
+
+# Gateway API token (auto-generated if empty, but recommended to set explicitly)
+OPENCLAW_GATEWAY_TOKEN=     # REQUIRED - use: openssl rand -hex 32
+
+#==============================================================================
+# AI PROVIDERS (at least one REQUIRED)
+#==============================================================================
+
+# Anthropic Claude
+ANTHROPIC_API_KEY=          # sk-ant-...
+
+# OpenAI
+OPENAI_API_KEY=             # sk-...
+
+# Google Gemini
+GEMINI_API_KEY=
+
+# xAI Grok
+XAI_API_KEY=
+
+# Groq
+GROQ_API_KEY=
+
+# Mistral
+MISTRAL_API_KEY=
+
+# AWS Bedrock
+# AWS_ACCESS_KEY_ID=
+# AWS_SECRET_ACCESS_KEY=
+# AWS_REGION=us-east-1
+
+# OpenRouter (multi-provider)
+# OPENROUTER_API_KEY=
+
+# Ollama (local models)
+# OLLAMA_BASE_URL=http://host.docker.internal:11434
+
+# Override default model selection
+# OPENCLAW_PRIMARY_MODEL=claude-sonnet-4-5-20250929
+
+#==============================================================================
+# PORTS
+#==============================================================================
+
+# External nginx port (what you access in browser)
+PORT=8080
+
+# Internal gateway port (usually leave default)
+OPENCLAW_GATEWAY_PORT=18789
+
+#==============================================================================
+# STORAGE
+#==============================================================================
+
+# Internal paths (Docker defaults - usually leave as-is)
+# OPENCLAW_STATE_DIR=/data/.openclaw
+# OPENCLAW_WORKSPACE_DIR=/data/workspace
+
+# Named volume for home directory (persists until explicitly removed)
+# OPENCLAW_HOME_VOLUME=openclaw_home
+
+#==============================================================================
+# BROWSER SIDECAR (optional)
+#==============================================================================
+
+# Chrome DevTools Protocol URL (requires browser sidecar container)
+# BROWSER_CDP_URL=http://browser:9223
+
+# Enable script evaluation in browser (security risk - default false)
+# BROWSER_EVALUATE_ENABLED=false
+
+# Connection timeout
+# BROWSER_REMOTE_TIMEOUT_MS=1500
+
+#==============================================================================
+# TELEGRAM (optional)
+#==============================================================================
+
+# TELEGRAM_BOT_TOKEN=
+# TELEGRAM_DM_POLICY=pairing          # pairing/allow/deny
+# TELEGRAM_ALLOW_FROM=                 # comma-separated user IDs
+# TELEGRAM_REPLY_TO_MODE=first         # first/last/all
+# TELEGRAM_CHUNK_MODE=length           # length/message
+# TELEGRAM_TEXT_CHUNK_LIMIT=4000
+# TELEGRAM_STREAM_MODE=partial         # partial/full
+
+#==============================================================================
+# DISCORD (optional)
+#==============================================================================
+
+# DISCORD_BOT_TOKEN=
+# DISCORD_DM_POLICY=pairing
+# DISCORD_TEXT_CHUNK_LIMIT=2000
+# DISCORD_MEDIA_MAX_MB=8
+# DISCORD_HISTORY_LIMIT=20
+
+#==============================================================================
+# SLACK (optional)
+#==============================================================================
+
+# SLACK_BOT_TOKEN=
+# SLACK_APP_TOKEN=
+# SLACK_TEXT_CHUNK_LIMIT=4000
+# SLACK_MEDIA_MAX_MB=20
+# SLACK_HISTORY_LIMIT=50
+
+#==============================================================================
+# WHATSAPP (optional - FULL-OVERWRITE MODE)
+#==============================================================================
+# WARNING: When WHATSAPP_ENABLED=true, the ENTIRE WhatsApp config block
+# is replaced by environment variables. Set ALL WhatsApp vars you need.
+
+# WHATSAPP_ENABLED=false
+# WHATSAPP_DM_POLICY=pairing
+# WHATSAPP_ALLOW_FROM=                 # E.164 phone numbers
+# WHATSAPP_MEDIA_MAX_MB=50
+
+#==============================================================================
+# WEBHOOKS (optional)
+#==============================================================================
+
+# HOOKS_ENABLED=false
+# HOOKS_TOKEN=                         # separate from AUTH_PASSWORD
+# HOOKS_PATH=/hooks                    # endpoint: http://localhost:8080/hooks
+
+#==============================================================================
+# AUDIO TRANSCRIPTION (optional)
+#==============================================================================
+
+# DEEPGRAM_API_KEY=
+
+#==============================================================================
+# DOCKER BUILD OPTIONS
+#==============================================================================
+
+# Additional APT packages installed at BUILD time (not runtime)
+# OPENCLAW_DOCKER_APT_PACKAGES="ffmpeg build-essential python3"
+
+# Extra bind mounts (comma-separated, host:container:mode)
+# OPENCLAW_EXTRA_MOUNTS="$HOME/.codex:/home/node/.codex:ro"
+
+###############################################################################
+# EXAMPLE CONFIGURATIONS
+###############################################################################
+
+# --- Minimal (just Anthropic) ---
+# OPENCLAW_GATEWAY_BIND=loopback
+# AUTH_PASSWORD=my-strong-password
+# OPENCLAW_GATEWAY_TOKEN=$(openssl rand -hex 32)
+# ANTHROPIC_API_KEY=sk-ant-...
+
+# --- Multi-provider with Telegram ---
+# OPENCLAW_GATEWAY_BIND=loopback
+# AUTH_PASSWORD=my-strong-password
+# OPENCLAW_GATEWAY_TOKEN=$(openssl rand -hex 32)
+# ANTHROPIC_API_KEY=sk-ant-...
+# OPENAI_API_KEY=sk-...
+# TELEGRAM_BOT_TOKEN=123456:ABC-DEF...
+# TELEGRAM_DM_POLICY=allow
+# TELEGRAM_ALLOW_FROM=12345678
+
+# --- Full setup with browser + webhooks ---
+# OPENCLAW_GATEWAY_BIND=loopback
+# AUTH_PASSWORD=my-strong-password
+# OPENCLAW_GATEWAY_TOKEN=$(openssl rand -hex 32)
+# ANTHROPIC_API_KEY=sk-ant-...
+# BROWSER_CDP_URL=http://browser:9223
+# HOOKS_ENABLED=true
+# HOOKS_TOKEN=$(openssl rand -hex 16)
+
+###############################################################################
+# POST-DEPLOYMENT CHECKLIST
+###############################################################################
+# 1. Access dashboard: http://localhost:${PORT:-8080}/
+# 2. Run health check: docker exec openclaw openclaw doctor --fix
+# 3. Verify binding: docker exec openclaw ss -tlnp | grep 18789
+#    Should show 127.0.0.1:18789 (NOT 0.0.0.0:18789)
+# 4. Test first message through web UI
+# 5. Configure channels as needed

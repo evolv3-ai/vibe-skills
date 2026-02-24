@@ -1,0 +1,79 @@
+# ======================================================================
+# Admin Profile Configuration
+# Secret values stored in vault.age
+# Non-secret values editable directly here
+# ======================================================================
+#
+# After running migrate-to-vault.sh, this file becomes a MANIFEST:
+#   - Non-secret values stay populated (edit freely)
+#   - Secret values show empty with "# in vault" comment
+#   - load-profile.sh merges this file + vault secrets at runtime
+#
+# To add a new non-secret key: just add it here
+# To add a new secret: add it here (empty), then run secrets --edit
+
+# --- Bootstrap (required) ---
+ADMIN_ROOT=                              # Central admin directory (e.g., ~/.admin)
+ADMIN_DEVICE=                            # Device name (e.g., WOPR3, macbook-pro)
+ADMIN_PLATFORM=                          # Platform: windows | wsl | linux | macos
+
+# --- Vault ---
+ADMIN_VAULT=                             # enabled | disabled (default: disabled)
+AGE_KEY_PATH=                            # Path to age key (default: ~/.age/key.txt)
+
+# --- Identity ---
+ADMIN_USER=                              # Primary admin username
+DEVICE_NAME=                             # Alias for ADMIN_DEVICE (legacy compat)
+
+# --- Paths ---
+ADMIN_LOG_PATH=                          # Default: $ADMIN_ROOT/logs
+ADMIN_PROFILE_PATH=                      # Default: $ADMIN_ROOT/profiles
+
+# --- Platform-Specific ---
+WIN_USER_HOME=                           # Windows: $USERPROFILE
+WIN_ADMIN_PATH=                          # Windows: $WIN_USER_HOME\.admin
+WSL_ADMIN_PATH=                          # WSL: ~/dev/wsl-admin
+WSL_DISTRO=                              # WSL distribution (e.g., Ubuntu-24.04)
+
+# --- SSH ---
+SSH_KEY_PATH=                            # Default: ~/.ssh/id_rsa
+SSH_PUBLIC_KEY_PATH=                     # Default: ${SSH_KEY_PATH}.pub
+SSH_CONFIG_PATH=                         # Default: ~/.ssh/config
+
+# --- Sync (multi-device) ---
+ADMIN_SYNC_ENABLED=                      # true | false
+ADMIN_SYNC_PATH=                         # Synced folder (e.g., ~/Dropbox/Admin)
+
+# --- SimpleMem ---
+SIMPLEMEM_URL=                           # e.g., https://mem.self-host.io/mcp
+SIMPLEMEM_TOKEN=                         # in vault
+
+# --- Cloud Providers (secrets in vault) ---
+OCI_CONFIG_PATH=                         # Default: ~/.oci/config
+OCI_TENANCY_OCID=                        # in vault
+OCI_USER_OCID=                           # in vault
+OCI_REGION=                              # e.g., ap-sydney-1
+OCI_COMPARTMENT_OCID=                    # in vault
+HCLOUD_TOKEN=                            # in vault
+HCLOUD_CONTEXT=                          # e.g., default
+DIGITALOCEAN_TOKEN=                      # in vault
+VULTR_API_KEY=                           # in vault
+LINODE_TOKEN=                            # in vault
+CONTABO_CLIENT_ID=                       # in vault
+CONTABO_CLIENT_SECRET=                   # in vault
+CONTABO_USER=                            # in vault
+CONTABO_PASS=                            # in vault
+
+# --- Applications ---
+COOLIFY_DOMAIN=                          # e.g., coolify.yourdomain.com
+COOLIFY_ADMIN_EMAIL=                     # in vault
+COOLIFY_WILDCARD_DOMAIN=                 # e.g., *.yourdomain.com
+KASM_DOMAIN=                             # e.g., kasm.yourdomain.com
+KASM_ADMIN_PASSWORD=                     # in vault
+
+# --- Cloudflare ---
+CLOUDFLARE_API_TOKEN=                    # in vault
+CLOUDFLARE_ZONE_ID=                      # in vault
+CLOUDFLARE_ACCOUNT_ID=                   # in vault
+CLOUDFLARE_TUNNEL_NAME=                  # e.g., my-tunnel
+CLOUDFLARE_TUNNEL_ID=                    # in vault

@@ -1,0 +1,249 @@
+# =============================================================================
+# DEPLOYMENT CONFIGURATION - CHOOSE YOUR SETUP
+# =============================================================================
+
+# Deployment Type Selection
+# Options: "kasm", "coolify", "both", "none"
+# - kasm: Deploy KASM Workspaces only
+# - coolify: Deploy Coolify self-hosted PaaS only  
+# - both: Deploy both KASM and Coolify servers
+# - none: Skip deployment (configuration only)
+DEPLOYMENT_TYPE=coolify
+
+# Server Configuration Profiles
+# These are the recommended configurations for each server type
+
+# KASM Workspaces Requirements (Container-based workspace solution)
+# Default: 2 OCPUs, 12GB RAM, 80GB Storage
+# Can scale up to 4 OCPUs, 24GB RAM for production workloads
+KASM_ENABLE=false
+KASM_INSTANCE_OCPUS=2
+KASM_INSTANCE_MEMORY_GB=12
+KASM_INSTANCE_STORAGE_GB=80
+
+# Coolify Requirements (Self-hosted PaaS platform)
+# Default: 2 OCPUs, 12GB RAM, 100GB Storage
+# Suitable for small to medium deployments
+COOLIFY_ENABLE=true
+COOLIFY_INSTANCE_OCPUS=2
+COOLIFY_INSTANCE_MEMORY_GB=12
+COOLIFY_INSTANCE_STORAGE_GB=100
+
+# Skip Preflight Check
+# Set to true if you already have OCI CLI installed and configured
+SKIP_PREFLIGHT=false
+
+# Skip Environment Validation
+# Set to true if you're confident all variables are correctly set
+SKIP_ENV_VALIDATION=false
+
+# =============================================================================
+# ACCOUNT REQUIREMENTS CHECK
+# =============================================================================
+# Before proceeding, ensure you have accounts with:
+# 
+# 1. Oracle Cloud Infrastructure (OCI)
+#    - Sign up at: https://cloud.oracle.com
+#    - Free tier includes: 4 OCPUs, 24GB RAM (ARM instances)
+#    - Required for: Infrastructure provisioning
+#
+# 2. GitHub (Optional but recommended)
+#    - Sign up at: https://github.com
+#    - Required for: Version control, CI/CD with Coolify
+#
+# 3. Cloudflare
+#    - Sign up at: https://cloudflare.com
+#    - Free tier includes: Unlimited sites, basic tunnels
+#    - Required for: Secure tunnel access, DNS management
+
+# =============================================================================
+# OCI Infrastructure Configuration
+# =============================================================================
+
+# OCI Authentication (required for infrastructure setup)
+# Get these from your OCI console: https://cloud.oracle.com
+TENANCY_OCID=ocid1.tenancy.oc1..your_tenancy_ocid_here
+REGION=us-ashburn-1
+
+# Infrastructure Configuration
+COMPARTMENT_NAME=DevOpsLab
+VCN_CIDR=10.0.0.0/16
+SUBNET_CIDR=10.0.1.0/24
+
+# Instance Configuration (uses deployment type settings above)
+INSTANCE_SHAPE=VM.Standard.A1.Flex
+OPERATING_SYSTEM="Canonical Ubuntu"
+OPERATING_SYSTEM_VERSION="22.04"
+
+# SSH Configuration
+# Path to your SSH public key for instance access
+SSH_PUBLIC_KEY_PATH=/path/to/your/ssh/key.pub
+# Path to your SSH private key for SSH connections
+SSH_PRIVATE_KEY_PATH=/path/to/your/ssh/key
+
+# =============================================================================
+# Cloudflare Tunnel Configuration
+# =============================================================================
+
+# Cloudflare API Configuration
+# Get your API token from: https://dash.cloudflare.com/profile/api-tokens
+# Required permissions: Zone:DNS:Edit, Account:Cloudflare Tunnel:Edit
+CLOUDFLARE_API_TOKEN=your_api_token_here
+
+# Get these from your Cloudflare dashboard
+CLOUDFLARE_ACCOUNT_ID=your_account_id_here
+CLOUDFLARE_ZONE_ID=your_zone_id_here
+CLOUDFLARE_EMAIL=your_email@example.com
+
+# Tunnel Setup Flags
+# Set to true/false to enable/disable tunnel setup during deployment
+SETUP_COOLIFY_TUNNEL=false
+SETUP_KASM_TUNNEL=false
+
+# =============================================================================
+# KASM Server Configuration (if KASM_ENABLE=true)
+# =============================================================================
+
+# KASM Tunnel Configuration
+KASM_TUNNEL_NAME=kasm-tunnel
+KASM_TUNNEL_HOSTNAME=kasm.yourdomain.com
+
+# KASM Server Details (will be auto-populated after infrastructure setup)
+KASM_SERVER_IP=
+# KASM default install uses port 443, not 8443
+KASM_PORT=443
+RDP_PORT=3389
+SESSION_PORT_START=3000
+SESSION_PORT_END=4000
+
+# KASM Admin Configuration
+KASM_ADMIN_PASSWORD=your_secure_password_here
+KASM_SWAP_SIZE=4G
+
+# =============================================================================
+# Coolify Server Configuration (if COOLIFY_ENABLE=true)
+# =============================================================================
+
+# Coolify Tunnel Configuration
+COOLIFY_TUNNEL_NAME=coolify-tunnel
+COOLIFY_TUNNEL_HOSTNAME=coolify.yourdomain.com
+
+# Coolify HTTPS Configuration
+# Set to true to enable HTTPS on the Coolify origin server
+# Note: Cloudflare provides SSL/TLS termination regardless of this setting
+# HTTPS on origin adds an extra security layer but requires certificate setup
+COOLIFY_USE_HTTPS=false
+COOLIFY_HTTPS_PORT=8443
+
+# Coolify Server Details (will be auto-populated after infrastructure setup)
+COOLIFY_SERVER_IP=
+COOLIFY_PORT=8000
+
+# =============================================================================
+# Coolify Admin Credentials
+# =============================================================================
+# These are used during Coolify installation to pre-configure the admin account.
+# The install script internally uses ROOT_USERNAME, ROOT_USER_EMAIL, ROOT_USER_PASSWORD.
+# We use COOLIFY_ prefix in config for clarity.
+#
+# IMPORTANT:
+# - COOLIFY_ROOT_USER_EMAIL does NOT have to match CLOUDFLARE_EMAIL
+# - Ask user during interview if they want same or different email
+#
+# PASSWORD REQUIREMENTS (Coolify enforced):
+# - Minimum 8 characters
+# - At least one uppercase letter (A-Z)
+# - At least one lowercase letter (a-z)
+# - At least one number (0-9)
+# - At least one symbol (!@#$%^&*)
+#
+# Generate compliant password: echo "$(openssl rand -base64 16 | tr -d '/+=' | head -c 14)@A1"
+
+COOLIFY_ROOT_USERNAME=admin
+COOLIFY_ROOT_USER_EMAIL=admin@yourdomain.com
+COOLIFY_ROOT_USER_PASSWORD=GENERATE_SECURE_PASSWORD
+
+# Domain Configuration (for database auto-configuration)
+# COOLIFY_INSTANCE_DOMAIN: Main Coolify URL (e.g., coolify.yourdomain.com)
+# COOLIFY_WILDCARD_DOMAIN: Base domain for deployed apps (e.g., yourdomain.com)
+COOLIFY_INSTANCE_DOMAIN=coolify.yourdomain.com
+COOLIFY_WILDCARD_DOMAIN=yourdomain.com
+
+# Docker Configuration
+DOCKER_VERSION=24.0
+
+# Coolify Version (leave empty for latest)
+COOLIFY_VERSION=
+
+# =============================================================================
+# SSH Configuration for Remote Deployment
+# =============================================================================
+
+SSH_USER=ubuntu
+
+# =============================================================================
+# Optional: Advanced Configuration
+# =============================================================================
+
+# Cloudflare Tunnel Advanced Settings
+# TUNNEL_REGION=us
+# TUNNEL_PROTOCOL=quic
+
+# OCI Advanced Settings
+# MIN_INSTANCES=1
+# MAX_INSTANCES=3
+# SCALE_OUT_THRESHOLD=75
+# SCALE_IN_THRESHOLD=25
+
+# Coolify Advanced Settings
+# COOLIFY_APP_ENV=production
+# COOLIFY_APP_DEBUG=false
+# COOLIFY_DB_PASSWORD=auto_generated
+# COOLIFY_REDIS_PASSWORD=auto_generated
+
+# =============================================================================
+# Auto-Generated Variables (populated by scripts)
+# =============================================================================
+
+# These will be automatically filled by infrastructure setup scripts
+# COMPARTMENT_ID=
+# VCN_ID=
+# SUBNET_ID=
+# INTERNET_GATEWAY_ID=
+# ROUTE_TABLE_ID=
+# SECURITY_LIST_ID=
+# KASM_INSTANCE_ID=
+# COOLIFY_INSTANCE_ID=
+# AVAILABILITY_DOMAIN=
+# UBUNTU_IMAGE_ID=
+# KASM_INSTANCE_PUBLIC_IP=
+# KASM_INSTANCE_PRIVATE_IP=
+# COOLIFY_INSTANCE_PUBLIC_IP=
+# COOLIFY_INSTANCE_PRIVATE_IP=
+
+# These will be automatically filled by tunnel setup scripts
+# KASM_TUNNEL_ID=
+# COOLIFY_TUNNEL_ID=
+# KASM_DNS_RECORD_ID=
+# COOLIFY_DNS_RECORD_ID=
+
+# =============================================================================
+# CREDENTIALS SUMMARY (for reference - populated during deployment)
+# =============================================================================
+# This section is added by Claude after deployment for quick reference.
+# All credentials are stored in this file - NO separate credentials.txt
+#
+# Coolify:
+#   URL: https://${COOLIFY_INSTANCE_DOMAIN}
+#   Email: ${COOLIFY_ROOT_USER_EMAIL}
+#   Password: (see COOLIFY_ROOT_USER_PASSWORD above)
+#
+# KASM (if deployed):
+#   URL: https://${KASM_TUNNEL_HOSTNAME}
+#   Username: admin@kasm.local
+#   Password: (see KASM_ADMIN_PASSWORD above)
+#
+# SSH Access:
+#   Coolify: ssh -i ${SSH_PRIVATE_KEY_PATH} ${SSH_USER}@${COOLIFY_SERVER_IP}
+#   KASM: ssh -i ${SSH_PRIVATE_KEY_PATH} ${SSH_USER}@${KASM_SERVER_IP}
+# =============================================================================

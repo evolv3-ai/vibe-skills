@@ -1,0 +1,192 @@
+{
+  "uuid": "example-mock-api",
+  "lastMigration": 32,
+  "name": "Example API",
+  "endpointPrefix": "api",
+  "latency": 0,
+  "port": 3000,
+  "hostname": "0.0.0.0",
+  "routes": [
+    {
+      "uuid": "health-check",
+      "type": "http",
+      "documentation": "Health check endpoint",
+      "method": "get",
+      "endpoint": "health",
+      "responses": [
+        {
+          "uuid": "health-response",
+          "body": "{ \"status\": \"ok\", \"timestamp\": \"{{now}}\" }",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "Success",
+          "headers": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null
+    },
+    {
+      "uuid": "get-users",
+      "type": "http",
+      "documentation": "Get all users",
+      "method": "get",
+      "endpoint": "users",
+      "responses": [
+        {
+          "uuid": "users-response",
+          "body": "{\n  \"users\": [\n    {{#repeat 5}}\n    {\n      \"id\": {{@index}},\n      \"name\": \"{{faker 'person.fullName'}}\",\n      \"email\": \"{{faker 'internet.email'}}\",\n      \"avatar\": \"{{faker 'image.avatar'}}\"\n    }{{#unless @last}},{{/unless}}\n    {{/repeat}}\n  ],\n  \"total\": 5\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "Success",
+          "headers": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null
+    },
+    {
+      "uuid": "get-user-by-id",
+      "type": "http",
+      "documentation": "Get user by ID",
+      "method": "get",
+      "endpoint": "users/:id",
+      "responses": [
+        {
+          "uuid": "user-found",
+          "body": "{\n  \"id\": {{urlParam 'id'}},\n  \"name\": \"{{faker 'person.fullName'}}\",\n  \"email\": \"{{faker 'internet.email'}}\",\n  \"createdAt\": \"{{faker 'date.past'}}\"\n}",
+          "latency": 0,
+          "statusCode": 200,
+          "label": "User Found",
+          "headers": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        },
+        {
+          "uuid": "user-not-found",
+          "body": "{ \"error\": \"User not found\", \"id\": {{urlParam 'id'}} }",
+          "latency": 0,
+          "statusCode": 404,
+          "label": "Not Found",
+          "headers": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [
+            {
+              "target": "params",
+              "modifier": "id",
+              "value": "999",
+              "operator": "equals",
+              "invert": false
+            }
+          ],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": false,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null
+    },
+    {
+      "uuid": "create-user",
+      "type": "http",
+      "documentation": "Create a new user",
+      "method": "post",
+      "endpoint": "users",
+      "responses": [
+        {
+          "uuid": "user-created",
+          "body": "{\n  \"id\": {{faker 'number.int' min=100 max=999}},\n  \"name\": \"{{body 'name'}}\",\n  \"email\": \"{{body 'email'}}\",\n  \"createdAt\": \"{{now}}\"\n}",
+          "latency": 0,
+          "statusCode": 201,
+          "label": "Created",
+          "headers": [
+            { "key": "Content-Type", "value": "application/json" }
+          ],
+          "bodyType": "INLINE",
+          "filePath": "",
+          "databucketID": "",
+          "sendFileAsBody": false,
+          "rules": [],
+          "rulesOperator": "OR",
+          "disableTemplating": false,
+          "fallbackTo404": false,
+          "default": true,
+          "crudKey": "id",
+          "callbacks": []
+        }
+      ],
+      "responseMode": null
+    }
+  ],
+  "rootChildren": [
+    { "type": "route", "uuid": "health-check" },
+    { "type": "route", "uuid": "get-users" },
+    { "type": "route", "uuid": "get-user-by-id" },
+    { "type": "route", "uuid": "create-user" }
+  ],
+  "proxyMode": false,
+  "proxyHost": "",
+  "proxyRemovePrefix": false,
+  "tlsOptions": {
+    "enabled": false,
+    "type": "CERT",
+    "pfxPath": "",
+    "certPath": "",
+    "keyPath": "",
+    "caPath": "",
+    "passphrase": ""
+  },
+  "cors": true,
+  "headers": [
+    { "key": "Access-Control-Allow-Origin", "value": "*" },
+    { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,PATCH,DELETE,OPTIONS" },
+    { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" }
+  ],
+  "proxyReqHeaders": [],
+  "proxyResHeaders": [],
+  "data": [],
+  "callbacks": []
+}

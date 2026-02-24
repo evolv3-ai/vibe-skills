@@ -1,0 +1,82 @@
+{
+  "schemaVersion": "3.0",
+  "adminSkillVersion": "1.0.0",
+  "multiDevice": false,
+  "skillVersions": {
+    "admin": "1.0.0",
+    "devops": "1.0.0",
+    "oci": "1.0.0",
+    "hetzner": "1.0.0",
+    "contabo": "1.0.0",
+    "digital-ocean": "1.0.0",
+    "vultr": "1.0.0",
+    "linode": "1.0.0",
+    "coolify": "1.0.0",
+    "kasm": "1.0.0"
+  },
+
+  "device": {
+    "name": "DEVICE_NAME",
+    "platform": "windows",
+    "shell": "pwsh",
+    "user": "USERNAME",
+    "os": "",
+    "osVersion": "",
+    "architecture": "",
+    "envType": "windows",
+    "created": "",
+    "lastUpdated": ""
+  },
+
+  "paths": {
+    "adminRoot": "",
+    "deviceProfile": "",
+    "logs": "",
+    "issuesDir": "",
+    "registries": "",
+    "config": "",
+    "backups": "",
+    "scripts": "",
+    "inbox": "",
+    "mcpRegistry": "",
+    "skillsRegistry": "",
+    "devopsRegistry": ""
+  },
+
+  "packageManagers": {},
+
+  "tools": {},
+
+  "preferences": {
+    "packages": { "manager": "winget" },
+    "python": { "manager": "uv" },
+    "node": { "manager": "npm" },
+    "shell": { "default": "pwsh" }
+  },
+
+  "wsl": {},
+  "docker": {},
+
+  "mcp": {
+    "servers": {}
+  },
+
+  "servers": [],
+  "deployments": {},
+
+  "issues": {
+    "current": [],
+    "resolved": []
+  },
+
+  "history": [],
+
+  "capabilities": {
+    "canRunPowershell": false,
+    "canRunBash": false,
+    "hasWsl": false,
+    "hasDocker": false,
+    "hasSsh": false,
+    "hasGit": false
+  }
+}

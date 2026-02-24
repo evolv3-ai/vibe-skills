@@ -1,0 +1,78 @@
+# WinAdmin Environment Configuration
+# Copy this file to .env.local in your admin project directory
+# DO NOT commit .env.local to version control
+
+# =============================================================================
+# DEVICE IDENTIFICATION
+# =============================================================================
+# Current device name (auto-detected: $env:COMPUTERNAME)
+DEVICE_NAME=YOUR_DEVICE_NAME
+
+# =============================================================================
+# ADMIN ROOT CONFIGURATION
+# =============================================================================
+# Centralized admin root (Dropbox, OneDrive, network share, or local)
+# Examples:
+#   - Dropbox: N:/Dropbox/Admin/
+#   - OneDrive: C:/Users/YourName/OneDrive/Admin/
+#   - Local: D:/Admin/
+ADMIN_ROOT=YOUR_ADMIN_ROOT_PATH
+
+# =============================================================================
+# DEVICE-SPECIFIC PATHS (derived from ADMIN_ROOT)
+# =============================================================================
+# Device profile and logs directory
+DEVICE_PATH=${ADMIN_ROOT}/devices/${DEVICE_NAME}/
+
+# Device profile JSON file (source of truth for installed tools)
+DEVICE_PROFILE=${DEVICE_PATH}/profile.json
+
+# Device-specific log file
+DEVICE_LOGS=${DEVICE_PATH}/logs.txt
+
+# =============================================================================
+# CENTRAL LOGS (cross-device visibility)
+# =============================================================================
+CENTRAL_LOGS=${ADMIN_ROOT}/logs/central/
+OPERATIONS_LOG=${CENTRAL_LOGS}/operations.log
+INSTALLATIONS_LOG=${CENTRAL_LOGS}/installations.log
+SYSTEM_CHANGES_LOG=${CENTRAL_LOGS}/system-changes.log
+
+# =============================================================================
+# PACKAGE MANAGER STATUS
+# =============================================================================
+# Set to true/false based on what's installed on this device
+HAS_WINGET=true
+HAS_SCOOP=true
+HAS_CHOCOLATEY=false
+HAS_NPM=true
+
+# =============================================================================
+# TOOL PATHS (optional - for explicit path references)
+# =============================================================================
+# NPM global packages
+NPM_GLOBAL_PATH=${APPDATA}/npm
+
+# Scoop shims
+SCOOP_SHIMS_PATH=${USERPROFILE}/scoop/shims
+
+# Python (if installed via winget)
+# PYTHON_PATH=${LOCALAPPDATA}/Programs/Python/Python313
+
+# =============================================================================
+# MCP CONFIGURATION (if using MCP servers)
+# =============================================================================
+# MCP servers directory
+MCP_ROOT=YOUR_MCP_ROOT_PATH
+
+# MCP registry (centralized)
+MCP_REGISTRY=${ADMIN_ROOT}/registries/mcp-registry.json
+
+# Claude Desktop config
+CLAUDE_DESKTOP_CONFIG=${APPDATA}/Claude/claude_desktop_config.json
+
+# =============================================================================
+# TIMESTAMPS
+# =============================================================================
+# Last time this config was verified
+LAST_VERIFIED=2025-12-06

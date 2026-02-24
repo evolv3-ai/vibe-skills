@@ -1,0 +1,73 @@
+{
+  "schemaVersion": "1.0",
+  "lastUpdated": "2026-02-02",
+  "description": "Central registry for DevOps servers, deployments, and infrastructure",
+  "providers": {
+    "oci": {
+      "name": "Oracle Cloud Infrastructure",
+      "skill": "devops",
+      "configRequired": [
+        "OCI_TENANCY_OCID",
+        "OCI_USER_OCID",
+        "OCI_FINGERPRINT",
+        "OCI_KEY_FILE",
+        "OCI_REGION"
+      ],
+      "reference": "references/oci.md"
+    },
+    "hetzner": {
+      "name": "Hetzner Cloud",
+      "skill": "devops",
+      "configRequired": [
+        "HCLOUD_TOKEN"
+      ],
+      "reference": "references/hetzner.md"
+    },
+    "contabo": {
+      "name": "Contabo",
+      "skill": "devops",
+      "configRequired": [
+        "CONTABO_CLIENT_ID",
+        "CONTABO_CLIENT_SECRET"
+      ],
+      "reference": "references/contabo.md"
+    },
+    "digitalocean": {
+      "name": "DigitalOcean",
+      "skill": "devops",
+      "configRequired": [
+        "DO_TOKEN"
+      ],
+      "reference": "references/digitalocean.md"
+    },
+    "linode": {
+      "name": "Linode (Akamai)",
+      "skill": "devops",
+      "configRequired": [
+        "LINODE_TOKEN"
+      ],
+      "reference": "references/linode.md"
+    }
+  },
+  "applications": {
+    "coolify": {
+      "name": "Coolify",
+      "skill": "devops",
+      "requirements": [
+        "docker"
+      ],
+      "reference": "references/coolify.md"
+    },
+    "kasm": {
+      "name": "KASM Workspaces",
+      "skill": "devops",
+      "requirements": [
+        "docker"
+      ],
+      "reference": "references/kasm.md"
+    }
+  },
+  "servers": {},
+  "deployments": {},
+  "syncHistory": []
+}

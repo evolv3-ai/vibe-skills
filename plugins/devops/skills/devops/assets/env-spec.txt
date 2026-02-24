@@ -1,0 +1,49 @@
+﻿# Agent DevOps Inventory v1
+
+A minimal, `.env`-style text format that lets agents keep track of:
+
+- Cloud providers (OCI, Hetzner, GCP, Contabo, etc.)
+- Local/network providers (home lab, LAN)
+- Nodes (remote servers, local PCs, dev boxes, etc.)
+- How to connect to each node (local vs SSH)
+- Basic metadata (env, role, status, tags)
+
+The goal is to be **painfully simple**: one text file, easy for humans to edit and easy for agents to parse.
+
+---
+
+## 1. File Naming
+
+Recommended names (but not required):
+
+- `.agent-devops.env`
+- `agent-devops.env.local`
+- `infra/agent-devops.env`
+
+Any `.env`-style flat `KEY=VALUE` file is acceptable.
+
+---
+
+## 2. General Format
+
+- One entry per line: `KEY=VALUE`
+- Lines starting with `#` are comments and must be ignored by agents.
+- Blank lines are allowed and must be ignored by agents.
+- Keys must use **UPPER_SNAKE_CASE**: `A–Z`, `0–9`, `_`.
+- Values are arbitrary strings (no quoting rules defined; avoid `=` in values if possible).
+
+Example section separators are purely conventional:
+
+```env
+# =========================
+# METADATA
+# =========================
+...
+# =========================
+# PROVIDERS
+# =========================
+...
+# =========================
+# SERVERS / NODES
+# =========================
+...

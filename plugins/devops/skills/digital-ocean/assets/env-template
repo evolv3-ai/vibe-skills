@@ -1,0 +1,69 @@
+# DigitalOcean Infrastructure Configuration
+# Copy to .env.local and fill in your values
+
+# =============================================================================
+# Authentication
+# =============================================================================
+
+# API Token - Get from: https://cloud.digitalocean.com/account/api/tokens
+# Create a token with "Read & Write" scope
+DIGITALOCEAN_ACCESS_TOKEN=your_api_token_here
+
+# =============================================================================
+# Server Configuration
+# =============================================================================
+
+# Region
+# Options: nyc1, nyc3, sfo2, sfo3, tor1, lon1, ams3, fra1, blr1, sgp1, syd1
+DO_REGION=nyc1
+
+# Droplet Size
+# Basic (Shared): s-1vcpu-1gb ($6), s-2vcpu-4gb ($24), s-4vcpu-8gb ($48), s-8vcpu-16gb ($96)
+# Premium (Dedicated): c-2-4gib ($42), c-4-8gib ($84), c-8-16gib ($168), c-16-32gib ($336)
+# General Purpose: g-2vcpu-8gb ($63), g-4vcpu-16gb ($126), g-8vcpu-32gb ($252)
+DO_SIZE=s-2vcpu-4gb
+
+# OS Image
+# Options: ubuntu-22-04-x64, ubuntu-24-04-x64, debian-12-x64, debian-11-x64
+DO_IMAGE=ubuntu-22-04-x64
+
+# Server Name
+SERVER_NAME=my-server
+
+# =============================================================================
+# SSH Configuration
+# =============================================================================
+
+# SSH Key Name (as registered in DigitalOcean)
+SSH_KEY_NAME=my-key
+
+# Local SSH Key Paths
+SSH_PUBLIC_KEY_PATH=~/.ssh/id_rsa.pub
+SSH_PRIVATE_KEY_PATH=~/.ssh/id_rsa
+
+# =============================================================================
+# Outputs (set after deployment)
+# =============================================================================
+
+# These will be set by the deployment process
+# SERVER_IP=
+# SSH_USER=root
+# SSH_KEY_PATH=~/.ssh/id_rsa
+# SERVER_ARCH=amd64
+
+# =============================================================================
+# Service-Specific (for downstream skills)
+# =============================================================================
+
+# These will be set to SERVER_IP after deployment
+# COOLIFY_SERVER_IP=
+# KASM_SERVER_IP=
+
+# =============================================================================
+# Kasm Auto-Scaling (optional)
+# =============================================================================
+
+# These are configured in Kasm admin, not here
+# DO_KASM_REGION=nyc1
+# DO_KASM_SIZE=s-4vcpu-8gb
+# DO_KASM_SSH_KEY_ID=

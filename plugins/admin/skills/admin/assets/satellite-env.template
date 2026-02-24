@@ -1,0 +1,17 @@
+# Admin satellite config - points to centralized profile
+# Created by new-admin-profile.sh during setup
+#
+# This file lives at ~/.admin/.env on EVERY environment (WSL, native, etc.)
+# It contains ONLY pointers and context - no secrets, no preferences.
+# Secrets belong in $ADMIN_ROOT/.env. Preferences belong in the profile JSON.
+#
+# Do not edit manually unless migrating to a new ADMIN_ROOT location.
+
+# Where the centralized admin data lives (profiles, logs, registries, etc.)
+ADMIN_ROOT=YOUR_ADMIN_ROOT_PATH
+
+# Device hostname (used to construct profile path: $ADMIN_ROOT/profiles/$ADMIN_DEVICE.json)
+ADMIN_DEVICE=YOUR_HOSTNAME
+
+# Platform type: wsl, linux, macos, windows
+ADMIN_PLATFORM=YOUR_PLATFORM

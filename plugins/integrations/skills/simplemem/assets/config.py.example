@@ -1,0 +1,101 @@
+"""
+SimpleMem Configuration
+
+Copy this file to config.py and set your values.
+Never commit config.py to version control (contains API keys).
+
+Provider options:
+  1. OpenAI direct: Set OPENAI_API_KEY
+  2. OpenRouter: Set OPENROUTER_API_KEY (multi-provider gateway)
+  3. LiteLLM: Set LITELLM_* variables (multi-provider abstraction)
+  4. Azure OpenAI: Set OPENAI_API_KEY + OPENAI_BASE_URL
+  5. Any OpenAI-compatible: Set OPENAI_API_KEY + OPENAI_BASE_URL
+"""
+
+# ============================================================================
+# API Configuration (choose one provider)
+# ============================================================================
+
+# Option 1: OpenAI direct
+OPENAI_API_KEY = "sk-your-openai-key"
+OPENAI_BASE_URL = None  # Default OpenAI endpoint
+
+# Option 2: OpenRouter (unified gateway for multiple providers)
+# OPENROUTER_API_KEY = "sk-or-your-openrouter-key"
+# OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
+
+# ============================================================================
+# Model Configuration
+# ============================================================================
+
+# LLM Model (for reasoning and answer generation)
+LLM_MODEL = "gpt-4.1-mini"
+# Via OpenRouter: "openai/gpt-4.1-mini", "anthropic/claude-sonnet-4-5-20250929"
+# Via LiteLLM: "gpt-4.1-mini", "claude-sonnet-4-5-20250929"
+
+# Embedding Model
+EMBEDDING_MODEL = "Qwen/Qwen3-Embedding-0.6B"  # State-of-the-art, small
+# Via OpenRouter: "qwen/qwen3-embedding-8b" (4096 dims)
+# Via OpenAI: "text-embedding-3-small" (1536 dims)
+
+# Embedding dimension (MUST match your chosen embedding model)
+EMBEDDING_DIMENSION = 1024  # Qwen3-Embedding-0.6B
+# EMBEDDING_DIMENSION = 4096  # qwen3-embedding-8b via OpenRouter
+# EMBEDDING_DIMENSION = 1536  # text-embedding-3-small
+
+# LLM parameters
+TEMPERATURE = 0.1
+MAX_TOKENS = None  # Model default
+
+# ============================================================================
+# Memory Building Parameters
+# ============================================================================
+
+# Dialogues per processing window
+WINDOW_SIZE = 40
+
+# Overlap between windows (for context continuity)
+OVERLAP_SIZE = 2
+
+# ============================================================================
+# Retrieval Parameters
+# ============================================================================
+
+# Semantic search (dense vector similarity)
+SEMANTIC_TOP_K = 25
+
+# Keyword search (BM25 matching)
+KEYWORD_TOP_K = 5
+
+# Structured search (metadata filtering)
+STRUCTURED_TOP_K = 5
+
+# ============================================================================
+# Database Configuration
+# ============================================================================
+
+# LanceDB storage path
+LANCEDB_PATH = "./data/lancedb"
+
+# Default memory table name
+MEMORY_TABLE_NAME = "memory_entries"
+
+# ============================================================================
+# Parallel Processing
+# ============================================================================
+
+# Memory building
+ENABLE_PARALLEL_PROCESSING = True
+MAX_PARALLEL_WORKERS = 16
+
+# Retrieval
+ENABLE_PARALLEL_RETRIEVAL = True
+MAX_RETRIEVAL_WORKERS = 8
+
+# ============================================================================
+# Planning and Reflection
+# ============================================================================
+
+ENABLE_PLANNING = True
+ENABLE_REFLECTION = True
+MAX_REFLECTION_ROUNDS = 2

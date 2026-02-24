@@ -1,0 +1,274 @@
+{
+  "schemaVersion": "1.0",
+  "lastUpdated": "2026-02-02T00:00:00Z",
+  "clients": {
+    "claude-code": {
+      "name": "Claude Code CLI",
+      "configPath": null,
+      "skillsPath": "~/.claude/skills",
+      "commandsPath": "~/.claude/commands",
+      "pluginCachePath": "~/.claude/plugins/cache",
+      "installMethod": "plugin-marketplace",
+      "capabilities": [
+        "skills",
+        "commands",
+        "agents",
+        "plugins"
+      ],
+      "notes": "Primary development environment"
+    },
+    "claude-desktop": {
+      "name": "Claude Desktop",
+      "configPath": null,
+      "skillsPath": null,
+      "commandsPath": null,
+      "installMethod": "manual-copy",
+      "capabilities": [
+        "skills"
+      ],
+      "notes": "Skills via MCP or manual paste"
+    },
+    "cursor": {
+      "name": "Cursor IDE",
+      "configPath": "~/.cursor/rules",
+      "skillsPath": null,
+      "commandsPath": null,
+      "installMethod": "rules-file",
+      "capabilities": [
+        "rules"
+      ],
+      "notes": "Uses .cursorrules or rules directory"
+    },
+    "windsurf": {
+      "name": "Windsurf",
+      "configPath": "~/.windsurf",
+      "skillsPath": null,
+      "commandsPath": null,
+      "installMethod": "rules-file",
+      "capabilities": [
+        "rules"
+      ],
+      "notes": "Codeium-based IDE"
+    },
+    "gemini-cli": {
+      "name": "Gemini CLI",
+      "configPath": "~/.gemini",
+      "skillsPath": null,
+      "commandsPath": null,
+      "installMethod": "AGENTS.md",
+      "capabilities": [
+        "agents"
+      ],
+      "notes": "Uses AGENTS.md in project root"
+    },
+    "opencode": {
+      "name": "OpenCode",
+      "configPath": "~/.config/opencode",
+      "skillsPath": "~/.config/opencode/skills",
+      "commandsPath": null,
+      "installMethod": "symlink",
+      "capabilities": [
+        "skills"
+      ],
+      "notes": "Open-source AI coding assistant"
+    }
+  },
+  "skillSources": {
+    "evolv3-ai/vibe-skills": {
+      "type": "marketplace",
+      "url": "https://github.com/evolv3-ai/vibe-skills",
+      "description": "EVOLV3.AI curated skills",
+      "bundles": [
+        "admin",
+        "project",
+        "cloudflare",
+        "ai",
+        "frontend",
+        "auth"
+      ],
+      "default": true
+    },
+    "jezweb/claude-skills": {
+      "type": "marketplace",
+      "url": "https://github.com/jezweb/claude-skills",
+      "description": "Jeremy Dawes' upstream skills",
+      "bundles": [
+        "project",
+        "cloudflare",
+        "ai",
+        "frontend",
+        "auth",
+        "design",
+        "office"
+      ],
+      "default": false
+    },
+    "anthropics/skills": {
+      "type": "official",
+      "url": "https://github.com/anthropics/skills",
+      "description": "Official Anthropic skills",
+      "bundles": [],
+      "default": false
+    },
+    "local": {
+      "type": "local",
+      "path": "~/.claude/skills-local",
+      "description": "Custom local skills",
+      "bundles": [],
+      "default": false
+    }
+  },
+  "installedSkills": {
+    "admin": {
+      "source": "evolv3-ai/vibe-skills",
+      "version": "0.0.2",
+      "installDate": "2026-02-02",
+      "installMethod": "plugin",
+      "bundle": "admin",
+      "clients": [
+        "claude-code"
+      ],
+      "status": "active",
+      "lastVerified": "2026-02-02",
+      "notes": "Alpha consolidated admin (local)"
+    },
+    "admin-mcp": {
+      "source": "evolv3-ai/vibe-skills",
+      "version": "1.0.0",
+      "installDate": "2026-01-15",
+      "installMethod": "plugin",
+      "bundle": "admin",
+      "clients": [
+        "claude-code",
+        "claude-desktop"
+      ],
+      "status": "archived",
+      "lastVerified": "2026-01-20",
+      "notes": "Replaced by consolidated admin skill"
+    },
+    "tailwind-v4-shadcn": {
+      "source": "jezweb/claude-skills",
+      "version": "2.0.0",
+      "installDate": "2026-01-10",
+      "installMethod": "plugin",
+      "bundle": "frontend",
+      "clients": [
+        "claude-code"
+      ],
+      "status": "active",
+      "lastVerified": "2026-01-15",
+      "notes": "Tailwind v4 + shadcn/ui patterns"
+    },
+    "devops": {
+      "source": "evolv3-ai/vibe-skills",
+      "version": "0.0.2",
+      "installDate": "2026-02-02",
+      "installMethod": "plugin",
+      "bundle": "admin",
+      "clients": [
+        "claude-code"
+      ],
+      "status": "active",
+      "lastVerified": "2026-02-02",
+      "notes": "Alpha consolidated devops (remote)"
+    }
+  },
+  "clientInstallations": {
+    "claude-code": {
+      "marketplaces": [
+        "evolv3-ai/vibe-skills"
+      ],
+      "bundles": [
+        "admin",
+        "project"
+      ],
+      "individualSkills": [],
+      "lastSync": "2026-01-20"
+    }
+  },
+  "installMethods": {
+    "plugin": {
+      "description": "Install via Claude Code plugin marketplace",
+      "command": "/plugin install {bundle}@{marketplace}",
+      "pros": [
+        "Auto-updates",
+        "Bundle management",
+        "Agent discovery"
+      ],
+      "cons": [
+        "Requires marketplace setup"
+      ]
+    },
+    "symlink": {
+      "description": "Symlink skill directory to ~/.claude/skills/",
+      "command": "ln -s {source} ~/.claude/skills/{name}",
+      "pros": [
+        "Direct editing",
+        "Immediate changes"
+      ],
+      "cons": [
+        "Manual management",
+        "No auto-updates"
+      ]
+    },
+    "copy": {
+      "description": "Copy skill files to target location",
+      "command": "cp -r {source} {target}",
+      "pros": [
+        "Works everywhere",
+        "No dependencies"
+      ],
+      "cons": [
+        "Manual updates",
+        "Version drift"
+      ]
+    },
+    "rules-file": {
+      "description": "Export skill content to rules file format",
+      "command": "cat {skill}/SKILL.md >> {target}/.cursorrules",
+      "pros": [
+        "Works with Cursor/Windsurf"
+      ],
+      "cons": [
+        "Loses structure",
+        "Manual updates"
+      ]
+    }
+  },
+  "syncHistory": [
+    {
+      "date": "2026-01-20",
+      "action": "marketplace-update",
+      "source": "evolv3-ai/vibe-skills",
+      "changes": [
+        "Added admin-skills",
+        "Updated admin-mcp"
+      ]
+    },
+    {
+      "date": "2026-02-02",
+      "action": "consolidation",
+      "source": "local",
+      "changes": [
+        "Consolidated admin-* skills into admin and admin-devops",
+        "Added legacy aliases"
+      ]
+    }
+  ],
+  "aliases": {
+    "admin-windows": "admin",
+    "admin-wsl": "admin",
+    "admin-unix": "admin",
+    "admin-mcp": "admin",
+    "admin-skills": "admin",
+    "admin-infra-oci": "oci",
+    "admin-infra-hetzner": "hetzner",
+    "admin-infra-linode": "linode",
+    "admin-infra-digitalocean": "digital-ocean",
+    "admin-infra-contabo": "contabo",
+    "admin-infra-vultr": "vultr",
+    "admin-app-coolify": "coolify",
+    "admin-app-kasm": "kasm",
+    "admin-devops": "devops"
+  }
+}

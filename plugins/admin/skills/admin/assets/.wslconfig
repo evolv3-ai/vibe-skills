@@ -1,0 +1,95 @@
+# WSL2 Configuration File
+# Location: C:\Users\{USERNAME}\.wslconfig
+# Apply changes: wsl --shutdown
+
+[wsl2]
+# =============================================================================
+# MEMORY AND CPU
+# =============================================================================
+
+# Memory - How much memory to assign to the WSL 2 VM
+# Default: 50% of total memory on Windows or 8GB, whichever is less
+# Examples: 4GB, 8GB, 16GB, 32GB
+memory=16GB
+
+# Processors - How many logical processors to assign
+# Default: Same number as Windows
+processors=8
+
+# Swap - How much swap space to add
+# Default: 25% of available memory
+swap=4GB
+
+# Custom swap file path (optional)
+# swapFile=D:\\wsl\\swap.vhdx
+
+# =============================================================================
+# NETWORKING
+# =============================================================================
+
+# Localhost forwarding - Access WSL services from Windows via localhost
+# Default: true
+localhostForwarding=true
+
+# DNS tunneling - Use Windows DNS settings
+# Default: true
+# dnsTunneling=true
+
+# Firewall - Apply Windows Firewall rules to WSL
+# Default: true
+# firewall=true
+
+# Auto proxy - Use Windows HTTP proxy settings
+# Default: true
+# autoProxy=true
+
+# =============================================================================
+# VIRTUALIZATION
+# =============================================================================
+
+# Nested virtualization - Allow running VMs inside WSL
+# Default: true
+nestedVirtualization=true
+
+# GPU support - Enable GPU compute support
+# Default: true
+# gpuSupport=true
+
+# =============================================================================
+# GUI AND DISPLAY
+# =============================================================================
+
+# GUI applications - Enable WSLg for Linux GUI apps
+# Default: true
+guiApplications=true
+
+# =============================================================================
+# PERFORMANCE
+# =============================================================================
+
+# Page reporting - Release unused memory back to Windows
+# Default: true
+pageReporting=true
+
+# =============================================================================
+# EXPERIMENTAL FEATURES
+# =============================================================================
+
+[experimental]
+# Sparse VHD - Automatically reclaim disk space
+# Compacts the virtual hard disk when possible
+sparseVhd=true
+
+# Auto memory reclaim - Release cached memory automatically
+# Options: disabled, dropcache, gradual
+# - disabled: No automatic reclaim
+# - dropcache: Drop caches when memory is low
+# - gradual: Slowly release unused memory
+autoMemoryReclaim=gradual
+
+# Mirrored networking - Mirror Windows network config
+# Makes WSL networking behave more like Windows
+# networkingMode=mirrored
+
+# Host address loopback - Access Windows services from WSL
+# hostAddressLoopback=true

@@ -1,0 +1,77 @@
+{
+  "shells": {
+    "powershell": {
+      "enabled": true,
+      "command": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+      "args": ["-Command"],
+      "description": "PowerShell 7.x (recommended)"
+    },
+    "powershell5": {
+      "enabled": true,
+      "command": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+      "args": ["-Command"],
+      "description": "Windows PowerShell 5.1 (legacy)"
+    },
+    "cmd": {
+      "enabled": true,
+      "command": "cmd.exe",
+      "args": ["/c"],
+      "description": "Command Prompt"
+    },
+    "gitbash": {
+      "enabled": false,
+      "command": "C:\\Program Files\\Git\\bin\\bash.exe",
+      "args": ["-c"],
+      "description": "Git Bash (disabled by default)"
+    }
+  },
+  "ssh": {
+    "connections": [
+      {
+        "id": "example-server",
+        "name": "Example Server",
+        "host": "192.168.1.100",
+        "port": 22,
+        "username": "admin",
+        "privateKeyPath": "C:/Users/USERNAME/.ssh/id_rsa",
+        "description": "Example SSH connection"
+      },
+      {
+        "id": "coolify-server",
+        "name": "Coolify Server",
+        "host": "coolify.example.com",
+        "port": 22,
+        "username": "root",
+        "privateKeyPath": "C:/Users/USERNAME/.ssh/coolify_key",
+        "description": "Coolify deployment server"
+      }
+    ]
+  },
+  "security": {
+    "allowedPaths": [
+      "C:/Users/USERNAME",
+      "D:/",
+      "D:/Dropbox"
+    ],
+    "blockedCommands": [
+      "format",
+      "shutdown",
+      "restart",
+      "rm -rf /",
+      "del /f /s /q C:\\",
+      "Remove-Item -Recurse -Force C:\\"
+    ],
+    "commandTimeout": 60,
+    "maxOutputSize": 1048576
+  },
+  "defaults": {
+    "shell": "powershell",
+    "workingDirectory": "C:/Users/USERNAME",
+    "encoding": "utf-8"
+  },
+  "logging": {
+    "enabled": true,
+    "level": "info",
+    "logFile": null
+  }
+}

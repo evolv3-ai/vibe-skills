@@ -1,0 +1,68 @@
+# GitHub Actions workflow with Mockoon CLI
+# Add to .github/workflows/
+
+name: API Integration Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # Option 1: Use Mockoon CLI Action
+      - name: Start Mock API
+        uses: mockoon/cli-action@v2
+        with:
+          version: 'latest'
+          data-file: './mock-data.json'
+          port: 3000
+
+      # Wait for mock to be ready
+      - name: Wait for Mock API
+        run: |
+          timeout 30 bash -c 'until curl -s http://localhost:3000/health; do sleep 1; done'
+
+      # Run your tests
+      - name: Run Integration Tests
+        run: npm run test:integration
+
+      # Option 2: Use Docker (alternative)
+      # - name: Start Mock API (Docker)
+      #   run: |
+      #     docker run -d -p 3000:3000 \
+      #       -v ${{ github.workspace }}/mock-data.json:/data/mock.json:ro \
+      #       mockoon/cli:latest --data /data/mock.json --port 3000
+      #     sleep 5
+
+  # Example: Multiple mock APIs
+  # multi-mock-test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #
+  #     - name: Start Users API
+  #       uses: mockoon/cli-action@v2
+  #       with:
+  #         data-file: './mocks/users.json'
+  #         port: 3001
+  #
+  #     - name: Start Orders API
+  #       uses: mockoon/cli-action@v2
+  #       with:
+  #         data-file: './mocks/orders.json'
+  #         port: 3002
+  #
+  #     - name: Run Tests
+  #       run: npm test

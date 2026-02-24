@@ -1,8 +1,0 @@
-{
-  "name": "integrations",
-  "description": "Google Chat webhooks, Google Apps Script automation, ElevenLabs voice agents, and MCP server building.",
-  "author": {
-    "name": "Jeremy Dawes / Jezweb",
-    "email": "jeremy@jezweb.net"
-  }
-}

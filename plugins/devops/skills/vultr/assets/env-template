@@ -1,0 +1,72 @@
+# Vultr Infrastructure Configuration
+# Copy to .env.local and fill in your values
+
+# =============================================================================
+# Authentication
+# =============================================================================
+
+# API Key - Get from: https://my.vultr.com/settings/#settingsapi
+# Create a Personal Access Token with "All" permissions
+VULTR_API_KEY=your_api_key_here
+
+# =============================================================================
+# Server Configuration
+# =============================================================================
+
+# Region
+# Options: ewr, ord, dfw, lax, sea, atl, mia, yto, lhr, ams, fra, cdg, nrt, sgp, syd, blr
+# Run `vultr-cli regions list` for full list
+VULTR_REGION=ewr
+
+# Plan
+# Cloud Compute: vc2-1c-1gb ($6), vc2-2c-4gb ($24), vc2-4c-8gb ($48), vc2-6c-16gb ($96)
+# High-Frequency: vhf-2c-4gb ($24), vhf-4c-16gb ($72), vhf-6c-24gb ($108)
+# Run `vultr-cli plans list` for full list
+VULTR_PLAN=vc2-2c-4gb
+
+# OS ID
+# 1743 = Ubuntu 22.04, 2136 = Ubuntu 24.04, 477 = Debian 12
+# Run `vultr-cli os list` for full list
+VULTR_OS_ID=1743
+
+# Server Name
+SERVER_NAME=my-server
+
+# =============================================================================
+# SSH Configuration
+# =============================================================================
+
+# SSH Key Name (as registered in Vultr)
+SSH_KEY_NAME=my-key
+
+# Local SSH Key Paths
+SSH_PUBLIC_KEY_PATH=~/.ssh/id_rsa.pub
+SSH_PRIVATE_KEY_PATH=~/.ssh/id_rsa
+
+# =============================================================================
+# Outputs (set after deployment)
+# =============================================================================
+
+# These will be set by the deployment process
+# SERVER_IP=
+# SSH_USER=root
+# SSH_KEY_PATH=~/.ssh/id_rsa
+# SERVER_ARCH=amd64
+# INSTANCE_ID=
+
+# =============================================================================
+# Service-Specific (for downstream skills)
+# =============================================================================
+
+# These will be set to SERVER_IP after deployment
+# COOLIFY_SERVER_IP=
+# KASM_SERVER_IP=
+
+# =============================================================================
+# Kubernetes (optional)
+# =============================================================================
+
+# For VKE autoscaling
+# VKE_MIN_NODES=1
+# VKE_MAX_NODES=5
+# VKE_PLAN=vc2-2c-4gb

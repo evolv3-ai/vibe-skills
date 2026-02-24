@@ -1,0 +1,75 @@
+# Linode Infrastructure Configuration
+# Copy to .env.local and fill in your values
+
+# =============================================================================
+# Authentication
+# =============================================================================
+
+# API Token - Get from: https://cloud.linode.com/profile/tokens
+# Create a Personal Access Token with "Read/Write" scope for needed resources
+LINODE_CLI_TOKEN=your_api_token_here
+
+# =============================================================================
+# Server Configuration
+# =============================================================================
+
+# Region
+# Options: us-east, us-central, us-west, us-southeast, us-ord, us-lax, us-mia, us-sea
+#          ca-central, eu-west, eu-central, ap-south, ap-northeast, ap-west, ap-southeast
+# Run `linode-cli regions list` for full list
+LINODE_REGION=us-east
+
+# Linode Type
+# Shared: g6-nanode-1 ($5), g6-standard-2 ($24), g6-standard-4 ($48), g6-standard-6 ($96)
+# Dedicated: g6-dedicated-2 ($36), g6-dedicated-4 ($72), g6-dedicated-8 ($144)
+# Premium: g7-premium-2 ($43), g7-premium-4 ($86), g7-premium-8 ($172)
+# Run `linode-cli linodes types` for full list
+LINODE_TYPE=g6-standard-2
+
+# OS Image
+# Options: linode/ubuntu22.04, linode/ubuntu24.04, linode/debian12, linode/debian11
+# Run `linode-cli images list` for full list
+LINODE_IMAGE=linode/ubuntu22.04
+
+# Server Name
+SERVER_NAME=my-server
+
+# =============================================================================
+# SSH Configuration
+# =============================================================================
+
+# SSH Key Label (as registered in Linode)
+SSH_KEY_LABEL=my-key
+
+# Local SSH Key Paths
+SSH_PUBLIC_KEY_PATH=~/.ssh/id_rsa.pub
+SSH_PRIVATE_KEY_PATH=~/.ssh/id_rsa
+
+# =============================================================================
+# Outputs (set after deployment)
+# =============================================================================
+
+# These will be set by the deployment process
+# SERVER_IP=
+# SSH_USER=root
+# SSH_KEY_PATH=~/.ssh/id_rsa
+# SERVER_ARCH=amd64
+# LINODE_ID=
+
+# =============================================================================
+# Service-Specific (for downstream skills)
+# =============================================================================
+
+# These will be set to SERVER_IP after deployment
+# COOLIFY_SERVER_IP=
+# KASM_SERVER_IP=
+
+# =============================================================================
+# Kubernetes (optional)
+# =============================================================================
+
+# For LKE Cluster Autoscaler
+# LKE_CLUSTER_NAME=my-lke
+# LKE_MIN_NODES=1
+# LKE_MAX_NODES=5
+# LKE_NODE_TYPE=g6-standard-2

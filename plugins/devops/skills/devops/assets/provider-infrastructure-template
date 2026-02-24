@@ -1,0 +1,251 @@
+# DevOps Admin Infrastructure Provider Configuration
+# This template supports multiple cloud providers
+# Copy this to project root as .env.local and fill in your values
+
+# =============================================================================
+# PROVIDER SELECTION
+# =============================================================================
+
+# Cloud Provider Selection
+# Options: "oci", "hetzner", "hostinger", "digitalocean", "linode", "vultr", "aws", "gcp", "azure"
+CLOUD_PROVIDER=oci
+
+# =============================================================================
+# OCI (Oracle Cloud Infrastructure) Configuration
+# =============================================================================
+# Only required if CLOUD_PROVIDER=oci
+
+# OCI Authentication
+OCI_TENANCY_OCID=ocid1.tenancy.oc1..your_tenancy_ocid_here
+OCI_REGION=us-ashburn-1
+
+# OCI Instance Configuration
+OCI_COMPARTMENT_NAME=DevOpsLab
+OCI_VCN_CIDR=10.0.0.0/16
+OCI_SUBNET_CIDR=10.0.1.0/24
+OCI_INSTANCE_SHAPE=VM.Standard.A1.Flex
+OCI_OPERATING_SYSTEM="Canonical Ubuntu"
+OCI_OPERATING_SYSTEM_VERSION="22.04"
+
+# =============================================================================
+# Hetzner Cloud Configuration
+# =============================================================================
+# Only required if CLOUD_PROVIDER=hetzner
+
+# Hetzner API Token - Get from: https://console.hetzner.cloud/
+HETZNER_API_TOKEN=your_api_token_here
+
+# Hetzner Configuration
+# Locations: nbg1 (Nuremberg), fsn1 (Falkenstein), hel1 (Helsinki), ash (Ashburn), hil (Hillsboro)
+HETZNER_LOCATION=nbg1
+
+# Server Types: cx11 (1 vCPU, 2GB), cpx11 (2 vCPU, 2GB), cx21 (2 vCPU, 4GB), cpx21 (3 vCPU, 4GB)
+# ARM: cax11 (2 vCPU ARM, 4GB), cax21 (4 vCPU ARM, 8GB), cax31 (8 vCPU ARM, 16GB)
+HETZNER_SERVER_TYPE=cax21
+
+# Image: ubuntu-22.04, ubuntu-24.04, debian-12, etc.
+HETZNER_IMAGE=ubuntu-22.04
+
+# =============================================================================
+# DigitalOcean Configuration
+# =============================================================================
+# Only required if CLOUD_PROVIDER=digitalocean
+
+# DigitalOcean API Token - Get from: https://cloud.digitalocean.com/account/api/tokens
+DO_API_TOKEN=your_api_token_here
+
+# DigitalOcean Configuration
+# Regions: nyc1, nyc3, sfo3, ams3, sgp1, lon1, fra1, tor1, blr1, syd1
+DO_REGION=nyc3
+
+# Droplet Sizes: s-1vcpu-1gb, s-1vcpu-2gb, s-2vcpu-2gb, s-2vcpu-4gb, s-4vcpu-8gb
+DO_SIZE=s-2vcpu-4gb
+
+# Image: ubuntu-22-04-x64, ubuntu-24-04-x64, debian-12-x64
+DO_IMAGE=ubuntu-22-04-x64
+
+# =============================================================================
+# Linode (Akamai) Configuration
+# =============================================================================
+# Only required if CLOUD_PROVIDER=linode
+
+# Linode API Token - Get from: https://cloud.linode.com/profile/tokens
+LINODE_API_TOKEN=your_api_token_here
+
+# Linode Configuration
+# Regions: us-east, us-west, us-central, eu-west, eu-central, ap-south, ap-northeast, etc.
+LINODE_REGION=us-east
+
+# Plans: g6-nanode-1 (1GB), g6-standard-1 (2GB), g6-standard-2 (4GB), g6-standard-4 (8GB)
+LINODE_TYPE=g6-standard-2
+
+# Image: linode/ubuntu22.04, linode/ubuntu24.04, linode/debian12
+LINODE_IMAGE=linode/ubuntu22.04
+
+# =============================================================================
+# Vultr Configuration
+# =============================================================================
+# Only required if CLOUD_PROVIDER=vultr
+
+# Vultr API Key - Get from: https://my.vultr.com/settings/#settingsapi
+VULTR_API_KEY=your_api_key_here
+
+# Vultr Configuration
+# Regions: ewr (New Jersey), ord (Chicago), dfw (Dallas), sea (Seattle), lax (Los Angeles)
+# ams (Amsterdam), fra (Frankfurt), lhr (London), sgp (Singapore), syd (Sydney)
+VULTR_REGION=ewr
+
+# Plans: vc2-1c-1gb, vc2-1c-2gb, vc2-2c-4gb, vc2-4c-8gb
+# ARM: vhp-1c-1gb-arm, vhp-2c-2gb-arm, vhp-2c-4gb-arm
+VULTR_PLAN=vc2-2c-4gb
+
+# OS: 387 (Ubuntu 22.04), 1743 (Ubuntu 24.04), 2136 (Debian 12)
+VULTR_OS_ID=387
+
+# =============================================================================
+# Hostinger VPS Configuration
+# =============================================================================
+# Only required if CLOUD_PROVIDER=hostinger
+
+# Hostinger API Token - Get from: Hostinger control panel
+HOSTINGER_API_TOKEN=your_api_token_here
+
+# Hostinger Configuration
+# Locations: us, eu, asia
+HOSTINGER_LOCATION=us
+
+# Plans: KVM 1 (1 vCPU, 4GB), KVM 2 (2 vCPU, 8GB), KVM 4 (4 vCPU, 16GB)
+HOSTINGER_PLAN=kvm-2
+
+# OS: ubuntu-22.04, ubuntu-24.04, debian-12
+HOSTINGER_OS=ubuntu-22.04
+
+# =============================================================================
+# AWS (Amazon Web Services) Configuration
+# =============================================================================
+# Only required if CLOUD_PROVIDER=aws
+
+# AWS Credentials
+AWS_ACCESS_KEY_ID=your_access_key_here
+AWS_SECRET_ACCESS_KEY=your_secret_key_here
+AWS_REGION=us-east-1
+
+# EC2 Configuration
+# Instance Types: t3.micro, t3.small, t3.medium, t4g.micro (ARM), t4g.small (ARM)
+AWS_INSTANCE_TYPE=t4g.small
+
+# AMI ID - Get latest Ubuntu 22.04 ARM AMI for your region
+# Find AMIs: https://cloud-images.ubuntu.com/locator/ec2/
+AWS_AMI_ID=ami-xxxxxxxxxxxxxxxxx
+
+# =============================================================================
+# GCP (Google Cloud Platform) Configuration
+# =============================================================================
+# Only required if CLOUD_PROVIDER=gcp
+
+# GCP Credentials JSON file path
+GCP_CREDENTIALS_FILE=/path/to/gcp-credentials.json
+GCP_PROJECT_ID=your-project-id
+
+# GCP Configuration
+# Zones: us-central1-a, us-east1-b, europe-west1-b, asia-southeast1-a
+GCP_ZONE=us-central1-a
+
+# Machine Types: e2-micro, e2-small, e2-medium, t2a-standard-1 (ARM), t2a-standard-2 (ARM)
+GCP_MACHINE_TYPE=t2a-standard-1
+
+# Image: projects/ubuntu-os-cloud/global/images/family/ubuntu-2204-lts
+GCP_IMAGE_FAMILY=ubuntu-2204-lts
+
+# =============================================================================
+# Azure Configuration
+# =============================================================================
+# Only required if CLOUD_PROVIDER=azure
+
+# Azure Credentials
+AZURE_SUBSCRIPTION_ID=your_subscription_id_here
+AZURE_TENANT_ID=your_tenant_id_here
+AZURE_CLIENT_ID=your_client_id_here
+AZURE_CLIENT_SECRET=your_client_secret_here
+
+# Azure Configuration
+# Locations: eastus, westus2, centralus, northeurope, westeurope, southeastasia
+AZURE_LOCATION=eastus
+
+# VM Sizes: Standard_B1s, Standard_B2s, Standard_D2ps_v5 (ARM), Standard_D4ps_v5 (ARM)
+AZURE_VM_SIZE=Standard_D2ps_v5
+
+# Image: Canonical:0001-com-ubuntu-server-jammy:22_04-lts-arm64:latest
+AZURE_IMAGE_URN=Canonical:0001-com-ubuntu-server-jammy:22_04-lts-arm64:latest
+
+# =============================================================================
+# Universal Server Configuration (applies to all providers)
+# =============================================================================
+
+# Server Resources (used as target specs for provider selection)
+# Providers will select closest matching plan
+SERVER_VCPUS=2
+SERVER_MEMORY_GB=4
+SERVER_STORAGE_GB=80
+
+# SSH Configuration (applies to all providers)
+SSH_PUBLIC_KEY_PATH=~/.ssh/id_rsa.pub
+SSH_PRIVATE_KEY_PATH=~/.ssh/id_rsa
+SSH_USER=ubuntu
+
+# Server Naming
+SERVER_NAME_PREFIX="my-"
+
+# =============================================================================
+# Provider Cost Comparison (for reference)
+# =============================================================================
+
+# 2 vCPU, 4GB RAM, 80GB Storage (approximate monthly costs):
+# - Oracle Cloud (A1.Flex ARM): $0 (Always Free - 4 OCPUs, 24GB total)
+# - Hetzner (CAX21 ARM): €4.90 (~$5.30)
+# - Vultr (VC2-2C-4GB): $18/month
+# - DigitalOcean (s-2vcpu-4gb): $24/month
+# - Linode (g6-standard-2): $18/month
+# - Hostinger (KVM 2): ~$12/month
+# - AWS (t4g.small ARM): ~$12/month (without free tier)
+# - GCP (t2a-standard-1 ARM): ~$15/month
+# - Azure (Standard_D2ps_v5 ARM): ~$20/month
+
+# =============================================================================
+# Notes on Provider Selection
+# =============================================================================
+
+# Oracle Cloud (OCI):
+# - Best for: Free tier usage (4 OCPUs ARM, 24GB RAM free forever)
+# - Cons: Capacity issues, complex setup
+# - Recommended: Primary choice for cost-conscious users
+
+# Hetzner:
+# - Best for: Best price/performance ratio in Europe
+# - Pros: Excellent performance, simple billing, ARM instances
+# - Cons: Limited US presence, fewer datacenter locations
+
+# DigitalOcean:
+# - Best for: Developer-friendly, great documentation
+# - Pros: Simple API, reliable, global presence
+# - Cons: More expensive than alternatives
+
+# Linode (Akamai):
+# - Best for: Balance of cost and features
+# - Pros: Good performance, reasonable pricing
+# - Cons: Fewer features than AWS/GCP/Azure
+
+# Vultr:
+# - Best for: Global datacenter coverage
+# - Pros: Many locations, ARM instances available
+# - Cons: Mid-range pricing
+
+# Hostinger:
+# - Best for: Managed VPS with cPanel
+# - Pros: Includes control panel, managed services
+# - Cons: Less flexible than pure VPS providers
+
+# AWS/GCP/Azure:
+# - Best for: Enterprise features, scaling, integration with other cloud services
+# - Pros: Feature-rich, global infrastructure, enterprise support
+# - Cons: Complex pricing, expensive for simple workloads

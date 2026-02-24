@@ -1,0 +1,231 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/evolv3ai/admin-suite/profile-schema.json",
+  "title": "Device Profile Schema v3.0",
+  "description": "Unified device profile for context-aware development assistance",
+  "type": "object",
+  "required": ["schemaVersion", "device", "packageManagers", "tools"],
+  "properties": {
+    "schemaVersion": {
+      "type": "string",
+      "const": "3.0",
+      "description": "Schema version for migration support"
+    },
+    "adminSkillVersion": {
+      "type": "string",
+      "description": "Version of admin skill that created/last updated this profile"
+    },
+    "multiDevice": {
+      "type": "boolean",
+      "description": "Whether this is a multi-device setup with cloud-synced storage"
+    },
+    "skillVersions": {
+      "type": "object",
+      "description": "Version tracking for all admin suite skills",
+      "additionalProperties": {
+        "type": "string"
+      }
+    },
+    "device": {
+      "type": "object",
+      "description": "Core device identity and hardware",
+      "required": ["name", "platform", "user"],
+      "properties": {
+        "name": { "type": "string", "description": "Hostname/device name" },
+        "platform": { "enum": ["windows", "macos", "linux"], "description": "Primary OS" },
+        "shell": { "enum": ["powershell", "pwsh", "bash", "zsh", "fish"], "description": "Default shell" },
+        "user": { "type": "string", "description": "Primary username" },
+        "os": { "type": "string", "description": "Full OS name (e.g., Windows 11 Pro)" },
+        "osVersion": { "type": "string", "description": "OS build/version" },
+        "architecture": { "enum": ["AMD64", "ARM64", "x86"], "description": "CPU architecture" },
+        "cpu": { "type": "string", "description": "CPU model" },
+        "cores": { "type": "integer", "description": "Physical cores" },
+        "threads": { "type": "integer", "description": "Logical threads" },
+        "ram": { "type": "string", "description": "Total RAM (e.g., 64 GB)" },
+        "timezone": { "type": "string", "description": "System timezone" },
+        "initialized": { "type": "string", "format": "date-time" },
+        "lastUpdated": { "type": "string", "format": "date-time" }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "description": "Critical filesystem locations - THE KEY TO CONTEXT",
+      "properties": {
+        "adminRoot": { "type": "string", "description": "Admin skills data root" },
+        "deviceProfile": { "type": "string", "description": "This profile file location" },
+        "logs": { "type": "string", "description": "Centralized log directory" },
+        "claudeConfig": { "type": "string", "description": "Claude Desktop config.json" },
+        "claudeSkills": { "type": "string", "description": "Claude skills directory" },
+        "mcpServers": { "type": "string", "description": "MCP servers root directory" },
+        "sshKeys": { "type": "string", "description": "SSH keys directory" },
+        "projects": { "type": "string", "description": "Default projects root" },
+        "dropbox": { "type": ["string", "null"], "description": "Dropbox sync folder" },
+        "npmGlobal": { "type": "string", "description": "Global npm modules path" },
+        "pythonVenvs": { "type": "string", "description": "Python venvs root" }
+      }
+    },
+    "packageManagers": {
+      "type": "object",
+      "description": "Available package managers - determines HOW to install",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "present": { "type": "boolean" },
+          "version": { "type": ["string", "null"] },
+          "path": { "type": ["string", "null"], "description": "Executable path" },
+          "location": { "type": ["string", "null"], "description": "Install root" },
+          "lastChecked": { "type": "string", "format": "date-time" },
+          "preferred": { "type": "boolean", "description": "User prefers this" }
+        }
+      }
+    },
+    "tools": {
+      "type": "object",
+      "description": "Installed development tools - THE CORE CONTEXT",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "present": { "type": "boolean" },
+          "version": { "type": ["string", "null"] },
+          "installedVia": { "type": ["string", "null"] },
+          "path": { "type": ["string", "null"], "description": "Primary executable" },
+          "shimPath": { "type": ["string", "null"], "description": "Shim if using scoop" },
+          "configPath": { "type": ["string", "null"], "description": "Config file location" },
+          "lastChecked": { "type": "string", "format": "date-time" },
+          "installStatus": { "enum": ["working", "failed", "pending", "deprecated"] },
+          "notes": { "type": ["string", "null"], "description": "Context for AI" }
+        }
+      }
+    },
+    "preferences": {
+      "type": "object",
+      "description": "User preferences - CRITICAL FOR SMART ADAPTATION",
+      "properties": {
+        "python": {
+          "type": "object",
+          "properties": {
+            "manager": { "enum": ["uv", "pip", "conda", "poetry", "pipenv"] },
+            "reason": { "type": "string" }
+          }
+        },
+        "node": {
+          "type": "object",
+          "properties": {
+            "manager": { "enum": ["npm", "pnpm", "yarn", "bun"] },
+            "reason": { "type": "string" }
+          }
+        },
+        "packages": {
+          "type": "object",
+          "properties": {
+            "manager": { "enum": ["scoop", "winget", "chocolatey", "brew", "apt"] },
+            "reason": { "type": "string" }
+          }
+        },
+        "shell": {
+          "type": "object",
+          "properties": {
+            "preferred": { "type": "string" },
+            "profilePath": { "type": "string" }
+          }
+        },
+        "editor": { "type": "string" },
+        "terminal": { "type": "string" }
+      }
+    },
+    "wsl": {
+      "type": ["object", "null"],
+      "description": "WSL configuration (Windows only)"
+    },
+    "docker": {
+      "type": ["object", "null"],
+      "description": "Docker configuration"
+    },
+    "mcp": {
+      "type": "object",
+      "description": "MCP server configurations"
+    },
+    "servers": {
+      "type": "array",
+      "description": "Managed remote servers"
+    },
+    "issues": {
+      "type": "object",
+      "description": "Known problems and pending fixes"
+    },
+    "history": {
+      "type": "array",
+      "description": "Installation and configuration history"
+    },
+    "capabilities": {
+      "type": "object",
+      "description": "Quick capability flags for routing decisions"
+    },
+    "vault": {
+      "type": ["object", "null"],
+      "description": "Age-encrypted secrets vault configuration",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether vault mode is active (matches ADMIN_VAULT env var)"
+        },
+        "vaultPath": {
+          "type": "string",
+          "description": "Path to vault.age file (default: $ADMIN_ROOT/vault.age)"
+        },
+        "keyPath": {
+          "type": "string",
+          "description": "Path to age private key (default: ~/.age/key.txt)"
+        },
+        "publicKey": {
+          "type": "string",
+          "description": "Age public key (starts with age1...)"
+        },
+        "migratedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When plaintext .env was migrated to vault"
+        },
+        "secretCount": {
+          "type": "integer",
+          "description": "Number of secrets in vault"
+        }
+      }
+    },
+    "deployments": {
+      "type": "object",
+      "description": "References to deployment configurations (.env.local files)",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "envFile": { 
+            "type": "string", 
+            "description": "Path to .env.local file with deployment config" 
+          },
+          "type": { 
+            "enum": ["coolify", "kasm", "both", "custom"],
+            "description": "Deployment type"
+          },
+          "provider": {
+            "type": "string",
+            "description": "Infrastructure provider (oci, hetzner, contabo, etc.)"
+          },
+          "status": { 
+            "enum": ["active", "stopped", "failed", "pending", "retired"],
+            "description": "Current deployment status"
+          },
+          "serverIds": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "References to servers[] by id"
+          },
+          "lastDeployed": { 
+            "type": "string", 
+            "format": "date-time" 
+          },
+          "notes": { "type": ["string", "null"] }
+        }
+      }
+    }
+  }
+}

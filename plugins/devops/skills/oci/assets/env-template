@@ -1,0 +1,139 @@
+# OCI Infrastructure Environment Configuration Template
+# Copy this to project root as .env.local and fill in your values
+# WARNING: Never commit .env.local to version control!
+
+# =============================================================================
+# OCI Authentication
+# =============================================================================
+
+# Tenancy OCID - Get from: https://cloud.oracle.com
+# Navigate to: Profile Icon → Tenancy → Copy OCID
+TENANCY_OCID=ocid1.tenancy.oc1..your_tenancy_ocid_here
+
+# Region - Available regions: us-ashburn-1, us-phoenix-1, ca-montreal-1, etc.
+# List all regions: oci iam region list
+# Free tier ARM instances available in most regions
+REGION=us-ashburn-1
+
+# =============================================================================
+# Infrastructure Configuration
+# =============================================================================
+
+# Compartment Name - Will be created if it doesn't exist
+# Best practice: Use descriptive names (e.g., DevOps, Production, Testing)
+COMPARTMENT_NAME=DevOpsLab
+
+# Network Configuration
+# VCN CIDR block - Main network range for all resources
+VCN_CIDR=10.0.0.0/16
+
+# Subnet CIDR - Must be within VCN CIDR block
+# Public subnet for instances with internet access
+SUBNET_CIDR=10.0.1.0/24
+
+# =============================================================================
+# Compute Instance Configuration
+# =============================================================================
+
+# Instance Shape
+# - VM.Standard.A1.Flex: ARM instances (Always Free eligible - 4 OCPU, 24GB RAM total)
+# - VM.Standard.E2.1.Micro: x86 micro instance (Always Free - 1 OCPU, 1GB RAM)
+INSTANCE_SHAPE=VM.Standard.A1.Flex
+
+# Operating System and Version
+# For ARM (A1.Flex): Use "Canonical Ubuntu" with "22.04" or "24.04"
+# For x86: Any compatible OS
+OPERATING_SYSTEM="Canonical Ubuntu"
+OPERATING_SYSTEM_VERSION="22.04"
+
+# Instance Resources (for Flex shapes)
+# Always Free limits for A1.Flex: Up to 4 OCPUs and 24GB RAM total across all instances
+# Minimum: 1 OCPU, 6GB RAM per instance
+# Examples:
+#   - Single instance: 4 OCPUs, 24GB RAM
+#   - Two instances: 2 OCPUs, 12GB RAM each
+#   - Four instances: 1 OCPU, 6GB RAM each
+INSTANCE_OCPUS=2
+INSTANCE_MEMORY_GB=12
+
+# Boot Volume Size (in GB)
+# Always Free: Up to 200GB total across all boot volumes
+# Minimum: 50GB, Recommended: 80-100GB per instance
+INSTANCE_STORAGE_GB=100
+
+# Instance Display Name Prefix
+# Used for naming instances (e.g., "Coolify-Instance", "KASM-Instance")
+INSTANCE_DISPLAY_NAME_PREFIX="My-Instance-"
+
+# =============================================================================
+# SSH Configuration
+# =============================================================================
+
+# SSH Public Key Path - For instance access
+# Key will be added to instance during provisioning
+# Generate new key: ssh-keygen -t rsa -b 4096 -f ~/.ssh/oci_key
+SSH_PUBLIC_KEY_PATH=~/.ssh/id_rsa.pub
+
+# SSH Private Key Path - For connecting to instance
+SSH_PRIVATE_KEY_PATH=~/.ssh/id_rsa
+
+# SSH Username (default for Ubuntu)
+SSH_USER=ubuntu
+
+# =============================================================================
+# Auto-Generated Variables (populated by scripts)
+# =============================================================================
+
+# These will be automatically filled during infrastructure provisioning
+# DO NOT manually edit these unless you know what you're doing
+
+# COMPARTMENT_ID=
+# VCN_ID=
+# SUBNET_ID=
+# INTERNET_GATEWAY_ID=
+# ROUTE_TABLE_ID=
+# SECURITY_LIST_ID=
+# INSTANCE_ID=
+# AVAILABILITY_DOMAIN=
+# UBUNTU_IMAGE_ID=
+# INSTANCE_PUBLIC_IP=
+# INSTANCE_PRIVATE_IP=
+
+# =============================================================================
+# Examples and Common Configurations
+# =============================================================================
+
+# Example 1: Single powerful instance (uses full Always Free allocation)
+# INSTANCE_OCPUS=4
+# INSTANCE_MEMORY_GB=24
+# INSTANCE_STORAGE_GB=200
+
+# Example 2: Two balanced instances (split Always Free allocation)
+# Instance 1: INSTANCE_OCPUS=2, INSTANCE_MEMORY_GB=12, INSTANCE_STORAGE_GB=100
+# Instance 2: INSTANCE_OCPUS=2, INSTANCE_MEMORY_GB=12, INSTANCE_STORAGE_GB=100
+
+# Example 3: Micro instance for testing (also Always Free)
+# INSTANCE_SHAPE=VM.Standard.E2.1.Micro
+# OPERATING_SYSTEM="Canonical Ubuntu"
+# OPERATING_SYSTEM_VERSION="22.04"
+# (OCPUs and memory are fixed for micro instances)
+
+# =============================================================================
+# Helper Commands
+# =============================================================================
+
+# List all available regions:
+# oci iam region list --output table
+
+# List available shapes in a region:
+# oci compute shape list --compartment-id <TENANCY_OCID> --output table
+
+# List available images for Ubuntu 22.04 ARM:
+# oci compute image list --compartment-id <TENANCY_OCID> \
+#   --operating-system "Canonical Ubuntu" \
+#   --operating-system-version "22.04" \
+#   --shape VM.Standard.A1.Flex \
+#   --output table
+
+# Check availability domain capacity:
+# oci iam availability-domain list --compartment-id <TENANCY_OCID>
