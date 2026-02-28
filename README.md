@@ -1,4 +1,4 @@
-# agent-skills
+# vibe-skills
 
 **Owner**: [evolv3ai](https://evolv3.ai) | hello@evolv3.ai
 **License**: MIT
@@ -46,11 +46,11 @@ Standalone utility skills that support operations.
 
 ```bash
 # Add marketplace
-/plugin marketplace add evolv3ai/agent-skills
+/plugin marketplace add evolv3-ai/vibe-skills
 
 # Install plugins
-/plugin install admin-devops@agent-skills
-/plugin install tools@agent-skills
+/plugin install admin-devops@vibe-skills
+/plugin install tools@vibe-skills
 ```
 
 ## Local Development

@@ -1,6 +1,6 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "agent-skills",
+  "name": "vibe-skills",
   "description": "Admin, DevOps, and utility skills for Claude Code agents",
   "owner": { "name": "evolv3ai", "email": "hello@evolv3.ai" },
   "plugins": [

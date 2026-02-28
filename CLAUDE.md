@@ -1,6 +1,6 @@
-# CLAUDE.md — agent-skills
+# CLAUDE.md — vibe-skills
 
-**Repository**: https://github.com/evolv3ai/agent-skills
+**Repository**: https://github.com/evolv3-ai/vibe-skills
 **Owner**: evolv3ai | https://evolv3.ai
 
 This repo is the development workspace for evolv3ai's Claude Code agent skills. It contains two plugins — `admin-devops` (operational skills) and `tools` (standalone utilities).
@@ -8,7 +8,7 @@ This repo is the development workspace for evolv3ai's Claude Code agent skills. 
 ## Directory Structure
 
 ```
-agent-skills/
+vibe-skills/
 ├── plugins/
 │   ├── admin-devops/              # Local admin + remote infra + app deployment
 │   │   ├── .claude-plugin/
@@ -121,11 +121,11 @@ tools:
 
 ```bash
 # Add marketplace (one-time)
-/plugin marketplace add evolv3ai/agent-skills
+/plugin marketplace add evolv3-ai/vibe-skills
 
 # Install plugins
-/plugin install admin-devops@agent-skills
-/plugin install tools@agent-skills
+/plugin install admin-devops@vibe-skills
+/plugin install tools@vibe-skills
 ```
 
 ## Quality Checklist
