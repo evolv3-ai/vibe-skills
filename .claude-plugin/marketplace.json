@@ -1,46 +1,19 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "evolv3ai-skills",
-  "description": "Workflow skills for Claude Code — each produces tangible output",
-  "owner": {
-    "name": "evolv3ai",
-    "email": "hello@evolv3.ai"
-  },
+  "name": "agent-skills",
+  "description": "Admin, DevOps, and utility skills for Claude Code agents",
+  "owner": { "name": "evolv3ai", "email": "hello@evolv3.ai" },
   "plugins": [
     {
-      "name": "admin",
-      "description": "Local machine administration for Windows, WSL, macOS, Linux. Install tools, manage packages, configure dev environments. Profile-aware.",
-      "source": "./plugins/admin",
-      "category": "development"
-    },
-    {
-      "name": "cloudflare",
-      "description": "Manage Cloudflare DNS records and zones from the terminal with the cf CLI. Full DNS CRUD, zone listing, and JSON output for scripting.",
-      "source": "./plugins/cloudflare",
-      "category": "development"
-    },
-    {
-      "name": "design-assets",
-      "description": "Generate colour palettes, favicon packages, and custom SVG icon sets from brand colours.",
-      "source": "./plugins/design-assets",
-      "category": "design"
-    },
-    {
-      "name": "dev-tools",
-      "description": "Stream Deck profiles, mock REST APIs, Ralphban task boards, and pi_agent_rust development workflows.",
-      "source": "./plugins/dev-tools",
-      "category": "development"
-    },
-    {
-      "name": "devops",
-      "description": "Remote infrastructure: cloud provisioning (OCI, Hetzner, Linode, DigitalOcean, Contabo, Vultr), app deployment (Coolify, KASM, OpenClaw).",
-      "source": "./plugins/devops",
+      "name": "admin-devops",
+      "description": "Local machine admin, remote infrastructure provisioning, and app deployment. Profile-aware with 8 agents.",
+      "source": "./plugins/admin-devops",
       "category": "deployment"
     },
     {
-      "name": "integrations",
-      "description": "iii cross-language engine, SimpleMem agent memory, and Obsidian RLM large-file processing.",
-      "source": "./plugins/integrations",
+      "name": "tools",
+      "description": "Standalone utility skills — memory, session discovery, and development tools.",
+      "source": "./plugins/tools",
       "category": "productivity"
     }
   ]

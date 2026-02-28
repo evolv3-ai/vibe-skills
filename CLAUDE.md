@@ -1,132 +1,139 @@
-# Claude Skills
+# CLAUDE.md — agent-skills
 
-**Repository**: https://github.com/evolv3ai/claude-skills
+**Repository**: https://github.com/evolv3ai/agent-skills
 **Owner**: evolv3ai | https://evolv3.ai
 
-Production workflow skills for Claude Code CLI. Each skill guides Claude through a recipe to produce tangible output — not knowledge dumps, but working deliverables.
-
-## Philosophy
-
-- Every skill must produce visible output (files, configurations, deployable projects)
-- "The context window is a public good" — only include what Claude doesn't already know
-- Follows the official Claude Code plugin spec
+This repo is the development workspace for evolv3ai's Claude Code agent skills. It contains two plugins — `admin-devops` (operational skills) and `tools` (standalone utilities).
 
 ## Directory Structure
 
 ```
-claude-skills/
-├── plugins/                                # 6 installable plugins (21 skills)
-│   ├── admin/                              # Local machine admin, session discovery
-│   │   └── skills/
-│   │       ├── admin/
-│   │       └── session-scout/
-│   ├── cloudflare/                         # Cloudflare DNS CLI
-│   │   └── skills/
-│   │       └── cloudflare-cli/
-│   ├── design-assets/                      # Colour palettes, favicons, icons
-│   │   └── skills/
-│   ├── dev-tools/                          # Stream Deck, mock APIs, Kanban, pi_agent
-│   │   └── skills/
-│   │       ├── deckmate/
-│   │       ├── mockoon-cli/
-│   │       ├── pi-agent-rust/
-│   │       └── ralphban/
-│   ├── devops/                             # Cloud provisioning + app deployment
-│   │   └── skills/
-│   │       ├── contabo/
-│   │       ├── coolify/
-│   │       ├── coolify-cli/
-│   │       ├── devops/
-│   │       ├── digital-ocean/
-│   │       ├── hetzner/
-│   │       ├── kasm/
-│   │       ├── linode/
-│   │       ├── oci/
-│   │       ├── openclaw/
-│   │       └── vultr/
-│   └── integrations/                       # iii engine, SimpleMem, Obsidian RLM
-│       └── skills/
-│           ├── iii/
-│           ├── obsidian-rlm/
-│           └── simplemem/
-├── .claude-plugin/                         # Marketplace + plugin config
-│   ├── marketplace.json
-│   └── plugin.json
-├── CLAUDE.md                               # This file
-├── README.md                               # Public-facing overview
-└── LICENSE                                 # MIT
-```
-
-## Plugin Anatomy (Anthropic Spec)
-
-Each plugin contains one or more skills, auto-discovered from `skills/`:
-
-```
-plugin-name/
+agent-skills/
+├── plugins/
+│   ├── admin-devops/              # Local admin + remote infra + app deployment
+│   │   ├── .claude-plugin/
+│   │   │   └── plugin.json
+│   │   ├── commands/              # 8 slash commands
+│   │   ├── agents/                # 8 agent definitions
+│   │   └── skills/                # 13 skills
+│   │       ├── admin/             # Local machine admin, profiles, MCP, logging
+│   │       ├── devops/            # Remote infra orchestration, server inventory
+│   │       ├── oci/               # Oracle Cloud (ARM64, Always Free)
+│   │       ├── hetzner/           # Hetzner Cloud (ARM64 + x86)
+│   │       ├── contabo/           # Contabo VPS (x86)
+│   │       ├── digital-ocean/     # DigitalOcean (x86)
+│   │       ├── vultr/             # Vultr Cloud (x86)
+│   │       ├── linode/            # Linode/Akamai (x86)
+│   │       ├── coolify/           # Self-hosted PaaS deployment
+│   │       ├── coolify-cli/       # Coolify CLI reference
+│   │       ├── kasm/              # Container-based VDI
+│   │       ├── openclaw/          # AI gateway (multi-LLM, multi-channel)
+│   │       └── cloudflare-cli/    # Cloudflare DNS management
+│   └── tools/                     # Standalone utilities
+│       ├── .claude-plugin/
+│       │   └── plugin.json
+│       └── skills/                # 4 skills
+│           ├── simplemem/         # Semantic long-term memory via MCP
+│           ├── session-scout/     # Discover recent AI sessions
+│           ├── pi-agent-rust/     # pi_agent_rust development workflows
+│           └── iii/               # Cross-language backend engine
 ├── .claude-plugin/
-│   └── plugin.json        # name, description, author
-└── skills/
-    └── skill-name/
-        ├── SKILL.md       # Frontmatter + instructions, under 500 lines
-        ├── scripts/       # Executable code (run directly)
-        ├── references/    # Docs loaded on demand by Claude
-        └── assets/        # Files used in output (templates, images)
+│   ├── plugin.json
+│   └── marketplace.json
+└── .gitignore
 ```
 
-## Adding a New Plugin
+## Skill Anatomy
 
-1. Create the plugin directory:
+Every skill follows the Anthropic plugin spec:
+
+```
+skill-name/
+├── SKILL.md           # Frontmatter (name, description) + instructions
+├── scripts/           # Executable scripts (bash, PowerShell, TypeScript)
+├── references/        # Docs loaded on demand by Claude
+└── assets/            # Templates, configs, env files
+```
+
+### Rules
+
+- `SKILL.md` is the only required file — must have valid YAML frontmatter
+- Keep SKILL.md under 500 lines — "the context window is a public good"
+- Every skill must produce tangible output (files, configs, deployments), not just reference material
+- Scripts must be executable (`chmod +x`)
+- Cross-platform scripts: provide both `.sh` and `.ps1` variants
+
+## Adding a New Skill
+
+1. Create the skill directory under the appropriate plugin:
    ```bash
-   mkdir -p plugins/my-plugin/{.claude-plugin,skills}
+   mkdir -p plugins/admin-devops/skills/new-skill/{scripts,references,assets}
    ```
 
-2. Create `.claude-plugin/plugin.json`:
-   ```json
-   {
-     "name": "my-plugin",
-     "description": "What this plugin does.",
-     "author": { "name": "evolv3ai", "email": "hello@evolv3.ai" }
-   }
+2. Create `SKILL.md` with frontmatter:
+   ```yaml
+   ---
+   name: new-skill
+   description: What this skill does in one sentence.
+   ---
    ```
 
-3. Add skills inside `plugins/my-plugin/skills/` (each with SKILL.md)
+3. Add instructions, scripts, and references as needed.
 
-4. Add an entry to `.claude-plugin/marketplace.json`:
-   ```json
-   { "name": "my-plugin", "description": "...", "source": "./plugins/my-plugin", "category": "development" }
+4. Test locally:
+   ```bash
+   claude --plugin-dir ./plugins/admin-devops
    ```
 
-5. Update the directory tree in this file and the table in README.md
+## Adding a Slash Command
 
-**Categories**: `development`, `design`, `productivity`, `testing`, `security`, `database`, `monitoring`, `deployment`
+Create a markdown file in the plugin's `commands/` directory:
 
-## Creating a Skill
+```bash
+# plugins/admin-devops/commands/my-command.md
+```
 
-Ask Claude: "Create a new skill for [use case]"
+Commands are auto-discovered by Claude Code from the `commands/` directory.
 
-Key principle: **every skill must produce something.** If it's just reference material Claude already knows, it doesn't earn a place here.
+## Adding an Agent
 
-## Installing Plugins
+Create a markdown file in the plugin's `agents/` directory with frontmatter:
+
+```yaml
+---
+name: my-agent
+description: When to use this agent
+model: sonnet  # or haiku, opus
+tools:
+  - Read
+  - Bash
+  - Grep
+---
+```
+
+## Testing Skills
+
+- **Local dev**: `claude --plugin-dir ./plugins/admin-devops`
+- **Both plugins**: run two sessions or install via marketplace
+- **After changes**: restart Claude Code to reload plugins
+
+## Installing from Marketplace
 
 ```bash
 # Add marketplace (one-time)
-/plugin marketplace add evolv3ai/claude-skills
+/plugin marketplace add evolv3ai/agent-skills
 
-# Install individual plugins
-/plugin install admin@evolv3ai-skills
-/plugin install cloudflare@evolv3ai-skills
-/plugin install devops@evolv3ai-skills
-
-# Local dev (loads a single plugin without install)
-claude --plugin-dir ./plugins/cloudflare
+# Install plugins
+/plugin install admin-devops@agent-skills
+/plugin install tools@agent-skills
 ```
 
-After installing, restart Claude Code to load new plugins.
-
-## Quality Bar
+## Quality Checklist
 
 Before committing a skill:
 - [ ] SKILL.md has valid YAML frontmatter (name + description)
 - [ ] Under 500 lines
-- [ ] Produces tangible output (not just reference material)
-- [ ] Tested by actually using it on a real task
+- [ ] Produces tangible output
+- [ ] Tested on a real task
+- [ ] Scripts are executable
+- [ ] No hardcoded paths (use profile resolution)

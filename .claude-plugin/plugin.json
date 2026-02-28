@@ -1,8 +1,5 @@
 {
-  "name": "evolv3ai-skills",
-  "description": "Workflow skills for Claude Code — each produces tangible output",
-  "author": {
-    "name": "evolv3ai",
-    "email": "hello@evolv3.ai"
-  }
+  "name": "agent-skills",
+  "description": "Admin, DevOps, and utility skills for Claude Code agents",
+  "author": { "name": "evolv3ai", "email": "hello@evolv3.ai" }
 }

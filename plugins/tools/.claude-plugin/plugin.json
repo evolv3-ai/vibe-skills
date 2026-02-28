@@ -1,0 +1,5 @@
+{
+  "name": "tools",
+  "description": "Standalone utility skills for Claude Code agents",
+  "author": { "name": "evolv3ai", "email": "hello@evolv3.ai" }
+}

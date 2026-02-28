@@ -1,0 +1,5 @@
+{
+  "name": "admin-devops",
+  "description": "Local machine admin, remote infrastructure provisioning, and app deployment",
+  "author": { "name": "evolv3ai", "email": "hello@evolv3.ai" }
+}
