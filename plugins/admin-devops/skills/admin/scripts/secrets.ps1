@@ -5,13 +5,16 @@
 .DESCRIPTION
     PowerShell equivalent of the bash secrets CLI wrapper.
     Uses age encryption to manage secrets stored in $ADMIN_ROOT/vault.age.
+    Accepts both PowerShell-style (-List) and bash-style (--list) flags.
 .EXAMPLE
     .\secrets.ps1 HCLOUD_TOKEN          # Get single secret
-    .\secrets.ps1 -List                 # List all keys
+    .\secrets.ps1 -List                 # List all keys (PowerShell style)
+    .\secrets.ps1 --list                # List all keys (bash style)
     .\secrets.ps1 -Export               # KEY=value format
     .\secrets.ps1 -Source               # PowerShell $env: format
     .\secrets.ps1 -Decrypt              # Show all plaintext
     .\secrets.ps1 -Encrypt path.env     # Encrypt file to vault
+    .\secrets.ps1 --encrypt path.env    # Encrypt file (bash style)
     .\secrets.ps1 -Status               # Show vault status
 #>
 
@@ -19,6 +22,9 @@
 param(
     [Parameter(Position = 0, ParameterSetName = 'GetKey')]
     [string]$KeyName,
+
+    [Parameter(Position = 1, ParameterSetName = 'GetKey')]
+    [string]$TrailingArg,
 
     [Parameter(ParameterSetName = 'List')]
     [switch]$List,
@@ -73,6 +79,40 @@ function Resolve-AgeKey {
 $AdminRoot = Get-AdminRoot
 $AgeKey = Resolve-AgeKey
 $VaultFile = Join-Path $AdminRoot "vault.age"
+
+# --- Bash-style flag translation (--double-dash → PascalCase) ---
+# Allows: secrets.ps1 --list, secrets.ps1 -l, secrets.ps1 --encrypt FILE
+# See: https://github.com/evolv3-ai/vibe-skills/issues/2
+if ($KeyName -match '^--?' -and $PSCmdlet.ParameterSetName -eq 'GetKey') {
+    switch ($KeyName) {
+        { $_ -in '--list', '-l' }    { $List = $true; $KeyName = '' }
+        { $_ -in '--export', '-e' }  { $Export = $true; $KeyName = '' }
+        { $_ -in '--source', '-s' }  { $Source = $true; $KeyName = '' }
+        '--decrypt'                   { $Decrypt = $true; $KeyName = '' }
+        '--encrypt' {
+            if (-not $TrailingArg) {
+                Write-Error "Usage: secrets.ps1 --encrypt FILE"
+                exit 1
+            }
+            $Encrypt = $TrailingArg; $KeyName = ''
+        }
+        '--edit' {
+            Write-Host "Note: --edit is only available in the Bash version (secrets --edit)." -ForegroundColor Yellow
+            Write-Host "On Windows, decrypt manually, edit, and re-encrypt:" -ForegroundColor Yellow
+            Write-Host "  .\secrets.ps1 -Decrypt > temp.env" -ForegroundColor Cyan
+            Write-Host "  notepad temp.env" -ForegroundColor Cyan
+            Write-Host "  .\secrets.ps1 -Encrypt temp.env" -ForegroundColor Cyan
+            Write-Host "  Remove-Item temp.env" -ForegroundColor Cyan
+            return
+        }
+        '--status'                    { $Status = $true; $KeyName = '' }
+        { $_ -in '--help', '-h' }    { $Help = $true; $KeyName = '' }
+        default {
+            Write-Error "Unknown option: $KeyName`nRun 'secrets.ps1 -Help' for usage."
+            exit 1
+        }
+    }
+}
 
 # --- Validation ---
 function Assert-AgeKey {
@@ -177,7 +217,7 @@ function Show-Help {
     Write-Host @"
 Admin Vault - age-encrypted secrets management (PowerShell)
 
-Usage:
+Usage (PowerShell-style):
   .\secrets.ps1 KEY                - Get value for KEY
   .\secrets.ps1 -List              - List all secret keys
   .\secrets.ps1 -Export            - Export all secrets (KEY=value format)
@@ -186,6 +226,17 @@ Usage:
   .\secrets.ps1 -Encrypt FILE      - Encrypt plaintext file to vault
   .\secrets.ps1 -Status            - Show vault status and paths
   .\secrets.ps1 -Help              - Show this help
+
+Usage (Bash-style -- also accepted):
+  .\secrets.ps1 --list             .\secrets.ps1 -l
+  .\secrets.ps1 --export           .\secrets.ps1 -e
+  .\secrets.ps1 --source           .\secrets.ps1 -s
+  .\secrets.ps1 --decrypt
+  .\secrets.ps1 --encrypt FILE
+  .\secrets.ps1 --status
+  .\secrets.ps1 --help             .\secrets.ps1 -h
+
+Note: --edit is bash-only. On Windows, decrypt/edit/re-encrypt manually.
 
 Examples:
   .\secrets.ps1 HCLOUD_TOKEN              # Get Hetzner API token
@@ -221,4 +272,5 @@ if ($KeyName) {
 }
 
 Write-Host "Usage: .\secrets.ps1 KEY | -List | -Export | -Source | -Decrypt | -Encrypt FILE | -Status | -Help" -ForegroundColor Yellow
+Write-Host "       Bash-style flags also accepted: --list, --export, --source, --decrypt, --encrypt FILE, --status, --help" -ForegroundColor Yellow
 exit 1
