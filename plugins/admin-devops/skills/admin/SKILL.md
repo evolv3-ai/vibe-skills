@@ -144,7 +144,7 @@ Secrets can be encrypted at rest using [age encryption](https://age-encryption.o
 
 **CLI (Bash)**: `secrets KEYNAME` | `secrets --list` | `eval $(secrets -s)` | `secrets --edit`
 
-**CLI (PowerShell)**: `secrets.ps1 KEY` | `secrets.ps1 -List` | `secrets.ps1 -Source` | `secrets.ps1 -Status`
+**CLI (PowerShell)**: `secrets.ps1 KEY` | `secrets.ps1 -List` | `secrets.ps1 -Source` | `secrets.ps1 -Status` (also accepts bash-style `--list`, `--export`, etc.)
 
 **Feature flag**: `ADMIN_VAULT=enabled|disabled` in satellite `~/.admin/.env`. Falls back to plaintext when disabled or deps missing.
 

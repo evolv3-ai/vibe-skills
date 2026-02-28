@@ -74,7 +74,7 @@ eval $(secrets -s)         # Load all to shell
 .\secrets.ps1 -Source | Invoke-Expression  # Load all to env
 ```
 
-> **Note**: Bash uses `--double-dash` flags. PowerShell uses `-PascalCase` switches. Do not mix them.
+> **Note**: Bash uses `--double-dash` flags. PowerShell uses `-PascalCase` switches. PowerShell also accepts bash-style `--double-dash` flags for cross-platform compatibility.
 
 ## Daily Usage
 
