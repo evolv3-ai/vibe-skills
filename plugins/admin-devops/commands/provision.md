@@ -26,7 +26,7 @@ Provision a new server on a cloud provider through an interactive TUI interview.
 Verify profile exists and load it:
 
 ```bash
-result=$("${CLAUDE_PLUGIN_ROOT}/../admin/scripts/test-admin-profile.sh")
+result=$("${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/test-admin-profile.sh")
 if [[ $(echo "$result" | jq -r '.exists') != "true" ]]; then
     echo "HALT: No profile. Run /setup-profile first."
     exit 1

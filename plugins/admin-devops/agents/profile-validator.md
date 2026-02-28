@@ -143,7 +143,7 @@ Generate a structured report:
 
 Profile test:
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/scripts/test-admin-profile.sh"
+"${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/test-admin-profile.sh"
 ```
 
 Validate JSON:

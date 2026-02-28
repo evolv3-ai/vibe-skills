@@ -81,7 +81,7 @@ Before ANY installation:
 
 ### 1. Load Profile
 ```bash
-result=$("${CLAUDE_PLUGIN_ROOT}/scripts/test-admin-profile.sh")
+result=$("${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/test-admin-profile.sh")
 if [[ $(echo "$result" | jq -r '.exists') != "true" ]]; then
     echo "HALT: No profile. User must run /setup-profile first."
     exit 1
@@ -182,7 +182,7 @@ echo "$PROFILE" | jq . > "$PROFILE_PATH"
 
 ### 2. Log Operation
 ```bash
-source "${CLAUDE_PLUGIN_ROOT}/scripts/log-admin-event.sh"
+source "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/log-admin-event.sh"
 log_admin_event "Installed docker v24.0.0" "OK"
 ```
 

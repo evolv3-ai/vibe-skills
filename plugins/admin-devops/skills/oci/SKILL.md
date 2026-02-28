@@ -124,6 +124,10 @@ oci iam availability-domain list
 
 **If this fails**: API key may not be uploaded to OCI Console → Profile → API Keys
 
+**Script path resolution**: When Claude Code loads this file, it provides the full
+path. All `scripts/` references below are relative to this file's directory.
+Derive `SKILL_DIR` from this file's path and prepend it when running scripts.
+
 ---
 
 ## Quick Start
@@ -133,7 +137,7 @@ oci iam availability-domain list
 OCI Always Free ARM instances are highly demanded. **Always check before deploying:**
 
 ```bash
-./scripts/check-oci-capacity.sh
+scripts/check-oci-capacity.sh
 ```
 
 <details>
@@ -141,22 +145,22 @@ OCI Always Free ARM instances are highly demanded. **Always check before deployi
 
 ```bash
 # Check specific region
-./scripts/check-oci-capacity.sh us-ashburn-1
+scripts/check-oci-capacity.sh us-ashburn-1
 
 # Use different OCI profile
-./scripts/check-oci-capacity.sh --profile PRODUCTION
+scripts/check-oci-capacity.sh --profile PRODUCTION
 
 # Check multiple regions
 for region in us-ashburn-1 us-phoenix-1 ca-toronto-1; do
   echo "=== $region ==="
-  ./scripts/check-oci-capacity.sh "$region"
+  scripts/check-oci-capacity.sh "$region"
 done
 ```
 
 **No capacity?** Use automated monitoring:
 
 ```bash
-./scripts/monitor-and-deploy.sh --stack-id <STACK_OCID>
+scripts/monitor-and-deploy.sh --stack-id <STACK_OCID>
 ```
 
 </details>
@@ -169,7 +173,7 @@ cp scripts/.env.example scripts/.env
 # Edit scripts/.env with your values
 
 # Deploy
-./scripts/oci-infrastructure-setup.sh
+scripts/oci-infrastructure-setup.sh
 ```
 
 ---
@@ -178,10 +182,10 @@ cp scripts/.env.example scripts/.env
 
 | Script | Purpose | Usage |
 |--------|---------|-------|
-| `check-oci-capacity.sh` | Check ARM instance availability | `./scripts/check-oci-capacity.sh [region]` |
-| `oci-infrastructure-setup.sh` | Full infrastructure deployment | `./scripts/oci-infrastructure-setup.sh` |
-| `monitor-and-deploy.sh` | Auto-deploy when capacity available | `./scripts/monitor-and-deploy.sh --stack-id <ID>` |
-| `cleanup-compartment.sh` | Delete all resources | `./scripts/cleanup-compartment.sh <COMPARTMENT_OCID>` |
+| `check-oci-capacity.sh` | Check ARM instance availability | `scripts/check-oci-capacity.sh [region]` |
+| `oci-infrastructure-setup.sh` | Full infrastructure deployment | `scripts/oci-infrastructure-setup.sh` |
+| `monitor-and-deploy.sh` | Auto-deploy when capacity available | `scripts/monitor-and-deploy.sh --stack-id <ID>` |
+| `cleanup-compartment.sh` | Delete all resources | `scripts/cleanup-compartment.sh <COMPARTMENT_OCID>` |
 
 <details>
 <summary><strong>Script details</strong></summary>
@@ -191,9 +195,9 @@ cp scripts/.env.example scripts/.env
 Checks VM.Standard.A1.Flex availability across availability domains.
 
 ```bash
-./scripts/check-oci-capacity.sh                    # Home region
-./scripts/check-oci-capacity.sh us-ashburn-1       # Specific region
-./scripts/check-oci-capacity.sh --profile DANIEL   # With profile
+scripts/check-oci-capacity.sh                    # Home region
+scripts/check-oci-capacity.sh us-ashburn-1       # Specific region
+scripts/check-oci-capacity.sh --profile DANIEL   # With profile
 ```
 
 Tests 4 OCPU / 24GB RAM (full free tier), falls back to 2/12 if unavailable.
@@ -203,7 +207,7 @@ Tests 4 OCPU / 24GB RAM (full free tier), falls back to 2/12 if unavailable.
 Continuously monitors and auto-deploys when capacity found.
 
 ```bash
-./scripts/monitor-and-deploy.sh \
+scripts/monitor-and-deploy.sh \
   --stack-id <STACK_OCID> \
   --profile DANIEL \
   --interval 300 \
@@ -221,7 +225,7 @@ Requires `.env` file with OCI credentials and configuration.
 Safely deletes compartment and all resources (requires confirmation).
 
 ```bash
-./scripts/cleanup-compartment.sh ocid1.compartment.oc1..xxx
+scripts/cleanup-compartment.sh ocid1.compartment.oc1..xxx
 ```
 
 </details>

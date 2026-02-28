@@ -3,18 +3,23 @@
 > **Note**: The critical profile gate instructions are in `SKILL.md`. This file provides
 > supplementary details and load commands.
 
+> **Path resolution**: These scripts live in the admin skill's `scripts/` directory.
+> From commands/agents, use `${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/`.
+> From SKILL.md contexts, derive the admin skill path from this file's location
+> (sibling skill at `../../admin/scripts/`).
+
 ---
 
 ## Quick Test Commands
 
 **PowerShell (Windows):**
 ```powershell
-pwsh -NoProfile -File "$HOME\.claude\skills\admin\scripts\Test-AdminProfile.ps1"
+pwsh -NoProfile -File "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/Test-AdminProfile.ps1"
 ```
 
 **Bash (WSL/Linux/macOS):**
 ```bash
-~/.claude/skills/admin/scripts/test-admin-profile.sh
+"${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/test-admin-profile.sh"
 ```
 
 Returns JSON: `{"exists":true|false,"path":"...","device":"...",...}`
@@ -31,7 +36,7 @@ If profile doesn't exist, use the TUI interview defined in `SKILL.md`:
 
 **PowerShell:**
 ```powershell
-pwsh -NoProfile -File "$HOME\.claude\skills\admin\scripts\New-AdminProfile.ps1" `
+pwsh -NoProfile -File "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/New-AdminProfile.ps1" `
   -AdminRoot "$HOME/.admin" `
   -PkgMgr "winget" `
   -PyMgr "uv" `
@@ -42,7 +47,7 @@ pwsh -NoProfile -File "$HOME\.claude\skills\admin\scripts\New-AdminProfile.ps1" 
 
 **Bash:**
 ```bash
-~/.claude/skills/admin/scripts/new-admin-profile.sh \
+"${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/new-admin-profile.sh" \
   --admin-root "$HOME/.admin" \
   --pkg-mgr "brew" \
   --py-mgr "uv" \
@@ -59,13 +64,13 @@ Add `-MultiDevice` / `--multi-device` for cloud-synced storage.
 
 **PowerShell:**
 ```powershell
-. "$HOME\.claude\skills\admin\scripts\Load-Profile.ps1"
+. "${CLAUDE_PLUGIN_ROOT}\skills\admin\scripts\Load-Profile.ps1"
 Load-AdminProfile -Export
 ```
 
 **Bash:**
 ```bash
-source ~/.claude/skills/admin/scripts/load-profile.sh
+source "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/load-profile.sh"
 load_admin_profile
 ```
 

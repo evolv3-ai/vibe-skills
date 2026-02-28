@@ -16,7 +16,7 @@ Display server inventory status from the device profile.
 ### Step 1: Load Profile
 
 ```bash
-result=$("${CLAUDE_PLUGIN_ROOT}/../admin/scripts/test-admin-profile.sh")
+result=$("${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/test-admin-profile.sh")
 if [[ $(echo "$result" | jq -r '.exists') != "true" ]]; then
     echo "No profile found. Run /setup-profile first."
     exit 1

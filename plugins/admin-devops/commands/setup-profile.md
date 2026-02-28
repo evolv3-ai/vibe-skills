@@ -21,12 +21,12 @@ Run the profile test script to determine current state:
 
 **PowerShell (Windows):**
 ```powershell
-pwsh -NoProfile -File "${CLAUDE_PLUGIN_ROOT}/scripts/Test-AdminProfile.ps1"
+pwsh -NoProfile -File "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/Test-AdminProfile.ps1"
 ```
 
 **Bash (WSL/Linux/macOS):**
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/scripts/test-admin-profile.sh"
+"${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/test-admin-profile.sh"
 ```
 
 Returns JSON: `{"exists":true|false,"path":"...","device":"..."}`
@@ -99,7 +99,7 @@ Pass the collected answers to the setup script:
 
 **PowerShell:**
 ```powershell
-pwsh -NoProfile -File "${CLAUDE_PLUGIN_ROOT}/scripts/New-AdminProfile.ps1" `
+pwsh -NoProfile -File "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/New-AdminProfile.ps1" `
   -AdminRoot "C:/Users/You/.admin" `
   -PkgMgr "winget" `
   -PyMgr "uv" `
@@ -110,7 +110,7 @@ pwsh -NoProfile -File "${CLAUDE_PLUGIN_ROOT}/scripts/New-AdminProfile.ps1" `
 
 **Bash:**
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/scripts/new-admin-profile.sh" \
+"${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/new-admin-profile.sh" \
   --admin-root "$HOME/.admin" \
   --pkg-mgr "brew" \
   --py-mgr "uv" \

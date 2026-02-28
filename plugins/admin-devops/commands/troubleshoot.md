@@ -234,13 +234,13 @@ Testing connection: `ssh -T git@github.com` - SUCCESS
 
 Create issue:
 ```bash
-source "${CLAUDE_PLUGIN_ROOT}/scripts/new-admin-issue.sh"
+source "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/new-admin-issue.sh"
 new_admin_issue "Git SSH not working" "Network/SSH" "high"
 ```
 
 Update issue:
 ```bash
-source "${CLAUDE_PLUGIN_ROOT}/scripts/update-admin-issue.sh"
+source "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/update-admin-issue.sh"
 update_admin_issue "ISSUE-001" "status" "closed"
 ```
 
