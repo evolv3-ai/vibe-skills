@@ -13,8 +13,10 @@ description: |
 
 # Admin - Local Machine Companion (Alpha)
 
-**Script paths**: All paths below are relative to this skill's base directory.
-Prepend the base directory shown above when running scripts (e.g., `{base}/scripts/test-admin-profile.sh`).
+**Script path resolution**: When Claude Code loads this file, it provides the full
+path. All `scripts/` references below are relative to this file's directory.
+Derive `SKILL_DIR` from this file's path and prepend it when running scripts
+(e.g., if loaded from `/path/to/skills/admin/SKILL.md`, run `/path/to/skills/admin/scripts/test-admin-profile.sh`).
 
 ---
 

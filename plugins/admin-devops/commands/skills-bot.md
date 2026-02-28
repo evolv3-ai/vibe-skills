@@ -106,7 +106,7 @@ Then:
 Scan `~/.claude/skills/` and update registry to match:
 
 ```bash
-source "${CLAUDE_PLUGIN_ROOT}/scripts/skills-sync.sh"
+source "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/skills-sync.sh"
 sync_skills_registry
 ```
 
@@ -196,13 +196,13 @@ Usage Count: 47 (this month)
 
 Sync registry:
 ```bash
-source "${CLAUDE_PLUGIN_ROOT}/scripts/skills-sync.sh"
+source "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/skills-sync.sh"
 sync_skills_registry
 ```
 
 Update registry entry:
 ```powershell
-& "${CLAUDE_PLUGIN_ROOT}/scripts/skills-update-registry.ps1" `
+& "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/skills-update-registry.ps1" `
   -SkillName "admin" `
   -Field "status" `
   -Value "disabled"

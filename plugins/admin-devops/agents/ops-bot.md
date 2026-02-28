@@ -78,7 +78,7 @@ Before ANY operation:
 
 ### 1. Profile Gate
 ```bash
-result=$("${SKILL_BASE}/scripts/test-admin-profile.sh")
+result=$("${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/test-admin-profile.sh")
 if [[ $(echo "$result" | jq -r '.exists') != "true" ]]; then
     echo "HALT: No profile. User must run /setup-profile first."
     exit 1
@@ -87,7 +87,7 @@ fi
 
 ### 2. Load Profile
 ```bash
-source "${SKILL_BASE}/scripts/load-profile.sh"
+source "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/load-profile.sh"
 load_admin_profile
 ```
 
@@ -145,7 +145,7 @@ Safely move profile + vault between locations (e.g., local to Dropbox, Dropbox t
    ```
 6. **Verify round-trip** - Load profile from new location:
    ```bash
-   ADMIN_ROOT="$NEW_ROOT" source "${SKILL_BASE}/scripts/load-profile.sh"
+   ADMIN_ROOT="$NEW_ROOT" source "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/load-profile.sh"
    load_admin_profile
    # Should succeed with correct device name and platform
    ```
@@ -308,7 +308,7 @@ SOURCE_DATE=$(echo "$SOURCE_JSON" | jq -r '.device.lastUpdated')
 
 #### Step 2: Load Current Profile
 ```bash
-source "${SKILL_BASE}/scripts/load-profile.sh"
+source "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/load-profile.sh"
 load_admin_profile
 CURRENT_PATH="$ADMIN_PROFILE_PATH"
 CURRENT_JSON="$ADMIN_PROFILE_JSON"

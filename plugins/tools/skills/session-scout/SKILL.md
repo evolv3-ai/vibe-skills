@@ -12,6 +12,10 @@ description: |
 **Last Updated**: 2026-02-13
 **Dependencies**: PowerShell 7+ (Windows) or Bash 4+ (macOS/Linux)
 
+**Script path resolution**: When Claude Code loads this file, it provides the full
+path. All `scripts/` references below are relative to this file's directory.
+Derive `SKILL_DIR` from this file's path and prepend it when running scripts.
+
 ---
 
 ## Quick Start (1 Minute)
@@ -21,19 +25,19 @@ description: |
 **macOS / Linux:**
 ```bash
 # Show recent sessions (default: top 12)
-~/.claude/skills/session-scout/scripts/session-scout.sh
+scripts/session-scout.sh
 
 # Show more sessions
-~/.claude/skills/session-scout/scripts/session-scout.sh --top 20
+scripts/session-scout.sh --top 20
 ```
 
 **Windows (PowerShell):**
 ```powershell
 # Show recent sessions (default: top 12)
-pwsh -ExecutionPolicy Bypass -File ~/.claude/skills/session-scout/scripts/Session-Scout.ps1
+pwsh -ExecutionPolicy Bypass -File scripts/Session-Scout.ps1
 
 # Show more sessions
-pwsh -ExecutionPolicy Bypass -File ~/.claude/skills/session-scout/scripts/Session-Scout.ps1 -Top 20
+pwsh -ExecutionPolicy Bypass -File scripts/Session-Scout.ps1 -Top 20
 ```
 
 **Output columns:**
@@ -48,19 +52,19 @@ pwsh -ExecutionPolicy Bypass -File ~/.claude/skills/session-scout/scripts/Sessio
 **macOS / Linux:**
 ```bash
 # Export to default location (~/.admin/logs/session-scout-YYYY-MM-DD.csv)
-~/.claude/skills/session-scout/scripts/session-scout.sh --csv
+scripts/session-scout.sh --csv
 
 # Export to custom path
-~/.claude/skills/session-scout/scripts/session-scout.sh --file ~/exports/sessions.csv
+scripts/session-scout.sh --file ~/exports/sessions.csv
 ```
 
 **Windows (PowerShell):**
 ```powershell
 # Export to default location (~/.admin/logs/session-scout-YYYY-MM-DD.csv)
-pwsh -ExecutionPolicy Bypass -File ~/.claude/skills/session-scout/scripts/Session-Scout.ps1 -Csv
+pwsh -ExecutionPolicy Bypass -File scripts/Session-Scout.ps1 -Csv
 
 # Export to custom path
-pwsh -ExecutionPolicy Bypass -File ~/.claude/skills/session-scout/scripts/Session-Scout.ps1 -File "D:\exports\sessions.csv"
+pwsh -ExecutionPolicy Bypass -File scripts/Session-Scout.ps1 -File "D:\exports\sessions.csv"
 ```
 
 ---

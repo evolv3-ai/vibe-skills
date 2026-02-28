@@ -57,21 +57,26 @@ Use profile.servers for inventory; do not maintain a separate list.
 
 ## Logging (MANDATORY)
 
-Uses local logging scripts (synced from admin):
-
-Logging scripts are synced from the admin plugin. Source them relative to the admin skill:
+Logging scripts live in the admin skill. From commands or agents (where
+`${CLAUDE_PLUGIN_ROOT}` is available), source them as:
 
 ```bash
-source scripts/log-admin-event.sh  # if synced from admin
+source "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/log-admin-event.sh"
 log_admin_event "Provisioned Hetzner server" "OK"
 ```
 
 ```powershell
-. "scripts\Log-AdminEvent.ps1"  # if synced from admin
+. "${CLAUDE_PLUGIN_ROOT}\skills\admin\scripts\Log-AdminEvent.ps1"
 Log-AdminEvent -Message "Provisioned Hetzner server" -Level OK
 ```
 
+When running from a SKILL.md context, resolve the admin skill path from the
+plugin directory structure (sibling skill under `skills/admin/`).
+
 ## Scripts / References
+
+**Script path resolution**: When Claude Code loads this file, it provides the full
+path. All `scripts/` references below are relative to this file's directory.
 
 - Inventory scripts: `scripts/agentDevopsInventory.ts`, `scripts/agent_devops_inventory.py`
 - Provider references: `references/*.md` (per-provider deployment guides)

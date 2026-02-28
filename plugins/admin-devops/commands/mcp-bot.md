@@ -82,7 +82,7 @@ Then run the installation:
 
 **PowerShell:**
 ```powershell
-& "${CLAUDE_PLUGIN_ROOT}/scripts/mcp-install-server.ps1" `
+& "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/mcp-install-server.ps1" `
   -ServerName "filesystem" `
   -Package "@anthropic/mcp-fs" `
   -Method "npx" `
@@ -95,7 +95,7 @@ Run comprehensive diagnostics:
 
 **PowerShell:**
 ```powershell
-& "${CLAUDE_PLUGIN_ROOT}/scripts/mcp-diagnose.ps1"
+& "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/mcp-diagnose.ps1"
 ```
 
 Checks:
@@ -126,7 +126,7 @@ Then:
 
 **PowerShell:**
 ```powershell
-& "${CLAUDE_PLUGIN_ROOT}/scripts/mcp-remove-server.ps1" -ServerName "filesystem"
+& "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/mcp-remove-server.ps1" -ServerName "filesystem"
 ```
 
 ### `/mcp-bot registry` - Manage Registry
@@ -138,7 +138,7 @@ cat ~/.admin/mcp-registry.json | jq .
 
 #### Add to Registry
 ```powershell
-& "${CLAUDE_PLUGIN_ROOT}/scripts/mcp-add-server.ps1" `
+& "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/mcp-add-server.ps1" `
   -ServerName "custom-server" `
   -Package "@user/mcp-server" `
   -Description "My custom MCP server"
@@ -147,7 +147,7 @@ cat ~/.admin/mcp-registry.json | jq .
 #### Sync Registry
 Scan Claude Desktop config and update registry with current state:
 ```powershell
-& "${CLAUDE_PLUGIN_ROOT}/scripts/mcp-scan-clients.ps1"
+& "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/mcp-scan-clients.ps1"
 ```
 
 ## MCP Registry Format
