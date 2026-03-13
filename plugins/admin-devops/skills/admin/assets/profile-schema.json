@@ -192,6 +192,38 @@
         }
       }
     },
+    "secrets": {
+      "type": ["object", "null"],
+      "description": "Secrets backend configuration (primary + fallback)",
+      "properties": {
+        "backend": {
+          "enum": ["infisical", "vault", "env"],
+          "description": "Primary secrets backend"
+        },
+        "fallback": {
+          "enum": ["vault", "env", "none"],
+          "description": "Fallback backend when primary is unavailable"
+        },
+        "infisical": {
+          "type": ["object", "null"],
+          "description": "Infisical Cloud configuration",
+          "properties": {
+            "projectId": {
+              "type": "string",
+              "description": "Infisical project ID"
+            },
+            "environment": {
+              "type": "string",
+              "description": "Infisical environment slug (e.g., prod, dev)"
+            },
+            "authMethod": {
+              "enum": ["machine-identity", "cli-login"],
+              "description": "How to authenticate with Infisical"
+            }
+          }
+        }
+      }
+    },
     "deployments": {
       "type": "object",
       "description": "References to deployment configurations (.env.local files)",

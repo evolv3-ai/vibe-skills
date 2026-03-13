@@ -21,6 +21,16 @@ ADMIN_PLATFORM=                          # Platform: windows | wsl | linux | mac
 ADMIN_VAULT=                             # enabled | disabled (default: disabled)
 AGE_KEY_PATH=                            # Path to age key (default: ~/.age/key.txt)
 
+# --- Secrets Backend ---
+ADMIN_SECRETS_BACKEND=                   # infisical | vault | env (default: vault)
+INFISICAL_PROJECT_ID=                    # Infisical project ID
+INFISICAL_ENVIRONMENT=                   # Infisical environment (default: prod)
+INFISICAL_AUTH_METHOD=                   # machine-identity | cli-login (default: cli-login)
+
+# --- Remote Profile Sync ---
+ADMIN_PROFILE_REPO=                      # GitHub repo URL for profile sync
+ADMIN_PROFILE_AUTO_PULL=                 # true | false (default: false)
+
 # --- Identity ---
 ADMIN_USER=                              # Primary admin username
 DEVICE_NAME=                             # Alias for ADMIN_DEVICE (legacy compat)

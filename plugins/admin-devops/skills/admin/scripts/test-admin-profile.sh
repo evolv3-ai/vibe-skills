@@ -70,6 +70,8 @@ test_admin_profile() {
     local py_mgr=""
     local node_mgr=""
     local shell_pref=""
+    local secrets_backend=""
+    local profile_repo=""
 
     # Priority 1: ADMIN_ROOT env var already set
     if [[ -n "${ADMIN_ROOT:-}" ]]; then
@@ -87,6 +89,8 @@ test_admin_profile() {
         py_mgr=$(read_satellite_var "ADMIN_PY_MGR" "$SATELLITE_ENV")
         node_mgr=$(read_satellite_var "ADMIN_NODE_MGR" "$SATELLITE_ENV")
         shell_pref=$(read_satellite_var "ADMIN_SHELL" "$SATELLITE_ENV")
+        secrets_backend=$(read_satellite_var "ADMIN_SECRETS_BACKEND" "$SATELLITE_ENV")
+        profile_repo=$(read_satellite_var "ADMIN_PROFILE_REPO" "$SATELLITE_ENV")
         device_name="${device_name:-$(hostname)}"
 
     # Priority 3: Legacy fallback (no satellite .env yet)
@@ -130,9 +134,16 @@ test_admin_profile() {
         prefs_json+=',"python":"'"${py_mgr}"'","node":"'"${node_mgr}"'","shell":"'"${shell_pref}"'"}'
     fi
 
+    # Build secrets/sync JSON fragment
+    local secrets_json=""
+    if [[ -n "$secrets_backend" || -n "$profile_repo" ]]; then
+        secrets_json=',"secretsBackend":"'"${secrets_backend:-vault}"'"'
+        [[ -n "$profile_repo" ]] && secrets_json+=',"profileRepo":"'"${profile_repo}"'"'
+    fi
+
     # Output JSON
     cat <<JSON
-{"exists":${exists},"path":"${profile_path}","device":"${device_name}","adminRoot":"${admin_root}","schemaVersion":"${schema_version}","adminSkillVersion":"${skill_version}","platform":"${platform}"${prefs_json}}
+{"exists":${exists},"path":"${profile_path}","device":"${device_name}","adminRoot":"${admin_root}","schemaVersion":"${schema_version}","adminSkillVersion":"${skill_version}","platform":"${platform}"${prefs_json}${secrets_json}}
 JSON
 }
 

@@ -136,6 +136,27 @@ AGE_KEY="$(resolve_age_key)"
 VAULT_FILE="${ADMIN_ROOT}/vault.age"
 ADMIN_VAULT_MODE="$(resolve_vault_mode)"
 
+resolve_secrets_backend() {
+    if [[ -n "${ADMIN_SECRETS_BACKEND:-}" ]]; then
+        echo "$ADMIN_SECRETS_BACKEND"; return
+    fi
+    if [[ -f "$SATELLITE_ENV" ]]; then
+        local backend
+        backend=$(grep "^ADMIN_SECRETS_BACKEND=" "$SATELLITE_ENV" 2>/dev/null | head -1 | cut -d'=' -f2-)
+        if [[ -n "$backend" ]]; then
+            echo "$backend"; return
+        fi
+    fi
+    # If no explicit backend set, infer from vault mode
+    if [[ "$ADMIN_VAULT_MODE" == "enabled" ]]; then
+        echo "vault"
+    else
+        echo "env"
+    fi
+}
+
+SECRETS_BACKEND="$(resolve_secrets_backend)"
+
 check_vault_deps() {
     if ! command -v age &> /dev/null; then
         log_warn "age not installed (needed for vault). Install: sudo apt install age"
@@ -155,7 +176,46 @@ check_vault_deps() {
 load_admin_secrets() {
     local export_vars="${1:-true}"
 
-    if [[ "$ADMIN_VAULT_MODE" == "enabled" ]]; then
+    # Infisical backend
+    if [[ "$SECRETS_BACKEND" == "infisical" ]]; then
+        if command -v infisical &>/dev/null; then
+            local project_id env_slug
+            project_id=$(grep "^INFISICAL_PROJECT_ID=" "$SATELLITE_ENV" 2>/dev/null | head -1 | cut -d'=' -f2-)
+            env_slug=$(grep "^INFISICAL_ENVIRONMENT=" "$SATELLITE_ENV" 2>/dev/null | head -1 | cut -d'=' -f2-)
+            env_slug="${env_slug:-prod}"
+
+            if [[ -n "$project_id" ]]; then
+                log_info "Loading secrets from Infisical (env: $env_slug)"
+                local count=0
+                local key value
+                while IFS= read -r line || [[ -n "$line" ]]; do
+                    [[ -z "${line// }" ]] && continue
+                    [[ "$line" != *"="* ]] && continue
+
+                    key="${line%%=*}"
+                    [[ "$key" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ]] || continue
+
+                    value="${line#*=}"
+                    value="${value#\"}"; value="${value%\"}"
+                    value="${value#\'}"; value="${value%\'}"
+
+                    if [[ "$export_vars" == "true" ]]; then
+                        export "$key=$value"
+                    fi
+                    count=$((count + 1))
+                done < <(infisical export --projectId "$project_id" --env "$env_slug" --format=dotenv 2>/dev/null)
+                log_ok "Loaded $count secrets from Infisical"
+                return 0
+            else
+                log_warn "INFISICAL_PROJECT_ID not set - falling back to vault"
+            fi
+        else
+            log_warn "infisical CLI not installed - falling back to vault"
+        fi
+    fi
+
+    # Vault backend (also serves as fallback from Infisical)
+    if [[ "$SECRETS_BACKEND" == "vault" || "$ADMIN_VAULT_MODE" == "enabled" ]]; then
         if check_vault_deps; then
             log_info "Decrypting vault: $VAULT_FILE"
             local count=0
@@ -180,11 +240,11 @@ load_admin_secrets() {
             log_ok "Loaded $count secrets from vault"
             return 0
         else
-            log_warn "Vault enabled but deps missing - falling back to plaintext .env"
+            log_warn "Vault deps missing - falling back to plaintext .env"
         fi
     fi
 
-    # Fallback: load plaintext .env if it exists
+    # Env backend (also final fallback)
     local master_env="${ADMIN_ROOT}/.env"
     if [[ -f "$master_env" ]]; then
         log_info "Loading secrets from plaintext .env"

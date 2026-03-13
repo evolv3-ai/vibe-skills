@@ -1,18 +1,20 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Admin Vault - age-encrypted secrets management (PowerShell)
+    Admin Secrets - multi-backend secrets management (PowerShell)
 .DESCRIPTION
-    PowerShell equivalent of the bash secrets CLI wrapper.
-    Uses age encryption to manage secrets stored in $ADMIN_ROOT/vault.age.
+    Supports three backends: infisical (cloud), vault (age-encrypted), env (plaintext).
+    Uses satellite ~/.admin/.env to resolve backend, paths, and Infisical config.
 .EXAMPLE
-    .\secrets.ps1 HCLOUD_TOKEN          # Get single secret
-    .\secrets.ps1 -List                 # List all keys
-    .\secrets.ps1 -Export               # KEY=value format
-    .\secrets.ps1 -Source               # PowerShell $env: format
-    .\secrets.ps1 -Decrypt              # Show all plaintext
-    .\secrets.ps1 -Encrypt path.env     # Encrypt file to vault
-    .\secrets.ps1 -Status               # Show vault status
+    .\secrets.ps1 HCLOUD_TOKEN              # Get from current backend
+    .\secrets.ps1 -List                     # List all keys
+    .\secrets.ps1 -Export                   # KEY=value format
+    .\secrets.ps1 -Source                   # PowerShell $env: format
+    .\secrets.ps1 -Decrypt                  # Show vault plaintext
+    .\secrets.ps1 -Encrypt path.env         # Encrypt file to vault
+    .\secrets.ps1 -Status                   # Show backend status
+    .\secrets.ps1 -Backend infisical -List  # Force Infisical backend
+    .\secrets.ps1 -MigrateToInfisical       # Push vault -> Infisical
 #>
 
 [CmdletBinding(DefaultParameterSetName = 'GetKey')]
@@ -38,8 +40,15 @@ param(
     [Parameter(ParameterSetName = 'Status')]
     [switch]$Status,
 
+    [Parameter(ParameterSetName = 'Migrate')]
+    [switch]$MigrateToInfisical,
+
     [Parameter(ParameterSetName = 'Help')]
-    [switch]$Help
+    [switch]$Help,
+
+    [Parameter()]
+    [ValidateSet('infisical', 'vault', 'env')]
+    [string]$Backend
 )
 
 # --- Resolve paths ---
@@ -73,6 +82,175 @@ function Resolve-AgeKey {
 $AdminRoot = Get-AdminRoot
 $AgeKey = Resolve-AgeKey
 $VaultFile = Join-Path $AdminRoot "vault.age"
+
+# --- Backend resolution ---
+function Resolve-SecretsBackend {
+    if ($Backend) { return $Backend }
+    if ($env:ADMIN_SECRETS_BACKEND) { return $env:ADMIN_SECRETS_BACKEND }
+    $satelliteEnv = Join-Path $HOME ".admin\.env"
+    if (Test-Path $satelliteEnv) {
+        $match = Select-String -Path $satelliteEnv -Pattern "^ADMIN_SECRETS_BACKEND=(.+)$" | Select-Object -First 1
+        if ($match) { return $match.Matches.Groups[1].Value }
+    }
+    return "vault"
+}
+
+function Resolve-InfisicalProjectId {
+    if ($env:INFISICAL_PROJECT_ID) { return $env:INFISICAL_PROJECT_ID }
+    $satelliteEnv = Join-Path $HOME ".admin\.env"
+    if (Test-Path $satelliteEnv) {
+        $match = Select-String -Path $satelliteEnv -Pattern "^INFISICAL_PROJECT_ID=(.+)$" | Select-Object -First 1
+        if ($match) { return $match.Matches.Groups[1].Value }
+    }
+    return $null
+}
+
+function Resolve-InfisicalEnv {
+    if ($env:INFISICAL_ENVIRONMENT) { return $env:INFISICAL_ENVIRONMENT }
+    $satelliteEnv = Join-Path $HOME ".admin\.env"
+    if (Test-Path $satelliteEnv) {
+        $match = Select-String -Path $satelliteEnv -Pattern "^INFISICAL_ENVIRONMENT=(.+)$" | Select-Object -First 1
+        if ($match) { return $match.Matches.Groups[1].Value }
+    }
+    return "prod"
+}
+
+$SecretsBackend = Resolve-SecretsBackend
+
+# --- Infisical operations ---
+function Test-InfisicalReady {
+    if (-not (Get-Command infisical -ErrorAction SilentlyContinue)) {
+        Write-Error "infisical CLI not installed. See: https://infisical.com/docs/cli/overview"
+        return $false
+    }
+    $projectId = Resolve-InfisicalProjectId
+    if (-not $projectId) {
+        Write-Error "INFISICAL_PROJECT_ID not set in satellite .env or environment"
+        return $false
+    }
+    return $true
+}
+
+function Get-InfisicalSecret {
+    param([string]$Key)
+    $projectId = Resolve-InfisicalProjectId
+    $envSlug = Resolve-InfisicalEnv
+    & infisical secrets get $Key --projectId $projectId --env $envSlug --plain 2>$null
+}
+
+function Get-InfisicalKeys {
+    $projectId = Resolve-InfisicalProjectId
+    $envSlug = Resolve-InfisicalEnv
+    $output = & infisical secrets list --projectId $projectId --env $envSlug 2>$null
+    $output | Select-Object -Skip 1 | ForEach-Object { ($_ -split '\s+')[1] } | Where-Object { $_ } | Sort-Object
+}
+
+function Get-InfisicalExport {
+    $projectId = Resolve-InfisicalProjectId
+    $envSlug = Resolve-InfisicalEnv
+    & infisical export --projectId $projectId --env $envSlug --format=dotenv 2>$null
+}
+
+# --- Fallback wrappers ---
+function Get-SecretWithFallback {
+    param([string]$Key)
+    $value = $null
+    switch ($SecretsBackend) {
+        'infisical' {
+            if (Test-InfisicalReady) {
+                $value = Get-InfisicalSecret -Key $Key
+            }
+            if (-not $value -and (Test-Path $VaultFile) -and (Test-Path $AgeKey)) {
+                $lines = Invoke-DecryptVault
+                foreach ($line in $lines) {
+                    if ($line -match "^${Key}=(.*)$") { $value = $matches[1] -replace '^["'']|["'']$'; break }
+                }
+            }
+        }
+        'vault' {
+            $value = Get-SecretValue -Key $Key
+            return
+        }
+        'env' {
+            $masterEnv = Join-Path $AdminRoot ".env"
+            if (Test-Path $masterEnv) {
+                $match = Select-String -Path $masterEnv -Pattern "^${Key}=(.+)$" | Select-Object -First 1
+                if ($match) { $value = $match.Matches.Groups[1].Value }
+            }
+        }
+    }
+    if (-not $value) {
+        Write-Error "Secret '$Key' not found (backend: $SecretsBackend)"
+        exit 1
+    }
+    return $value
+}
+
+function Get-KeysWithFallback {
+    switch ($SecretsBackend) {
+        'infisical' {
+            if (Test-InfisicalReady) { return Get-InfisicalKeys }
+            return Get-SecretKeys
+        }
+        'vault' { return Get-SecretKeys }
+        'env' {
+            $masterEnv = Join-Path $AdminRoot ".env"
+            if (Test-Path $masterEnv) {
+                Get-Content $masterEnv | Where-Object { $_ -notmatch '^\s*#' -and $_ -match '=' } |
+                    ForEach-Object { ($_ -split '=', 2)[0] } | Sort-Object
+            }
+        }
+    }
+}
+
+function Get-ExportWithFallback {
+    switch ($SecretsBackend) {
+        'infisical' {
+            if (Test-InfisicalReady) { return Get-InfisicalExport }
+            return Get-SecretExport
+        }
+        'vault' { return Get-SecretExport }
+        'env' {
+            $masterEnv = Join-Path $AdminRoot ".env"
+            if (Test-Path $masterEnv) {
+                Get-Content $masterEnv | Where-Object { $_ -notmatch '^\s*#' -and $_ -notmatch '^\s*$' -and $_ -match '=' }
+            }
+        }
+    }
+}
+
+function Invoke-MigrateToInfisical {
+    Assert-AgeKey
+    Assert-Vault
+    if (-not (Test-InfisicalReady)) { exit 1 }
+
+    $projectId = Resolve-InfisicalProjectId
+    $envSlug = Resolve-InfisicalEnv
+    Write-Host "Migrating vault secrets to Infisical..."
+    $count = 0
+
+    $lines = Invoke-DecryptVault
+    foreach ($line in $lines) {
+        if ($line -match '^\s*#' -or $line -notmatch '=') { continue }
+        $key = ($line -split '=', 2)[0]
+        $val = ($line -split '=', 2)[1]
+        Write-Host -NoNewline "  $key... "
+        try {
+            & infisical secrets set "${key}=${val}" --projectId $projectId --env $envSlug 2>$null | Out-Null
+            Write-Host "OK"
+            $count++
+        } catch {
+            Write-Host "FAILED" -ForegroundColor Red
+        }
+    }
+    Write-Host ""
+    Write-Host "Migrated $count secrets to Infisical (project: $projectId, env: $envSlug)"
+    Write-Host ""
+    Write-Host "Next steps:"
+    Write-Host "  1. Verify: .\secrets.ps1 -Backend infisical -List"
+    Write-Host "  2. Update satellite .env: ADMIN_SECRETS_BACKEND=infisical"
+    Write-Host "  3. Keep vault.age as offline fallback"
+}
 
 # --- Validation ---
 function Assert-AgeKey {
@@ -133,8 +311,33 @@ function Invoke-EncryptFile {
 }
 
 function Show-VaultStatus {
-    Write-Host "Admin Vault Status"
+    Write-Host "Admin Secrets Status"
     Write-Host ("─" * 36)
+    Write-Host "Backend:     $SecretsBackend"
+    Write-Host ""
+
+    # Infisical status
+    if ($SecretsBackend -eq 'infisical' -or (Get-Command infisical -ErrorAction SilentlyContinue)) {
+        Write-Host "Infisical:"
+        if (Get-Command infisical -ErrorAction SilentlyContinue) {
+            $projectId = Resolve-InfisicalProjectId
+            $envSlug = Resolve-InfisicalEnv
+            Write-Host "  CLI:       installed"
+            Write-Host "  Project:   $(if ($projectId) { $projectId } else { 'not set' })"
+            Write-Host "  Env:       $envSlug"
+            if ($projectId) {
+                try {
+                    & infisical secrets list --projectId $projectId --env $envSlug 2>$null | Out-Null
+                    Write-Host "  Auth:      OK"
+                } catch {
+                    Write-Host "  Auth:      FAILED (run: infisical login)" -ForegroundColor Red
+                }
+            }
+        } else {
+            Write-Host "  CLI:       NOT INSTALLED" -ForegroundColor Yellow
+        }
+        Write-Host ""
+    }
 
     Write-Host "Age key:     $AgeKey"
     if (Test-Path $AgeKey) {
@@ -168,6 +371,9 @@ function Show-VaultStatus {
         $vaultMatch = Select-String -Path $satelliteEnv -Pattern "^ADMIN_VAULT=(.+)$" | Select-Object -First 1
         $vaultMode = if ($vaultMatch) { $vaultMatch.Matches.Groups[1].Value } else { "not set" }
         Write-Host "  ADMIN_VAULT=$vaultMode"
+        $backendMatch = Select-String -Path $satelliteEnv -Pattern "^ADMIN_SECRETS_BACKEND=(.+)$" | Select-Object -First 1
+        $backendMode = if ($backendMatch) { $backendMatch.Matches.Groups[1].Value } else { "not set" }
+        Write-Host "  ADMIN_SECRETS_BACKEND=$backendMode"
     } else {
         Write-Host "  Status:    MISSING" -ForegroundColor Red
     }
@@ -201,12 +407,13 @@ Files:
 # --- Main ---
 if ($Help) { Show-Help; return }
 if ($Status) { Show-VaultStatus; return }
-if ($List) { Get-SecretKeys; return }
-if ($Export) { Get-SecretExport; return }
+if ($MigrateToInfisical) { Invoke-MigrateToInfisical; return }
+if ($List) { Get-KeysWithFallback; return }
+if ($Export) { Get-ExportWithFallback; return }
 if ($Decrypt) { Invoke-DecryptVault; return }
 if ($Encrypt) { Invoke-EncryptFile -InputFile $Encrypt; return }
 if ($Source) {
-    Get-SecretExport | ForEach-Object {
+    Get-ExportWithFallback | ForEach-Object {
         if ($_ -match '^([A-Za-z_][A-Za-z0-9_]*)=(.*)$') {
             $val = $matches[2] -replace '^["'']|["'']$'
             "`$env:$($matches[1]) = '$val'"
@@ -216,9 +423,9 @@ if ($Source) {
 }
 
 if ($KeyName) {
-    Get-SecretValue -Key $KeyName
+    Get-SecretWithFallback -Key $KeyName
     return
 }
 
-Write-Host "Usage: .\secrets.ps1 KEY | -List | -Export | -Source | -Decrypt | -Encrypt FILE | -Status | -Help" -ForegroundColor Yellow
+Write-Host "Usage: .\secrets.ps1 KEY | -List | -Export | -Source | -Decrypt | -Encrypt FILE | -Status | -Backend | -MigrateToInfisical | -Help" -ForegroundColor Yellow
 exit 1

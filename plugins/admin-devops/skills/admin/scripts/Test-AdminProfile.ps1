@@ -50,6 +50,17 @@ function Test-AdminProfile {
         }
     }
 
+    # Read secrets backend and profile repo from satellite .env
+    $satelliteEnv = Join-Path $HOME ".admin\.env"
+    if (Test-Path $satelliteEnv) {
+        $backendMatch = Select-String -Path $satelliteEnv -Pattern "^ADMIN_SECRETS_BACKEND=(.+)$" | Select-Object -First 1
+        if ($backendMatch) { $result.secretsBackend = $backendMatch.Matches.Groups[1].Value }
+        else { $result.secretsBackend = "vault" }
+
+        $repoMatch = Select-String -Path $satelliteEnv -Pattern "^ADMIN_PROFILE_REPO=(.+)$" | Select-Object -First 1
+        if ($repoMatch) { $result.profileRepo = $repoMatch.Matches.Groups[1].Value }
+    }
+
     return $result | ConvertTo-Json -Compress
 }
 

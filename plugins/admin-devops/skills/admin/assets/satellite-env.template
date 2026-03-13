@@ -15,3 +15,17 @@ ADMIN_DEVICE=YOUR_HOSTNAME
 
 # Platform type: wsl, linux, macos, windows
 ADMIN_PLATFORM=YOUR_PLATFORM
+
+# --- Secrets Backend ---
+# Which secrets backend to use: infisical | vault | env (default: vault)
+ADMIN_SECRETS_BACKEND=
+# Infisical Cloud settings (only needed when ADMIN_SECRETS_BACKEND=infisical)
+INFISICAL_PROJECT_ID=
+INFISICAL_ENVIRONMENT=prod
+INFISICAL_AUTH_METHOD=cli-login
+
+# --- Remote Profile Sync ---
+# GitHub repo URL for profile sync (e.g., git@github.com:user/admin-profiles.git)
+ADMIN_PROFILE_REPO=
+# Auto-pull on load: true | false (default: false)
+ADMIN_PROFILE_AUTO_PULL=false
