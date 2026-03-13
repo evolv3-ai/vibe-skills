@@ -1,0 +1,27 @@
+{
+  "eval_id": 0,
+  "eval_name": "install-ripgrep-wsl",
+  "prompt": "Install ripgrep on this WSL machine",
+  "assertions": [
+    {
+      "name": "profile-gate-first",
+      "description": "Profile check (test-admin-profile.sh) happens before any install command"
+    },
+    {
+      "name": "platform-detection",
+      "description": "Correctly identifies WSL environment"
+    },
+    {
+      "name": "uses-apt",
+      "description": "Uses apt as the package manager (profile preference), not snap/brew/other"
+    },
+    {
+      "name": "logs-operation",
+      "description": "Includes logging step using log_admin_event or Log-AdminEvent"
+    },
+    {
+      "name": "checks-already-installed",
+      "description": "Checks if ripgrep is already installed before attempting install"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "skill_name": "admin",
+  "evals": [
+    {
+      "id": 0,
+      "prompt": "Install ripgrep on this WSL machine",
+      "expected_output": "Should check profile gate first, detect WSL platform, use apt (profile preference), install ripgrep, and log the operation",
+      "files": [],
+      "assertions": [
+        {"name": "profile-gate-first", "check": "Profile check (test-admin-profile.sh) happens before any install command"},
+        {"name": "platform-detection", "check": "Correctly identifies WSL environment"},
+        {"name": "uses-apt", "check": "Uses apt as package manager, not snap/brew/other"},
+        {"name": "logs-operation", "check": "Includes logging step using log_admin_event"},
+        {"name": "checks-already-installed", "check": "Checks if ripgrep is already installed before attempting install"}
+      ]
+    },
+    {
+      "id": 1,
+      "prompt": "My MCP server filesystem isn't responding in Claude Desktop, can you diagnose it?",
+      "expected_output": "Should check profile gate, route to MCP reference, run diagnostics, check config file, and suggest fixes",
+      "files": [],
+      "assertions": [
+        {"name": "profile-gate-first", "check": "Profile check happens before diagnostic steps"},
+        {"name": "references-mcp-doc", "check": "Consults MCP reference file or mentions MCP-specific scripts"},
+        {"name": "checks-config-file", "check": "Examines Claude Desktop config JSON"},
+        {"name": "checks-node-version", "check": "Verifies Node.js 18+ available"},
+        {"name": "actionable-fixes", "check": "Provides specific fix steps, not generic advice"}
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Set up admin on a fresh Ubuntu machine — I want to use uv for Python and pnpm for Node",
+      "expected_output": "Should detect no profile, run TUI interview, create profile with uv and pnpm preferences, verify setup",
+      "files": [],
+      "assertions": [
+        {"name": "detects-no-profile", "check": "Recognizes no profile exists"},
+        {"name": "runs-tui-interview", "check": "Asks TUI interview questions (storage, preferences, inventory)"},
+        {"name": "passes-uv-pnpm", "check": "Passes uv and pnpm as preferences to setup script"},
+        {"name": "correct-script-call", "check": "Uses new-admin-profile.sh with correct flags"},
+        {"name": "verifies-after-setup", "check": "Re-runs test-admin-profile.sh to verify"}
+      ]
+    }
+  ]
+}

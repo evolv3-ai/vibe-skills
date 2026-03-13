@@ -1,0 +1,37 @@
+{
+  "expectations": [
+    {
+      "text": "Profile check (test-admin-profile.sh) happens before any install command",
+      "passed": true,
+      "evidence": "Step 1 runs test-admin-profile.sh as the very first action, well before the apt install in Step 5. The transcript explicitly labels it 'Mandatory First Step' and gates further progress on the result."
+    },
+    {
+      "text": "Correctly identifies WSL environment",
+      "passed": true,
+      "evidence": "The transcript title is 'Install ripgrep on WSL', Step 1 references WSL2 Ubuntu 24.04, profile loading checks device preferences, and Step 8 logs 'Installed ripgrep via apt on WSL'. The WSL context is recognized throughout."
+    },
+    {
+      "text": "Uses apt as the package manager (profile preference), not snap/brew/other",
+      "passed": true,
+      "evidence": "Step 2 explicitly checks the profile preference via jq and confirms 'apt'. Step 5 uses 'sudo apt update' and 'sudo apt install -y ripgrep'. No snap, brew, or other package managers are used."
+    },
+    {
+      "text": "Includes logging step using log_admin_event",
+      "passed": true,
+      "evidence": "Step 8 sources log-admin-event.sh and calls log_admin_event with message 'Installed ripgrep via apt on WSL' and level 'OK'. Both log destinations are noted."
+    },
+    {
+      "text": "Checks if ripgrep is already installed before attempting install",
+      "passed": true,
+      "evidence": "Step 3 runs 'which rg && rg --version' before any install command. The transcript states: 'If ripgrep is already installed: Log the finding and stop. No installation needed.'"
+    }
+  ],
+  "total_expectations": 5,
+  "passed_expectations": 5,
+  "score": 1.0,
+  "timing": {
+    "total_tokens": 26395,
+    "duration_ms": 50132,
+    "total_duration_seconds": 50.1
+  }
+}

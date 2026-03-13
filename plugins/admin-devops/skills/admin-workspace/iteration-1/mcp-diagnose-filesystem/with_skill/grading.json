@@ -1,0 +1,38 @@
+{
+  "expectations": [
+    {
+      "text": "Profile check happens before any diagnostic steps",
+      "passed": true,
+      "evidence": "Step 1 is explicitly 'Profile Gate (Mandatory First Step)' with the correct test-admin-profile.sh script. All diagnostic steps (config inspection, Node check, log review) begin at Step 4 and later."
+    },
+    {
+      "text": "Consults the MCP reference file or mentions MCP-specific scripts",
+      "passed": true,
+      "evidence": "The transcript header states 'Reference consulted: references/mcp.md (includes embedded CONFIGURATION.md, INSTALLATION.md, TROUBLESHOOTING.md, diagnostics.md, known-issues.md)'. Multiple steps cite specific sections of these references (e.g., Step 5 cites 'references/mcp.md > Troubleshooting > Manual Information Collection > Config Validity'). The Files and References Consulted table at the end lists 10 reference files."
+    },
+    {
+      "text": "Examines Claude Desktop config JSON location and contents",
+      "passed": true,
+      "evidence": "Step 4 locates the config at '/mnt/c/Users/$WIN_USER/AppData/Roaming/Claude/claude_desktop_config.json' and verifies it exists. Step 5 validates JSON with jq. Step 6 inspects the filesystem server entry specifically, checking command, args, path formats, and disabled flag."
+    },
+    {
+      "text": "Verifies Node.js version is 18+ as a prerequisite",
+      "passed": true,
+      "evidence": "Step 7 'Check System Environment (Node.js and npm)' runs 'cmd.exe /c \"node --version\"' on the Windows side and explicitly states 'Node.js 18+ on the Windows side (Claude Desktop runs as a Windows app)' and 'If Node is missing or below v18 on Windows, that explains the failure'."
+    },
+    {
+      "text": "Provides specific, actionable fix steps rather than just generic advice",
+      "passed": true,
+      "evidence": "Step 12 provides 7 ranked causes with concrete fixes: absolute path JSON config example for spawn ENOENT, 'npm install -g @modelcontextprotocol/server-filesystem' for global install, 'npx clear-npx-cache' for stale cache, backup restore commands for corrupt JSON, and a 6-step remediation workflow. Steps 5 and 6 also include specific backup restoration and config validation commands."
+    }
+  ],
+  "total_expectations": 5,
+  "passed_expectations": 5,
+  "failed_expectations": 0,
+  "pass_rate": 1.0,
+  "timing": {
+    "total_tokens": 34918,
+    "duration_ms": 95447,
+    "total_duration_seconds": 95.4
+  }
+}

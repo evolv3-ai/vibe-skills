@@ -1,0 +1,27 @@
+{
+  "eval_id": 1,
+  "eval_name": "mcp-diagnose-filesystem",
+  "prompt": "My MCP server filesystem isn't responding in Claude Desktop, can you diagnose it?",
+  "assertions": [
+    {
+      "name": "profile-gate-first",
+      "description": "Profile check happens before any diagnostic steps"
+    },
+    {
+      "name": "references-mcp-doc",
+      "description": "Consults the MCP reference file or mentions MCP-specific scripts"
+    },
+    {
+      "name": "checks-config-file",
+      "description": "Examines Claude Desktop config JSON location and contents"
+    },
+    {
+      "name": "checks-node-version",
+      "description": "Verifies Node.js version is 18+ as a prerequisite"
+    },
+    {
+      "name": "actionable-fixes",
+      "description": "Provides specific, actionable fix steps rather than just generic advice"
+    }
+  ]
+}

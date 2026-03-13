@@ -1,0 +1,27 @@
+{
+  "eval_id": 2,
+  "eval_name": "fresh-ubuntu-setup",
+  "prompt": "Set up admin on a fresh Ubuntu machine — I want to use uv for Python and pnpm for Node",
+  "assertions": [
+    {
+      "name": "detects-no-profile",
+      "description": "Recognizes that no profile exists and setup is needed"
+    },
+    {
+      "name": "runs-tui-interview",
+      "description": "Asks the TUI interview questions (storage location, preferences, inventory scan)"
+    },
+    {
+      "name": "passes-uv-pnpm",
+      "description": "Passes uv as Python manager and pnpm as Node manager to setup"
+    },
+    {
+      "name": "correct-script-call",
+      "description": "Uses new-admin-profile.sh with correct flags (--py-mgr, --node-mgr, etc.)"
+    },
+    {
+      "name": "verifies-after-setup",
+      "description": "Re-runs test-admin-profile.sh to verify profile was created"
+    }
+  ]
+}

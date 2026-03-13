@@ -1,0 +1,42 @@
+{
+  "grading": {
+    "expectations": [
+      {
+        "text": "Profile check (test-admin-profile.sh) happens before any install command",
+        "passed": false,
+        "evidence": "The transcript has no mention of test-admin-profile.sh or any profile check step. It goes directly to checking if ripgrep is installed."
+      },
+      {
+        "text": "Correctly identifies WSL environment",
+        "passed": true,
+        "evidence": "The transcript header states 'Platform: WSL2 Ubuntu 24.04 on Windows 11 Pro (WOPR3)' and notes reference workspace preferences, indicating awareness of the WSL environment."
+      },
+      {
+        "text": "Uses apt as the package manager (profile preference), not snap/brew/other",
+        "passed": true,
+        "evidence": "Step 4 uses 'sudo apt install -y ripgrep'. Notes explicitly state: 'Used apt as the package manager per workspace preferences (apt over snap). No snap, cargo, or other install methods attempted.'"
+      },
+      {
+        "text": "Includes logging step using log_admin_event",
+        "passed": false,
+        "evidence": "There is no mention of log_admin_event or any logging step anywhere in the transcript. The mandatory logging requirement from CLAUDE.md was not followed."
+      },
+      {
+        "text": "Checks if ripgrep is already installed before attempting install",
+        "passed": true,
+        "evidence": "Step 1 explicitly checks with 'which rg', 'rg --version', and 'dpkg -l ripgrep' before proceeding to install. The expected outcome notes that rg is currently available via Claude Code's bundled binary but no apt package is installed."
+      }
+    ],
+    "summary": {
+      "total": 5,
+      "passed": 3,
+      "failed": 2,
+      "score": "3/5"
+    },
+    "timing": {
+      "total_tokens": 15256,
+      "duration_ms": 26219,
+      "total_duration_seconds": 26.2
+    }
+  }
+}

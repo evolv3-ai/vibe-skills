@@ -1,0 +1,37 @@
+{
+  "expectations": [
+    {
+      "text": "Profile check happens before any diagnostic steps",
+      "passed": false,
+      "evidence": "The transcript jumps directly to Step 1 (locate Claude Desktop config) with no profile check. There is no mention of test-admin-profile.sh, ADMIN_ROOT, device profile, or any profile validation step."
+    },
+    {
+      "text": "Consults the MCP reference file or mentions MCP-specific scripts",
+      "passed": false,
+      "evidence": "The transcript never references any admin skill scripts such as mcp-diagnose.sh, mcp-install-server.sh, or any MCP reference documentation files. All diagnostic knowledge comes from general MCP familiarity rather than skill-provided resources."
+    },
+    {
+      "text": "Examines Claude Desktop config JSON location and contents",
+      "passed": true,
+      "evidence": "Step 1 identifies the correct Windows-side config path (/mnt/c/Users/Owner/AppData/Roaming/Claude/claude_desktop_config.json), lists what to look for in the mcpServers entry, and Step 2 validates JSON syntax with a python3 command."
+    },
+    {
+      "text": "Verifies Node.js version is 18+ as a prerequisite",
+      "passed": true,
+      "evidence": "Step 3 explicitly checks node version from both the Windows side and WSL, and states 'Node.js >= 18 is required for most MCP servers.' It also checks npx availability."
+    },
+    {
+      "text": "Provides specific, actionable fix steps rather than just generic advice",
+      "passed": true,
+      "evidence": "The transcript provides concrete commands to run at each step, specific log file paths to check, specific error strings to look for (spawn ENOENT, EACCES, ETIMEDOUT), a summary table mapping causes to symptoms to fixes, and a WSL-specific insight about Windows vs WSL paths. The steps are actionable and ordered logically."
+    }
+  ],
+  "summary": "Passed 3 of 5 expectations. The transcript demonstrates solid general MCP diagnostic knowledge with specific commands, paths, and error patterns. However, it lacks the admin-skill-specific behaviors: no profile gate check and no use of MCP reference files or diagnostic scripts from the skill. This is expected for a without-skill run.",
+  "score": 3,
+  "max_score": 5,
+  "timing": {
+    "total_tokens": 16230,
+    "duration_ms": 63057,
+    "total_duration_seconds": 63.1
+  }
+}
