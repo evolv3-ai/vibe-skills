@@ -4,6 +4,7 @@ Lightweight, git-safe secrets management using [age encryption](https://age-encr
 
 ## Contents
 
+- [Secrets Backend Options](#secrets-backend-options)
 - [Quick Start](#quick-start)
 - [Daily Usage](#daily-usage)
 - [Integration with admin scripts](#integration-with-admin-scripts)
@@ -12,6 +13,22 @@ Lightweight, git-safe secrets management using [age encryption](https://age-encr
 - [Key Backup](#key-backup)
 - [Multi-Device with Sync](#multi-device-with-sync)
 - [Troubleshooting](#troubleshooting)
+
+## Secrets Backend Options
+
+The admin suite supports three secrets backends. The vault (this guide) is the default. For multi-device setups, consider Infisical as the primary backend with vault as offline fallback.
+
+| Backend | Storage | Offline | Multi-Device | Audit Trail | Setup Effort |
+|---------|---------|---------|-------------|-------------|-------------|
+| **infisical** | Infisical Cloud | No | Native | Built-in | Medium (account + CLI) |
+| **vault** (default) | `vault.age` local file | Yes | Via Dropbox/git sync | git log only | Low (age CLI + key) |
+| **env** | Plaintext `.env` | Yes | Not recommended | None | None |
+
+Configure via `ADMIN_SECRETS_BACKEND` in `~/.admin/.env`. Fallback chain: infisical → vault → env.
+
+- **Infisical guide**: `references/infisical.md`
+- **Migration**: `secrets --migrate-to-infisical` pushes vault contents to Infisical Cloud
+- The vault remains valuable as an offline fallback even when Infisical is primary
 
 ## Quick Start
 

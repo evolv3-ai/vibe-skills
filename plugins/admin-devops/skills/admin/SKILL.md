@@ -47,23 +47,25 @@ Full details: `references/profile-gate.md` (discovery, TUI interview, create com
 - `.env.template` files belong only in `assets/` within a skill.
 - Store live secrets in `~/.admin/.env` and reference from there.
 
-## Vault: Encrypted Secrets (age)
+## Secrets Management
 
-Secrets can be encrypted at rest using [age encryption](https://age-encryption.org/). When `ADMIN_VAULT=enabled` in `~/.admin/.env`, `load-profile.sh` and `Load-Profile.ps1` decrypt `$ADMIN_ROOT/vault.age` instead of reading plaintext `.env`.
+Three backends available, configured via `ADMIN_SECRETS_BACKEND` in `~/.admin/.env`:
 
-**Setup**: `age-keygen -o ~/.age/key.txt` then `secrets --encrypt $ADMIN_ROOT/.env`
+| Backend | Storage | Best For |
+|---------|---------|----------|
+| `infisical` | Infisical Cloud | Multi-device, audit trail |
+| `vault` (default) | `$ADMIN_ROOT/vault.age` | Single device, offline |
+| `env` | `$ADMIN_ROOT/.env` | Legacy |
 
-**CLI (Bash)**: `secrets KEYNAME` | `secrets --list` | `eval $(secrets -s)` | `secrets --edit`
+**Fallback chain**: infisical → vault → env. If the primary backend is unavailable, scripts automatically try the next.
 
-**CLI (PowerShell)**: `secrets.ps1 KEY` | `secrets.ps1 -List` | `secrets.ps1 -Source` | `secrets.ps1 -Status`
+**CLI (Bash)**: `secrets KEYNAME` | `secrets --list` | `secrets --status` | `secrets --backend infisical --list`
 
-**Feature flag**: `ADMIN_VAULT=enabled|disabled` in satellite `~/.admin/.env`. Falls back to plaintext when disabled or deps missing.
+**CLI (PowerShell)**: `secrets.ps1 KEY` | `secrets.ps1 -List` | `secrets.ps1 -Status` | `secrets.ps1 -Backend infisical -List`
 
-**Cross-platform**: Bash (`scripts/secrets`), PowerShell (`scripts/secrets.ps1`), TypeScript (`scripts/admin-vault.ts` with `age-encryption` npm).
+**Migration**: `secrets --migrate-to-infisical` pushes vault contents to Infisical Cloud.
 
-**Migration**: Run `scripts/migrate-to-vault.sh` (Linux/WSL) or `scripts/migrate-to-vault.ps1` (Windows).
-
-**Guide**: `references/vault-guide.md`
+**Guides**: `references/vault-guide.md` (age vault), `references/infisical.md` (Infisical Cloud)
 
 ## Architecture
 
@@ -73,8 +75,8 @@ Secrets can be encrypted at rest using [age encryption](https://age-encryption.o
 admin (core)
   ├── 9 satellite skills: devops, oci, hetzner, contabo, digital-ocean, vultr, linode, coolify, kasm
   ├── 6 agents: profile-validator, docs-agent, verify-agent, tool-installer, mcp-bot, ops-bot
-  ├── Profile system: ~/.admin/.env (satellite) → $ADMIN_ROOT/profiles/*.json
-  ├── Vault: $ADMIN_ROOT/vault.age (age-encrypted secrets)
+  ├── Profile system: ~/.admin/.env (satellite) → $ADMIN_ROOT/profiles/*.json (+ GitHub sync)
+  ├── Secrets: Infisical Cloud (primary) → age vault (fallback) → .env (legacy)
   └── SimpleMem: Long-term memory across sessions (graceful degradation)
 ```
 
@@ -84,13 +86,15 @@ admin (core)
 Satellite .env (bootstrap)  →  profile.json (device config)  →  Agent decisions
         ↓                              ↓                              ↓
   ADMIN_ROOT, DEVICE,          tools, servers, prefs,          SimpleMem storage
-  PLATFORM, VAULT flag         capabilities, history           (speaker convention)
+  PLATFORM, SECRETS_BACKEND    capabilities, history           (speaker convention)
+        ↓
+  Infisical Cloud (primary) → vault.age (fallback) → .env (legacy)
 ```
 
-- **Satellite `.env`** (`~/.admin/.env`): Per-device bootstrap. Points to `ADMIN_ROOT`.
-- **Root `.env`** (`$ADMIN_ROOT/.env`): Manifest (all keys visible, secrets in vault).
-- **Profile JSON** (`$ADMIN_ROOT/profiles/{DEVICE}.json`): Full device config.
-- **Vault** (`$ADMIN_ROOT/vault.age`): Encrypted secrets, decrypted at runtime.
+- **Satellite `.env`** (`~/.admin/.env`): Per-device bootstrap. Points to `ADMIN_ROOT`, configures secrets backend.
+- **Root `.env`** (`$ADMIN_ROOT/.env`): Manifest (all keys visible, secrets in vault/Infisical).
+- **Profile JSON** (`$ADMIN_ROOT/profiles/{DEVICE}.json`): Full device config. Optionally synced via GitHub repo.
+- **Secrets**: Infisical Cloud (primary) → `$ADMIN_ROOT/vault.age` (fallback) → `.env` (legacy).
 
 ### Agent Roster
 
@@ -143,6 +147,9 @@ admin (core) ─── required by all satellites
 | MCP server management | references/mcp.md |
 | Skill registry | references/skills-registry.md |
 | Memory integration | references/memory-integration.md |
+| Secrets / Infisical setup | references/infisical.md |
+| Vault (age encryption) | references/vault-guide.md |
+| Profile sync (GitHub) | references/remote-profile.md |
 | **Remote servers/cloud** | **→ Use devops skill** |
 
 ## Profile-Aware Adaptation (Always Check Preferences)
@@ -193,3 +200,5 @@ pwsh -NoProfile -File "scripts/Log-AdminEvent.ps1" -Message "Installed ripgrep" 
 - Shell detection: `references/shell-detection.md`
 - Device profiles: `references/device-profiles.md`
 - PowerShell tips: `references/powershell-commands.md`
+- Infisical secrets: `references/infisical.md`
+- Remote profile sync: `references/remote-profile.md`
