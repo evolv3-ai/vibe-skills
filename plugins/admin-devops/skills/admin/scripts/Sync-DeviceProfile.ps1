@@ -1,13 +1,17 @@
 # Sync-DeviceProfile.ps1
 # Verify and update device profile with current system state
-# Usage: .\scripts\Sync-DeviceProfile.ps1 [-UpdateVersions] [-ResolveConflicts]
+# Optionally sync profiles directory with a private GitHub repo
+# Usage: .\scripts\Sync-DeviceProfile.ps1 [-UpdateVersions] [-ResolveConflicts] [-RepoSync]
 
 param(
     [string]$AdminRoot = $env:ADMIN_ROOT,
     [string]$DeviceName = $env:COMPUTERNAME,
     [switch]$UpdateVersions,     # Update all tool versions
     [switch]$ResolveConflicts,   # Auto-resolve sync conflicts
-    [switch]$DryRun              # Show changes without applying
+    [switch]$DryRun,             # Show changes without applying
+    [switch]$RepoSync,           # Sync profiles dir with GitHub repo
+    [switch]$RepoInit,           # Initialize profiles dir as git repo
+    [switch]$RepoStatus          # Show repo sync status
 )
 
 $ErrorActionPreference = "Continue"
@@ -186,6 +190,127 @@ if ($changes.Count -gt 0 -or $UpdateVersions) {
         $logEntry = "$timestamp - [$DeviceName] SUCCESS: Sync - Profile synchronized ($($changes.Count) changes)"
         Add-Content "$AdminRoot/devices/$DeviceName/logs.txt" -Value $logEntry
     }
+}
+
+# =============================================================================
+# GitHub Repo Sync
+# =============================================================================
+
+function Get-ProfileRepo {
+    $satelliteEnv = Join-Path $HOME ".admin\.env"
+    if (Test-Path $satelliteEnv) {
+        $match = Select-String -Path $satelliteEnv -Pattern "^ADMIN_PROFILE_REPO=(.+)$" | Select-Object -First 1
+        if ($match) { return $match.Matches.Groups[1].Value }
+    }
+    return $null
+}
+
+function Get-ProfilesDir {
+    return Join-Path $AdminRoot "profiles"
+}
+
+function Test-GitRepo {
+    param([string]$Path)
+    try {
+        $null = git -C $Path rev-parse --is-inside-work-tree 2>$null
+        return $LASTEXITCODE -eq 0
+    } catch { return $false }
+}
+
+function Invoke-RepoInit {
+    $repo = Get-ProfileRepo
+    if (-not $repo) {
+        Write-Host "ERROR: ADMIN_PROFILE_REPO not set in satellite .env" -ForegroundColor Red
+        return
+    }
+    $profilesDir = Get-ProfilesDir
+    if (Test-GitRepo $profilesDir) {
+        Write-Host "Already a git repo: $profilesDir" -ForegroundColor Yellow
+        return
+    }
+    Write-Host "Initializing git repo in $profilesDir" -ForegroundColor Cyan
+    git -C $profilesDir init -b main
+    git -C $profilesDir remote add origin $repo
+    git -C $profilesDir add -A
+    $fileCount = (git -C $profilesDir diff --cached --name-only | Measure-Object).Count
+    if ($fileCount -gt 0) {
+        git -C $profilesDir commit -m "feat: initial profile sync ($fileCount files)"
+        git -C $profilesDir push -u origin main
+        Write-Host "Initialized and pushed $fileCount files" -ForegroundColor Green
+    } else {
+        Write-Host "No files to commit" -ForegroundColor Yellow
+    }
+}
+
+function Invoke-RepoPull {
+    $profilesDir = Get-ProfilesDir
+    if (-not (Test-GitRepo $profilesDir)) {
+        Write-Host "Not a git repo: $profilesDir (use -RepoInit first)" -ForegroundColor Red
+        return
+    }
+    Write-Host "Pulling profile repo..." -ForegroundColor Cyan
+    git -C $profilesDir pull --rebase --autostash
+    Write-Host "Pull complete" -ForegroundColor Green
+}
+
+function Invoke-RepoPush {
+    $profilesDir = Get-ProfilesDir
+    if (-not (Test-GitRepo $profilesDir)) {
+        Write-Host "Not a git repo: $profilesDir (use -RepoInit first)" -ForegroundColor Red
+        return
+    }
+    $status = git -C $profilesDir status --porcelain
+    if (-not $status) {
+        Write-Host "No local changes to push" -ForegroundColor Gray
+        return
+    }
+    git -C $profilesDir add -A
+    $changed = (git -C $profilesDir diff --cached --name-only | Select-Object -First 5) -join ', '
+    git -C $profilesDir commit -m "sync($DeviceName): profile update ($changed)"
+    git -C $profilesDir push
+    Write-Host "Pushed profile changes" -ForegroundColor Green
+}
+
+function Show-RepoStatus {
+    $profilesDir = Get-ProfilesDir
+    $repo = Get-ProfileRepo
+    Write-Host "`nProfile Repo Sync Status" -ForegroundColor Cyan
+    Write-Host ("─" * 36)
+    Write-Host "Profiles dir:  $profilesDir"
+    Write-Host "Repo:          $(if ($repo) { $repo } else { 'not configured' })"
+    if (-not $repo) {
+        Write-Host "Status:        DISABLED" -ForegroundColor Yellow
+        return
+    }
+    if (-not (Test-GitRepo $profilesDir)) {
+        Write-Host "Status:        NOT INITIALIZED (use -RepoInit)" -ForegroundColor Yellow
+        return
+    }
+    $status = git -C $profilesDir status --porcelain
+    if ($status) {
+        Write-Host "Local changes: YES" -ForegroundColor Yellow
+        $status | Select-Object -First 10 | ForEach-Object { Write-Host "  $_" -ForegroundColor Gray }
+    } else {
+        Write-Host "Local changes: none" -ForegroundColor Green
+    }
+    $branch = git -C $profilesDir branch --show-current 2>$null
+    Write-Host "Branch:        $branch"
+    Write-Host "Remote:        $(git -C $profilesDir remote get-url origin 2>$null)"
+}
+
+# Handle repo sync commands
+if ($RepoInit) { Invoke-RepoInit; Write-Host ""; return }
+if ($RepoStatus) { Show-RepoStatus; Write-Host ""; return }
+if ($RepoSync) {
+    $repo = Get-ProfileRepo
+    if ($repo -and (Test-GitRepo (Get-ProfilesDir))) {
+        Invoke-RepoPull
+        Invoke-RepoPush
+    } else {
+        Write-Host "Repo sync not configured or not initialized" -ForegroundColor Yellow
+    }
+    Write-Host ""
+    return
 }
 
 Write-Host ""
