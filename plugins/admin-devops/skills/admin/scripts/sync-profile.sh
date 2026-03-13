@@ -27,7 +27,7 @@ SATELLITE_ENV="${HOME}/.admin/.env"
 # --- Resolve config ---
 read_satellite_var() {
     local var_name="$1"
-    grep "^${var_name}=" "$SATELLITE_ENV" 2>/dev/null | head -1 | cut -d'=' -f2-
+    grep "^${var_name}=" "$SATELLITE_ENV" 2>/dev/null | head -1 | cut -d'=' -f2- || true
 }
 
 resolve_admin_root() {
