@@ -2,48 +2,42 @@
 
 _Consolidated from `skills/admin (unix)` on 2026-02-02_
 
-## Skill Body
+## Contents
 
-# Unix Administration (macOS + Linux)
-
-## CRITICAL MUST: Secrets and .env
-
-- NEVER store live `.env` files or credentials inside any skill folder.
-- `.env.template` files belong only in `templates/` within a skill.
-- Store live secrets in `~/.admin/.env` (or another non-skill location you control) and reference them from there.
-
+- [Profile Gate](#profile-gate)
+- [Platform Detection](#platform-detection)
+- [Package Management (Profile-Aware)](#package-management-profile-aware)
+- [Python Commands (Profile-Aware)](#python-commands-profile-aware)
+- [Node Commands (Profile-Aware)](#node-commands-profile-aware)
+- [Services](#services)
+- [SSH to Servers](#ssh-to-servers)
+- [Update Profile](#update-profile)
+- [Capabilities Check](#capabilities-check)
+- [Scope Boundaries](#scope-boundaries)
+- [References](#references)
+- [Logging (Centralized)](#logging-centralized)
+- [Linux (apt): Standard Workflow](#linux-apt-standard-workflow)
+- [Linux (apt): Common Errors + Fixes](#linux-apt-common-errors--fixes)
+- [Linux (systemd): Common Operations](#linux-systemd-common-operations)
+- [macOS (Homebrew): Standard Workflow](#macos-homebrew-standard-workflow)
+- [macOS (Homebrew): PATH Notes (Apple Silicon)](#macos-homebrew-path-notes-apple-silicon)
+- [macOS (Homebrew): Services](#macos-homebrew-services)
+- [macOS (Homebrew): Common Errors + Fixes](#macos-homebrew-common-errors--fixes)
+- [Troubleshooting Checklist](#troubleshooting-checklist)
 
 **Requires**: macOS or native Linux (NOT WSL)
 
 ---
 
-## ⚠️ Profile Gate (MANDATORY - DO THIS FIRST)
+## Profile Gate
 
-**STOP. Before ANY operation, you MUST check for the profile. This is not optional.**
-
-### Step 1: Check Profile Exists
+Run the profile check before any operation. See `references/profile-gate.md` for full details.
 
 ```bash
 scripts/test-admin-profile.sh
 ```
 
-Returns JSON: `{"exists":true,"path":"~/.admin/profiles/hostname.json",...}`
-
-### Step 2: If Profile Missing → Run Setup
-
-```bash
-scripts/setup-interview.sh
-```
-
-**DO NOT proceed with ANY task until profile exists.**
-
-### Step 3: Load Profile
-
-```bash
-source scripts/load-profile.sh
-load_admin_profile
-show_admin_summary
-```
+If `exists: false`, run the TUI setup interview (see profile-gate.md) before proceeding.
 
 ---
 
@@ -232,26 +226,11 @@ has_capability "hasGit" && git --version
 
 - `references/OPERATIONS.md` - Common operations, troubleshooting
 
-## Reference Appendices
-
 ### unix: references/OPERATIONS.md
 
 # Unix Operations Reference
 
 Extended operations for macOS and Linux administration (outside of WSL). This file is expanded in later phases; keep `SKILL.md` as the overview.
-
-## Contents
-
-- Platform Detection
-- Logging (Centralized)
-- Linux (apt): Standard Workflow
-- Linux (apt): Common Errors + Fixes
-- Linux (systemd): Common Operations
-- macOS (Homebrew): Standard Workflow
-- macOS (Homebrew): PATH Notes (Apple Silicon)
-- macOS (Homebrew): Services
-- macOS (Homebrew): Common Errors + Fixes
-- Troubleshooting Checklist
 
 ---
 

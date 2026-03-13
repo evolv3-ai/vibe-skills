@@ -232,4 +232,4 @@ $profile | ConvertTo-Json -Depth 10 | Set-Content $profilePath
 
 - `admin/SKILL.md` - Main skill with dual-mode commands
 - `admin/references/shell-detection.md` - How shell detection works
-- `admin/references/first-run-setup.md` - First-run setup guide
+- `admin/references/profile-gate.md` - Profile setup and troubleshooting guide

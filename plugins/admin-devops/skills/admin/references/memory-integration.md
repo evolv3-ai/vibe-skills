@@ -2,6 +2,18 @@
 
 The admin skill integrates with SimpleMem for persistent operational memory across sessions. Agents can store and recall installation history, issue context, diagnostic findings, and configuration decisions.
 
+## Contents
+
+- [Architecture](#architecture)
+- [How It Works](#how-it-works)
+- [MCP Configuration](#mcp-configuration)
+- [Memory Patterns by Agent](#memory-patterns-by-agent)
+- [Graceful Degradation](#graceful-degradation)
+- [What Gets Stored](#what-gets-stored)
+- [Speaker Convention](#speaker-convention)
+- [Cross-Device Benefits](#cross-device-benefits)
+- [Privacy Considerations](#privacy-considerations)
+
 ## Architecture
 
 ```

@@ -8,7 +8,7 @@
 Detailed routing rules for the admin orchestrator skill.
 
 ## Contents
-- ⚠️ Environment Detection (Run First!)
+- Environment Detection (Run First!)
 - Routing Decision Flow
 - Step 0: Admin Environment Check
 - Keyword → Skill Mapping
@@ -19,7 +19,7 @@ Detailed routing rules for the admin orchestrator skill.
 
 ---
 
-## ⚠️ Environment Detection (MUST Run First)
+## Environment Detection (Must Run First)
 
 **Before ANY routing logic, detect the execution environment:**
 
@@ -162,7 +162,7 @@ echo "Detected: ENV=$ENV, ADMIN_ROOT=$ADMIN_ROOT"
 
 ### If Any Check Fails
 
-Run the first-run setup flow from `first-run-setup.md`:
+Run the setup flow from `profile-gate.md`:
 
 1. Detect platform (Windows, WSL, Linux, macOS)
 2. Create directory structure

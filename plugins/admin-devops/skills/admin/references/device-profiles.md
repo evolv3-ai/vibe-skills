@@ -2,6 +2,17 @@
 
 Device profiles provide **context-aware assistance** by tracking your installed tools, preferences, servers, and capabilities.
 
+## Contents
+
+- [Profile Discovery](#profile-discovery)
+- [Schema Version](#schema-version)
+- [Profile Structure](#profile-structure)
+- [Key Sections](#key-sections)
+- [Loading Profiles](#loading-profiles)
+- [Updating Profiles](#updating-profiles)
+- [Migration](#migration)
+- [Best Practices](#best-practices)
+
 ## Profile Discovery
 
 All platforms use a **satellite .env** at `~/.admin/.env` to find the profile:

@@ -2,56 +2,52 @@
 
 _Consolidated from `skills/admin (windows)` on 2026-02-02_
 
-## Skill Body
+## Contents
 
-# Windows Administration
-
-## CRITICAL MUST: Secrets and .env
-
-- NEVER store live `.env` files or credentials inside any skill folder.
-- `.env.template` files belong only in `templates/` within a skill.
-- Store live secrets in `~/.admin/.env` (or another non-skill location you control) and reference them from there.
-
+- [Profile Gate](#profile-gate)
+- [Quick Start (5 Minutes)](#quick-start-5-minutes)
+- [Critical Rules](#critical-rules)
+- [Package Installation (Profile-Aware)](#package-installation-profile-aware)
+- [Python Commands (Profile-Aware)](#python-commands-profile-aware)
+- [Node Commands (Profile-Aware)](#node-commands-profile-aware)
+- [Bash to PowerShell Translation](#bash-to-powershell-translation)
+- [PATH Operations](#path-operations)
+- [Environment Variables](#environment-variables)
+- [Check Tool Status](#check-tool-status)
+- [After ANY Operation (MANDATORY)](#after-any-operation-mandatory)
+- [After Installation](#after-installation)
+- [Execution Policy](#execution-policy)
+- [PowerShell Profile](#powershell-profile)
+- [Capabilities Check](#capabilities-check)
+- [Scope Boundaries](#scope-boundaries)
+- [Related Skills](#related-skills)
+- [References](#references)
+- [Known Issues Prevention](#known-issues-prevention)
+- [Using Bundled Resources](#using-bundled-resources)
+- [Troubleshooting](#troubleshooting)
+- [Complete Setup Checklist](#complete-setup-checklist)
+- [Official Documentation](#official-documentation)
+- [Package Versions (Snapshot)](#package-versions-snapshot)
 
 **Requires**: Windows platform, PowerShell 7.x
 
 ---
 
-## ⚠️ Profile Gate (MANDATORY - DO THIS FIRST)
+## Profile Gate
 
-**STOP. Before ANY operation, you MUST check for the profile. This is not optional.**
-
-### Step 1: Check Profile Exists
+Run the profile check before any operation. See `references/profile-gate.md` for full details.
 
 ```powershell
-# Use the helper script - it handles path resolution correctly
 pwsh -NoProfile -File "scripts/Test-AdminProfile.ps1"
 ```
 
-Returns JSON: `{"exists":true,"path":"...","device":"CASATEN",...}`
+If `exists: false`, run the TUI setup interview (see profile-gate.md) before proceeding.
 
-### Step 2: If Profile Missing → Run Setup
-
-If `exists` is `false`:
-```powershell
-pwsh -NoProfile -File "scripts/Setup-Interview.ps1"
-```
-
-**DO NOT proceed with ANY task until profile exists.**
-
-### Step 3: Load Profile
-
+After loading, check preferences:
 ```powershell
 . "scripts/Load-Profile.ps1"
 Load-AdminProfile -Export
-```
-
-### Step 4: Check Preferences Before Commands
-
-```powershell
-# User wants to install a package
 $preferredManager = $AdminProfile.preferences.packages.manager
-# Returns: "scoop" or "winget" or "chocolatey"
 ```
 
 ---
@@ -381,21 +377,11 @@ if (Test-AdminCapability "hasDocker") {
 - `references/known-issues.md` - Common pitfalls and prevention
 - `references/OPERATIONS.md` - Troubleshooting and diagnostics
 
-## Reference Appendices
-
 ### windows: references/OPERATIONS.md
 
 # Windows Operations Reference
 
 Extended operations for Windows administration: known issues prevention, bundled resources, troubleshooting, setup checklist, and version snapshots.
-
-## Contents
-- Known Issues Prevention
-- Using Bundled Resources
-- Troubleshooting
-- Complete Setup Checklist
-- Official Documentation
-- Package Versions (Snapshot)
 
 ---
 

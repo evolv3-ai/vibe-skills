@@ -2,16 +2,37 @@
 
 _Consolidated from `skills/admin (skills registry)` on 2026-02-02_
 
-## Skill Body
+## Contents
 
-# Skill Registry Management
-
-## CRITICAL MUST: Secrets and .env
-
-- NEVER store live `.env` files or credentials inside any skill folder.
-- `.env.template` files belong only in `templates/` within a skill.
-- Store live secrets in `~/.admin/.env` (or another non-skill location you control) and reference them from there.
-
+- [Profile-First Approach](#profile-first-approach)
+- [Registry Schema](#registry-schema)
+- [Quick Reference: Clients](#quick-reference-clients)
+- [List Installed Skills](#list-installed-skills)
+- [Install Skill to Claude Code](#install-skill-to-claude-code)
+- [Sync Skill to Other Clients](#sync-skill-to-other-clients)
+- [Audit Skills](#audit-skills)
+- [Remove Skill](#remove-skill)
+- [Marketplace Management](#marketplace-management)
+- [Sync History](#sync-history)
+- [Integration with admin Profile](#integration-with-admin-profile)
+- [References](#references)
+- [Scripts](#scripts)
+- [Related Skills](#related-skills)
+- [Claude Code CLI](#claude-code-cli)
+- [Claude Desktop](#claude-desktop)
+- [Cursor](#cursor)
+- [Windsurf](#windsurf)
+- [Gemini CLI](#gemini-cli)
+- [OpenCode](#opencode)
+- [Sync Script Usage](#sync-script-usage)
+- [Feature Comparison](#feature-comparison)
+- [Top-Level Structure](#top-level-structure)
+- [clients](#clients)
+- [skillSources](#skillsources)
+- [installedSkills](#installedskills)
+- [clientInstallations](#clientinstallations)
+- [installMethods](#installmethods)
+- [syncHistory](#synchistory)
 
 **Requires**: Device profile from `admin` skill
 
@@ -328,8 +349,6 @@ $registry.installedSkills["skill-mcp-provider"].mcpServer = "skill-mcp"
 |-------|---------|
 | `admin` | Device profile orchestrator |
 | `admin (mcp)` | MCP server management |
-
-## Reference Appendices
 
 ### skills: references/CLIENT_COMPATIBILITY.md
 

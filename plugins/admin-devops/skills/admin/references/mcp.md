@@ -2,64 +2,72 @@
 
 _Consolidated from `skills/admin (mcp)` on 2026-02-02_
 
-## Skill Body
+## Contents
 
-# MCP Server Management
-
-## CRITICAL MUST: Secrets and .env
-
-- NEVER store live `.env` files or credentials inside any skill folder.
-- `.env.template` files belong only in `templates/` within a skill.
-- Store live secrets in `~/.admin/.env` (or another non-skill location you control) and reference them from there.
-
+- [Profile Gate](#profile-gate)
+- [Registry-First Approach](#registry-first-approach)
+- [Quick Start](#quick-start)
+- [Scan MCP Clients](#scan-mcp-clients)
+- [Remove MCP Server](#remove-mcp-server)
+- [Critical Rules](#critical-rules)
+- [Profile-First Approach](#profile-first-approach)
+- [List MCP Servers](#list-mcp-servers)
+- [Config File Location](#config-file-location)
+- [Install New MCP Server](#install-new-mcp-server)
+- [Installation Patterns](#installation-patterns)
+- [Troubleshooting](#troubleshooting)
+- [Track MCP Issue](#track-mcp-issue)
+- [References](#references)
+- [Desktop Commander (Primary for Local Work)](#desktop-commander-primary-for-local-work)
+- [Win-CLI (SSH and Multi-Shell)](#win-cli-ssh-and-multi-shell)
+- [Claude Code MCP (Complex Multi-File Tasks)](#claude-code-mcp-complex-multi-file-tasks)
+- [Tool Selection Guide](#tool-selection-guide)
+- [Config Locations](#config-locations)
+- [Config Structure](#config-structure)
+- [Field Reference](#field-reference)
+- [Safe Editing Rules](#safe-editing-rules)
+- [Minimal Example](#minimal-example)
+- [Validation Checks](#validation-checks)
+- [Prerequisites](#prerequisites)
+- [Recommended NPX Install (Default)](#recommended-npx-install-default)
+- [Global npm Install](#global-npm-install)
+- [Local Clone Install (Development/Customization)](#local-clone-install-developmentcustomization)
+- [Python MCP Servers](#python-mcp-servers)
+- [MCP Installation Workflow (PowerShell)](#mcp-installation-workflow-powershell)
+- [MCP Installation Workflow (WSL/Bash)](#mcp-installation-workflow-wslbash)
+- [WSL Path Conversion](#wsl-path-conversion)
+- [Common MCP Servers](#common-mcp-servers)
+- [Why a Registry](#why-a-registry)
+- [Registry Schema](#registry-schema)
+- [Registry Update Script (PowerShell)](#registry-update-script-powershell)
+- [Run Diagnostics Script (Preferred)](#run-diagnostics-script-preferred)
+- [Manual Information Collection](#manual-information-collection)
+- [Common Problems and Fixes](#common-problems-and-fixes)
+- [Known Issues Prevention](#known-issues-prevention)
+- [Complete Setup Checklist](#complete-setup-checklist)
+- [Known Clients (Example Locations)](#known-clients-example-locations)
+- [MCP Registry Schema](#mcp-registry-schema)
+- [Top-level Fields](#top-level-fields)
+- [Server Entry (Normalized)](#server-entry-normalized)
 
 **Requires**: Node.js 18+ (for most servers). MCP clients are optional.
 
 ---
 
-## ⚠️ Profile Gate (MANDATORY - DO THIS FIRST)
+## Profile Gate
 
-**STOP. Before ANY operation, you MUST check for the profile. This is not optional.**
+Run the profile check before any MCP operation. See `references/profile-gate.md` for full details.
 
-### Step 1: Check Profile Exists
-
-**PowerShell (Windows):**
-```powershell
-pwsh -NoProfile -File "scripts/Test-AdminProfile.ps1"
-```
-
-**Bash (WSL/Linux/macOS):**
 ```bash
-scripts/test-admin-profile.sh
+scripts/test-admin-profile.sh          # Bash
 ```
-
-Returns JSON: `{"exists":true,"path":"...","device":"...",...}`
-
-### Step 2: If Profile Missing → Run Setup
-
-**PowerShell:**
 ```powershell
-pwsh -NoProfile -File "scripts/Setup-Interview.ps1"
+pwsh -NoProfile -File "scripts/Test-AdminProfile.ps1"  # PowerShell
 ```
 
-**Bash:**
-```bash
-scripts/setup-interview.sh
-```
+If `exists: false`, run the TUI setup interview (see profile-gate.md) before proceeding.
 
-**DO NOT proceed with ANY MCP operation until profile exists.**
-
-### Step 3: Load Profile & Log Operations
-
-After ANY MCP operation (install, remove, scan), log it:
-
-**PowerShell:**
-```powershell
-. "scripts/Log-AdminEvent.ps1"
-Log-AdminEvent -Message "Installed MCP server: filesystem" -Level OK
-```
-
-**Bash:**
+After any MCP operation, log it:
 ```bash
 source scripts/log-admin-event.sh
 log_admin_event "Installed MCP server: filesystem" "OK"
@@ -384,17 +392,9 @@ $AdminProfile | ConvertTo-Json -Depth 10 | Set-Content $AdminProfile.paths.devic
 - `references/CONFIGURATION.md` - Legacy config structure (Claude Desktop)
 - `references/TROUBLESHOOTING.md` - Legacy fixes
 
-## Reference Appendices
-
 ### mcp: references/CLI_TOOLS.md
 
 # MCP CLI Tools on Windows
-
-## Contents
-- Desktop Commander
-- Win-CLI
-- Claude Code MCP
-- Tool selection guide
 
 ---
 
@@ -519,14 +519,6 @@ Example entry:
 
 # Claude Desktop Configuration for MCP
 
-## Contents
-- Config locations
-- Config structure
-- Field reference
-- Safe editing rules
-- Minimal example
-- Validation checks
-
 ---
 
 ## Config Locations
@@ -624,17 +616,6 @@ If JSON parsing fails, restore the last backup.
 ### mcp: references/INSTALLATION.md
 
 # MCP Server Installation
-
-## Contents
-- Prerequisites
-- Recommended NPX install
-- Global npm install
-- Local clone install
-- Python MCP servers
-- Step‑by‑step workflow (PowerShell)
-- Step‑by‑step workflow (WSL/Bash)
-- WSL path conversion
-- Common MCP servers
 
 ---
 
@@ -865,11 +846,6 @@ Claude Desktop runs on Windows, so all config paths must be Windows paths:
 
 # MCP Registry Pattern
 
-## Contents
-- Why a registry
-- Registry schema
-- Update script (PowerShell)
-
 ---
 
 ## Why a Registry
@@ -946,13 +922,6 @@ function Update-McpRegistry {
 ### mcp: references/TROUBLESHOOTING.md
 
 # MCP Diagnostics and Troubleshooting
-
-## Contents
-- Run diagnostics script
-- Manual information collection
-- Common problems and fixes
-- Known issues prevention
-- Setup checklist
 
 ---
 

@@ -4,6 +4,17 @@ Quick reference for deciding when and how to use Claude Code agent teams vs suba
 
 **Requires**: `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in settings.json or environment.
 
+## Contents
+
+- [Decision Matrix: Subagents vs Teams](#decision-matrix-subagents-vs-teams)
+- [Cost Analysis](#cost-analysis)
+- [Admin/DevOps Use Cases](#admindevops-use-cases)
+- [Admin Agent Team Roster](#admin-agent-team-roster)
+- [Orchestration Patterns](#orchestration-patterns)
+- [Task Sizing](#task-sizing)
+- [Limitations](#limitations)
+- [Enable Agent Teams](#enable-agent-teams)
+
 ---
 
 ## Decision Matrix: Subagents vs Teams

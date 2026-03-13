@@ -353,5 +353,5 @@ echo "Profile created at: $ADMIN_ROOT/profiles/$DEVICE_NAME.json"
 ## Related Files
 
 - `admin/SKILL.md` - Main skill with dual-mode commands
-- `admin/references/first-run-setup.md` - Setup guide with both syntaxes
+- `admin/references/profile-gate.md` - Profile setup and troubleshooting guide
 - `admin/references/cross-platform.md` - Windows ↔ WSL coordination

@@ -2,6 +2,17 @@
 
 Lightweight, git-safe secrets management using [age encryption](https://age-encryption.org/) integrated with the admin suite's satellite `.env` / profile architecture.
 
+## Contents
+
+- [Quick Start](#quick-start)
+- [Daily Usage](#daily-usage)
+- [Integration with admin scripts](#integration-with-admin-scripts)
+- [Architecture](#architecture)
+- [Feature Flag](#feature-flag)
+- [Key Backup](#key-backup)
+- [Multi-Device with Sync](#multi-device-with-sync)
+- [Troubleshooting](#troubleshooting)
+
 ## Quick Start
 
 ### 1. Install age

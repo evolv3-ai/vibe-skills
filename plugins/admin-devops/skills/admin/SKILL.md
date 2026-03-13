@@ -20,15 +20,9 @@ Derive `SKILL_DIR` from this file's path and prepend it when running scripts
 
 ---
 
-## 🛑 PROFILE GATE — MANDATORY FIRST STEP
+## Profile Gate — Mandatory First Step
 
-**HALT. You MUST check for a profile before ANY operation. This is non-negotiable.**
-
-### Step 1: Check Satellite .env
-
-The fastest check is whether `~/.admin/.env` exists. This satellite file is created
-during setup and contains bootstrap vars (`ADMIN_ROOT`, `ADMIN_DEVICE`, `ADMIN_PLATFORM`)
-plus per-device preference vars (`ADMIN_PKG_MGR`, `ADMIN_WIN_PKG_MGR`, etc.).
+Check for a profile before any operation. No profile means no preferences, no logging path, no state.
 
 **Bash (WSL/Linux/macOS):**
 ```bash
@@ -42,93 +36,8 @@ pwsh -NoProfile -File "scripts/Test-AdminProfile.ps1"
 
 Returns JSON: `{"exists":true|false,"path":"...","device":"...","platform":"..."}`
 
-### Step 2: If `exists: false` → HALT AND RUN SETUP
-
-**DO NOT CONTINUE with the user's task. You must create a profile first.**
-
-Use the TUI interview below to gather preferences, then call the setup script.
-
----
-
-## 🎤 TUI Setup Interview (Agent-Driven)
-
-When profile does not exist, ask these questions using your TUI capabilities (e.g., `AskUserQuestion`).
-
-### Q1: Storage Location (Required)
-
-Ask: **"Will you use Admin on a single device or multiple devices?"**
-
-| Option | Description |
-|--------|-------------|
-| Single device (Recommended) | Local storage at `~/.admin`. Simple, no sync needed. |
-| Multiple devices | Cloud-synced folder (Dropbox, OneDrive, NAS). Profiles shared across machines. |
-
-If "Multiple devices" selected, follow up: **"Enter the path to your cloud-synced folder"**
-- Examples: `C:\Users\You\Dropbox\.admin`, `~/Dropbox/.admin`, `N:\Shared\.admin`
-
-### Q2: Tool Preferences (Optional)
-
-Ask: **"Set tool preferences now, or use defaults?"**
-
-If yes, ask each (platform-aware):
-- **Package manager (Linux-side):** apt (default on WSL/Linux) / brew (default on macOS) / dnf / pacman
-- **Windows package manager (WSL only):** winget (default) / scoop / choco / none
-- **Package manager (Windows native):** winget (default) / scoop / choco
-- **Python manager:** uv (default) / pip / conda / poetry
-- **Node manager:** npm (default) / pnpm / yarn / bun
-- **Default shell:** pwsh (default on Windows) / bash (default on Linux) / zsh (default on macOS) / fish
-
-### Q3: Inventory Scan (Optional)
-
-Ask: **"Run a quick inventory scan to detect installed tools?"**
-- Yes: Scans for git, node, python, docker, ssh, etc. and records versions
-- No: Creates minimal profile, tools detected on first use
-
----
-
-## 🔧 Create Profile (After Interview)
-
-Pass the user's answers to the setup script.
-
-**PowerShell:**
-```powershell
-pwsh -NoProfile -File "scripts/New-AdminProfile.ps1" `
-  -AdminRoot "C:/Users/You/.admin" `
-  -PkgMgr "winget" `
-  -PyMgr "uv" `
-  -NodeMgr "npm" `
-  -ShellDefault "pwsh" `
-  -RunInventory
-```
-
-**Bash:**
-```bash
-scripts/new-admin-profile.sh \
-  --admin-root "$HOME/.admin" \
-  --pkg-mgr "brew" \
-  --py-mgr "uv" \
-  --node-mgr "npm" \
-  --shell-default "zsh" \
-  --run-inventory
-```
-
-**Bash (WSL with Windows path + dual package managers):**
-```bash
-scripts/new-admin-profile.sh \
-  --admin-root "N:\Dropbox\08_Admin" \
-  --multi-device \
-  --pkg-mgr "apt" \
-  --win-pkg-mgr "winget" \
-  --run-inventory
-```
-
-Add `-MultiDevice` (PowerShell) or `--multi-device` (Bash) if user selected multi-device setup.
-
-### After Profile Created
-
-1. Verify: Re-run `Test-AdminProfile.ps1` or `test-admin-profile.sh` → should return `exists: true`
-2. Load profile: See `references/profile-gate.md` for load commands
-3. **Now** proceed with the user's original task
+If `exists: false` — stop and run the TUI setup interview before proceeding.
+Full details: `references/profile-gate.md` (discovery, TUI interview, create commands, troubleshooting).
 
 ---
 

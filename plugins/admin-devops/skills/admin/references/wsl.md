@@ -2,81 +2,45 @@
 
 _Consolidated from `skills/admin (wsl)` on 2026-02-02_
 
-## Skill Body
+## Contents
 
-# WSL Administration
-
-## CRITICAL MUST: Secrets and .env
-
-- NEVER store live `.env` files or credentials inside any skill folder.
-- `.env.template` files belong only in `templates/` within a skill.
-- Store live secrets in `~/.admin/.env` (or another non-skill location you control) and reference them from there.
-
+- [Profile Gate](#profile-gate)
+- [Quick Start](#quick-start)
+- [Critical Rules](#critical-rules)
+- [Check WSL Config from Profile](#check-wsl-config-from-profile)
+- [Package Installation (Profile-Aware)](#package-installation-profile-aware)
+- [Docker Operations](#docker-operations)
+- [Path Conversions](#path-conversions)
+- [SSH to Servers](#ssh-to-servers)
+- [Update Profile from WSL](#update-profile-from-wsl)
+- [Resource Limits](#resource-limits)
+- [Capabilities Check](#capabilities-check)
+- [Issues Tracking](#issues-tracking)
+- [Common Tasks](#common-tasks)
+- [Scope Boundaries](#scope-boundaries)
+- [References](#references)
+- [Troubleshooting](#troubleshooting)
+- [Git Configuration](#git-configuration)
+- [Known Issues Prevention](#known-issues-prevention)
+- [Complete Setup Checklist](#complete-setup-checklist)
+- [Official Documentation](#official-documentation)
+- [Package Versions (Snapshot)](#package-versions-snapshot)
 
 **Requires**: WSL2 context, Ubuntu 24.04
 
 ---
 
-## ⚠️ Profile Gate (MANDATORY - DO THIS FIRST)
+## Profile Gate
 
-**STOP. Before ANY operation, you MUST check for the profile. This is not optional.**
-
-### Step 1: Check Profile Exists
+Run the profile check before any operation. See `references/profile-gate.md` for full details.
 
 ```bash
-# Use the helper script - it handles WSL path detection correctly
 scripts/test-admin-profile.sh
 ```
 
-Returns JSON: `{"exists":true,"path":"/mnt/c/Users/Owner/.admin/profiles/CASATEN.json",...}`
+If `exists: false`, run the TUI setup interview (see profile-gate.md) before proceeding.
 
-### Step 2: If Profile Missing → Run Setup
-
-If `exists` is `false`:
-```bash
-scripts/setup-interview.sh
-```
-
-**DO NOT proceed with ANY task until profile exists.**
-
-### Step 3: Load Profile
-
-```bash
-source scripts/load-profile.sh
-load_admin_profile
-```
-
-### Step 4: After ANY Operation → Log It
-
-```bash
-source scripts/log-admin-event.sh
-log_admin_event "Installed docker via apt" "OK"
-
-# On failure, also create issue:
-source scripts/new-admin-issue.sh
-new_admin_issue "Docker installation failed" "install" "docker,apt"
-```
-
-## ⚠️ Critical: Profile Location
-
-**The profile lives on the WINDOWS side, not in WSL home.**
-
-A satellite `.env` at `~/.admin/.env` points to the real location:
-
-```bash
-# ~/.admin/.env contains:
-#   ADMIN_ROOT=/mnt/c/Users/Owner/.admin
-#   ADMIN_DEVICE=WOPR3
-#   ADMIN_PLATFORM=wsl
-
-# Read ADMIN_ROOT from satellite
-source <(grep "^ADMIN_ROOT=" ~/.admin/.env)
-PROFILE_PATH="$ADMIN_ROOT/profiles/$(hostname).json"
-ls "$PROFILE_PATH"  # Found!
-```
-
-The satellite `.env` is created by `new-admin-profile.sh` during setup.
-On WSL, `~/.admin/` contains **only** this `.env` file - all data lives at `ADMIN_ROOT`.
+**WSL note**: The profile lives on the Windows side (`/mnt/c/Users/Owner/.admin`), not in WSL home. The satellite `.env` at `~/.admin/.env` points to the real location. See the "Shared Admin Root" section in profile-gate.md for details.
 
 ---
 
@@ -387,21 +351,11 @@ fi
 - `references/known-issues.md` - Common pitfalls and prevention
 - `references/OPERATIONS.md` - Troubleshooting and diagnostics
 
-## Reference Appendices
-
 ### wsl: references/OPERATIONS.md
 
 # WSL Operations Reference
 
 Extended operations for WSL administration: troubleshooting, Git setup, known issues prevention, setup checklist, and version snapshots.
-
-## Contents
-- Troubleshooting
-- Git Configuration
-- Known Issues Prevention
-- Complete Setup Checklist
-- Official Documentation
-- Package Versions (Snapshot)
 
 ---
 
