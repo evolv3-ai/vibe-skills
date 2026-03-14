@@ -237,20 +237,34 @@ Common issues, best practices, configuration variables, and cleanup ordering are
 
 ## Logging Integration
 
-When performing infrastructure operations, log to the centralized system:
+Log every infrastructure operation via the admin skill's logging script:
 
 ```bash
+source "${SKILL_DIR}/../admin/scripts/log-admin-event.sh"
+
 # After provisioning
-log_admin "SUCCESS" "operation" "Provisioned OCI instance" "id=$INSTANCE_ID provider=OCI"
+log_admin_event "Provisioned OCI instance $INSTANCE_ID ($SHAPE)" "OK"
 
 # After destroying
-log_admin "SUCCESS" "operation" "Terminated OCI instance" "id=$INSTANCE_ID"
+log_admin_event "Terminated OCI instance $INSTANCE_ID" "OK"
 
 # On error
-log_admin "ERROR" "operation" "OCI deployment failed" "error=OUT_OF_HOST_CAPACITY"
+log_admin_event "OCI deployment failed: OUT_OF_HOST_CAPACITY in $REGION" "ERROR"
 ```
 
-See `admin` skill's `references/logging.md` for full logging documentation.
+## SimpleMem Integration
+
+Before provisioning, query for past experience:
+```
+memory_query: "What issues have occurred with OCI provisioning? Any capacity problems?"
+```
+
+After provisioning (success or failure), store the outcome:
+```
+memory_add:
+  speaker: "devops:server-provisioner"
+  content: "Provisioned OCI {shape} in {region}: {IP}. Purpose: {purpose}. Always Free: {yes/no}."
+```
 
 ---
 

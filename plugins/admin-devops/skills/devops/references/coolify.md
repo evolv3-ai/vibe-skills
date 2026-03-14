@@ -118,12 +118,14 @@ Detailed references (one level deep):
 
 ## Logging Integration
 
-Log major operations using centralized logging from `admin`:
+Log major operations via the admin skill's logging script:
 
 ```bash
-log_admin "SUCCESS" "installation" "Installed Coolify" "version=4.x server=$SERVER_ID"
-log_admin "SUCCESS" "system-change" "Configured Coolify" "domain=$DOMAIN"
-log_admin "SUCCESS" "operation" "Deployed app via Coolify" "app=$APP_NAME"
+source "${SKILL_DIR}/../admin/scripts/log-admin-event.sh"
+
+log_admin_event "Installed Coolify v4.x on $SERVER_ID" "OK"
+log_admin_event "Configured Coolify domain $DOMAIN on $SERVER_ID" "OK"
+log_admin_event "Deployed $APP_NAME via Coolify" "OK"
 ```
 
 ## Related Skills

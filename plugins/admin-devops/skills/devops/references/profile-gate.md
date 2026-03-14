@@ -4,22 +4,16 @@
 > supplementary details and load commands.
 
 > **Path resolution**: These scripts live in the admin skill's `scripts/` directory.
-> From commands/agents, use `${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/`.
-> From SKILL.md contexts, derive the admin skill path from this file's location
-> (sibling skill at `../../admin/scripts/`).
+> Resolve via sibling skill: `${SKILL_DIR}/../admin/scripts/` where `SKILL_DIR` is
+> derived from the loaded SKILL.md path at runtime.
 
 ---
 
 ## Quick Test Commands
 
-**PowerShell (Windows):**
-```powershell
-pwsh -NoProfile -File "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/Test-AdminProfile.ps1"
-```
-
 **Bash (WSL/Linux/macOS):**
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/test-admin-profile.sh"
+"${SKILL_DIR}/../admin/scripts/test-admin-profile.sh"
 ```
 
 Returns JSON: `{"exists":true|false,"path":"...","device":"...",...}`
@@ -28,49 +22,31 @@ Returns JSON: `{"exists":true|false,"path":"...","device":"...",...}`
 
 ## Create Profile (TUI-First Approach)
 
-If profile doesn't exist, use the TUI interview defined in `SKILL.md`:
-1. Agent asks storage location (single/multi-device)
-2. Agent asks tool preferences (optional)
-3. Agent asks about inventory scan (optional)
-4. Agent calls the setup script with answers:
+If profile doesn't exist, hand off to the **admin** skill which owns profile creation.
+The admin skill's TUI interview will:
+1. Ask storage location (single/multi-device)
+2. Ask tool preferences (optional)
+3. Ask about inventory scan (optional)
+4. Call the setup script with answers:
 
-**PowerShell:**
-```powershell
-pwsh -NoProfile -File "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/New-AdminProfile.ps1" `
-  -AdminRoot "$HOME/.admin" `
-  -PkgMgr "winget" `
-  -PyMgr "uv" `
-  -NodeMgr "npm" `
-  -ShellDefault "pwsh" `
-  -RunInventory
-```
-
-**Bash:**
 ```bash
-"${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/new-admin-profile.sh" \
+"${SKILL_DIR}/../admin/scripts/new-admin-profile.sh" \
   --admin-root "$HOME/.admin" \
-  --pkg-mgr "brew" \
+  --pkg-mgr "apt" \
   --py-mgr "uv" \
   --node-mgr "npm" \
-  --shell-default "zsh" \
+  --shell-default "bash" \
   --run-inventory
 ```
 
-Add `-MultiDevice` / `--multi-device` for cloud-synced storage.
+Add `--multi-device` for cloud-synced storage.
 
 ---
 
 ## Load Profile
 
-**PowerShell:**
-```powershell
-. "${CLAUDE_PLUGIN_ROOT}\skills\admin\scripts\Load-Profile.ps1"
-Load-AdminProfile -Export
-```
-
-**Bash:**
 ```bash
-source "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/load-profile.sh"
+source "${SKILL_DIR}/../admin/scripts/load-profile.sh"
 load_admin_profile
 ```
 

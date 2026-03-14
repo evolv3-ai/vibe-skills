@@ -122,7 +122,7 @@ chmod 600 ~/.config/hcloud/cli.toml
 **Method B: Environment variable (temporary, no config saved)**:
 ```bash
 # Set for current session only - hcloud commands will work but context won't persist
-export HCLOUD_TOKEN="$HETZNER_API_TOKEN"
+export HCLOUD_TOKEN=$(secrets HCLOUD_TOKEN)  # or: export HCLOUD_TOKEN="$HETZNER_API_TOKEN"
 hcloud server list  # Works without context
 ```
 
@@ -318,13 +318,13 @@ else
   SERVER_ARCH="amd64"
 fi
 
-# Save to .env.local for downstream skills
-echo "SERVER_IP=$SERVER_IP" >> .env.local
-echo "SSH_USER=root" >> .env.local
-echo "SSH_KEY_PATH=~/.ssh/id_rsa" >> .env.local
-echo "SERVER_ARCH=$SERVER_ARCH" >> .env.local
-echo "COOLIFY_SERVER_IP=$SERVER_IP" >> .env.local
-echo "KASM_SERVER_IP=$SERVER_IP" >> .env.local
+# Update profile.servers[] with new server data (profile is source of truth)
+# The provisioning agent or deployment-coordinator will update the profile JSON
+# with: server IP, SSH user, SSH key path, architecture, and purpose tags.
+echo "SERVER_IP=$SERVER_IP"
+echo "SSH_USER=root"
+echo "SSH_KEY_PATH=~/.ssh/id_rsa"
+echo "SERVER_ARCH=$SERVER_ARCH"
 
 echo ""
 echo "Server deployed successfully!"
@@ -368,20 +368,34 @@ Troubleshooting, best practices, configuration variables, and cost snapshots are
 
 ## Logging Integration
 
-When performing infrastructure operations, log to the centralized system:
+Log every infrastructure operation via the admin skill's logging script:
 
 ```bash
+source "${SKILL_DIR}/../admin/scripts/log-admin-event.sh"
+
 # After provisioning
-log_admin "SUCCESS" "operation" "Provisioned Hetzner server" "id=$SERVER_ID provider=Hetzner"
+log_admin_event "Provisioned Hetzner server $SERVER_ID in $HETZNER_LOCATION ($HETZNER_SERVER_TYPE)" "OK"
 
 # After destroying
-log_admin "SUCCESS" "operation" "Deleted Hetzner server" "id=$SERVER_ID"
+log_admin_event "Deleted Hetzner server $SERVER_ID" "OK"
 
 # On error
-log_admin "ERROR" "operation" "Hetzner deployment failed" "error=$ERROR_MSG"
+log_admin_event "Hetzner deployment failed: $ERROR_MSG" "ERROR"
 ```
 
-See `admin` skill's `references/logging.md` for full logging documentation.
+## SimpleMem Integration
+
+Before provisioning, query for past experience:
+```
+memory_query: "What issues have occurred with Hetzner provisioning?"
+```
+
+After provisioning (success or failure), store the outcome:
+```
+memory_add:
+  speaker: "devops:server-provisioner"
+  content: "Provisioned Hetzner {server_type} in {location}: {IP}. Purpose: {purpose}. Cost: {cost}/mo."
+```
 
 ---
 

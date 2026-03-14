@@ -312,13 +312,11 @@ ssh root@$SERVER_IP "uname -a && free -h && df -h /"
 # Linode only offers x86 architecture
 SERVER_ARCH="amd64"
 
-# Save to .env.local for downstream skills
-echo "SERVER_IP=$SERVER_IP" >> .env.local
-echo "SSH_USER=root" >> .env.local
-echo "SSH_KEY_PATH=~/.ssh/id_rsa" >> .env.local
-echo "SERVER_ARCH=$SERVER_ARCH" >> .env.local
-echo "COOLIFY_SERVER_IP=$SERVER_IP" >> .env.local
-echo "KASM_SERVER_IP=$SERVER_IP" >> .env.local
+# Update profile.servers[] with new server data (profile is source of truth)
+echo "SERVER_IP=$SERVER_IP"
+echo "SSH_USER=root"
+echo "SSH_KEY_PATH=~/.ssh/id_rsa"
+echo "SERVER_ARCH=$SERVER_ARCH"
 
 echo ""
 echo "Linode deployed successfully!"
@@ -388,20 +386,34 @@ Troubleshooting, best practices, configuration variables, and cost snapshots are
 
 ## Logging Integration
 
-When performing infrastructure operations, log to the centralized system:
+Log every infrastructure operation via the admin skill's logging script:
 
 ```bash
+source "${SKILL_DIR}/../admin/scripts/log-admin-event.sh"
+
 # After provisioning
-log_admin "SUCCESS" "operation" "Provisioned Linode" "id=$LINODE_ID provider=Linode"
+log_admin_event "Provisioned Linode $LINODE_ID in $LINODE_REGION ($LINODE_TYPE)" "OK"
 
 # After destroying
-log_admin "SUCCESS" "operation" "Deleted Linode" "id=$LINODE_ID"
+log_admin_event "Deleted Linode $LINODE_ID" "OK"
 
 # On error
-log_admin "ERROR" "operation" "Linode deployment failed" "error=$ERROR_MSG"
+log_admin_event "Linode deployment failed: $ERROR_MSG" "ERROR"
 ```
 
-See `admin` skill's `references/logging.md` for full logging documentation.
+## SimpleMem Integration
+
+Before provisioning, query for past experience:
+```
+memory_query: "What issues have occurred with Linode provisioning?"
+```
+
+After provisioning (success or failure), store the outcome:
+```
+memory_add:
+  speaker: "devops:server-provisioner"
+  content: "Provisioned Linode {type} in {region}: {IP}. Purpose: {purpose}. Cost: {cost}/mo."
+```
 
 ---
 

@@ -113,9 +113,13 @@ Detailed references (one level deep):
 
 ## Logging Integration
 
+Log major operations via the admin skill's logging script:
+
 ```bash
-log_admin "SUCCESS" "installation" "Installed KASM Workspaces" "version=1.x server=$SERVER_ID"
-log_admin "SUCCESS" "operation" "Ran KASM post-install wizard" "modules=$MODULES"
+source "${SKILL_DIR}/../admin/scripts/log-admin-event.sh"
+
+log_admin_event "Installed KASM Workspaces v1.x on $SERVER_ID" "OK"
+log_admin_event "Ran KASM post-install wizard ($MODULES) on $SERVER_ID" "OK"
 ```
 
 ## Related Skills

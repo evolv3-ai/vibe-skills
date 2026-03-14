@@ -13,13 +13,17 @@
 Prerequisites:
 - Provider skill installed (e.g., `oci`)
 - `coolify` skill installed
+- Profile gate passed (`test-admin-profile.sh`)
 
 Steps:
-1. Provision server via the provider skill (2+ vCPU, 8GB+ RAM).
-2. Add server to inventory with `ROLE=coolify`.
-3. Install Coolify using `coolify skill`.
-4. Configure a tunnel if needed (see `coolify skill` references).
-5. Update inventory:
+1. Retrieve provider API key via `secrets` CLI (e.g., `secrets HCLOUD_TOKEN`).
+2. Query SimpleMem for past deployment issues (`memory_query: "Coolify deployment issues"`).
+3. Provision server via the provider skill (2+ vCPU, 8GB+ RAM).
+4. Install Coolify using `coolify skill`.
+5. Configure a tunnel if needed (see `coolify skill` references).
+6. Update `profile.servers[]` with server data.
+7. Log the operation via `log_admin_event`.
+8. Store outcome in SimpleMem.
 
 ```env
 SERVER_COOLIFY01_ROLE=coolify
@@ -33,13 +37,17 @@ SERVER_COOLIFY01_TAGS=paas,docker,prod
 Prerequisites:
 - Provider skill installed
 - `kasm skill` installed
+- Profile gate passed (`test-admin-profile.sh`)
 
 Steps:
-1. Provision server via provider skill (4+ vCPU, 16GB+ RAM).
-2. Add server to inventory with `ROLE=kasm`.
-3. Install KASM using `kasm skill`.
-4. Configure a tunnel if needed (route `kasm.yourdomain.com` to port 8443).
-5. Update inventory:
+1. Retrieve provider API key via `secrets` CLI.
+2. Query SimpleMem for past deployment issues (`memory_query: "KASM deployment issues"`).
+3. Provision server via provider skill (4+ vCPU, 16GB+ RAM).
+4. Install KASM using `kasm skill`.
+5. Configure a tunnel if needed (route `kasm.yourdomain.com` to port 8443).
+6. Update `profile.servers[]` with server data.
+7. Log the operation via `log_admin_event`.
+8. Store outcome in SimpleMem.
 
 ```env
 SERVER_KASM01_ROLE=kasm
@@ -59,11 +67,15 @@ Recommended architecture:
 | DB01 | database | OCI | 2 OCPU, 12GB |
 
 Steps:
-1. Check inventory for existing servers.
-2. Provision any missing nodes via provider skills.
-3. Install services via `application` skills.
-4. Configure tunnels for public access.
-5. Update inventory with full server blocks.
+1. Pass profile gate and load `profile.servers[]` inventory.
+2. Retrieve provider secrets via `secrets` CLI.
+3. Query SimpleMem for past infrastructure issues.
+4. Provision any missing nodes via provider skills.
+5. Install services via `application` skills (coolify, kasm).
+6. Configure tunnels for public access.
+7. Update `profile.servers[]` with all server data.
+8. Log all operations via `log_admin_event`.
+9. Store outcomes in SimpleMem.
 
 Cost optimization ideas:
 - Use OCI Free Tier for ARM64 VMs.
