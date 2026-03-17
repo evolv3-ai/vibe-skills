@@ -48,7 +48,14 @@ param(
 
     [Parameter()]
     [ValidateSet('infisical', 'vault', 'env')]
-    [string]$Backend
+    [string]$Backend,
+
+    [Parameter()]
+    [string]$Path,
+
+    [Parameter()]
+    [Alias('ProjectSlug')]
+    [string]$Project
 )
 
 # --- Resolve paths ---
@@ -117,6 +124,33 @@ function Resolve-InfisicalEnv {
 
 $SecretsBackend = Resolve-SecretsBackend
 
+# --- Project slug resolution ---
+$ProjectsFile = Join-Path $AdminRoot "config\infisical-projects.json"
+
+function Resolve-ProjectSlug {
+    param([string]$Slug)
+    if (Test-Path $ProjectsFile) {
+        try {
+            $config = Get-Content $ProjectsFile -Raw | ConvertFrom-Json
+            $pid = $config.projects.$Slug.id
+            if ($pid) { return $pid }
+        } catch {}
+    }
+    if ($Slug -match '^[0-9a-f-]{36}$') { return $Slug }
+    $envVarName = "INFISICAL_PROJECT_ID_" + ($Slug.ToUpper() -replace '-', '_')
+    $envVal = [Environment]::GetEnvironmentVariable($envVarName)
+    if ($envVal) { return $envVal }
+    Write-Error "Cannot resolve project slug '$Slug'"
+    return $null
+}
+
+# Resolve --Project flag to project ID override
+$ProjectIdOverride = $null
+if ($Project) {
+    $ProjectIdOverride = Resolve-ProjectSlug -Slug $Project
+    if (-not $ProjectIdOverride) { exit 1 }
+}
+
 # --- Infisical operations ---
 function Test-InfisicalReady {
     if (-not (Get-Command infisical -ErrorAction SilentlyContinue)) {
@@ -133,22 +167,28 @@ function Test-InfisicalReady {
 
 function Get-InfisicalSecret {
     param([string]$Key)
-    $projectId = Resolve-InfisicalProjectId
+    $projectId = if ($ProjectIdOverride) { $ProjectIdOverride } else { Resolve-InfisicalProjectId }
     $envSlug = Resolve-InfisicalEnv
-    & infisical secrets get $Key --projectId $projectId --env $envSlug --plain 2>$null
+    $args = @("secrets", "get", $Key, "--projectId", $projectId, "--env", $envSlug, "--plain")
+    if ($Path) { $args += @("--path", $Path) }
+    & infisical @args 2>$null
 }
 
 function Get-InfisicalKeys {
-    $projectId = Resolve-InfisicalProjectId
+    $projectId = if ($ProjectIdOverride) { $ProjectIdOverride } else { Resolve-InfisicalProjectId }
     $envSlug = Resolve-InfisicalEnv
-    $output = & infisical secrets list --projectId $projectId --env $envSlug 2>$null
+    $args = @("secrets", "list", "--projectId", $projectId, "--env", $envSlug)
+    if ($Path) { $args += @("--path", $Path) }
+    $output = & infisical @args 2>$null
     $output | Select-Object -Skip 1 | ForEach-Object { ($_ -split '\s+')[1] } | Where-Object { $_ } | Sort-Object
 }
 
 function Get-InfisicalExport {
-    $projectId = Resolve-InfisicalProjectId
+    $projectId = if ($ProjectIdOverride) { $ProjectIdOverride } else { Resolve-InfisicalProjectId }
     $envSlug = Resolve-InfisicalEnv
-    & infisical export --projectId $projectId --env $envSlug --format=dotenv 2>$null
+    $args = @("export", "--projectId", $projectId, "--env", $envSlug, "--format=dotenv")
+    if ($Path) { $args += @("--path", $Path) }
+    & infisical @args 2>$null
 }
 
 # --- Fallback wrappers ---

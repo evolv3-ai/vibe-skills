@@ -47,25 +47,32 @@ Full details: `references/profile-gate.md` (discovery, TUI interview, create com
 - `.env.template` files belong only in `assets/` within a skill.
 - Store live secrets in `~/.admin/.env` and reference from there.
 
-## Secrets Management
+## Secrets Management (v4.0 — 3-Project Split)
 
-Three backends available, configured via `ADMIN_SECRETS_BACKEND` in `~/.admin/.env`:
+Secrets are organized across **3 Infisical projects** by trust boundary, with folder hierarchies:
 
-| Backend | Storage | Best For |
-|---------|---------|----------|
-| `infisical` | Infisical Cloud | Multi-device, audit trail |
-| `vault` (default) | `$ADMIN_ROOT/vault.age` | Single device, offline |
-| `env` | `$ADMIN_ROOT/.env` | Legacy |
+| Project | Trust Boundary | Contents |
+|---|---|---|
+| `admin-operator` | Operator | Provider keys, LLM tokens, Cloudflare, Google creds |
+| `admin-runtime` | Runtime (scoped) | Agent bot tokens, deployment passwords |
+| `customer-*` | Customer (isolated) | Per-customer OpenClaw config |
 
-**Fallback chain**: infisical → vault → env. If the primary backend is unavailable, scripts automatically try the next.
+**4-layer model**: age key → vault (bootstrap) → Infisical Cloud (3 projects) → generated runtime files
 
-**CLI (Bash)**: `secrets KEYNAME` | `secrets --list` | `secrets --status` | `secrets --backend infisical --list`
+**URI-based access** (new in v4.0):
+```bash
+resolve-secret-ref.sh "infisical://admin-operator/prod/providers/hetzner/HCLOUD_TOKEN"
+secrets --project admin-operator --path /providers/hetzner HCLOUD_TOKEN
+```
 
-**CLI (PowerShell)**: `secrets.ps1 KEY` | `secrets.ps1 -List` | `secrets.ps1 -Status` | `secrets.ps1 -Backend infisical -List`
+**Legacy CLI** (still works via fallback):
+```bash
+secrets HCLOUD_TOKEN          # Falls back through: generated/.env → Infisical → vault → .env
+```
 
-**Migration**: `secrets --migrate-to-infisical` pushes vault contents to Infisical Cloud.
+**Runtime rendering**: `render-runtime.sh` resolves all `secretRefs`/`fileRefs` from the profile and writes `$ADMIN_ROOT/generated/.env` for scripts that don't need live Infisical access.
 
-**Guides**: `references/vault-guide.md` (age vault), `references/infisical.md` (Infisical Cloud)
+**Guides**: `references/secrets-architecture.md` (full model), `references/infisical.md` (setup), `references/vault-guide.md` (fallback)
 
 ## Architecture
 
@@ -76,7 +83,7 @@ admin (core)
   ├── 9 satellite skills: devops, oci, hetzner, contabo, digital-ocean, vultr, linode, coolify, kasm
   ├── 6 agents: profile-validator, docs-agent, verify-agent, tool-installer, mcp-bot, ops-bot
   ├── Profile system: ~/.admin/.env (satellite) → $ADMIN_ROOT/profiles/*.json (+ GitHub sync)
-  ├── Secrets: Infisical Cloud (primary) → age vault (fallback) → .env (legacy)
+  ├── Secrets: 3 Infisical projects (operator/runtime/customer) → vault (fallback) → .env (legacy)
   └── SimpleMem: Long-term memory across sessions (graceful degradation)
 ```
 
@@ -86,15 +93,16 @@ admin (core)
 Satellite .env (bootstrap)  →  profile.json (device config)  →  Agent decisions
         ↓                              ↓                              ↓
   ADMIN_ROOT, DEVICE,          tools, servers, prefs,          SimpleMem storage
-  PLATFORM, SECRETS_BACKEND    capabilities, history           (speaker convention)
-        ↓
-  Infisical Cloud (primary) → vault.age (fallback) → .env (legacy)
+  PLATFORM, SECRETS_BACKEND    secretRefs, fileRefs            (speaker convention)
+        ↓                              ↓
+  generated/.env (pre-rendered) → Infisical (3 projects) → vault.age → .env
 ```
 
 - **Satellite `.env`** (`~/.admin/.env`): Per-device bootstrap. Points to `ADMIN_ROOT`, configures secrets backend.
-- **Root `.env`** (`$ADMIN_ROOT/.env`): Manifest (all keys visible, secrets in vault/Infisical).
-- **Profile JSON** (`$ADMIN_ROOT/profiles/{DEVICE}.json`): Full device config. Optionally synced via GitHub repo.
-- **Secrets**: Infisical Cloud (primary) → `$ADMIN_ROOT/vault.age` (fallback) → `.env` (legacy).
+- **Root `.env`** (`$ADMIN_ROOT/.env`): Bootstrap only (ADMIN_ROOT, ADMIN_DEVICE, ADMIN_PLATFORM, ADMIN_SECRETS_BACKEND).
+- **Profile JSON** (`$ADMIN_ROOT/profiles/{DEVICE}.json`): Full device config with `secretRefs` (URI pointers) and `fileRefs`.
+- **Projects config** (`$ADMIN_ROOT/config/infisical-projects.json`): Project slug → ID mapping.
+- **Generated** (`$ADMIN_ROOT/generated/.env`, `compat.env`): Pre-resolved secrets for scripts that don't need live Infisical access.
 
 ### Agent Roster
 

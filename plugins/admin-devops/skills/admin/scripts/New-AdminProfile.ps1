@@ -159,7 +159,7 @@ Write-OK "RAM: $ram GB"
 
 # Build base profile
 $profile = [ordered]@{
-    schemaVersion = "3.0"
+    schemaVersion = "4.1"
     adminSkillVersion = $AdminSkillVersion
     multiDevice = [bool]$MultiDevice
     skillVersions = $SkillVersions
@@ -205,6 +205,22 @@ $profile = [ordered]@{
     wsl = @{}
     docker = @{}
     mcp = @{ servers = @{} }
+    bindings = [ordered]@{
+        mcp = @{}
+        skill = @{}
+        agent = @{}
+        prompt = @{}
+    }
+    consumer = [ordered]@{
+        type = "workstation"
+        trustBoundary = "operator"
+    }
+    secretsConfig = [ordered]@{
+        backend = "vault"
+        fallback = "env"
+        multiProject = $false
+        projectsConfig = "config/infisical-projects.json"
+    }
     servers = @()
     deployments = @{}
     issues = @{ current = @(); resolved = @() }

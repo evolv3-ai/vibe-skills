@@ -33,7 +33,16 @@ All scripts use a **satellite .env** pattern for profile discovery:
 ADMIN_ROOT=/mnt/c/Users/Owner/.admin
 ADMIN_DEVICE=WOPR3
 ADMIN_PLATFORM=wsl
+
+# Secrets Backend (v4.0+)
+ADMIN_SECRETS_BACKEND=infisical
+INFISICAL_ENVIRONMENT=prod
+INFISICAL_AUTH_METHOD=cli-login
+# Machine identity (headless/runtime environments):
+INFISICAL_MACHINE_IDENTITY=wopr3-operator
 ```
+
+For the full secrets configuration including multi-project support, see `references/secrets-architecture.md`.
 
 ### Resolution Order
 

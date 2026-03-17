@@ -196,31 +196,61 @@ Layer 1: age key (local file, never leaves device)
 - Infisical creds unlock **all remote secrets**
 - If Infisical is down, the vault still has everything as fallback
 
-## Project Structure
+## Project Structure (3-Project Split)
 
-Recommended Infisical project layout for admin suite:
+Secrets are organized across 3 Infisical projects by trust boundary, with folder hierarchies:
+
+### 1. `admin-operator` — Operator secrets (provider keys, shared services)
 
 ```
-Project: admin-suite
-Environment: prod
-  ├── Cloud Providers
-  │   ├── HCLOUD_TOKEN
-  │   ├── DIGITALOCEAN_TOKEN
-  │   ├── VULTR_API_KEY
-  │   ├── LINODE_TOKEN
-  │   ├── CONTABO_CLIENT_ID / CONTABO_CLIENT_SECRET
-  │   ├── OCI_TENANCY_OCID / OCI_USER_OCID / OCI_COMPARTMENT_OCID
-  │   └── CLOUDFLARE_API_TOKEN / CLOUDFLARE_ZONE_ID / CLOUDFLARE_ACCOUNT_ID
-  ├── Applications
-  │   ├── COOLIFY_ADMIN_EMAIL
-  │   ├── KASM_ADMIN_PASSWORD
-  │   └── SIMPLEMEM_TOKEN
-  └── Bot Tokens
-      ├── LIA_BOT_TOKEN / SHANE_BOT_TOKEN / TERRA_BOT_TOKEN
-      └── PICOCLAW_BOT_TOKEN
+/shared/llm/              OPENROUTER_API_KEY, OPENAI_API_KEY
+/shared/mattermost/       ADMIN_TOKEN, URL
+/shared/sentinel/         TOKEN
+/shared/                  GITHUB_TOKEN
+/providers/hetzner/       HCLOUD_TOKEN
+/providers/contabo/       CLIENT_SECRET, OAUTH_PASS
+/providers/digitalocean/  ACCESS_TOKEN
+/providers/vultr/         API_KEY
+/providers/linode/        API_TOKEN
+/network/cloudflare/      API_TOKEN, ZONE_ID, ACCOUNT_ID
+/files/gcloud/            Base64-encoded JSON credentials
 ```
 
-Use Infisical's folder feature to organize if the key count grows large.
+### 2. `admin-runtime` — Agent and deployment runtime secrets
+
+```
+/agents/lia/              MM_BOT_TOKEN, GATEWAY_TOKEN, AUTH_PASSWORD
+/agents/shane/            MM_BOT_TOKEN, GATEWAY_TOKEN, AUTH_PASSWORD
+/agents/terra/            MM_BOT_TOKEN, GATEWAY_TOKEN, AUTH_PASSWORD
+/agents/taco/             MM_BOT_TOKEN
+/agents/picoclaw/         DISCORD_BOT_TOKEN, MM_BOT_TOKEN, BRAVE_API_KEY
+/deployments/kasm-*/      ADMIN_PASSWORD, CF_TUNNEL_TOKEN
+/deployments/nanoclaw-*/  CF_TUNNEL_TOKEN
+```
+
+### 3. `customer-*` — Per-customer projects (isolated)
+
+```
+/apps/openclaw/           Gateway config, channel tokens
+/workspace/               Workspace preferences
+/files/gcloud/            Customer-specific Google ADC
+/local/                   Local overrides
+```
+
+Project slug → ID mapping is in `$ADMIN_ROOT/config/infisical-projects.json`.
+
+### URI-based access
+
+Secrets are referenced via `infisical://` URIs:
+
+```
+infisical://admin-operator/prod/providers/hetzner/HCLOUD_TOKEN
+infisical://admin-runtime/prod/agents/lia/MM_BOT_TOKEN
+```
+
+Use `resolve-secret-ref.sh` to resolve URIs, or `secrets --project admin-operator --path /providers/hetzner HCLOUD_TOKEN`.
+
+See `references/secrets-architecture.md` for the complete 4-layer model.
 
 ## Troubleshooting
 

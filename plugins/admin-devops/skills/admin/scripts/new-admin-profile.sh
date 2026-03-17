@@ -138,6 +138,14 @@ while [[ $# -gt 0 ]]; do
             FORCE=true
             shift
             ;;
+        --headless)
+            HEADLESS=true
+            shift
+            ;;
+        --consumer-type)
+            CONSUMER_TYPE="$2"
+            shift 2
+            ;;
         -h|--help)
             head -36 "$0" | tail -30
             exit 0
@@ -300,6 +308,24 @@ for dir in "${DIRS[@]}"; do
         ok "Created: $dir"
     fi
 done
+
+# Create .gitignore for profile sync safety (prevents secrets leaking via git)
+GITIGNORE_FILE="${ADMIN_ROOT}/.gitignore"
+if [[ ! -f "$GITIGNORE_FILE" ]]; then
+    cat > "$GITIGNORE_FILE" <<'GITIGNORE'
+# Generated runtime files (contain resolved secrets)
+generated/
+
+# Encrypted vault and plaintext env
+*.age
+.env
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+GITIGNORE
+    ok "Created .gitignore for profile sync safety"
+fi
 
 # Gather system info
 section "Detecting System"
@@ -508,9 +534,16 @@ section "Saving Profile"
 
 TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 
+# Derive trust boundary from consumer type
+case "${CONSUMER_TYPE:-workstation}" in
+    runtime)     TRUST_BOUNDARY="runtime" ;;
+    customer-pc) TRUST_BOUNDARY="customer" ;;
+    *)           TRUST_BOUNDARY="operator" ;;
+esac
+
 cat > "$PROFILE_PATH" <<EOF
 {
-  "schemaVersion": "3.0",
+  "schemaVersion": "4.1",
   "adminSkillVersion": "$ADMIN_SKILL_VERSION",
   "multiDevice": $MULTI_DEVICE,
   "skillVersions": $SKILL_VERSIONS_JSON,
@@ -549,6 +582,22 @@ cat > "$PROFILE_PATH" <<EOF
   "wsl": {},
   "docker": {},
   "mcp": {"servers": {}},
+  "bindings": {
+    "mcp": {},
+    "skill": {},
+    "agent": {},
+    "prompt": {}
+  },
+  "consumer": {
+    "type": "${CONSUMER_TYPE:-workstation}",
+    "trustBoundary": "${TRUST_BOUNDARY}"
+  },
+  "secretsConfig": {
+    "backend": "vault",
+    "fallback": "env",
+    "multiProject": false,
+    "projectsConfig": "config/infisical-projects.json"
+  },
   "servers": [],
   "deployments": {},
   "issues": {"current": [], "resolved": []},

@@ -176,6 +176,30 @@ check_vault_deps() {
 load_admin_secrets() {
     local export_vars="${1:-true}"
 
+    # Check for pre-rendered generated/.env (from render-runtime.sh)
+    local generated_env="${ADMIN_ROOT}/generated/.env"
+    if [[ -f "$generated_env" ]]; then
+        # Freshness check: warn if older than 7 days
+        local file_age_days=0
+        if command -v stat &>/dev/null; then
+            local file_mtime
+            file_mtime=$(stat -c %Y "$generated_env" 2>/dev/null || stat -f %m "$generated_env" 2>/dev/null || echo 0)
+            local now_epoch
+            now_epoch=$(date +%s)
+            file_age_days=$(( (now_epoch - file_mtime) / 86400 ))
+        fi
+        if [[ "$file_age_days" -gt 7 ]]; then
+            log_warn "generated/.env is ${file_age_days} days old. Run render-runtime.sh to refresh."
+        fi
+        # Check for UNRESOLVED markers (from --skip-unresolvable)
+        if grep -q "^# UNRESOLVED:" "$generated_env" 2>/dev/null; then
+            log_warn "generated/.env has unresolved secrets. Run render-runtime.sh after configuring Infisical."
+        fi
+        log_info "Loading pre-rendered secrets from $generated_env"
+        load_env_file "$generated_env" "$export_vars"
+        return 0
+    fi
+
     # Infisical backend
     if [[ "$SECRETS_BACKEND" == "infisical" ]]; then
         if command -v infisical &>/dev/null; then
@@ -283,8 +307,8 @@ load_admin_profile() {
     ADMIN_PLATFORM=$(echo "$ADMIN_PROFILE_JSON" | jq -r '.device.platform')
     
     local schema_version=$(echo "$ADMIN_PROFILE_JSON" | jq -r '.schemaVersion')
-    if [[ "$schema_version" != "3.0" ]]; then
-        log_warn "Profile schema version $schema_version - expected 3.0"
+    if [[ "$schema_version" != "3.0" && "$schema_version" != "4.0" && "$schema_version" != "4.1" ]]; then
+        log_warn "Profile schema version $schema_version - expected 3.0, 4.0, or 4.1"
     fi
     
     local tool_count=$(echo "$ADMIN_PROFILE_JSON" | jq '.tools | length')
@@ -295,6 +319,36 @@ load_admin_profile() {
     log_info "Servers: $server_count managed"
     
     return 0
+}
+
+get_binding() {
+    local bind_type="$1"  # mcp, skill, agent, prompt
+    local bind_name="$2"
+    if [[ -z "$ADMIN_PROFILE_JSON" ]]; then
+        log_error "Profile not loaded. Run load_admin_profile first"
+        return 1
+    fi
+    echo "$ADMIN_PROFILE_JSON" | jq ".bindings[\"$bind_type\"][\"$bind_name\"] // empty" 2>/dev/null
+}
+
+get_all_secret_refs() {
+    # Returns all secretRefs from bindings (v4.1) and flat secretRefs (v4.0 compat)
+    if [[ -z "$ADMIN_PROFILE_JSON" ]]; then return 1; fi
+    local refs=""
+    # v4.1 bindings (takes precedence)
+    refs=$(echo "$ADMIN_PROFILE_JSON" | jq -r '
+        (.bindings // {} | to_entries[] | .value | to_entries[] |
+         select(.value.secretRefs != null) |
+         .value.secretRefs | to_entries[] | "\(.key)=\(.value)") // empty
+    ' 2>/dev/null)
+    # v4.0 flat secretRefs (fallback)
+    local flat_refs
+    flat_refs=$(echo "$ADMIN_PROFILE_JSON" | jq -r '
+        (.secretRefs // {} | to_entries[] | "\(.key)=\(.value)") // empty
+    ' 2>/dev/null)
+    # Combine: bindings first, then flat (bindings win on conflict since they come first in the pipeline)
+    if [[ -n "$refs" ]]; then echo "$refs"; fi
+    if [[ -n "$flat_refs" ]]; then echo "$flat_refs"; fi
 }
 
 load_deployment() {

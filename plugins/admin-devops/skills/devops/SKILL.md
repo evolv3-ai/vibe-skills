@@ -49,17 +49,29 @@ export HCLOUD_TOKEN=$(secrets HCLOUD_TOKEN)
 
 ### Provider Secrets Map
 
-| Secret Key | Provider | Used By |
-|---|---|---|
-| `HCLOUD_TOKEN` | Hetzner | hcloud CLI auth |
-| `DIGITALOCEAN_ACCESS_TOKEN` | DigitalOcean | doctl auth |
-| `CNTB_OAUTH2_CLIENT_SECRET` | Contabo | cntb config |
-| `CNTB_OAUTH2_PASS` | Contabo | cntb config |
-| `LINODE_API_TOKEN` | Linode | linode-cli |
-| `VULTR_API_KEY` | Vultr | vultr-cli |
-| `CF_API_TOKEN` | Cloudflare | Tunnel setup |
+| Secret Key | Infisical URI | Provider | Used By |
+|---|---|---|---|
+| `HCLOUD_TOKEN` | `infisical://admin-operator/prod/providers/hetzner/HCLOUD_TOKEN` | Hetzner | hcloud CLI auth |
+| `DIGITALOCEAN_ACCESS_TOKEN` | `infisical://admin-operator/prod/providers/digitalocean/ACCESS_TOKEN` | DigitalOcean | doctl auth |
+| `CNTB_OAUTH2_CLIENT_SECRET` | `infisical://admin-operator/prod/providers/contabo/CLIENT_SECRET` | Contabo | cntb config |
+| `CNTB_OAUTH2_PASS` | `infisical://admin-operator/prod/providers/contabo/OAUTH_PASS` | Contabo | cntb config |
+| `LINODE_API_TOKEN` | `infisical://admin-operator/prod/providers/linode/API_TOKEN` | Linode | linode-cli |
+| `VULTR_API_KEY` | `infisical://admin-operator/prod/providers/vultr/API_KEY` | Vultr | vultr-cli |
+| `CF_API_TOKEN` | `infisical://admin-operator/prod/network/cloudflare/API_TOKEN` | Cloudflare | Tunnel setup |
 
-**Guides**: Admin skill's `references/infisical.md` (Infisical Cloud), `references/vault-guide.md` (age vault)
+**Retrieval** (v4.0+):
+```bash
+# URI-based (recommended)
+HCLOUD_TOKEN=$(resolve-secret-ref.sh "infisical://admin-operator/prod/providers/hetzner/HCLOUD_TOKEN")
+
+# Multi-project secrets CLI
+HCLOUD_TOKEN=$(secrets --project admin-operator --path /providers/hetzner HCLOUD_TOKEN)
+
+# Legacy (still works via fallback chain)
+HCLOUD_TOKEN=$(secrets HCLOUD_TOKEN)
+```
+
+**Guides**: `references/secrets-architecture.md` (full 4-layer model), `references/infisical.md` (Infisical setup), `references/vault-guide.md` (age vault fallback)
 
 ---
 

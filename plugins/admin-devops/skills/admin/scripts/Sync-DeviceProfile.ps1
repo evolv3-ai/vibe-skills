@@ -25,17 +25,17 @@ if (-not $AdminRoot) {
     exit 1
 }
 
-$profilePath = "$AdminRoot/devices/$DeviceName/profile.json"
+$profilePath = "$AdminRoot/profiles/$DeviceName.json"
 
 if (-not (Test-Path $profilePath)) {
     Write-Host "ERROR: Profile not found: $profilePath" -ForegroundColor Red
-    Write-Host "Run Initialize-DeviceProfile.ps1 first" -ForegroundColor Yellow
+    Write-Host "Run New-AdminProfile.ps1 first" -ForegroundColor Yellow
     exit 1
 }
 
 # Check for sync conflicts
-$conflictFiles = Get-ChildItem "$AdminRoot/devices/$DeviceName/profile*.json" -ErrorAction SilentlyContinue |
-                 Where-Object { $_.Name -ne "profile.json" }
+$conflictFiles = Get-ChildItem "$AdminRoot/profiles/$DeviceName*.json" -ErrorAction SilentlyContinue |
+                 Where-Object { $_.Name -ne "$DeviceName.json" }
 
 if ($conflictFiles.Count -gt 0) {
     Write-Host "`nWARNING: Found $($conflictFiles.Count) conflict file(s):" -ForegroundColor Yellow
@@ -60,14 +60,14 @@ if ($conflictFiles.Count -gt 0) {
 # Load profile
 $profile = Get-Content $profilePath -Raw | ConvertFrom-Json
 
-Write-Host "`nProfile last updated: $($profile.deviceInfo.lastUpdated)" -ForegroundColor Gray
+Write-Host "`nProfile last updated: $($profile.device.lastUpdated)" -ForegroundColor Gray
 
 # Verify and update tools
 Write-Host "`n=== Tool Verification ===" -ForegroundColor Yellow
 
 $changes = @()
 
-foreach ($tool in $profile.installedTools.PSObject.Properties) {
+foreach ($tool in $profile.tools.PSObject.Properties) {
     $name = $tool.Name
     $info = $tool.Value
 
@@ -104,7 +104,7 @@ foreach ($tool in $profile.installedTools.PSObject.Properties) {
         }
 
         if (-not $DryRun) {
-            $profile.installedTools.$name.present = $actuallyPresent
+            $profile.tools.$name.present = $actuallyPresent
         }
     }
 
@@ -119,18 +119,18 @@ foreach ($tool in $profile.installedTools.PSObject.Properties) {
         }
 
         if (-not $DryRun) {
-            $profile.installedTools.$name.version = $actualVersion
+            $profile.tools.$name.version = $actualVersion
         }
     }
 
     # Update lastChecked
     if (-not $DryRun) {
-        $profile.installedTools.$name.lastChecked = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
+        $profile.tools.$name.lastChecked = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
     }
 
     # Update path if found
     if ($cmd -and -not $DryRun) {
-        $profile.installedTools.$name.path = $cmd.Source
+        $profile.tools.$name.path = $cmd.Source
     }
 }
 
@@ -181,14 +181,16 @@ if ($changes.Count -gt 0 -or $UpdateVersions) {
     if ($DryRun) {
         Write-Host "`nDry run - no changes saved" -ForegroundColor Yellow
     } else {
-        $profile.deviceInfo.lastUpdated = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
+        $profile.device.lastUpdated = (Get-Date -Format "yyyy-MM-ddTHH:mm:ssZ")
         $profile | ConvertTo-Json -Depth 10 | Set-Content $profilePath -Encoding UTF8
         Write-Host "`nProfile saved: $profilePath" -ForegroundColor Green
 
         # Log sync
         $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
         $logEntry = "$timestamp - [$DeviceName] SUCCESS: Sync - Profile synchronized ($($changes.Count) changes)"
-        Add-Content "$AdminRoot/devices/$DeviceName/logs.txt" -Value $logEntry
+        $logDir = Join-Path $AdminRoot "logs"
+        if (-not (Test-Path $logDir)) { $null = New-Item -ItemType Directory -Path $logDir -Force }
+        Add-Content (Join-Path $logDir "operations.log") -Value $logEntry
     }
 }
 

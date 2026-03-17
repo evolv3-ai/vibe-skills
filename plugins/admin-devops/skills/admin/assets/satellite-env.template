@@ -20,9 +20,14 @@ ADMIN_PLATFORM=YOUR_PLATFORM
 # Which secrets backend to use: infisical | vault | env (default: vault)
 ADMIN_SECRETS_BACKEND=
 # Infisical Cloud settings (only needed when ADMIN_SECRETS_BACKEND=infisical)
+# Legacy single-project mode (backward compatible):
 INFISICAL_PROJECT_ID=
 INFISICAL_ENVIRONMENT=prod
 INFISICAL_AUTH_METHOD=cli-login
+# Multi-project mode (v4.0+): project mapping in $ADMIN_ROOT/config/infisical-projects.json
+# Machine identity (headless/runtime environments):
+INFISICAL_MACHINE_IDENTITY=
+# INFISICAL_UNIVERSAL_AUTH_CLIENT_ID and CLIENT_SECRET stored in vault (bootstrap chain)
 
 # --- Remote Profile Sync ---
 # GitHub repo URL for profile sync (e.g., git@github.com:user/admin-profiles.git)

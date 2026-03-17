@@ -1,17 +1,58 @@
 ---
 name: setup-profile
-description: Create or reconfigure the admin device profile through a TUI interview
+description: Create or reconfigure the admin device profile through a TUI interview or headless flags
 allowed-tools:
   - Read
   - Write
   - Bash
   - AskUserQuestion
-argument-hint: "[--reset]"
+argument-hint: "[--reset] [--headless --pkg-mgr MGR --py-mgr MGR ...]"
 ---
 
 # /setup-profile Command
 
-Create or reconfigure the admin device profile through an interactive TUI interview.
+Create or reconfigure the admin device profile. Two modes:
+
+- **Interactive (default):** TUI interview asks preferences one at a time
+- **Headless:** Pass all preferences as flags, skip prompts (for remote/automated setup)
+
+## Headless Mode
+
+When `--headless` is specified, skip all TUI prompts and use provided flags or defaults:
+
+```bash
+/setup-profile --headless
+/setup-profile --headless --pkg-mgr apt --py-mgr uv --node-mgr npm --run-inventory
+/setup-profile --headless --admin-root /home/deploy/.admin --force
+```
+
+**Headless defaults:**
+| Parameter | Default |
+|-----------|---------|
+| `--admin-root` | `$HOME/.admin` (WSL: `/mnt/c/Users/$WIN_USER/.admin`) |
+| `--pkg-mgr` | auto-detect (apt on Linux, brew on macOS) |
+| `--py-mgr` | uv |
+| `--node-mgr` | npm |
+| `--shell-default` | auto-detect from `$SHELL` |
+| `--run-inventory` | yes in headless mode |
+| `--force` | false (set to overwrite existing) |
+
+**Headless execution** — call the script directly:
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/new-admin-profile.sh" \
+  --admin-root "${ADMIN_ROOT:-$HOME/.admin}" \
+  --pkg-mgr "${PKG_MGR:-apt}" \
+  --py-mgr "${PY_MGR:-uv}" \
+  --node-mgr "${NODE_MGR:-npm}" \
+  --shell-default "${SHELL_DEFAULT:-bash}" \
+  --run-inventory \
+  --force
+```
+
+After creation, verify and report (same as Step 5 below).
+
+## Interactive Mode (default)
 
 ## Workflow
 

@@ -1,4 +1,6 @@
-# Admin Vault Guide
+# Admin Vault Guide (Fallback Backend)
+
+> **Note**: As of schema v4.0, Infisical Cloud with the 3-project split is the primary secrets backend. The age vault now serves as the **offline fallback** and **bootstrap anchor** for Infisical machine identity credentials. See `references/secrets-architecture.md` for the full 4-layer model.
 
 Lightweight, git-safe secrets management using [age encryption](https://age-encryption.org/) integrated with the admin suite's satellite `.env` / profile architecture.
 

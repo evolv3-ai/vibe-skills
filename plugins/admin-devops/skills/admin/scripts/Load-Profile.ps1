@@ -69,8 +69,8 @@ function Load-AdminProfile {
         return $null
     }
 
-    if ($profile.schemaVersion -ne "3.0") {
-        Write-Log "Profile schema version $($profile.schemaVersion) - expected 3.0" "WARN"
+    if ($profile.schemaVersion -ne "3.0" -and $profile.schemaVersion -ne "4.0" -and $profile.schemaVersion -ne "4.1") {
+        Write-Log "Profile schema version $($profile.schemaVersion) - expected 3.0, 4.0, or 4.1" "WARN"
     }
 
     Write-Log "Device: $($profile.device.name) ($($profile.device.platform))" "OK"
@@ -271,6 +271,17 @@ function Load-Vault {
 function Load-AdminSecrets {
     [CmdletBinding()]
     param([switch]$ExportToEnvironment)
+
+    # Check for pre-rendered generated/.env (from Render-Runtime.ps1)
+    $generatedEnv = Join-Path $_adminRoot "generated\.env"
+    if (Test-Path $generatedEnv) {
+        Write-Log "Loading pre-rendered secrets from $generatedEnv"
+        $result = Load-EnvFile -Path $generatedEnv -ExportToEnvironment:$ExportToEnvironment
+        if ($ExportToEnvironment -and $result) {
+            $global:AdminSecrets = $result
+        }
+        return $result
+    }
 
     $mode = Get-VaultMode
 

@@ -1,15 +1,64 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://github.com/evolv3ai/admin-suite/profile-schema.json",
-  "title": "Device Profile Schema v3.0",
-  "description": "Unified device profile for context-aware development assistance",
+  "title": "Device Profile Schema v4.1",
+  "description": "Unified device profile for context-aware development assistance. v4.1 adds bindings (per-component secretRefs/fileRefs/env).",
   "type": "object",
   "required": ["schemaVersion", "device", "packageManagers", "tools"],
+  "$defs": {
+    "componentBinding": {
+      "type": "object",
+      "description": "Per-component binding: secrets, files, env, and install state",
+      "properties": {
+        "secretRefs": {
+          "type": "object",
+          "description": "Maps secret names to infisical:// URIs",
+          "additionalProperties": { "type": "string" }
+        },
+        "fileRefs": {
+          "type": "object",
+          "description": "Maps file names to URI + renderTo path",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "uri": { "type": "string" },
+              "renderTo": { "type": "string" },
+              "mode": { "type": "string", "default": "0600" }
+            },
+            "required": ["uri", "renderTo"]
+          }
+        },
+        "env": {
+          "type": "object",
+          "description": "Static (non-secret) environment variables",
+          "additionalProperties": { "type": "string" }
+        },
+        "status": {
+          "enum": ["active", "disabled", "pending", "error"],
+          "description": "active=working, disabled=intentionally off, pending=not yet rendered, error=resolution failed"
+        },
+        "installedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this binding was created"
+        },
+        "lastSyncedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Last time this binding was refreshed from library"
+        },
+        "installPolicy": {
+          "enum": ["library", "plugin", "manual"],
+          "description": "How this component was installed (library=Library managed, plugin=Claude Code plugin, manual=user)"
+        }
+      }
+    }
+  },
   "properties": {
     "schemaVersion": {
       "type": "string",
-      "const": "3.0",
-      "description": "Schema version for migration support"
+      "enum": ["3.0", "4.0", "4.1"],
+      "description": "Schema version (4.1 adds bindings, replaces flat secretRefs/fileRefs)"
     },
     "adminSkillVersion": {
       "type": "string",
@@ -22,9 +71,7 @@
     "skillVersions": {
       "type": "object",
       "description": "Version tracking for all admin suite skills",
-      "additionalProperties": {
-        "type": "string"
-      }
+      "additionalProperties": { "type": "string" }
     },
     "device": {
       "type": "object",
@@ -49,212 +96,163 @@
     },
     "paths": {
       "type": "object",
-      "description": "Critical filesystem locations - THE KEY TO CONTEXT",
+      "description": "Critical filesystem locations",
       "properties": {
-        "adminRoot": { "type": "string", "description": "Admin skills data root" },
-        "deviceProfile": { "type": "string", "description": "This profile file location" },
-        "logs": { "type": "string", "description": "Centralized log directory" },
-        "claudeConfig": { "type": "string", "description": "Claude Desktop config.json" },
-        "claudeSkills": { "type": "string", "description": "Claude skills directory" },
-        "mcpServers": { "type": "string", "description": "MCP servers root directory" },
-        "sshKeys": { "type": "string", "description": "SSH keys directory" },
-        "projects": { "type": "string", "description": "Default projects root" },
-        "dropbox": { "type": ["string", "null"], "description": "Dropbox sync folder" },
-        "npmGlobal": { "type": "string", "description": "Global npm modules path" },
-        "pythonVenvs": { "type": "string", "description": "Python venvs root" }
+        "adminRoot": { "type": "string" },
+        "deviceProfile": { "type": "string" },
+        "logs": { "type": "string" },
+        "claudeConfig": { "type": "string" },
+        "claudeSkills": { "type": "string" },
+        "mcpServers": { "type": "string" },
+        "sshKeys": { "type": "string" },
+        "projects": { "type": "string" },
+        "dropbox": { "type": ["string", "null"] },
+        "npmGlobal": { "type": "string" },
+        "pythonVenvs": { "type": "string" }
       }
     },
     "packageManagers": {
       "type": "object",
-      "description": "Available package managers - determines HOW to install",
+      "description": "Available package managers",
       "additionalProperties": {
         "type": "object",
         "properties": {
           "present": { "type": "boolean" },
           "version": { "type": ["string", "null"] },
-          "path": { "type": ["string", "null"], "description": "Executable path" },
-          "location": { "type": ["string", "null"], "description": "Install root" },
+          "path": { "type": ["string", "null"] },
+          "location": { "type": ["string", "null"] },
           "lastChecked": { "type": "string", "format": "date-time" },
-          "preferred": { "type": "boolean", "description": "User prefers this" }
+          "preferred": { "type": "boolean" }
         }
       }
     },
     "tools": {
       "type": "object",
-      "description": "Installed development tools - THE CORE CONTEXT",
+      "description": "Installed development tools",
       "additionalProperties": {
         "type": "object",
         "properties": {
           "present": { "type": "boolean" },
           "version": { "type": ["string", "null"] },
           "installedVia": { "type": ["string", "null"] },
-          "path": { "type": ["string", "null"], "description": "Primary executable" },
-          "shimPath": { "type": ["string", "null"], "description": "Shim if using scoop" },
-          "configPath": { "type": ["string", "null"], "description": "Config file location" },
+          "path": { "type": ["string", "null"] },
+          "shimPath": { "type": ["string", "null"] },
+          "configPath": { "type": ["string", "null"] },
           "lastChecked": { "type": "string", "format": "date-time" },
           "installStatus": { "enum": ["working", "failed", "pending", "deprecated"] },
-          "notes": { "type": ["string", "null"], "description": "Context for AI" }
+          "notes": { "type": ["string", "null"] }
         }
       }
     },
     "preferences": {
       "type": "object",
-      "description": "User preferences - CRITICAL FOR SMART ADAPTATION",
+      "description": "User preferences",
       "properties": {
-        "python": {
-          "type": "object",
-          "properties": {
-            "manager": { "enum": ["uv", "pip", "conda", "poetry", "pipenv"] },
-            "reason": { "type": "string" }
-          }
-        },
-        "node": {
-          "type": "object",
-          "properties": {
-            "manager": { "enum": ["npm", "pnpm", "yarn", "bun"] },
-            "reason": { "type": "string" }
-          }
-        },
-        "packages": {
-          "type": "object",
-          "properties": {
-            "manager": { "enum": ["scoop", "winget", "chocolatey", "brew", "apt"] },
-            "reason": { "type": "string" }
-          }
-        },
-        "shell": {
-          "type": "object",
-          "properties": {
-            "preferred": { "type": "string" },
-            "profilePath": { "type": "string" }
-          }
-        },
+        "python": { "type": "object", "properties": { "manager": { "enum": ["uv", "pip", "conda", "poetry", "pipenv"] }, "reason": { "type": "string" } } },
+        "node": { "type": "object", "properties": { "manager": { "enum": ["npm", "pnpm", "yarn", "bun"] }, "reason": { "type": "string" } } },
+        "packages": { "type": "object", "properties": { "manager": { "enum": ["scoop", "winget", "chocolatey", "brew", "apt"] }, "reason": { "type": "string" } } },
+        "shell": { "type": "object", "properties": { "preferred": { "type": "string" }, "profilePath": { "type": "string" } } },
         "editor": { "type": "string" },
         "terminal": { "type": "string" }
       }
     },
-    "wsl": {
-      "type": ["object", "null"],
-      "description": "WSL configuration (Windows only)"
-    },
-    "docker": {
-      "type": ["object", "null"],
-      "description": "Docker configuration"
-    },
-    "mcp": {
-      "type": "object",
-      "description": "MCP server configurations"
-    },
-    "servers": {
-      "type": "array",
-      "description": "Managed remote servers"
-    },
-    "issues": {
-      "type": "object",
-      "description": "Known problems and pending fixes"
-    },
-    "history": {
-      "type": "array",
-      "description": "Installation and configuration history"
-    },
-    "capabilities": {
-      "type": "object",
-      "description": "Quick capability flags for routing decisions"
-    },
+    "wsl": { "type": ["object", "null"] },
+    "docker": { "type": ["object", "null"] },
+    "mcp": { "type": "object", "description": "MCP server configurations" },
+    "servers": { "type": "array", "description": "Managed remote servers" },
+    "issues": { "type": "object" },
+    "history": { "type": "array" },
+    "capabilities": { "type": "object" },
     "vault": {
       "type": ["object", "null"],
       "description": "Age-encrypted secrets vault configuration",
       "properties": {
-        "enabled": {
-          "type": "boolean",
-          "description": "Whether vault mode is active (matches ADMIN_VAULT env var)"
-        },
-        "vaultPath": {
-          "type": "string",
-          "description": "Path to vault.age file (default: $ADMIN_ROOT/vault.age)"
-        },
-        "keyPath": {
-          "type": "string",
-          "description": "Path to age private key (default: ~/.age/key.txt)"
-        },
-        "publicKey": {
-          "type": "string",
-          "description": "Age public key (starts with age1...)"
-        },
-        "migratedAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "When plaintext .env was migrated to vault"
-        },
-        "secretCount": {
-          "type": "integer",
-          "description": "Number of secrets in vault"
-        }
+        "enabled": { "type": "boolean" },
+        "vaultPath": { "type": "string" },
+        "keyPath": { "type": "string" },
+        "publicKey": { "type": "string" },
+        "migratedAt": { "type": "string", "format": "date-time" },
+        "secretCount": { "type": "integer" }
       }
     },
     "secrets": {
       "type": ["object", "null"],
-      "description": "Secrets backend configuration (primary + fallback)",
+      "description": "Legacy secrets backend config (v3.0). Use secretsConfig for v4.0+",
       "properties": {
-        "backend": {
-          "enum": ["infisical", "vault", "env"],
-          "description": "Primary secrets backend"
-        },
-        "fallback": {
-          "enum": ["vault", "env", "none"],
-          "description": "Fallback backend when primary is unavailable"
-        },
-        "infisical": {
-          "type": ["object", "null"],
-          "description": "Infisical Cloud configuration",
-          "properties": {
-            "projectId": {
-              "type": "string",
-              "description": "Infisical project ID"
-            },
-            "environment": {
-              "type": "string",
-              "description": "Infisical environment slug (e.g., prod, dev)"
-            },
-            "authMethod": {
-              "enum": ["machine-identity", "cli-login"],
-              "description": "How to authenticate with Infisical"
-            }
-          }
-        }
+        "backend": { "enum": ["infisical", "vault", "env"] },
+        "fallback": { "enum": ["vault", "env", "none"] },
+        "infisical": { "type": ["object", "null"], "properties": { "projectId": { "type": "string" }, "environment": { "type": "string" }, "authMethod": { "enum": ["machine-identity", "cli-login"] } } }
+      }
+    },
+    "secretRefs": {
+      "type": "object",
+      "description": "DEPRECATED (v4.0). Use bindings.*.secretRefs in v4.1+",
+      "additionalProperties": { "type": "string" }
+    },
+    "fileRefs": {
+      "type": "object",
+      "description": "DEPRECATED (v4.0). Use bindings.*.fileRefs in v4.1+",
+      "additionalProperties": { "type": "object" }
+    },
+    "bindings": {
+      "type": "object",
+      "description": "Per-component bindings (v4.1+). Each key maps component name to its secrets, files, env, and status.",
+      "properties": {
+        "mcp": { "type": "object", "additionalProperties": { "$ref": "#/$defs/componentBinding" } },
+        "skill": { "type": "object", "additionalProperties": { "$ref": "#/$defs/componentBinding" } },
+        "agent": { "type": "object", "additionalProperties": { "$ref": "#/$defs/componentBinding" } },
+        "prompt": { "type": "object", "additionalProperties": { "$ref": "#/$defs/componentBinding" } }
+      }
+    },
+    "secretsConfig": {
+      "type": ["object", "null"],
+      "description": "Multi-project secrets configuration (v4.0+)",
+      "properties": {
+        "backend": { "enum": ["infisical", "vault", "env"] },
+        "fallback": { "enum": ["vault", "env", "none"] },
+        "multiProject": { "type": "boolean" },
+        "projectsConfig": { "type": "string" }
+      }
+    },
+    "consumer": {
+      "type": ["object", "null"],
+      "description": "What type of consumer this profile represents",
+      "properties": {
+        "type": { "enum": ["workstation", "runtime", "customer-pc"] },
+        "runtime": { "type": ["string", "null"], "description": "Runtime identifier (e.g., kasm-hetzner-02)" },
+        "trustBoundary": { "enum": ["operator", "runtime", "customer"] }
+      }
+    },
+    "access": {
+      "type": ["object", "null"],
+      "description": "Infisical access scope for this consumer",
+      "properties": {
+        "projects": { "type": "array", "items": { "type": "string" } },
+        "folders": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "generated": {
+      "type": ["object", "null"],
+      "description": "Paths to generated runtime files",
+      "properties": {
+        "envFile": { "type": "string" },
+        "compatFile": { "type": "string" },
+        "agentsMd": { "type": "string" },
+        "lastRendered": { "type": "string", "format": "date-time" }
       }
     },
     "deployments": {
       "type": "object",
-      "description": "References to deployment configurations (.env.local files)",
+      "description": "Deployment configurations",
       "additionalProperties": {
         "type": "object",
         "properties": {
-          "envFile": { 
-            "type": "string", 
-            "description": "Path to .env.local file with deployment config" 
-          },
-          "type": { 
-            "enum": ["coolify", "kasm", "both", "custom"],
-            "description": "Deployment type"
-          },
-          "provider": {
-            "type": "string",
-            "description": "Infrastructure provider (oci, hetzner, contabo, etc.)"
-          },
-          "status": { 
-            "enum": ["active", "stopped", "failed", "pending", "retired"],
-            "description": "Current deployment status"
-          },
-          "serverIds": {
-            "type": "array",
-            "items": { "type": "string" },
-            "description": "References to servers[] by id"
-          },
-          "lastDeployed": { 
-            "type": "string", 
-            "format": "date-time" 
-          },
+          "envFile": { "type": "string" },
+          "type": { "enum": ["coolify", "kasm", "both", "custom"] },
+          "provider": { "type": "string" },
+          "status": { "enum": ["active", "stopped", "failed", "pending", "retired"] },
+          "serverIds": { "type": "array", "items": { "type": "string" } },
+          "lastDeployed": { "type": "string", "format": "date-time" },
           "notes": { "type": ["string", "null"] }
         }
       }
