@@ -244,3 +244,33 @@ Example: 8GB server with 2768MB per session:
 Example: 32GB server:
 (32768 - 4096) / 2768 = ~10 concurrent sessions
 ```
+
+---
+
+## Granting sudo Access to kasm-user
+
+By default, `kasm-user` has no sudo privileges. To enable passwordless sudo, add this to the workspace's Docker Exec Config:
+
+```json
+{
+  "first_launch": {
+    "user": "root",
+    "cmd": "bash -c \"bash -c 'echo \"kasm-user ALL=(ALL) NOPASSWD: ALL\" > /etc/sudoers.d/kasm-user && chmod 440 /etc/sudoers.d/kasm-user'\""
+  }
+}
+```
+
+**Important**: Append directly to `/etc/sudoers`, NOT to `/etc/sudoers.d/`. Many KASM base images lack the `#includedir` directive for `sudoers.d`, so drop-in files are silently ignored.
+
+### Combining Multiple Docker Exec Configs
+
+Only one `first_launch` block is allowed. Chain commands with `&&`:
+
+```json
+{
+  "first_launch": {
+    "user": "root",
+    "cmd": "bash -c \"bash -c 'echo \"kasm-user ALL=(ALL) NOPASSWD: ALL\" > /etc/sudoers.d/kasm-user && chmod 440 /etc/sudoers.d/kasm-user' && mkdir -p /run/user/1000 && chmod 700 /run/user/1000 && chown 1000:1000 /run/user/1000 && dbus-daemon --session --address=unix:path=/run/user/1000/bus --nofork --nopidfile --syslog-only &\""
+  }
+}
+```

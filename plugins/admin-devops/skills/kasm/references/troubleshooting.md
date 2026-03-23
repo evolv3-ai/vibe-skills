@@ -302,3 +302,41 @@ sudo docker system df
 # List all containers (including stopped)
 sudo docker ps -a
 ```
+
+---
+
+## No sudo in Workspace Containers
+
+**Symptom**: `kasm-user` cannot run `sudo` commands inside workspace containers. Commands fail with `kasm-user is not in the sudoers file`.
+
+**Root cause**: Default KASM workspace images don't grant sudo to `kasm-user`.
+
+### Fix: Docker Exec Config
+
+Add this to the workspace's Docker Exec Config (JSON) in the KASM admin UI:
+
+```json
+{
+  "first_launch": {
+    "user": "root",
+    "cmd": "bash -c \"bash -c 'echo \"kasm-user ALL=(ALL) NOPASSWD: ALL\" > /etc/sudoers.d/kasm-user && chmod 440 /etc/sudoers.d/kasm-user'\""
+  }
+}
+```
+
+This runs as root on first container launch and grants passwordless sudo to `kasm-user`.
+
+**Note**: The `sudoers.d` drop-in approach (`/etc/sudoers.d/kasm-user`) does NOT work reliably in KASM containers — some base images don't have `#includedir /etc/sudoers.d` in their sudoers file. Appending directly to `/etc/sudoers` is the proven method.
+
+### Combining with Other Docker Exec Configs
+
+If you also need D-Bus/keyring setup, chain the commands:
+
+```json
+{
+  "first_launch": {
+    "user": "root",
+    "cmd": "bash -c \"bash -c 'echo \"kasm-user ALL=(ALL) NOPASSWD: ALL\" > /etc/sudoers.d/kasm-user && chmod 440 /etc/sudoers.d/kasm-user' && mkdir -p /run/user/1000 && chmod 700 /run/user/1000 && chown 1000:1000 /run/user/1000 && dbus-daemon --session --address=unix:path=/run/user/1000/bus --nofork --nopidfile --syslog-only &\""
+  }
+}
+```

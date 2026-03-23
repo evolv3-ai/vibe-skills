@@ -1,0 +1,20 @@
+name: vibe-skills
+
+# before: npm install  # optional pre-launch hook
+
+rows:
+  - size: 70%
+    panes:
+      - title: Claude 1
+        command: claude
+      - title: Claude 2
+        command: claude
+
+  - panes:
+      - title: Dev Server
+        # command: npm run dev
+        # dir: apps/web       # per-pane working directory
+        # env:                 # per-pane environment variables
+        #   PORT: 3000
+      - title: Shell
+        # focus: true          # give this pane initial focus
