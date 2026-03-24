@@ -177,7 +177,7 @@ function Get-InfisicalSecret {
 function Get-InfisicalKeys {
     $projectId = if ($ProjectIdOverride) { $ProjectIdOverride } else { Resolve-InfisicalProjectId }
     $envSlug = Resolve-InfisicalEnv
-    $args = @("secrets", "list", "--projectId", $projectId, "--env", $envSlug)
+    $args = @("secrets", "--projectId", $projectId, "--env", $envSlug)
     if ($Path) { $args += @("--path", $Path) }
     $output = & infisical @args 2>$null
     $output | Select-Object -Skip 1 | ForEach-Object { ($_ -split '\s+')[1] } | Where-Object { $_ } | Sort-Object
@@ -209,7 +209,7 @@ function Get-SecretWithFallback {
         }
         'vault' {
             $value = Get-SecretValue -Key $Key
-            return
+            return $value
         }
         'env' {
             $masterEnv = Join-Path $AdminRoot ".env"
@@ -367,7 +367,7 @@ function Show-VaultStatus {
             Write-Host "  Env:       $envSlug"
             if ($projectId) {
                 try {
-                    & infisical secrets list --projectId $projectId --env $envSlug 2>$null | Out-Null
+                    & infisical secrets --projectId $projectId --env $envSlug 2>$null | Out-Null
                     Write-Host "  Auth:      OK"
                 } catch {
                     Write-Host "  Auth:      FAILED (run: infisical login)" -ForegroundColor Red
