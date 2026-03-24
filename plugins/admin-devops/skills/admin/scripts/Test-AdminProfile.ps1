@@ -20,14 +20,33 @@ function Test-AdminProfile {
     [CmdletBinding()]
     param()
 
-    # Resolve ADMIN_ROOT
-    $AdminRoot = $env:ADMIN_ROOT
-    if (-not $AdminRoot) {
+    # Satellite .env path
+    $satelliteEnv = Join-Path $HOME ".admin\.env"
+
+    # Priority 1: ADMIN_ROOT env var already set
+    if ($env:ADMIN_ROOT) {
+        $AdminRoot = $env:ADMIN_ROOT
+        $DeviceName = if ($env:ADMIN_DEVICE) { $env:ADMIN_DEVICE } else { $env:COMPUTERNAME }
+        $Platform = $env:ADMIN_PLATFORM
+
+    # Priority 2: Satellite .env file (primary mechanism)
+    } elseif (Test-Path $satelliteEnv) {
+        $satVars = @{}
+        foreach ($line in Get-Content $satelliteEnv) {
+            if ($line -match '^([A-Z_]+)=(.*)$') { $satVars[$matches[1]] = $matches[2] }
+        }
+        $AdminRoot = if ($satVars['ADMIN_ROOT']) { $satVars['ADMIN_ROOT'] } else { Join-Path $HOME ".admin" }
+        $DeviceName = if ($satVars['ADMIN_DEVICE']) { $satVars['ADMIN_DEVICE'] } else { $env:COMPUTERNAME }
+        $Platform = $satVars['ADMIN_PLATFORM']
+
+    # Priority 3: Legacy fallback
+    } else {
         $AdminRoot = Join-Path $HOME ".admin"
+        $DeviceName = $env:COMPUTERNAME
+        $Platform = $null
     }
 
-    # Build profile path (use Join-Path to avoid quoting issues)
-    $DeviceName = $env:COMPUTERNAME
+    # Build profile path
     $ProfilePath = Join-Path $AdminRoot "profiles\$DeviceName.json"
 
     $result = @{
@@ -50,15 +69,26 @@ function Test-AdminProfile {
         }
     }
 
-    # Read secrets backend and profile repo from satellite .env
-    $satelliteEnv = Join-Path $HOME ".admin\.env"
+    # Add satellite-derived metadata
+    if ($Platform) { $result.platform = $Platform }
     if (Test-Path $satelliteEnv) {
-        $backendMatch = Select-String -Path $satelliteEnv -Pattern "^ADMIN_SECRETS_BACKEND=(.+)$" | Select-Object -First 1
-        if ($backendMatch) { $result.secretsBackend = $backendMatch.Matches.Groups[1].Value }
-        else { $result.secretsBackend = "vault" }
+        if (-not $satVars) {
+            $satVars = @{}
+            foreach ($line in Get-Content $satelliteEnv) {
+                if ($line -match '^([A-Z_]+)=(.*)$') { $satVars[$matches[1]] = $matches[2] }
+            }
+        }
+        $result.secretsBackend = if ($satVars['ADMIN_SECRETS_BACKEND']) { $satVars['ADMIN_SECRETS_BACKEND'] } else { "vault" }
+        if ($satVars['ADMIN_PROFILE_REPO']) { $result.profileRepo = $satVars['ADMIN_PROFILE_REPO'] }
 
-        $repoMatch = Select-String -Path $satelliteEnv -Pattern "^ADMIN_PROFILE_REPO=(.+)$" | Select-Object -First 1
-        if ($repoMatch) { $result.profileRepo = $repoMatch.Matches.Groups[1].Value }
+        # Preferences (parity with bash)
+        $prefs = @{}
+        if ($satVars['ADMIN_PKG_MGR']) { $prefs.packages = $satVars['ADMIN_PKG_MGR'] }
+        if ($satVars['ADMIN_WIN_PKG_MGR']) { $prefs.winPackages = $satVars['ADMIN_WIN_PKG_MGR'] }
+        if ($satVars['ADMIN_PY_MGR']) { $prefs.python = $satVars['ADMIN_PY_MGR'] }
+        if ($satVars['ADMIN_NODE_MGR']) { $prefs.node = $satVars['ADMIN_NODE_MGR'] }
+        if ($satVars['ADMIN_SHELL']) { $prefs.shell = $satVars['ADMIN_SHELL'] }
+        if ($prefs.Count -gt 0) { $result.preferences = $prefs }
     }
 
     return $result | ConvertTo-Json -Compress
