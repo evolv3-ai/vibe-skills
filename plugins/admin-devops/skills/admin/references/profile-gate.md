@@ -78,6 +78,29 @@ Returns JSON: `{"exists":true|false,"path":"...","device":"...","platform":"..."
 
 If `exists: false` — do not proceed with any task. Run the TUI interview below first.
 
+### Fallback: When Scripts Fail
+
+If both test scripts fail (shell unavailable, permission denied, script missing from plugin cache),
+use native Claude tools to check the profile directly:
+
+1. **Read satellite .env**: Use the Read tool on `~/.admin/.env`
+   - Extract `ADMIN_ROOT`, `ADMIN_DEVICE`, `ADMIN_PLATFORM`
+   - If file doesn't exist, no profile is configured — run TUI interview
+
+2. **Read profile JSON**: Use the Read tool on `$ADMIN_ROOT/profiles/$ADMIN_DEVICE.json`
+   - Parse `schemaVersion`, `adminSkillVersion`, `device.platform`
+   - If file doesn't exist, profile needs to be created — run TUI interview
+
+3. **If both files exist**: Construct the same JSON response the scripts would return and proceed:
+   ```json
+   {"exists":true,"path":"<ADMIN_ROOT>/profiles/<ADMIN_DEVICE>.json","device":"<ADMIN_DEVICE>","adminRoot":"<ADMIN_ROOT>","platform":"<ADMIN_PLATFORM>"}
+   ```
+
+4. **Read secrets backend**: Also check `ADMIN_SECRETS_BACKEND` in satellite `.env` (defaults to `vault`)
+
+This fallback ensures the profile gate never blocks operations due to script execution issues.
+The satellite `.env` and profile JSON are plain text — no shell execution required.
+
 ---
 
 ## TUI Setup Interview

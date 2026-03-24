@@ -39,6 +39,16 @@ Returns JSON: `{"exists":true|false,"path":"...","device":"...","platform":"..."
 If `exists: false` — stop and run the TUI setup interview before proceeding.
 Full details: `references/profile-gate.md` (discovery, TUI interview, create commands, troubleshooting).
 
+### Fallback: When Scripts Fail
+
+If both bash and PowerShell test scripts fail (e.g., shell not available, permission denied, script missing
+from plugin cache), use native Claude tools to check directly:
+
+1. **Check satellite .env** — Read `~/.admin/.env` to get `ADMIN_ROOT` and `ADMIN_DEVICE`
+2. **Check profile JSON** — Read `$ADMIN_ROOT/profiles/$ADMIN_DEVICE.json`
+3. If both exist, proceed normally using the values read from these files
+4. If neither exists, run the TUI setup interview (see `references/profile-gate.md`)
+
 ---
 
 ## CRITICAL: Secrets and .env
