@@ -347,7 +347,7 @@ if ($RunInventory) {
     # claude
     $claudeCmd = Get-Command claude -ErrorAction SilentlyContinue
     if ($claudeCmd) {
-        $claudeVer = ((claude --version 2>$null) -split ' ')[-1] -replace '^v', ''
+        $claudeVer = ((claude --version 2>$null) -split ' ')[0]
         $tools["claude"] = @{ present = $true; version = $claudeVer; path = $claudeCmd.Source }
         Write-OK "claude: $claudeVer"
     }
