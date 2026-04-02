@@ -93,6 +93,8 @@ NODE_MGR="npm"
 SHELL_DEFAULT=""
 RUN_INVENTORY=false
 FORCE=false
+HEADLESS=false
+CONSUMER_TYPE=""
 
 # Script paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -273,11 +275,13 @@ SKILL_VERSIONS_JSON+="}"
 DEVICE_NAME=$(hostname)
 PROFILE_PATH="${ADMIN_ROOT}/profiles/${DEVICE_NAME}.json"
 
-section "New Admin Profile"
-echo "Device:      $DEVICE_NAME"
-echo "AdminRoot:   $ADMIN_ROOT"
-echo "Platform:    $PLATFORM"
-echo "MultiDevice: $MULTI_DEVICE"
+if [[ "$HEADLESS" != "true" ]]; then
+    section "New Admin Profile"
+    echo "Device:      $DEVICE_NAME"
+    echo "AdminRoot:   $ADMIN_ROOT"
+    echo "Platform:    $PLATFORM"
+    echo "MultiDevice: $MULTI_DEVICE"
+fi
 
 # Check existing profile
 if [[ -f "$PROFILE_PATH" && "$FORCE" != "true" ]]; then
@@ -674,18 +678,20 @@ if [[ -f "$AGENTS_TEMPLATE" ]]; then
 fi
 
 # Summary
-section "Profile Created Successfully"
-echo -e "${GREEN}Profile:${NC}      $PROFILE_PATH"
-echo -e "${GREEN}ADMIN_ROOT:${NC}   $ADMIN_ROOT"
-echo -e "Multi-device: $MULTI_DEVICE"
-echo ""
-echo -e "${YELLOW}Preferences:${NC}"
-echo "  Packages:     $PKG_MGR"
-[[ -n "$WIN_PKG_MGR" ]] && echo "  Win packages: $WIN_PKG_MGR"
-echo "  Python:       $PY_MGR"
-echo "  Node:         $NODE_MGR"
-echo "  Shell:        $SHELL_DEFAULT"
-echo ""
+if [[ "$HEADLESS" != "true" ]]; then
+    section "Profile Created Successfully"
+    echo -e "${GREEN}Profile:${NC}      $PROFILE_PATH"
+    echo -e "${GREEN}ADMIN_ROOT:${NC}   $ADMIN_ROOT"
+    echo -e "Multi-device: $MULTI_DEVICE"
+    echo ""
+    echo -e "${YELLOW}Preferences:${NC}"
+    echo "  Packages:     $PKG_MGR"
+    [[ -n "$WIN_PKG_MGR" ]] && echo "  Win packages: $WIN_PKG_MGR"
+    echo "  Python:       $PY_MGR"
+    echo "  Node:         $NODE_MGR"
+    echo "  Shell:        $SHELL_DEFAULT"
+    echo ""
+fi
 
 # Output JSON for agent consumption
 WIN_PKG_JSON=""
