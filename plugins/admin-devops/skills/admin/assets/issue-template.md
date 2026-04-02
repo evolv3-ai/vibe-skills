@@ -9,6 +9,7 @@ created: CREATED_TIMESTAMP
 updated: UPDATED_TIMESTAMP
 related_logs:
   - logs/operations.log
+github_issue_url:
 ---
 
 # ISSUE_TITLE
