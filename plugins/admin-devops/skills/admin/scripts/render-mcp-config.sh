@@ -215,15 +215,15 @@ done
 # Write config
 if [[ "$DRY_RUN" == "true" ]]; then
     section "Dry Run Output"
-    echo '{"mcpServers":' "$new_servers" '}' | jq .
+    echo "$new_servers" | jq '{mcpServers: .}'
 else
     # Backup existing
     if [[ -f "$MCP_CONFIG" ]]; then
         cp "$MCP_CONFIG" "${MCP_CONFIG}.backup.$(date +%Y%m%d%H%M%S)"
     fi
 
-    # Write
-    echo '{"mcpServers":' "$new_servers" '}' | jq . > "$MCP_CONFIG"
+    # Write — use jq for safe JSON construction (avoids shell word-splitting on $new_servers)
+    echo "$new_servers" | jq '{mcpServers: .}' > "$MCP_CONFIG"
     chmod 600 "$MCP_CONFIG"
     ok "Written: $MCP_CONFIG"
 fi
