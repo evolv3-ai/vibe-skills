@@ -17,12 +17,12 @@ Track, diagnose, and resolve issues using markdown files stored in `~/.admin/iss
 
 ## Issue File Location
 
-All issues are stored as markdown files:
+All issues are stored as markdown files with timestamp-based IDs:
 ```
 ~/.admin/issues/
-├── ISSUE-001-git-ssh-not-working.md
-├── ISSUE-002-docker-permission-denied.md
-└── ISSUE-003-node-version-conflict.md
+├── issue_20260204_120000_git_ssh_not_working.md
+├── issue_20260203_093015_docker_permission_denied.md
+└── issue_20260202_155500_node_version_conflict.md
 ```
 
 ## SimpleMem Integration
@@ -69,12 +69,12 @@ Ask: "What category is this issue?"
 
 | Option | Description |
 |--------|-------------|
-| Tool/Installation | Package manager, install failures |
-| Configuration | PATH, environment variables, config files |
-| MCP Server | Model Context Protocol issues |
-| Network/SSH | Connectivity, authentication |
-| Permission | Access denied, privilege issues |
-| Other | General issues |
+| troubleshoot | General troubleshooting |
+| install | Package manager, install failures |
+| devenv | Development environment issues |
+| mcp | Model Context Protocol issues |
+| skills | Skill/agent/command bugs |
+| devops | Remote server or infrastructure issues |
 
 #### Q2: Issue Title
 Ask: "Briefly describe the issue (one line)"
@@ -82,61 +82,51 @@ Ask: "Briefly describe the issue (one line)"
 #### Q3: Issue Description
 Ask: "What's happening? Include error messages if any."
 
-#### Q4: Priority
-Ask: "How urgent is this issue?"
+#### Q4: Tags
+Ask: "Add tags for this issue (comma-separated keywords, e.g. `ssh,git,auth`)"
 
-| Option | Description |
-|--------|-------------|
-| High | Blocking work, needs immediate fix |
-| Medium | Important but has workaround |
-| Low | Minor inconvenience |
+These tags make issues searchable. Use topic keywords, not severity words.
 
-Then create the issue file:
+Then create the issue file using the helper script:
 
-**Template: `~/.admin/issues/ISSUE-{NNN}-{slug}.md`**
+**Template: `~/.admin/issues/issue_{YYYYMMDD}_{HHMMSS}_{slug}.md`**
 
 ```markdown
 ---
-id: ISSUE-001
-title: Git SSH not working
-category: Network/SSH
-priority: high
+id: issue_20260204_120000_git_ssh_not_working
+device: DESKTOP-ABC
+platform: wsl
 status: open
+category: troubleshoot
+tags: [ssh, git, auth]
 created: 2026-02-04T12:00:00Z
 updated: 2026-02-04T12:00:00Z
-platform: windows
-device: DESKTOP-ABC
+related_logs:
+  - logs/operations.log
+github_issue_url:
 ---
 
 # Git SSH not working
 
-## Problem
-Unable to push to GitHub via SSH. Getting "Permission denied (publickey)" error.
+## Context
+User was trying to push to GitHub. Received permission denied error.
 
-## Error Message
+## Symptoms
+`git push origin main` returns:
 ```
 git@github.com: Permission denied (publickey).
 fatal: Could not read from remote repository.
 ```
 
-## Environment
-- OS: Windows 11
-- Shell: PowerShell 7
-- Git version: 2.42.0
-- SSH agent: OpenSSH
+## Hypotheses
 
-## Steps to Reproduce
-1. Run `git push origin main`
-2. Observe error
+## Actions Taken
 
-## Investigation Log
-<!-- Add notes as you investigate -->
+## Resolution
 
-## Solution
-<!-- Fill in when resolved -->
+## Verification
 
-## Related Issues
-<!-- Link to related issues if any -->
+## Next Action
 ```
 
 ### `/troubleshoot list` - List All Issues
@@ -144,21 +134,25 @@ fatal: Could not read from remote repository.
 Read all files in `~/.admin/issues/` and display summary table:
 
 ```
-ID       | Title                      | Status | Priority | Created
----------|----------------------------|--------|----------|----------
-ISSUE-001| Git SSH not working        | open   | high     | 2026-02-04
-ISSUE-002| Docker permission denied   | open   | medium   | 2026-02-03
-ISSUE-003| Node version conflict      | closed | low      | 2026-02-02
+ID                                           | Status | Category     | Created
+---------------------------------------------|--------|--------------|----------
+issue_20260204_120000_git_ssh_not_working    | open   | troubleshoot | 2026-02-04
+issue_20260203_093015_docker_permission_denied| open  | install      | 2026-02-03
+issue_20260202_155500_node_version_conflict  | closed | devenv       | 2026-02-02
 ```
 
 Filter options:
 - `--open` - Show only open issues
 - `--closed` - Show only closed issues
-- `--high` - Show only high priority
+- `--category <name>` - Filter by category (troubleshoot, install, devenv, mcp, skills, devops)
 
 ### `/troubleshoot show <id>` - Show Issue Details
 
 Read and display the full issue file for the given ID.
+
+The `<id>` can be:
+- The full timestamp ID: `issue_20260204_120000_git_ssh_not_working`
+- A partial match: `git_ssh` — the script will find the matching file
 
 If no ID provided, ask user to select from open issues.
 
@@ -181,10 +175,10 @@ Ask: "How was this issue resolved?"
 Ask: "Describe the solution or workaround"
 
 Then update the issue file:
-1. Set `status: closed`
-2. Add `resolved: <timestamp>`
-3. Add `resolution: <type>`
-4. Fill in the Solution section
+1. Set `status: resolved` in frontmatter
+2. Update the `updated:` timestamp
+3. Fill in the `## Resolution` section with the description
+4. Fill in the `## Verification` section
 
 ### `/troubleshoot search <term>` - Search Issues
 
@@ -202,24 +196,23 @@ Display matching issues with context.
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| id | Yes | Unique issue ID (ISSUE-NNN) |
-| title | Yes | Short description |
-| category | Yes | Issue category |
-| priority | Yes | high/medium/low |
-| status | Yes | open/in_progress/closed |
+| id | Yes | Timestamp-based ID: `issue_YYYYMMDD_HHMMSS_slug` |
+| device | Yes | Device hostname |
+| platform | Yes | wsl \| windows \| linux \| macos |
+| status | Yes | open \| resolved \| needs-escalation |
+| category | Yes | troubleshoot \| install \| devenv \| mcp \| skills \| devops |
+| tags | Yes | List of keyword tags (not severity) |
 | created | Yes | ISO timestamp |
 | updated | Yes | ISO timestamp (auto-updated) |
-| platform | No | OS/platform |
-| device | No | Device hostname |
-| resolved | No | Timestamp when resolved |
-| resolution | No | How it was resolved |
+| related_logs | No | Log files relevant to this issue |
+| github_issue_url | No | GitHub issue URL if escalated |
 
 ### Investigation Log
 
 Encourage users to add timestamped notes as they investigate:
 
 ```markdown
-## Investigation Log
+## Actions Taken
 
 ### 2026-02-04 12:30
 Checked SSH key exists: `~/.ssh/id_rsa.pub` - YES
@@ -235,19 +228,21 @@ Testing connection: `ssh -T git@github.com` - SUCCESS
 Create issue:
 ```bash
 source "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/new-admin-issue.sh"
-new_admin_issue "Git SSH not working" "Network/SSH" "high"
+new_admin_issue "Git SSH not working" "troubleshoot" "ssh,git,auth"
 ```
 
 Update issue:
 ```bash
 source "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/update-admin-issue.sh"
-update_admin_issue "ISSUE-001" "status" "closed"
+update_admin_issue "issue_20260204_120000_git_ssh_not_working" "resolution" "Added SSH key to agent"
+# Or resolve entirely:
+update_admin_issue "issue_20260204_120000_git_ssh_not_working" --resolve
 ```
 
 ## Tips
 
-- Use meaningful slugs in filenames for easy identification
+- Use tags for topics (e.g., `ssh`, `docker`, `node`), not severity levels
+- Partial ID matching works: `update_admin_issue "git_ssh"` finds `issue_..._git_ssh_not_working`
 - Add investigation notes with timestamps as you work
-- Link related issues when patterns emerge
 - Search before creating to avoid duplicates
-- High-priority issues should block other work until resolved
+- For bugs in skills/agents/commands, see `references/escalation-policy.md` to escalate to GitHub
