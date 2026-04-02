@@ -58,7 +58,8 @@ detect_win_user() {
 read_satellite_var() {
     local var_name="$1"
     local env_file="$2"
-    grep "^${var_name}=" "$env_file" 2>/dev/null | head -1 | cut -d'=' -f2-
+    # || true prevents pipefail from killing the script when a key is absent
+    grep "^${var_name}=" "$env_file" 2>/dev/null | head -1 | cut -d'=' -f2- || true
 }
 
 test_admin_profile() {
