@@ -84,8 +84,8 @@ Check if The Library skill is installed at `~/.claude/skills/library/`.
 
 ```bash
 if [[ ! -f ~/.claude/skills/library/SKILL.md ]]; then
-    git clone git@github.com:evolv3ai/the-library.git ~/.claude/skills/library/ 2>/dev/null || \
-      git clone https://github.com/evolv3ai/the-library.git ~/.claude/skills/library/
+    git clone git@github.com:evolv3ai/library.git ~/.claude/skills/library/ 2>/dev/null || \
+      git clone https://github.com/evolv3ai/library.git ~/.claude/skills/library/
 fi
 ```
 

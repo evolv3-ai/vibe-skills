@@ -53,17 +53,9 @@ show_admin_session_start() {
     if [[ ! -f "$profile_path" ]]; then
         echo ""
         echo -e "${CYAN}=== Admin Session Start ===${NC}"
-        echo -e "${YELLOW}[WARN]${NC} No profile found for $hostname"
-        echo -e "${GRAY}Running setup interview...${NC}"
-
-        local setup_script="${SCRIPT_DIR}/setup-interview.sh"
-        if [[ -f "$setup_script" ]]; then
-            # shellcheck source=setup-interview.sh
-            bash "$setup_script"
-        else
-            echo -e "${RED}[ERROR]${NC} Setup script not found: $setup_script"
-            return 1
-        fi
+        echo -e "${YELLOW}[WARN]${NC} No profile found for $device_name"
+        echo -e "${CYAN}[INFO]${NC} Run /setup-profile to create one."
+        return 0
     fi
 
     # Load profile (suppress output for cleaner display)
@@ -74,7 +66,6 @@ show_admin_session_start() {
         return 1
     fi
 
-    local device_name
     device_name=$(echo "$ADMIN_PROFILE_JSON" | jq -r '.device.name // "unknown"')
     local platform
     platform=$(echo "$ADMIN_PROFILE_JSON" | jq -r '.device.platform // "unknown"')
