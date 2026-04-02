@@ -91,7 +91,7 @@ secrets HCLOUD_TOKEN          # Falls back through: generated/.env → Infisical
 ```
 admin (core)
   ├── 9 satellite skills: devops, oci, hetzner, contabo, digital-ocean, vultr, linode, coolify, kasm
-  ├── 6 agents: profile-validator, docs-agent, verify-agent, tool-installer, mcp-bot, ops-bot
+  ├── 7 agents: profile-validator, docs-agent, verify-agent, tool-installer, ops-bot, server-provisioner, deployment-coordinator
   ├── Profile system: ~/.admin/.env (satellite) → $ADMIN_ROOT/profiles/*.json (+ GitHub sync)
   ├── Secrets: 3 Infisical projects (operator/runtime/customer) → vault (fallback) → .env (legacy)
   └── SimpleMem: Long-term memory across sessions (graceful degradation)
@@ -122,8 +122,9 @@ Satellite .env (bootstrap)  →  profile.json (device config)  →  Agent decisi
 | docs-agent | haiku | File I/O documentation updates | Read, Write, Glob, Grep |
 | verify-agent | sonnet | System health checks, no Write | Read, Bash, Glob, Grep |
 | tool-installer | sonnet | Install software per profile prefs | Read, Write, Bash, AskUserQuestion |
-| mcp-bot | sonnet | MCP server diagnostics and config | Read, Write, Bash, Glob, Grep |
 | ops-bot | sonnet | Multi-step operations (migration, import, bulk config) | Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion |
+| server-provisioner | sonnet | Cloud VM provisioning across providers | Read, Write, Bash, AskUserQuestion |
+| deployment-coordinator | sonnet | End-to-end app deployments (Coolify, KASM) | Read, Write, Bash, AskUserQuestion |
 
 All agents use SimpleMem graceful degradation and profile gate as first step.
 Details: `references/agent-teams.md`, `references/memory-integration.md`
@@ -169,6 +170,7 @@ admin (core) ─── required by all satellites
 | Vault (age encryption) | references/vault-guide.md |
 | Profile sync (GitHub) | references/remote-profile.md |
 | **Remote servers/cloud** | **→ Use devops skill** |
+| Skill bug escalation | references/escalation-policy.md |
 
 ## Profile-Aware Adaptation (Always Check Preferences)
 
