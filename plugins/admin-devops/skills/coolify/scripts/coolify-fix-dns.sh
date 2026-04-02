@@ -23,10 +23,24 @@ echo "🔧 Fixing DNS Resolution for $TUNNEL_HOSTNAME..."
 echo ""
 
 # Validate required variables
-if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ZONE_ID" ] || [ -z "$DNS_RECORD_ID" ] || [ -z "$TUNNEL_ID" ]; then
+# API variables: must be set for script to function
+if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ZONE_ID" ] || [ -z "$DNS_RECORD_ID" ] || [ -z "$TUNNEL_ID" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
     echo "❌ Missing required environment variables. Please run coolify-cloudflare-tunnel-setup.sh first."
+    echo ""
+    echo "Required variables:"
+    echo "  CLOUDFLARE_API_TOKEN    - Cloudflare API token"
+    echo "  CLOUDFLARE_ZONE_ID      - DNS zone ID"
+    echo "  CLOUDFLARE_ACCOUNT_ID   - Cloudflare account ID"
+    echo "  DNS_RECORD_ID           - DNS record ID for the tunnel hostname"
+    echo "  TUNNEL_ID               - Cloudflare tunnel ID"
+    echo "  TUNNEL_HOSTNAME         - Public hostname (e.g. coolify.example.com)"
     exit 1
 fi
+
+# Optional variables: used in diagnostic output — default to descriptive placeholders if not set
+TUNNEL_NAME="${TUNNEL_NAME:-<tunnel-name>}"
+COOLIFY_SERVER_IP="${COOLIFY_SERVER_IP:-<server-ip>}"
+COOLIFY_PORT="${COOLIFY_PORT:-8000}"
 
 # Step 1: Check current DNS record status
 echo "🔍 Checking current DNS record status..."
