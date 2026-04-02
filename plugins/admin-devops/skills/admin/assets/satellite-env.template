@@ -2,23 +2,42 @@
 # Created by new-admin-profile.sh during setup
 #
 # This file lives at ~/.admin/.env on EVERY environment (WSL, native, etc.)
-# It contains ONLY pointers and context - no secrets, no preferences.
-# Secrets belong in $ADMIN_ROOT/.env. Preferences belong in the profile JSON.
+# It contains ONLY pointers, context, and preferences — no secrets.
+# Secrets belong in $ADMIN_ROOT/.env. Full profile in $ADMIN_ROOT/profiles/$ADMIN_DEVICE.json
 #
-# Do not edit manually unless migrating to a new ADMIN_ROOT location.
+# IMPORTANT: All keys must be present (value may be empty) to avoid pipefail crashes.
+# Do not remove keys — set them to empty string if unused on this platform.
 
-# Where the centralized admin data lives (profiles, logs, registries, etc.)
+# --- Core (Required) ---
+# Where the centralized admin data lives (profiles, logs, issues, etc.)
 ADMIN_ROOT=YOUR_ADMIN_ROOT_PATH
 
 # Device hostname (used to construct profile path: $ADMIN_ROOT/profiles/$ADMIN_DEVICE.json)
 ADMIN_DEVICE=YOUR_HOSTNAME
 
-# Platform type: wsl, linux, macos, windows
+# Platform type: wsl | linux | macos | windows
 ADMIN_PLATFORM=YOUR_PLATFORM
+
+# --- Tool Preferences (Required keys, values set during /setup-profile) ---
+# Linux-side package manager: apt | brew | dnf | pacman
+ADMIN_PKG_MGR=
+
+# Windows package manager (WSL only, empty on native Linux/macOS): winget | scoop | choco
+ADMIN_WIN_PKG_MGR=
+
+# Python manager: uv | pip | conda | poetry
+ADMIN_PY_MGR=
+
+# Node package manager: npm | pnpm | yarn | bun
+ADMIN_NODE_MGR=
+
+# Default shell: bash | zsh | pwsh | fish
+ADMIN_SHELL=
 
 # --- Secrets Backend ---
 # Which secrets backend to use: infisical | vault | env (default: vault)
 ADMIN_SECRETS_BACKEND=
+
 # Infisical Cloud settings (only needed when ADMIN_SECRETS_BACKEND=infisical)
 # Legacy single-project mode (backward compatible):
 INFISICAL_PROJECT_ID=
@@ -27,10 +46,10 @@ INFISICAL_AUTH_METHOD=cli-login
 # Multi-project mode (v4.0+): project mapping in $ADMIN_ROOT/config/infisical-projects.json
 # Machine identity (headless/runtime environments):
 INFISICAL_MACHINE_IDENTITY=
-# INFISICAL_UNIVERSAL_AUTH_CLIENT_ID and CLIENT_SECRET stored in vault (bootstrap chain)
 
 # --- Remote Profile Sync ---
 # GitHub repo URL for profile sync (e.g., git@github.com:user/admin-profiles.git)
+# Leave empty if not using profile sync
 ADMIN_PROFILE_REPO=
 # Auto-pull on load: true | false (default: false)
 ADMIN_PROFILE_AUTO_PULL=false

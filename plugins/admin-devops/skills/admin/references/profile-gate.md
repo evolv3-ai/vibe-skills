@@ -44,6 +44,27 @@ INFISICAL_MACHINE_IDENTITY=wopr3-operator
 
 For the full secrets configuration including multi-project support, see `references/secrets-architecture.md`.
 
+### Complete Satellite .env Variable Reference
+
+All variables read by `test-admin-profile.sh` and `load-profile.sh`. Required variables must be present (even if empty) to avoid `pipefail` crashes on optional var lookups.
+
+| Variable | Required | Description | Example Values |
+|----------|----------|-------------|----------------|
+| `ADMIN_ROOT` | **Yes** | Path to the centralized admin directory | `/mnt/c/Users/Owner/.admin`, `~/.admin` |
+| `ADMIN_DEVICE` | **Yes** | Device hostname (constructs profile path) | `WOPR3`, `DELTABOT` |
+| `ADMIN_PLATFORM` | **Yes** | Platform type | `wsl`, `linux`, `macos`, `windows` |
+| `ADMIN_PKG_MGR` | **Yes** | Linux-side package manager | `apt`, `brew`, `dnf` |
+| `ADMIN_WIN_PKG_MGR` | Yes* | Windows package manager (WSL only) | `winget`, `scoop`, `choco` |
+| `ADMIN_PY_MGR` | **Yes** | Python environment manager | `uv`, `pip`, `conda`, `poetry` |
+| `ADMIN_NODE_MGR` | **Yes** | Node package manager | `npm`, `pnpm`, `yarn`, `bun` |
+| `ADMIN_SHELL` | **Yes** | Default shell | `bash`, `zsh`, `pwsh` |
+| `ADMIN_SECRETS_BACKEND` | Yes* | Secrets backend | `vault`, `infisical`, `env` |
+| `ADMIN_PROFILE_REPO` | Yes* | GitHub URL for profile sync | `git@github.com:user/profiles.git`, *(empty OK)* |
+
+**\*Required as a key** — value may be empty, but the key must exist in the file. Missing keys cause `grep` to exit non-zero, which with `pipefail` crashes the calling script.
+
+This file is created automatically by `new-admin-profile.sh` during `/setup-profile`. See `assets/satellite-env.template` for the full template.
+
 ### Resolution Order
 
 1. `ADMIN_ROOT` env var (if already exported)
