@@ -141,6 +141,37 @@ Returns a JSON array of `{name, type, action, installPolicy}`. For each entry wi
 
 **Headless:** Use `vault` as default unless `--secrets-backend` flag is provided.
 
+#### Step 7b: Infisical Backend (optional)
+
+If `$INFISICAL_TOKEN` is set in the environment or `--secrets-backend infisical` was passed:
+
+1. **Check Infisical CLI** — if not installed:
+   ```bash
+   curl -1sLf 'https://dl.infisical.com/cli/setup.sh' | bash
+   ```
+
+2. **Authenticate:**
+   - If `$INFISICAL_TOKEN` is set: token-based auth is used automatically by the CLI
+   - Interactive: run `infisical login` and follow prompts
+
+3. **Initialize the 3-project hierarchy:**
+   ```bash
+   "${CLAUDE_PLUGIN_ROOT}/skills/admin/scripts/infisical-bootstrap.sh"
+   ```
+   This creates:
+   - `admin-operator` project — provider API keys, LLM tokens, Cloudflare, Google creds
+   - `admin-runtime` project — agent bot tokens, deployment passwords
+   - `admin-customer` project — per-customer OpenClaw config
+   Each project gets `dev`, `staging`, `prod` environments with a shared secrets folder.
+
+4. **Note:** `$INFISICAL_TOKEN` must be set as an environment variable — **not passed as a CLI flag** (flag values are visible in `ps aux` and shell history). Export it before running bootstrap:
+   ```bash
+   export INFISICAL_TOKEN="<machine-identity-token>"
+   /bootstrap --secrets-backend infisical
+   ```
+
+5. See `references/infisical.md` for the full 4-layer secrets architecture (age → vault → infisical → generated).
+
 ### Step 8: Render Runtime
 
 ```bash
