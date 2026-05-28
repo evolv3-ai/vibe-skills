@@ -32,6 +32,14 @@ if [[ $(echo "$result" | jq -r '.exists') != "true" ]]; then
     exit 1
 fi
 
+# Strict schema preflight (admin-devops QA #2)
+preflight=$("${CLAUDE_PLUGIN_ROOT}/scripts/profile-preflight.sh" --json)
+if [[ $(echo "$preflight" | jq -r '.ok') != "true" ]]; then
+    echo "$preflight"
+    echo "HALT: profile preflight failed. Try: scripts/profile-preflight.sh --fix-suggestions"
+    exit 1
+fi
+
 # Check for servers
 SERVERS=$(jq '.servers | length' "$PROFILE_PATH")
 if [[ "$SERVERS" -eq 0 ]]; then

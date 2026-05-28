@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "IncidentRecord",
+  "type": "object",
+  "required": ["id", "severity", "owner", "impact", "timeline", "runbook_links"],
+  "properties": {
+    "id": {"type": "string"},
+    "severity": {"type": "string", "enum": ["sev1", "sev2", "sev3", "sev4"]},
+    "owner": {"type": "string"},
+    "impact": {"type": "string"},
+    "timeline": {
+      "type": "array",
+      "items": {"type": "object"}
+    },
+    "runbook_links": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  }
+}

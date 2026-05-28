@@ -1,0 +1,37 @@
+{
+  "version": "1.0.0",
+  "errors": [
+    {
+      "error_code": "PROFILE_MISSING",
+      "remediation": "Run /setup-profile or /bootstrap before mutating commands."
+    },
+    {
+      "error_code": "PROFILE_INVALID",
+      "remediation": "Run scripts/profile-preflight.sh --fix-suggestions for required keys."
+    },
+    {
+      "error_code": "SECRET_UNRESOLVED",
+      "remediation": "Verify secret backend reachability and consumer policy allowlist."
+    },
+    {
+      "error_code": "PROVIDER_AUTH_FAILED",
+      "remediation": "Re-authenticate provider CLI and retry."
+    },
+    {
+      "error_code": "PROVIDER_RETRY_EXHAUSTED",
+      "remediation": "Inspect provider status; circuit breaker may be open. Wait for cooldown."
+    },
+    {
+      "error_code": "DEPENDENCY_GRAPH_INVALID",
+      "remediation": "Run scripts/validate-dep-graph.sh; resolve duplicates, missing deps, or cycles."
+    },
+    {
+      "error_code": "NON_RETRYABLE",
+      "remediation": "Inspect raw error; this class is not eligible for retry."
+    },
+    {
+      "error_code": "CIRCUIT_OPEN",
+      "remediation": "Wait for cooldown to elapse or delete the circuit-breaker state file."
+    }
+  ]
+}

@@ -125,6 +125,14 @@ claude plugin add ~/dev/vibe-skills/plugins/admin-devops
 
 The profile must exist before reconcile (Step 6) because reconcile reads `consumer.type` from the profile.
 
+### Step 5.5: Profile Preflight Gate (admin-devops QA #2)
+
+Validate the new profile against the JSON Schema before any further mutation.
+
+```bash
+"${CLAUDE_PLUGIN_ROOT}/scripts/profile-preflight.sh" --json "$HOME/.admin/profiles/$(hostname).json"
+```
+
 ### Step 6: Reconcile Library
 
 Determine what this device needs based on its consumer type and trust boundary:

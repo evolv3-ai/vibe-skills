@@ -206,6 +206,11 @@ Display matching issues with context.
 | updated | Yes | ISO timestamp (auto-updated) |
 | related_logs | No | Log files relevant to this issue |
 | github_issue_url | No | GitHub issue URL if escalated |
+| severity | No | sev1 \| sev2 \| sev3 \| sev4 (incident-grade triage; see `schemas/incident.schema.json`) |
+| owner | No | Person/team currently responsible |
+| impact | No | Free-text user/system impact summary |
+| timeline | No | Ordered list of `{at: <iso>, note: "..."}` events |
+| runbook_links | No | Links to runbooks or remediation docs |
 
 ### Investigation Log
 
