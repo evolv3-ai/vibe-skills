@@ -4,26 +4,38 @@ The admin-devops secrets system uses a 4-layer model with 3 Infisical projects, 
 
 ## Contents
 
+- [Backend Options](#backend-options)
 - [4-Layer Model](#4-layer-model)
 - [3 Infisical Projects](#3-infisical-projects)
 - [Folder Taxonomy](#folder-taxonomy)
 - [URI Format](#uri-format)
 - [Profile Schema: secretRefs and fileRefs](#profile-schema-secretrefs-and-filerefs)
 - [Runtime Rendering](#runtime-rendering)
+- [Daily Usage](#daily-usage)
 - [Machine Identities](#machine-identities)
 - [Fallback Chain](#fallback-chain)
 - [Consumer Types](#consumer-types)
 
+## Backend Options
+
+Three secrets backends are configured via `ADMIN_SECRETS_BACKEND` in `~/.admin/.env`. Fallback chain: infisical → vault → env.
+
+| Backend | Storage | Offline | Multi-Device | Audit Trail |
+|---|---|---|---|---|
+| `infisical` (primary) | Infisical Cloud | No | Native | Built-in |
+| `vault` | `$ADMIN_ROOT/vault.age` | Yes | Via Dropbox/git sync | git log only |
+| `env` | Plaintext `$ADMIN_ROOT/.env` | Yes | Not recommended | None |
+
 ## 4-Layer Model
 
 ```
-Layer 1: Age Key (local file, never leaves device)
+Layer 1: Age Key (local file, stays on device)
   └── Layer 2: Vault (age-encrypted, contains Infisical bootstrap creds)
         └── Layer 3: Infisical Cloud (3 projects, folder-organized)
               └── Layer 4: Generated Runtime (resolved .env + credential files)
 ```
 
-- **Layer 1** (age key): The root of trust. One file per device at `~/.age/key.txt`.
+- **Layer 1** (age key): The root of trust. One file per device at `~/.age/key.txt`, kept local to the device.
 - **Layer 2** (vault): Contains `INFISICAL_UNIVERSAL_AUTH_CLIENT_ID` and `CLIENT_SECRET` for bootstrap. Also serves as offline fallback for all secrets.
 - **Layer 3** (Infisical): Three projects with folder hierarchies. Source of truth for all secrets during normal operation.
 - **Layer 4** (generated): Output of `render-runtime.sh`. Pre-resolved `.env` files that scripts source without needing Infisical access at runtime.
@@ -39,7 +51,7 @@ Layer 1: Age Key (local file, never leaves device)
 ### Why split?
 
 - **Least privilege**: A KASM runtime only needs its own deployment secrets, not all provider keys
-- **Customer isolation**: Customer credentials never touch operator infrastructure
+- **Customer isolation**: Customer credentials stay isolated from operator infrastructure
 - **Audit trail**: Per-project access logs show who accessed what
 
 ## Folder Taxonomy
@@ -155,6 +167,34 @@ Vault fallback → age -d vault.age
 Plaintext .env → last resort
 ```
 
+## Daily Usage
+
+The `secrets` CLI routes through the active backend automatically; usage is identical regardless of backend. Multi-project Infisical lookups add `--project` and `--path`.
+
+**Bash:**
+```bash
+secrets HCLOUD_TOKEN                                   # Get from current backend
+secrets --project admin-operator --path /providers/hetzner HCLOUD_TOKEN
+secrets --list                                          # List keys
+eval $(secrets -s)                                      # Export all to env
+secrets --status                                        # Backend status + auth
+secrets --edit                                          # Edit vault in $EDITOR (vault backend)
+secrets --encrypt /tmp/new.env                          # Encrypt a file into the vault
+secrets --backend vault HCLOUD_TOKEN                    # Force a backend for one command
+```
+
+**PowerShell:**
+```powershell
+.\secrets.ps1 HCLOUD_TOKEN                              # Get from current backend
+.\secrets.ps1 -Project admin-operator -Path /providers/hetzner HCLOUD_TOKEN
+.\secrets.ps1 -List                                     # List keys
+.\secrets.ps1 -Source | Invoke-Expression               # Export all to env
+.\secrets.ps1 -Status                                   # Backend status + auth
+.\secrets.ps1 -Backend vault HCLOUD_TOKEN               # Force a backend for one command
+```
+
+> Bash uses `--double-dash` flags; PowerShell uses `-PascalCase` switches. Do not mix them.
+
 ## Machine Identities
 
 For headless environments (runtimes, customer PCs), machine identities provide scoped access:
@@ -177,7 +217,7 @@ Every resolve function follows this order:
 3. **Vault**: Age-encrypted local file (requires age key)
 4. **Plaintext .env**: Legacy, last resort
 
-The vault is never deleted. It serves as:
+The vault is always retained. It serves as:
 - Offline fallback when Infisical is unreachable
 - Bootstrap anchor for Infisical credentials
 - Emergency recovery path

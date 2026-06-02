@@ -49,7 +49,7 @@ case "$OS" in
     Darwin) echo "macOS" ;;
     Linux)  
         if grep -qi microsoft /proc/version 2>/dev/null; then
-            echo "WSL - use admin (wsl) instead"
+            echo "WSL - use references/wsl.md instead"
         else
             echo "Native Linux"
         fi
@@ -216,39 +216,13 @@ has_capability "hasGit" && git --version
 | apt (Linux) | ✅ | - |
 | systemd services | ✅ | - |
 | Python/Node | ✅ | - |
-| WSL operations | ❌ | admin (wsl) |
-| Windows operations | ❌ | admin (windows) |
-| Server provisioning | ❌ | devops |
+| WSL operations | ❌ | references/wsl.md |
+| Windows operations | ❌ | references/windows.md |
+| Server provisioning | ❌ | devops skill |
 
 ---
 
-## References
-
-- `references/OPERATIONS.md` - Common operations, troubleshooting
-
-### unix: references/OPERATIONS.md
-
-# Unix Operations Reference
-
-Extended operations for macOS and Linux administration (outside of WSL). This file is expanded in later phases; keep `SKILL.md` as the overview.
-
----
-
-## Platform Detection
-
-```bash
-uname -s
-# Darwin → macOS
-# Linux  → Linux (native). If in WSL, use admin (wsl).
-```
-
-WSL detection:
-
-```bash
-grep -qi microsoft /proc/version 2>/dev/null && echo "wsl"
-```
-
-If this returns `wsl`, use `admin (wsl)` instead of `admin (unix)`.
+## Extended Operations (macOS / Linux)
 
 ---
 
@@ -261,111 +235,30 @@ Prefer the `admin` logging functions:
 Quick examples:
 
 ```bash
-log_admin "SUCCESS" "installation" "Installed package" "pkg=<PKG>"
-log_admin "SUCCESS" "operation" "Updated system" "method=apt"
-log_admin "ERROR" "operation" "Command failed" "cmd=<CMD> exit=<CODE>"
+log_admin_event "Installed package (pkg=<PKG>)" "OK" "installations.log"
+log_admin_event "Updated system (method=apt)" "OK"
+log_admin_event "Command failed (cmd=<CMD> exit=<CODE>)" "ERROR"
 ```
 
 ---
 
 ## Linux (apt): Standard Workflow
 
-Use these steps for Debian/Ubuntu systems.
+Standard apt commands (`update`, `install`, `remove`, `search`, `apt-mark hold`, `autoremove`/`clean`) work as expected. Two project-specific points:
 
-### 0. Identify distro and version (for correct packages)
+**Identify distro/version first** (picks correct packages):
 
 ```bash
 cat /etc/os-release
-uname -a
 ```
 
-### 1. Update package lists and upgrade
-
-```bash
-sudo apt update
-sudo apt upgrade -y
-```
-
-If you changed sources recently:
-
-```bash
-sudo apt update --allow-releaseinfo-change
-```
-
-Log:
-
-```bash
-log_admin "SUCCESS" "operation" "Updated system packages" "method=apt"
-```
-
-### 2. Install packages
+**Verify after install, then log** (one representative example):
 
 ```bash
 sudo apt install -y <PKG>
-```
-
-Verify install:
-
-```bash
-dpkg -l | rg -n "^ii\\s+<PKG>\\b" || true
 apt-cache policy <PKG>
-command -v <CMD> || true
-<CMD> --version || true
-```
-
-Log:
-
-```bash
-log_admin "SUCCESS" "installation" "Installed package" "pkg=<PKG> method=apt"
-```
-
-### 3. Remove packages
-
-```bash
-sudo apt remove -y <PKG>
-sudo apt autoremove -y
-```
-
-For config purge:
-
-```bash
-sudo apt purge -y <PKG>
-```
-
-Log:
-
-```bash
-log_admin "SUCCESS" "installation" "Removed package" "pkg=<PKG> method=apt"
-```
-
-### 4. Search packages
-
-```bash
-apt-cache search <TERM>
-apt-cache show <PKG> | sed -n '1,120p'
-```
-
-### 5. Hold/unhold packages (pin versions)
-
-```bash
-sudo apt-mark hold <PKG>
-apt-mark showhold
-sudo apt-mark unhold <PKG>
-```
-
-### 6. Cleanup
-
-```bash
-sudo apt autoremove -y
-sudo apt clean
-```
-
-```bash
-sudo apt update
-sudo apt upgrade -y
-sudo apt install -y <PKG>
-sudo apt remove -y <PKG>
-apt-cache policy <PKG>
+command -v <CMD> && <CMD> --version
+log_admin_event "Installed package (pkg=<PKG> method=apt)" "OK" "installations.log"
 ```
 
 ---
@@ -395,7 +288,7 @@ sudo apt update
 Log failures:
 
 ```bash
-log_admin "ERROR" "operation" "apt lock prevented update" "path=/var/lib/dpkg/lock-frontend"
+log_admin_event "apt lock prevented update (path=/var/lib/dpkg/lock-frontend)" "ERROR"
 ```
 
 ### Error: dpkg was interrupted
@@ -438,7 +331,7 @@ ping -c 1 deb.debian.org || true
 Log:
 
 ```bash
-log_admin "ERROR" "operation" "DNS resolution failed" "host=deb.debian.org"
+log_admin_event "DNS resolution failed (host=deb.debian.org)" "ERROR"
 ```
 
 ### Error: Release file changed / repository metadata changed
@@ -459,101 +352,33 @@ sudo apt update
 
 ## Linux (systemd): Common Operations
 
+Standard `systemctl` verbs (`status`/`start`/`stop`/`restart`/`enable`/`disable`) and `journalctl -u <SERVICE>` apply. The non-obvious one: **after editing a unit file, reload before restarting**, or your changes are ignored.
+
 ```bash
-# Status and logs
-sudo systemctl status <SERVICE>
-sudo journalctl -u <SERVICE> --no-pager -n 200
-sudo journalctl -u <SERVICE> -f
-
-# Start/stop/restart
-sudo systemctl start <SERVICE>
-sudo systemctl stop <SERVICE>
-sudo systemctl restart <SERVICE>
-
-# Enable/disable at boot
-sudo systemctl enable <SERVICE>
-sudo systemctl disable <SERVICE>
-
-# After editing unit files
 sudo systemctl daemon-reload
 sudo systemctl restart <SERVICE>
-
-# Discover services
-systemctl list-units --type=service --state=running
 ```
 
 ---
 
 ## macOS (Homebrew): Standard Workflow
 
-```bash
-# Verify platform
-uname -s
-# Darwin → macOS
+Standard `brew` verbs (`install`/`uninstall`/`upgrade`/`cleanup`/`pin`/`unpin`/`info`/`list`) work as documented. Two project-specific points:
 
-# Verify brew
-brew --version
-command -v brew
-brew config
-```
-
-### Install Homebrew (if missing)
-
-Use the official installer. This requires network access.
+**Install Homebrew if missing** (official installer, needs network):
 
 ```bash
 /bin/bash -c \"$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"
+log_admin_event "Installed Homebrew (method=brew-install)" "OK" "installations.log"
 ```
 
-Log:
-
-```bash
-log_admin "SUCCESS" "installation" "Installed Homebrew" "method=brew-install"
-```
-
-### Update and upgrade
-
-```bash
-brew update
-brew upgrade
-brew cleanup
-```
-
-Log:
-
-```bash
-log_admin "SUCCESS" "operation" "Updated brew packages" "method=brew"
-```
-
-### Install and uninstall formulae
+**Verify after install, then log** (one representative example):
 
 ```bash
 brew install <FORMULA>
-brew uninstall <FORMULA>
-brew list --formula
-brew info <FORMULA>
-```
-
-Verify installed formula and binary:
-
-```bash
 brew --prefix <FORMULA>
-command -v <CMD> || true
-<CMD> --version || true
-```
-
-Log:
-
-```bash
-log_admin "SUCCESS" "installation" "Installed formula" "formula=<FORMULA> method=brew"
-```
-
-### Pin / unpin (freeze versions)
-
-```bash
-brew pin <FORMULA>
-brew unpin <FORMULA>
-brew list --pinned
+command -v <CMD> && <CMD> --version
+log_admin_event "Installed formula (formula=<FORMULA> method=brew)" "OK" "installations.log"
 ```
 
 ---
@@ -598,19 +423,11 @@ brew --version
 
 ## macOS (Homebrew): Services
 
-Some formulae provide background services via `brew services`:
+Some formulae provide background services via `brew services` (`list`/`start`/`stop`/`restart`). Log changes:
 
 ```bash
-brew services list
 brew services start <FORMULA>
-brew services restart <FORMULA>
-brew services stop <FORMULA>
-```
-
-Log:
-
-```bash
-log_admin "SUCCESS" "system-change" "Updated brew service" "service=<FORMULA> action=start"
+log_admin_event "Updated brew service (service=<FORMULA> action=start)" "OK" "system-changes.log"
 ```
 
 ---
@@ -657,7 +474,7 @@ brew config
 Log failures:
 
 ```bash
-log_admin "ERROR" "operation" "brew update failed" "check=brew-doctor"
+log_admin_event "brew update failed (check=brew-doctor)" "ERROR"
 ```
 
 ---
@@ -665,7 +482,7 @@ log_admin "ERROR" "operation" "brew update failed" "check=brew-doctor"
 ## Troubleshooting Checklist
 
 - Confirm platform (`uname -s`) and avoid WSL-only paths unless you are in WSL.
-- If you detect WSL (`grep -qi microsoft /proc/version`), use `admin (wsl)`.
+- If you detect WSL (`grep -qi microsoft /proc/version`), use `references/wsl.md`.
 - Confirm tool path:
   - `command -v <CMD>`
   - `which <CMD>`

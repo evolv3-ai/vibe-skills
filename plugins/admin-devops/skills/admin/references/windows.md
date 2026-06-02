@@ -28,6 +28,10 @@ _Consolidated from `skills/admin (windows)` on 2026-02-02_
 - [Complete Setup Checklist](#complete-setup-checklist)
 - [Official Documentation](#official-documentation)
 - [Package Versions (Snapshot)](#package-versions-snapshot)
+- [Bash to PowerShell Translation (Full)](#bash-to-powershell-translation-full)
+- [Environment Variables (Windows)](#environment-variables-windows)
+- [Package Managers (Windows)](#package-managers-windows)
+- [PATH Configuration (Windows)](#path-configuration-windows)
 
 **Requires**: Windows platform, PowerShell 7.x
 
@@ -83,21 +87,13 @@ Show-AdminSummary
 
 ## Critical Rules
 
-### Always Do
-
 - Use PowerShell 7.x (`pwsh.exe`), not Windows PowerShell 5.1 (`powershell.exe`)
-- Use PowerShell cmdlets, not bash/Linux commands
-- Use full paths with `Test-Path` before file operations
-- Set PATH in Windows Registry for persistence (not just session)
+- Use PowerShell cmdlets (`Get-Content`, `Get-ChildItem`, ...), not bash commands (`cat`, `ls`, `grep`, `echo`, `export`)
+- Use full, verified paths with `Test-Path` before file operations
+- Set PATH in the Windows Registry for persistence (not just the session), and check execution policy before running scripts
 - Use `${env:VARIABLE}` syntax for environment variables
-
-### Never Do
-
-- Use bash commands (`cat`, `ls`, `grep`, `echo`, `export`)
-- Use relative paths without verification
-- Modify system PATH without backup
-- Run scripts without execution policy check
-- Create duplicate config files (update the existing one)
+- Update existing config files in place rather than creating duplicates
+- Back up the current PATH value before modifying the system PATH (a single-step, irreversible overwrite)
 
 ---
 
@@ -162,25 +158,7 @@ $nodeMgr = $AdminProfile.preferences.node.manager
 
 ## Bash to PowerShell Translation
 
-| Bash | PowerShell | Notes |
-|------|------------|-------|
-| `cat file` | `Get-Content file` | Or `gc` |
-| `cat file \| head -20` | `Get-Content file -Head 20` | |
-| `cat file \| tail -20` | `Get-Content file -Tail 20` | |
-| `ls -la` | `Get-ChildItem -Force` | |
-| `grep "x" file` | `Select-String "x" file` | Or `sls` |
-| `echo "x"` | `Write-Output "x"` | |
-| `echo "x" > file` | `Set-Content file -Value "x"` | |
-| `echo "x" >> file` | `Add-Content file -Value "x"` | |
-| `export VAR=x` | `$env:VAR = "x"` | Session only |
-| `export VAR=x` (perm) | `[Environment]::SetEnvironmentVariable("VAR", "x", "User")` | |
-| `test -f file` | `Test-Path file -PathType Leaf` | |
-| `test -d dir` | `Test-Path dir -PathType Container` | |
-| `mkdir -p dir` | `New-Item -ItemType Directory -Path dir -Force` | |
-| `rm -rf dir` | `Remove-Item dir -Recurse -Force` | |
-| `which cmd` | `Get-Command cmd` | |
-| `curl URL` | `Invoke-WebRequest URL` | |
-| `jq` | `ConvertFrom-Json` / `ConvertTo-Json` | |
+See the full translation table under [Bash to PowerShell Translation (Full)](#bash-to-powershell-translation-full) below.
 
 ---
 
@@ -350,44 +328,21 @@ if (Test-AdminCapability "hasDocker") {
 
 | Task Type | Route To |
 |-----------|----------|
-| WSL administration | `admin (wsl)` |
-| MCP servers | `admin (mcp)` |
-| Linux/macOS admin | `admin (unix)` |
-| Cross-platform routing | `admin` |
-
----
-
-## Related Skills
-
-| Task | Route To |
-|------|----------|
-| WSL operations | `admin (wsl)` |
-| MCP servers | `admin (mcp)` |
-| Server provisioning | `devops` |
-| Profile management | `admin` |
+| WSL administration | `references/wsl.md` |
+| MCP servers | `references/mcp.md` |
+| Linux/macOS admin | `references/unix.md` |
+| Server provisioning | **devops** skill |
+| Cross-platform routing / profile management | this skill (`SKILL.md`) |
 
 ---
 
 ## References
 
-- `references/bash-to-powershell.md` - Full command translation table
-- `references/package-managers.md` - winget/scoop/npm/choco workflows
-- `references/path-configuration.md` - PATH safety and persistence
-- `references/environment-variables.md` - Session vs permanent variables
-- `references/known-issues.md` - Common pitfalls and prevention
-- `references/OPERATIONS.md` - Troubleshooting and diagnostics
-
-### windows: references/OPERATIONS.md
-
-# Windows Operations Reference
-
-Extended operations for Windows administration: known issues prevention, bundled resources, troubleshooting, setup checklist, and version snapshots.
+The extended material below covers: full Bash-to-PowerShell translation, package-manager bootstraps, PATH safety/persistence, session-vs-permanent environment variables, known-issue prevention, troubleshooting, the setup checklist, and version snapshots.
 
 ---
 
 ## Known Issues Prevention
-
-This skill prevents **15** documented issues:
 
 ### Issue #1: Using bash commands in PowerShell
 **Error**: `cat : The term 'cat' is not recognized`
@@ -508,9 +463,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 }
 ```
 
-### windows: references/bash-to-powershell.md
-
-# Bash to PowerShell Translation (Full)
+## Bash to PowerShell Translation (Full)
 
 | Bash Command | PowerShell Equivalent | Notes |
 |--------------|----------------------|-------|
@@ -545,38 +498,10 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 | `awk` | `Select-Object`, `ForEach-Object` | Data processing |
 | `source file.sh` | `. .\file.ps1` | Dot-source script |
 
-### windows: references/environment-variables.md
+## Environment Variables (Windows)
 
-# Environment Variables (Windows)
-
-## Session Variables (Temporary)
-
-```powershell
-# Set variable
-$env:MY_VAR = "value"
-
-# Read variable
-$env:MY_VAR
-
-# Remove variable
-Remove-Item Env:\MY_VAR
-```
-
-## Permanent Variables
-
-```powershell
-# Set User variable (persists across sessions)
-[Environment]::SetEnvironmentVariable("MY_VAR", "value", "User")
-
-# Set Machine variable (requires admin)
-[Environment]::SetEnvironmentVariable("MY_VAR", "value", "Machine")
-
-# Read from specific scope
-[Environment]::GetEnvironmentVariable("MY_VAR", "User")
-
-# Remove permanent variable
-[Environment]::SetEnvironmentVariable("MY_VAR", $null, "User")
-```
+- **Session (temporary)**: `$env:MY_VAR = "value"`; read `$env:MY_VAR`; remove `Remove-Item Env:\MY_VAR`.
+- **Permanent**: `[Environment]::SetEnvironmentVariable("MY_VAR", "value", "User")` (or `"Machine"`, requires admin). Read with `GetEnvironmentVariable("MY_VAR", "User")`; remove by setting `$null`.
 
 ## Load Variables from .env File
 
@@ -602,142 +527,29 @@ function Load-EnvFile {
 Load-EnvFile ".env"
 ```
 
-### windows: references/known-issues.md
+## Package Managers (Windows)
 
-# Known Issues Prevention (Windows)
+Dispatch on `$AdminProfile.preferences.packages.manager` (see [Package Installation (Profile-Aware)](#package-installation-profile-aware)). The standard verbs are stock CLI: `install`, `upgrade`/`update`, `list`, `uninstall` for winget/scoop/npm/choco. Only the bootstrap (one-time installer) commands are noted here.
 
-This section captures common Windows admin pitfalls and how to avoid them.
+**winget** — ships with Windows; preferred for Windows apps. Use `Package.Name` IDs (e.g. `winget install Microsoft.PowerShell --version 1.2.3`).
 
-## Issue 1: Using bash commands in PowerShell
-- Error: `cat : The term 'cat' is not recognized`
-- Cause: PowerShell uses cmdlets instead of bash commands
-- Prevention: Use translation table (`cat` -> `Get-Content`)
-
-## Issue 2: PATH not persisting
-- Error: Commands work in one session but not another
-- Cause: Setting `$env:PATH` only affects current session
-- Prevention: Use `[Environment]::SetEnvironmentVariable()` for persistence
-
-## Issue 3: JSON depth truncation
-- Error: JSON output shows `@{...}` instead of nested values
-- Cause: Default `ConvertTo-Json -Depth` is 2
-- Prevention: Always use `ConvertTo-Json -Depth 10`
-
-## Issue 4: Profile not loading
-- Error: Profile functions/aliases not available
-- Cause: Wrong profile location or `-NoProfile` flag
-- Prevention: Verify `$PROFILE` path and check startup flags
-
-## Issue 5: Script execution blocked
-- Error: `script.ps1 cannot be loaded because running scripts is disabled`
-- Cause: Execution policy is Restricted
-- Prevention: Set `RemoteSigned` for current user
-
-## Issue 6: npm global commands not found
-- Error: `npm : The term 'npm' is not recognized`
-- Cause: npm path not in system PATH
-- Prevention: Add `%APPDATA%\npm` to User PATH via registry
-
-## Issue 7: PowerShell 5.1 vs 7.x confusion
-- Error: Features not working, different behavior
-- Cause: Using `powershell.exe` (5.1) instead of `pwsh.exe` (7.x)
-- Prevention: Use `pwsh` or verify with `$PSVersionTable`
-
-### windows: references/package-managers.md
-
-# Package Managers (Windows)
-
-## winget (Preferred for Windows Apps)
-
+**scoop** — developer tools. Bootstrap:
 ```powershell
-# Search for package
-winget search "package-name"
-
-# Install package
-winget install Package.Name
-
-# Install specific version
-winget install Package.Name --version 1.2.3
-
-# List installed packages
-winget list
-
-# Upgrade package
-winget upgrade Package.Name
-
-# Upgrade all packages
-winget upgrade --all
-
-# Uninstall package
-winget uninstall Package.Name
-```
-
-## scoop (Developer Tools)
-
-```powershell
-# Install scoop (if not installed)
 irm get.scoop.sh | iex
-
-# Add buckets (repositories)
 scoop bucket add extras
 scoop bucket add versions
-
-# Install package
-scoop install git
-
-# List installed
-scoop list
-
-# Update package
-scoop update git
-
-# Update all
-scoop update *
-
-# Uninstall
-scoop uninstall git
 ```
 
-## npm (Node.js Packages)
+**npm** — global packages live under `%APPDATA%\npm` (must be on User PATH; see Issue #6). Use `npm install -g <pkg>`.
 
+**chocolatey** — alternative, admin required. Bootstrap:
 ```powershell
-# Install globally
-npm install -g package-name
-
-# List global packages
-npm list -g --depth=0
-
-# Update global package
-npm update -g package-name
-
-# Uninstall global
-npm uninstall -g package-name
-```
-
-## chocolatey (Alternative)
-
-```powershell
-# Install chocolatey (admin required)
 Set-ExecutionPolicy Bypass -Scope Process -Force
 [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
 iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-
-# Install package
-choco install package-name -y
-
-# List installed
-choco list --local-only
-
-# Upgrade
-choco upgrade package-name -y
-
-# Uninstall
-choco uninstall package-name -y
 ```
 
-### windows: references/path-configuration.md
-
-# PATH Configuration (Windows)
+## PATH Configuration (Windows)
 
 ## Check Current PATH
 

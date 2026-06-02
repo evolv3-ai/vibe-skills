@@ -8,12 +8,8 @@ This document explains how the admin skill detects and adapts to different shell
 - IMPORTANT: Claude Code on Windows Uses Git Bash
 - Detection Method
 - Platform Detection Helpers
-- Shell Mode Syntax Comparison
-- Common Issues
-- Best Practices
 - Platform + Shell Matrix
 - Claude Code on Windows: Path Conversion
-- Related Files
 
 ---
 
@@ -166,134 +162,20 @@ function Get-AdminPlatform {
 # Usage: $platform = Get-AdminPlatform
 ```
 
-## Shell Mode Syntax Comparison
+## Shell Mode Syntax
 
-### Directory Creation
+Standard Bash and PowerShell syntax differ across the obvious primitives (directory
+creation, env-var reads, file checks, conditionals, command capture) — use whichever
+matches the detected `ADMIN_SHELL` and keep a single dialect per script. The
+admin-specific habits that matter:
 
-**Bash:**
-```bash
-mkdir -p "${ADMIN_LOG_PATH:-${ADMIN_ROOT:-$HOME/.admin}/logs}/devices/$(hostname)"
-```
-
-**PowerShell:**
-```powershell
-New-Item -ItemType Directory -Force -Path (Join-Path $env:USERPROFILE '.admin\logs\devices' $env:COMPUTERNAME)
-```
-
-### Environment Variables
-
-**Bash:**
-```bash
-DEVICE_NAME="${DEVICE_NAME:-$(hostname)}"
-echo $DEVICE_NAME
-```
-
-**PowerShell:**
-```powershell
-$DEVICE_NAME = if ($env:DEVICE_NAME) { $env:DEVICE_NAME } else { $env:COMPUTERNAME }
-Write-Output $DEVICE_NAME
-```
-
-### File Existence Check
-
-**Bash:**
-```bash
-if [[ -f ".env.local" ]]; then
-    source .env.local
-fi
-```
-
-**PowerShell:**
-```powershell
-if (Test-Path '.env.local') {
-    # Load env file
-    Get-Content '.env.local' | ForEach-Object {
-        if ($_ -match '^([^=]+)=(.*)$') {
-            [Environment]::SetEnvironmentVariable($matches[1], $matches[2], 'Process')
-        }
-    }
-}
-```
-
-### Command Output
-
-**Bash:**
-```bash
-result=$(some_command)
-echo "$result"
-```
-
-**PowerShell:**
-```powershell
-$result = some_command
-Write-Output $result
-```
-
-### Conditional Logic
-
-**Bash:**
-```bash
-if [[ "$platform" == "wsl" ]]; then
-    echo "In WSL"
-elif [[ "$platform" == "windows" ]]; then
-    echo "In Windows"
-fi
-```
-
-**PowerShell:**
-```powershell
-if ($platform -eq 'wsl') {
-    Write-Output "In WSL"
-} elseif ($platform -eq 'windows') {
-    Write-Output "In Windows"
-}
-```
-
-### Path Handling
-
-**Bash:**
-```bash
-log_file="${ADMIN_LOG_PATH:-${ADMIN_ROOT:-$HOME/.admin}/logs}/operations.log"
-```
-
-**PowerShell:**
-```powershell
-$logFile = Join-Path $env:USERPROFILE '.admin\logs\operations.log'
-```
-
-## Common Issues
-
-### Issue: Environment Variable Expansion Fails
-
-**Symptom:** `$env:USERPROFILE` becomes `:USERPROFILE` or empty
-
-**Cause:** Bash trying to interpret PowerShell syntax
-
-**Solution:** Use the correct syntax for the detected shell
-
-### Issue: Path Format Errors
-
-**Symptom:** `The given path's format is not supported`
-
-**Cause:** Using forward slashes or Unix paths in PowerShell
-
-**Solution:** Use `Join-Path` in PowerShell, string paths in Bash
-
-### Issue: Command Not Found
-
-**Symptom:** `mkdir: command not found` in PowerShell
-
-**Cause:** PowerShell uses different command names
-
-**Solution:** Use `New-Item -ItemType Directory` in PowerShell
-
-## Best Practices
-
-1. **Always detect shell first** - Before running any commands
-2. **Don't mix syntaxes** - Use all Bash or all PowerShell
-3. **Use Join-Path in PowerShell** - Never concatenate paths with strings
-4. **Test in both environments** - Verify commands work in both shells
-5. **Provide clear handoff messages** - When a task needs the other shell
+- **Build the admin root from the layered fallback** so callers can override it:
+  Bash `"${ADMIN_LOG_PATH:-${ADMIN_ROOT:-$HOME/.admin}/logs}/operations.log"`;
+  PowerShell `Join-Path $env:USERPROFILE '.admin\logs\operations.log'`.
+- **Construct paths with `Join-Path` in PowerShell** rather than string concatenation,
+  so the backslash style stays correct on native Windows.
+- **Detect the shell before running anything**, then keep all commands in that one
+  dialect; when a task genuinely needs the other shell, hand off with a clear message.
 
 ## Platform + Shell Matrix
 
@@ -349,9 +231,3 @@ EOF
 
 echo "Profile created at: $ADMIN_ROOT/profiles/$DEVICE_NAME.json"
 ```
-
-## Related Files
-
-- `admin/SKILL.md` - Main skill with dual-mode commands
-- `admin/references/profile-gate.md` - Profile setup and troubleshooting guide
-- `admin/references/cross-platform.md` - Windows ↔ WSL coordination
