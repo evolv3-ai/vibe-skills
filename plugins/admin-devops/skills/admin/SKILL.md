@@ -1,12 +1,14 @@
 ---
 name: admin
 description: |
-  Local machine administration for Windows, WSL, macOS, Linux. Install tools, check
-  if software is installed, manage packages, configure dev environments. Works with
-  winget, scoop, brew, apt, npm, pip, uv. Profile-aware: adapts to your preferences.
+  Administer the local machine on Windows, WSL, macOS, or Linux: install and update tools,
+  check if software is installed, manage packages, configure dev environments, and
+  troubleshoot WSL. Works with winget, scoop, brew, apt, npm, pip, uv. Profile-aware:
+  adapts to your preferences.
 
-  Use when: install 7zip, is git installed, clone repo, check if node installed,
-  add to PATH, configure MCP servers, manage dev tools, set up environment.
+  Use when: install 7zip, update all winget/scoop packages, is git installed, clone repo,
+  check if node installed, add to PATH, configure MCP servers, fix WSL D-Bus/TTS issues,
+  manage dev tools, set up environment.
 
   NOT for: VPS, cloud servers, remote infrastructure → use devops skill.
 ---
@@ -53,9 +55,8 @@ from plugin cache), use native Claude tools to check directly:
 
 ## CRITICAL: Secrets and .env
 
-- NEVER store live `.env` files or credentials inside any skill folder.
-- `.env.template` files belong only in `assets/` within a skill.
-- Store live secrets in `~/.admin/.env` and reference from there.
+- Store all live secrets in `~/.admin/.env` and reference them from there.
+- Inside a skill, keep only `.env.template` files, and place them in `assets/`.
 
 ## Secrets Management (v4.0 — 3-Project Split)
 
@@ -160,6 +161,7 @@ admin (core) ─── required by all satellites
 | Task | Reference |
 |------|-----------|
 | Install tool/package | references/{platform}.md |
+| Update tool/package | `/update` command — single app, all apps, or all-per-manager (scoop/winget/apt/brew) |
 | Windows administration | references/windows.md |
 | WSL administration | references/wsl.md |
 | macOS/Linux admin | references/unix.md |
@@ -178,7 +180,7 @@ admin (core) ─── required by all satellites
 - Node: `preferences.node.manager` (npm/pnpm/yarn/bun)
 - Packages: `preferences.packages.manager` (scoop/winget/choco/brew/apt)
 
-Never suggest install commands without checking preferences first.
+Always read `preferences.{python,node,packages}.manager` from the profile before suggesting any install or update command.
 
 ## Package Installation Workflow (All Platforms)
 

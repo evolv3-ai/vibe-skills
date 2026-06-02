@@ -73,13 +73,7 @@ This file is created automatically by `new-admin-profile.sh` during `/setup-prof
 
 ### Why Satellite?
 
-On WSL, the profile data lives on the Windows filesystem (e.g., `/mnt/c/Users/Owner/.admin`),
-but agents check `$HOME` first. Without a satellite `.env` at `~/.admin/`, agents may:
-- Assume no setup exists (no `~/.admin/` folder)
-- Try to create a new profile in WSL's `$HOME`
-- Override the skill's instructions
-
-The satellite `.env` prevents this by making `~/.admin/` exist with a pointer to the real data.
+On WSL the profile data lives on the Windows filesystem (e.g. `/mnt/c/Users/Owner/.admin`), but agents check `$HOME` first. The satellite `.env` at `~/.admin/` makes `$HOME` always point to the real data, so agents resolve the existing profile instead of assuming none exists or creating a duplicate in WSL's `$HOME`.
 
 ---
 
@@ -126,37 +120,11 @@ The satellite `.env` and profile JSON are plain text — no shell execution requ
 
 ## TUI Setup Interview
 
-When profile does not exist, ask these questions using `AskUserQuestion` or equivalent.
+When profile does not exist, gather these answers using `AskUserQuestion` or equivalent, then run the create command below.
 
-### Q1: Storage Location (Required)
-
-Ask: **"Will you use Admin on a single device or multiple devices?"**
-
-| Option | Description |
-|--------|-------------|
-| Single device (Recommended) | Local storage at `~/.admin`. Simple, no sync needed. |
-| Multiple devices | Cloud-synced folder (Dropbox, OneDrive, NAS). Profiles shared across machines. |
-
-If "Multiple devices" selected, follow up: **"Enter the path to your cloud-synced folder"**
-- Examples: `C:\Users\You\Dropbox\.admin`, `~/Dropbox/.admin`, `N:\Shared\.admin`
-
-### Q2: Tool Preferences (Optional)
-
-Ask: **"Set tool preferences now, or use defaults?"**
-
-If yes, ask each (platform-aware):
-- **Package manager (Linux-side):** apt (default on WSL/Linux) / brew (default on macOS) / dnf / pacman
-- **Windows package manager (WSL only):** winget (default) / scoop / choco / none
-- **Package manager (Windows native):** winget (default) / scoop / choco
-- **Python manager:** uv (default) / pip / conda / poetry
-- **Node manager:** npm (default) / pnpm / yarn / bun
-- **Default shell:** pwsh (default on Windows) / bash (default on Linux) / zsh (default on macOS) / fish
-
-### Q3: Inventory Scan (Optional)
-
-Ask: **"Run a quick inventory scan to detect installed tools?"**
-- Yes: Scans for git, node, python, docker, ssh, etc. and records versions
-- No: Creates minimal profile, tools detected on first use
+1. **Storage location (required):** single device (local `~/.admin`, recommended) or multiple devices (cloud-synced folder — Dropbox/OneDrive/NAS — shared across machines). For multi-device, capture the folder path, e.g. `C:\Users\You\Dropbox\.admin`, `~/Dropbox/.admin`, `N:\Shared\.admin`.
+2. **Tool preferences (optional, platform-aware defaults):** Linux pkg mgr (apt on WSL/Linux, brew on macOS / dnf / pacman); Windows pkg mgr (winget default / scoop / choco / none); Python mgr (uv default / pip / conda / poetry); Node mgr (npm default / pnpm / yarn / bun); shell (pwsh on Windows, bash on Linux, zsh on macOS / fish).
+3. **Inventory scan (optional):** scan for git, node, python, docker, ssh, etc. and record versions, or create a minimal profile with tools detected on first use.
 
 ---
 
@@ -249,92 +217,19 @@ This ensures one device profile (not duplicated), unified logs, and a single sou
 
 ## Troubleshooting
 
-### Config Not Loading
-
-**Bash:**
-```bash
-# Check config locations
-ls -la "${ADMIN_ROOT:-$HOME/.admin}/.env"
-ls -la .env.local
-
-# Verify syntax
-bash -n "${ADMIN_ROOT:-$HOME/.admin}/.env"
-```
-
-**PowerShell:**
-```powershell
-# Check config locations
-Test-Path "$env:USERPROFILE\.admin\.env"
-Test-Path ".env.local"
-
-# View config content
-Get-Content "$env:USERPROFILE\.admin\.env"
-```
-
-### Permission Issues
-
-**Bash:**
-```bash
-# Fix ownership
-chown -R $(whoami) "${ADMIN_ROOT:-$HOME/.admin}"
-
-# Fix permissions
-chmod 700 "${ADMIN_ROOT:-$HOME/.admin}"
-chmod 600 "${ADMIN_ROOT:-$HOME/.admin}/.env"
-chmod 755 "${ADMIN_LOG_PATH:-${ADMIN_ROOT:-$HOME/.admin}/logs}" \
-          "${ADMIN_PROFILE_PATH:-${ADMIN_ROOT:-$HOME/.admin}/profiles}"
-```
-
-**PowerShell:**
-```powershell
-# Check access
-$adminPath = "$env:USERPROFILE\.admin"
-Get-Acl $adminPath | Format-List
-
-# Grant full control to current user (if needed)
-$acl = Get-Acl $adminPath
-$rule = New-Object System.Security.AccessControl.FileSystemAccessRule(
-    $env:USERNAME, "FullControl", "ContainerInherit,ObjectInherit", "None", "Allow"
-)
-$acl.SetAccessRule($rule)
-Set-Acl $adminPath $acl
-```
+Inspect the satellite `.env` and profile JSON as plain text (Read tool, `cat`, or `Get-Content`) at `${ADMIN_ROOT:-$HOME/.admin}/.env` and `$ADMIN_ROOT/profiles/$ADMIN_DEVICE.json` — both are plain text, no shell execution needed. On Windows run scripts from `pwsh.exe` (PowerShell 7+), not `powershell.exe` 5.1; if scripts are blocked by execution policy, allow local scripts with `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
 
 ### Reset Configuration
 
+Back up the existing admin root, then re-run setup — the admin skill detects the missing config and restarts the TUI interview.
+
 **Bash:**
 ```bash
-# Backup and reset
 mv "${ADMIN_ROOT:-$HOME/.admin}" "${ADMIN_ROOT:-$HOME/.admin}.backup.$(date +%Y%m%d)"
-# Re-run setup — admin skill will detect missing config
 ```
 
 **PowerShell:**
 ```powershell
-# Backup and reset
 $backupName = ".admin.backup.$(Get-Date -Format 'yyyyMMdd')"
 Move-Item "$env:USERPROFILE\.admin" "$env:USERPROFILE\$backupName"
-# Re-run setup — admin skill will detect missing config
-```
-
-### Windows-Specific Issues
-
-**PowerShell Version Too Old:**
-```powershell
-# Check version (need 7.x, not 5.1)
-$PSVersionTable.PSVersion
-
-# If 5.1, install PowerShell 7
-winget install Microsoft.PowerShell
-
-# Then run from pwsh.exe, not powershell.exe
-```
-
-**Execution Policy:**
-```powershell
-# Check policy
-Get-ExecutionPolicy
-
-# If Restricted, allow local scripts
-Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned
 ```

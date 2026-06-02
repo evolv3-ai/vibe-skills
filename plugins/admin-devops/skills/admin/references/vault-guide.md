@@ -6,9 +6,7 @@ Lightweight, git-safe secrets management using [age encryption](https://age-encr
 
 ## Contents
 
-- [Secrets Backend Options](#secrets-backend-options)
 - [Quick Start](#quick-start)
-- [Daily Usage](#daily-usage)
 - [Integration with admin scripts](#integration-with-admin-scripts)
 - [Architecture](#architecture)
 - [Feature Flag](#feature-flag)
@@ -16,37 +14,13 @@ Lightweight, git-safe secrets management using [age encryption](https://age-encr
 - [Multi-Device with Sync](#multi-device-with-sync)
 - [Troubleshooting](#troubleshooting)
 
-## Secrets Backend Options
-
-The admin suite supports three secrets backends. The vault (this guide) is the default. For multi-device setups, consider Infisical as the primary backend with vault as offline fallback.
-
-| Backend | Storage | Offline | Multi-Device | Audit Trail | Setup Effort |
-|---------|---------|---------|-------------|-------------|-------------|
-| **infisical** | Infisical Cloud | No | Native | Built-in | Medium (account + CLI) |
-| **vault** (default) | `vault.age` local file | Yes | Via Dropbox/git sync | git log only | Low (age CLI + key) |
-| **env** | Plaintext `.env` | Yes | Not recommended | None | None |
-
-Configure via `ADMIN_SECRETS_BACKEND` in `~/.admin/.env`. Fallback chain: infisical → vault → env.
-
-- **Infisical guide**: `references/infisical.md`
-- **Migration**: `secrets --migrate-to-infisical` pushes vault contents to Infisical Cloud
-- The vault remains valuable as an offline fallback even when Infisical is primary
+For the backend comparison table and daily-usage CLI, see `references/secrets-architecture.md` § Backend Options and § Daily Usage. Migrate vault → Infisical with `secrets --migrate-to-infisical` (`references/infisical.md` § Migration from Vault). The vault remains valuable as an offline fallback even when Infisical is primary.
 
 ## Quick Start
 
 ### 1. Install age
 
-```bash
-# Linux/WSL
-sudo apt install age
-
-# macOS
-brew install age
-
-# Windows
-scoop install age
-# or: choco install age
-```
+One-line install per platform (`sudo apt install age` on Linux/WSL, `brew install age` on macOS, `scoop install age` on Windows).
 
 ### 2. Generate key
 
@@ -88,90 +62,7 @@ AGE_KEY_PATH=/mnt/c/Users/Owner/.age/key.txt   # Explicit path (cross-platform)
 
 ### 5. Test
 
-**Bash:**
-```bash
-secrets --status           # Check everything is wired up
-secrets --list             # See all keys
-secrets HCLOUD_TOKEN       # Get a single value
-eval $(secrets -s)         # Load all to shell
-```
-
-**PowerShell:**
-```powershell
-.\secrets.ps1 -Status     # Check everything is wired up
-.\secrets.ps1 -List        # See all keys
-.\secrets.ps1 HCLOUD_TOKEN # Get a single value
-.\secrets.ps1 -Source | Invoke-Expression  # Load all to env
-```
-
-> **Note**: Bash uses `--double-dash` flags. PowerShell uses `-PascalCase` switches. Do not mix them.
-
-## Daily Usage
-
-### Retrieve secrets
-
-**Bash:**
-```bash
-# Single value
-secrets HCLOUD_TOKEN
-HCLOUD_TOKEN=$(secrets HCLOUD_TOKEN)
-
-# All values as env vars
-eval $(secrets -s)
-
-# List keys
-secrets --list
-
-# View all (for debugging)
-secrets --decrypt
-```
-
-**PowerShell:**
-```powershell
-# Single value
-.\secrets.ps1 HCLOUD_TOKEN
-$token = .\secrets.ps1 HCLOUD_TOKEN
-
-# All values as env vars
-.\secrets.ps1 -Source | Invoke-Expression
-
-# List keys
-.\secrets.ps1 -List
-
-# View all (for debugging)
-.\secrets.ps1 -Decrypt
-```
-
-### Edit vault
-
-```bash
-# Opens vault in $EDITOR, re-encrypts on save (Bash only)
-secrets --edit
-```
-
-### Add new secret
-
-```bash
-secrets --edit
-# Add: NEW_API_KEY=abc123
-# Save and close editor
-```
-
-### Encrypt from scratch
-
-```bash
-# Write secrets to a temp file
-cat > /tmp/new-secrets.env << 'EOF'
-HCLOUD_TOKEN=your-token
-OCI_TENANCY_OCID=your-ocid
-EOF
-
-# Encrypt to vault
-secrets --encrypt /tmp/new-secrets.env
-
-# Delete plaintext
-rm /tmp/new-secrets.env
-```
+Verify with `secrets --status` (bash) / `.\secrets.ps1 -Status` (PowerShell). For the full retrieve/list/edit/encrypt CLI, see `references/secrets-architecture.md` § Daily Usage.
 
 ## Integration with admin scripts
 
@@ -231,7 +122,7 @@ Requires: `npm install age-encryption`
   ADMIN_VAULT=enabled                                ← Feature flag
   AGE_KEY_PATH=/mnt/c/Users/Owner/.age/key.txt       ← Explicit key location
 
-$AGE_KEY_PATH (private key - NEVER commit/sync)
+$AGE_KEY_PATH (private key - keep local; exclude from commit/sync)
   AGE-SECRET-KEY-1...
 
 $ADMIN_ROOT/vault.age (encrypted - git-safe, sync-safe)
@@ -314,10 +205,10 @@ The age private key at `~/.age/key.txt` is the single point of failure. If lost,
 - Copy to a USB drive stored securely
 - Store encrypted copy in a different system
 
-**Do NOT**:
-- Commit `~/.age/key.txt` to git
-- Sync via Dropbox/OneDrive (unless encrypted)
-- Store alongside vault.age (defeats encryption)
+**Keep the key isolated**:
+- Keep `~/.age/key.txt` out of git
+- Sync only an encrypted copy via Dropbox/OneDrive
+- Store it separately from vault.age (co-locating defeats encryption)
 
 ## Multi-Device with Sync
 
@@ -326,7 +217,7 @@ The vault integrates naturally with the admin suite's multi-device sync feature 
 ### Setup
 
 ```
-SYNCED ($ADMIN_ROOT on shared storage)       LOCAL (per-device, never synced)
+SYNCED ($ADMIN_ROOT on shared storage)       LOCAL (per-device, stays local)
 ══════════════════════════════════════       ═══════════════════════════════
 /mnt/n/Dropbox/Admin/                        ~/.admin/.env  (satellite)
   ├── profiles/WOPR3.json                    ~/.age/key.txt (or AGE_KEY_PATH)
@@ -386,13 +277,6 @@ secrets --encrypt $ADMIN_ROOT/.env
 ### "Decryption failed"
 - Wrong key: `age-keygen -y ~/.age/key.txt` shows the public key. It must match the one used to encrypt.
 - Corrupted vault: Re-encrypt from plaintext backup.
-
-### "age not installed"
-```bash
-sudo apt install age    # Linux/WSL
-brew install age        # macOS
-scoop install age       # Windows
-```
 
 ### Vault enabled but still loading plaintext
 Check `~/.admin/.env` has `ADMIN_VAULT=enabled` (not `ADMIN_VAULT=true` or other values).

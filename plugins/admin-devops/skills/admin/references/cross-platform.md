@@ -61,42 +61,20 @@ platform-specific references (windows.md, wsl.md, unix.md).
 
 ## Path Conversion
 
-### Windows → WSL
+Drive `C:` maps to `/mnt/c`, `D:` to `/mnt/d`, etc. Backslashes become forward slashes. WSL home (`/home/user`) is reachable from Windows via the `\\wsl$\` UNC path.
 
 | Windows Path | WSL Path |
 |--------------|----------|
 | `C:/Users/<WIN_USER>` | `/mnt/c/Users/<WIN_USER>` |
-| `D:/projects` | `/mnt/d/projects` |
 | `D:/Dropbox` | `/mnt/d/Dropbox` |
+| `N:\Dropbox` | `/mnt/n/Dropbox` |
+| `\\wsl$\Ubuntu-24.04\home\user` | `/home/user` |
 
-**PowerShell function:**
-```powershell
-function Convert-ToWslPath {
-    param([string]$WindowsPath)
-    $path = $WindowsPath -replace '\\', '/'
-    $path = $path -replace '^([A-Za-z]):', '/mnt/$1'.ToLower()
-    $path
-}
-# Convert-ToWslPath "D:/projects/myapp" → /mnt/d/projects/myapp
-```
+Use `wslpath` for exact conversion in either direction:
 
-**Bash (using wslpath):**
 ```bash
-wslpath -u 'C:/Users/<WIN_USER>/Documents'
-# Returns: /mnt/c/Users/Owner/Documents
-```
-
-### WSL → Windows
-
-| WSL Path | Windows Path |
-|----------|--------------|
-| `/home/user` | `\\wsl$\Ubuntu-24.04\home\user` |
-| `/mnt/c/Users` | `C:/Users` |
-
-**Bash:**
-```bash
-wslpath -w /home/username/file.txt
-# Returns: \\wsl$\Ubuntu-24.04\home\username\file.txt
+wslpath -u 'C:/Users/Owner/Documents'   # → /mnt/c/Users/Owner/Documents
+wslpath -w /home/username/file.txt        # → \\wsl$\Ubuntu-24.04\home\username\file.txt
 ```
 
 ## Handoff Protocols
@@ -171,17 +149,15 @@ C:/Users/{USERNAME}/.wslconfig
 
 ### Configuration Template
 
+Core resource knobs (`memory`, `processors`, `swap`) are what you tune most; add `autoMemoryReclaim` to return idle RAM to Windows.
+
 ```ini
 [wsl2]
 memory=16GB
 processors=8
 swap=4GB
-localhostForwarding=true
-nestedVirtualization=true
-guiApplications=true
 
 [experimental]
-sparseVhd=true
 autoMemoryReclaim=gradual
 ```
 
@@ -196,12 +172,11 @@ autoMemoryReclaim=gradual
 
 ### Apply Changes
 
-```powershell
-# Edit config
-notepad "$env:USERPROFILE/.wslconfig"
+Edit `.wslconfig` from the Windows side (it is a Windows file). NEVER edit it from inside WSL via `/mnt/c` — line-ending corruption can make it silently ignored.
 
-# Restart WSL to apply
-wsl --shutdown
+```powershell
+notepad "$env:USERPROFILE/.wslconfig"
+wsl --shutdown   # restart WSL to apply
 ```
 
 ## wsl.conf (Per-Distribution)
@@ -227,32 +202,17 @@ appendWindowsPath=true
 
 ## Line Ending Handling
 
-### Problem
+Windows uses CRLF, Linux uses LF. CRLF in a `.sh` file breaks shebangs and silently fails scripts — keep shell scripts LF. Convert with `dos2unix script.sh` / `unix2dos script.sh`.
 
-Windows uses CRLF (`\r\n`), Linux uses LF (`\n`).
+Configure git to manage this automatically:
 
-### Solutions
-
-**Convert to Unix (for WSL):**
 ```bash
-dos2unix script.sh
+git config --global core.autocrlf true    # Windows
+git config --global core.autocrlf input   # WSL
 ```
 
-**Convert to Windows:**
-```bash
-unix2dos script.sh
-```
+Or pin per-file via `.gitattributes`:
 
-**Git configuration:**
-```bash
-# Windows
-git config --global core.autocrlf true
-
-# WSL
-git config --global core.autocrlf input
-```
-
-**.gitattributes:**
 ```
 * text=auto
 *.sh text eol=lf
@@ -261,58 +221,21 @@ git config --global core.autocrlf input
 
 ## Common Operations
 
-### Check WSL Status
+Run from Windows (PowerShell):
 
 ```powershell
-wsl --version
-wsl --list --verbose
-wsl --status
-```
+wsl --version; wsl --list --verbose; wsl --status   # status
+wsl -d Ubuntu-24.04 -e free -h                       # WSL memory usage
 
-### WSL Memory Usage
-
-```powershell
-wsl -d Ubuntu-24.04 -e free -h
-```
-
-### Reclaim Disk Space
-
-```powershell
-# Clean up inside WSL
+# Reclaim disk: clean inside WSL, then shutdown and compact the VHD (admin)
 wsl -d Ubuntu-24.04 -e sudo apt autoremove -y
 wsl -d Ubuntu-24.04 -e sudo apt clean
-
-# Shutdown and compact
 wsl --shutdown
-# Then compact VHD (requires admin)
 ```
 
 ## Troubleshooting
 
-### WSL Not Starting
-
-```powershell
-wsl --status
-wsl --update
-Restart-Service LxssManager
-```
-
-### Memory Not Reclaimed
-
-Add to `.wslconfig`:
-```ini
-[experimental]
-autoMemoryReclaim=gradual
-```
-
-### Can't Access Windows Files from WSL
-
-Check `/etc/wsl.conf` has:
-```ini
-[automount]
-enabled=true
-```
-
-### Permission Denied on WSL Files
-
-Access via `\\wsl$\` path, not directly through AppData.
+- **WSL not starting**: `wsl --status`, then `wsl --update`, then `Restart-Service LxssManager`.
+- **Memory not reclaimed**: add `autoMemoryReclaim=gradual` under `[experimental]` in `.wslconfig` (see template above).
+- **Can't access Windows files from WSL**: ensure `/etc/wsl.conf` has `[automount] enabled=true`.
+- **Permission denied on WSL files**: access them through the `\\wsl$\` path (e.g. `\\wsl$\Ubuntu-24.04\home\user`), which routes through the 9P server with correct permissions.

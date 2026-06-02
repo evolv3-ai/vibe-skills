@@ -1,6 +1,6 @@
 # Device Profiles - v3.0
 
-Device profiles provide **context-aware assistance** by tracking your installed tools, preferences, servers, and capabilities.
+Device profiles provide context-aware assistance by tracking installed tools, preferences, servers, and capabilities.
 
 ## Contents
 
@@ -15,22 +15,28 @@ Device profiles provide **context-aware assistance** by tracking your installed 
 
 ## Profile Discovery
 
-All platforms use a **satellite .env** at `~/.admin/.env` to find the profile:
+All platforms use a satellite `.env` at `~/.admin/.env` to resolve the profile. Resolution order:
+
+| Step | Source | Result |
+|------|--------|--------|
+| 1 | `~/.admin/.env` | Read bootstrap + preference vars |
+| 2 | `ADMIN_ROOT` + `ADMIN_DEVICE` | `$ADMIN_ROOT/profiles/$ADMIN_DEVICE.json` |
+| 3 | `ADMIN_PLATFORM` | `wsl`/`linux`/`macos`/`windows` |
+
+Satellite `.env` vars:
 
 ```
-~/.admin/.env            ← Satellite (always at $HOME, per-device)
-  # Bootstrap vars
-  ADMIN_ROOT=<path>      ← Points to centralized data
-  ADMIN_DEVICE=<name>    ← Device name (used for profile filename)
-  ADMIN_PLATFORM=<os>    ← wsl/linux/macos/windows
-    └─ resolves to → $ADMIN_ROOT/profiles/$ADMIN_DEVICE.json
+# Bootstrap (resolve profile path)
+ADMIN_ROOT=<path>          # Centralized data location
+ADMIN_DEVICE=<name>        # Profile filename
+ADMIN_PLATFORM=<os>        # wsl/linux/macos/windows
 
-  # Preference vars (per-device, no JSON parsing needed)
-  ADMIN_PKG_MGR=apt          ← Linux-side package manager
-  ADMIN_WIN_PKG_MGR=winget   ← Windows-side (WSL only, optional)
-  ADMIN_PY_MGR=uv            ← Python manager
-  ADMIN_NODE_MGR=npm         ← Node manager
-  ADMIN_SHELL=zsh            ← Default shell
+# Preferences (per-device, no JSON parsing needed)
+ADMIN_PKG_MGR=apt          # Linux-side package manager
+ADMIN_WIN_PKG_MGR=winget   # Windows-side (WSL only, optional)
+ADMIN_PY_MGR=uv            # Python manager
+ADMIN_NODE_MGR=npm         # Node manager
+ADMIN_SHELL=zsh            # Default shell
 ```
 
 ### Examples by Platform
@@ -42,25 +48,21 @@ All platforms use a **satellite .env** at `~/.admin/.env` to find the profile:
 | Linux/macOS | `~/.admin/.env` | `~/.admin` | `.../profiles/myhost.json` |
 | Multi-device | `~/.admin/.env` | `/mnt/nas/.admin` | `.../profiles/myhost.json` |
 
-On WSL, `~/.admin/` contains **only** the satellite `.env`. All data lives at `ADMIN_ROOT`.
+On WSL, `~/.admin/` contains only the satellite `.env`; all data lives at `ADMIN_ROOT`.
 
 ### WSL Dual Package Managers
 
 WSL devices have two package manager contexts:
-- **Linux-side** (`ADMIN_PKG_MGR`): apt, dnf, pacman — manages Linux packages
-- **Windows-side** (`ADMIN_WIN_PKG_MGR`): winget, scoop, choco — manages Windows packages
+- **Linux-side** (`ADMIN_PKG_MGR`): apt, dnf, pacman — Linux packages
+- **Windows-side** (`ADMIN_WIN_PKG_MGR`): winget, scoop, choco — Windows packages
 
-The profile JSON stores both under `preferences.packages` and `preferences.winPackages`.
-The satellite `.env` stores both as flat vars for quick shell access without JSON parsing.
+The profile JSON stores both under `preferences.packages` and `preferences.winPackages`; the satellite `.env` stores both as flat vars for quick shell access.
 
-**Path translation**: Windows paths (e.g., `N:\Dropbox\08_Admin`) are automatically translated
-to WSL paths (e.g., `/mnt/n/Dropbox/08_Admin`) during profile setup via `wslpath` or manual conversion.
+**Path translation**: Windows paths (e.g. `N:\Dropbox\08_Admin`) are translated to WSL paths (e.g. `/mnt/n/Dropbox/08_Admin`) during setup via `wslpath`.
 
 ## Schema Version
 
-Current: **v3.0**
-
-Schema file: `assets/profile-schema.json`
+Current: **v3.0**. Schema file: `assets/profile-schema.json`
 
 ## Profile Structure
 
@@ -87,7 +89,7 @@ Schema file: `assets/profile-schema.json`
 
 ### preferences - Smart Adaptation
 
-The `preferences` section enables the core value proposition: adapting instructions to your setup.
+Adapts instructions to your setup.
 
 ```json
 "preferences": {
@@ -106,11 +108,9 @@ The `preferences` section enables the core value proposition: adapting instructi
 }
 ```
 
-**Usage**: Before suggesting `pip install x`, check `profile.preferences.python.manager`. If it's `uv`, suggest `uv pip install x` instead.
+**Usage**: Before suggesting `pip install x`, check `profile.preferences.python.manager`. If it's `uv`, suggest `uv pip install x`.
 
 ### tools - Full Context
-
-Each tool has rich metadata for AI guidance:
 
 ```json
 "tools": {
@@ -131,7 +131,7 @@ Each tool has rich metadata for AI guidance:
 **Key fields**:
 - `path` / `shimPath`: Where to find the executable
 - `installStatus`: `working`, `failed`, `pending`, `deprecated`
-- `notes`: **AI guidance** - explicit instructions for this tool
+- `notes`: AI guidance — explicit instructions for this tool
 
 ### servers - Remote Management
 
@@ -152,7 +152,7 @@ Each tool has rich metadata for AI guidance:
 ]
 ```
 
-**Usage**: Construct SSH commands from profile data instead of asking user every time.
+**Usage**: Construct SSH commands from profile data instead of asking the user each time.
 
 ### deployments - .env.local References
 
@@ -168,7 +168,7 @@ Each tool has rich metadata for AI guidance:
 }
 ```
 
-**Two-file architecture**: Profile stores device context, `.env.local` stores deployment secrets. Profile **references** env files to avoid duplication.
+**Two-file architecture**: Profile stores device context; `.env.local` stores deployment secrets. Profile references env files to avoid duplication.
 
 ### capabilities - Quick Routing
 
@@ -219,7 +219,19 @@ has_capability "hasWsl"
 
 ## Updating Profiles
 
-After installing a tool:
+Edit the JSON (e.g. with `jq`), or use the loader objects. After installing a tool:
+
+```bash
+# Bash
+jq '.tools.newtool = {
+  present: true,
+  version: "1.0.0",
+  installedVia: "apt",
+  path: "/usr/bin/newtool",
+  installStatus: "working",
+  lastChecked: now | todate
+}' "$ADMIN_PROFILE" > "$ADMIN_PROFILE.tmp" && mv "$ADMIN_PROFILE.tmp" "$ADMIN_PROFILE"
+```
 
 ```powershell
 # PowerShell
@@ -234,36 +246,29 @@ $AdminProfile.tools["newtool"] = @{
 $AdminProfile | ConvertTo-Json -Depth 10 | Set-Content $AdminProfile.paths.deviceProfile
 ```
 
-After encountering an issue:
-
-```powershell
-$AdminProfile.issues.current += @{
-    id = "issue-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
-    tool = "python"
-    issue = "Version conflict with system Python"
-    priority = "high"
-    status = "pending"
-    created = (Get-Date).ToString("o")
-}
-```
+Record issues under `issues.current` with `id`, `tool`, `issue`, `priority`, `status`, `created` so failed approaches are not repeated.
 
 ## Migration
 
 From older profile formats:
 
 ```powershell
-# Preview
-.\scripts\Migrate-Profile.ps1 -DryRun
+# PowerShell
+.\scripts\Migrate-Profile.ps1 -DryRun   # Preview
+.\scripts\Migrate-Profile.ps1           # Execute
+```
 
-# Execute
-.\scripts\Migrate-Profile.ps1
+```bash
+# Bash
+./scripts/migrate-profile.sh --dry-run   # Preview
+./scripts/migrate-profile.sh             # Execute
 ```
 
 ## Best Practices
 
-1. **Always load profile first** - Before any operation
-2. **Check preferences** - Never assume pip/npm/etc.
-3. **Use notes field** - Add AI guidance for tricky tools
-4. **Track issues** - Avoid repeating failed approaches
-5. **Keep history** - Log installations for debugging
-6. **Reference env files** - Don't duplicate secrets in profile
+1. Load the profile before any operation.
+2. Check `preferences` to pick the right package/python/node manager.
+3. Use the `notes` field to record AI guidance for tricky tools.
+4. Track issues so failed approaches are not repeated.
+5. Keep `history` to log installations for debugging.
+6. Reference env files instead of duplicating secrets in the profile.

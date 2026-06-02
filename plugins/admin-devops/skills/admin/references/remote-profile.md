@@ -15,12 +15,7 @@ Sync the admin profiles directory with a private GitHub repo for multi-device ac
 
 ## Overview
 
-The profiles directory (`$ADMIN_ROOT/profiles/`) contains device profiles, server inventory, and deployment configs. Remote sync via a private GitHub repo provides:
-
-- **Version history**: Every profile change is a git commit with device attribution
-- **Multi-device access**: New devices clone the repo to get all profiles instantly
-- **Backup**: Profile data is always recoverable from GitHub
-- **Audit trail**: `git log` shows what changed, when, and from which device
+The profiles directory (`$ADMIN_ROOT/profiles/`) contains device profiles, server inventory, and deployment configs. Remote sync via a private GitHub repo gives version history (each change is a commit with device attribution), multi-device access (clone to get all profiles), backup, and an audit trail.
 
 This is independent of Dropbox/OneDrive sync (`ADMIN_SYNC_PATH`) — GitHub sync is git-native and works offline with periodic push.
 
@@ -57,11 +52,7 @@ scripts/sync-profile.sh --init
 .\scripts\Sync-DeviceProfile.ps1 -RepoInit
 ```
 
-This does:
-1. `git init -b main` in the profiles directory
-2. `git remote add origin` with the configured repo URL
-3. Commits all existing profile files
-4. Pushes to `origin/main`
+This runs `git init -b main` in the profiles directory, adds the configured repo as `origin`, commits all existing profile files, and pushes to `origin/main`.
 
 ## Sync Scripts
 
@@ -173,14 +164,6 @@ scripts/sync-profile.sh --push
 ```
 
 The pull uses `--rebase --autostash` to handle this cleanly.
-
-### SSH key not working
-
-Ensure your SSH key is added to GitHub and the ssh-agent:
-```bash
-ssh -T git@github.com          # Test connection
-ssh-add ~/.ssh/id_rsa           # Add key to agent
-```
 
 ### Sync not running automatically
 
