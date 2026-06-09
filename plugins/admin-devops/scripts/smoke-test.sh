@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Smoke test for v5 wiring. Exits non-zero if any gate misbehaves.
+set -uo pipefail
+BASE="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+fail=0
+expect_exit() {
+  local label="$1" expected="$2"; shift 2
+  "$@" >/dev/null 2>&1
+  local rc=$?
+  if (( rc == expected )); then
+    echo "  [pass] $label (exit=$rc)"
+  else
+    echo "  [FAIL] $label expected=$expected got=$rc"
+    fail=1
+  fi
+}
+
+echo "Smoke test:"
+expect_exit "preflight valid -> 0"     0 "$BASE/scripts/profile-preflight.sh" "$BASE/tests/fixtures/profile/valid.json" --json
+expect_exit "preflight invalid -> 3"   3 "$BASE/scripts/profile-preflight.sh" "$BASE/tests/fixtures/profile/invalid.json" --json
+expect_exit "validate-contract -> 0"   0 "$BASE/scripts/validate-contract.sh"
+expect_exit "validate-dep-graph -> 0"  0 "$BASE/scripts/validate-dep-graph.sh"
+expect_exit "doctor -> 0"              0 "$BASE/scripts/doctor.sh" --json
+expect_exit "provider-core health -> 0" 0 "$BASE/scripts/provider-core.sh" "$BASE/scripts/provider-adapter-template.sh" health_check
+
+if (( fail == 0 )); then
+  echo '{"ok":true,"smoke":"passed"}'
+else
+  echo '{"ok":false,"smoke":"failed"}'
+  exit 1
+fi

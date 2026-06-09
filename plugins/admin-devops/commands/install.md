@@ -23,15 +23,14 @@ Uses a **subagent pipeline**: tool-installer → verify-agent → docs-agent.
 │  /install    │ ──→ │ tool-installer│ ──→ │verify-agent│ ──→ docs-agent (log)
 │  (this cmd)  │     │  (install)   │     │ (verify)   │
 └─────────────┘     └──────────────┘     └────────────┘
-   Profile gate        memory_query →       Store results
-   + TUI interview     Run install          to SimpleMem
-                       commands
+   Profile gate        Run install          Verify, then
+   + TUI interview     commands             log to ~/.admin/
 ```
 
 - **This command**: Profile gate, determine what to install, TUI prompts
-- **tool-installer agent**: Query SimpleMem for past experience, then execute installation
-- **verify-agent**: Confirm the install works, store verification results to SimpleMem
-- **docs-agent**: Log the operation, update profile, store session summary to SimpleMem
+- **tool-installer agent**: Execute installation using the profile's preferred manager
+- **verify-agent**: Confirm the install works and report findings to docs-agent
+- **docs-agent**: Log the operation, update profile, write a session summary
 
 ## Step 1: Profile Gate
 
@@ -73,25 +72,9 @@ Ask: **"Which tool would you like to install?"**
 
 Common options: git, node, python, docker, rust, go, 7zip, ripgrep, fd, fzf, jq, or specify other.
 
-## Step 3: Memory Recall (if SimpleMem available)
+## Step 3: Execute Pipeline
 
-Before executing the pipeline, check if SimpleMem MCP tools are available. If `memory_query` is present, query for past experience:
-
-```
-memory_query: "What happened last time I installed {tool} on {platform}?"
-```
-
-If relevant memories exist, surface them to the user:
-```
-Memory recall: Last installed {tool} on 2026-02-10.
-  Note: Required adding user to docker group afterward.
-```
-
-If SimpleMem is unavailable, skip this step silently and proceed.
-
-## Step 4: Execute Pipeline
-
-### 4A: Package Installation
+### 3A: Package Installation
 
 **Stage 1 - tool-installer agent**: Spawn tool-installer with Task tool.
 
@@ -137,7 +120,7 @@ Provide docs-agent with:
 - Profile update: `.tools.{tool}` with version, manager, status, timestamp
 - If verify-agent found issues: Create issue (category: install, tags: tool name)
 
-### 4B: Repository Clone
+### 3B: Repository Clone
 
 **Stage 1** - Clone directly (no agent needed for git clone):
 1. Ask for destination path (default: `~/projects/`)
@@ -150,7 +133,7 @@ Provide docs-agent with:
 
 **Stage 3** - docs-agent: Log the clone operation.
 
-### 4C: Custom Script
+### 3C: Custom Script
 
 1. Validate script path exists
 2. Ask for confirmation before running
@@ -158,17 +141,7 @@ Provide docs-agent with:
 4. Spawn verify-agent if the script installed a tool
 5. Spawn docs-agent to log the operation
 
-## Step 5: Memory Store (if SimpleMem available)
-
-After the pipeline completes, store the outcome to SimpleMem if available:
-
-```
-memory_add:
-  speaker: "admin:tool-installer"
-  content: "Installed {tool} v{version} on {DEVICE} ({platform}) via {manager}. Result: {success/failure}. {any notable gotchas or issues encountered}"
-```
-
-## Step 6: Report
+## Step 4: Report
 
 After pipeline completes, summarize:
 

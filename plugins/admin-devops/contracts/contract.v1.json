@@ -1,0 +1,14 @@
+{
+  "version": "1.0.0",
+  "routing": {"source": "contracts"},
+  "profile": {
+    "schema": "schemas/profile.schema.json",
+    "preflightRequired": true
+  },
+  "secrets": {
+    "stateMachine": "contracts/secrets-resolution.v1.json",
+    "policy": "policies/secrets-policy.json"
+  },
+  "logging": {"schema": "contracts/log-event.schema.json"},
+  "commands": {"requiredSections": ["Prechecks", "Plan", "Execution", "Post-steps"]}
+}

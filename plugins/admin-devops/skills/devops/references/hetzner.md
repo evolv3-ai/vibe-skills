@@ -383,22 +383,6 @@ log_admin_event "Deleted Hetzner server $SERVER_ID" "OK"
 log_admin_event "Hetzner deployment failed: $ERROR_MSG" "ERROR"
 ```
 
-## SimpleMem Integration
-
-Before provisioning, query for past experience:
-```
-memory_query: "What issues have occurred with Hetzner provisioning?"
-```
-
-After provisioning (success or failure), store the outcome:
-```
-memory_add:
-  speaker: "devops:server-provisioner"
-  content: "Provisioned Hetzner {server_type} in {location}: {IP}. Purpose: {purpose}. Cost: {cost}/mo."
-```
-
----
-
 ## References
 
 - [Hetzner Cloud Console](https://console.hetzner.cloud/)

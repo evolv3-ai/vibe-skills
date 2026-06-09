@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "LogEvent",
+  "type": "object",
+  "required": ["timestamp", "op_id", "component", "action", "target", "status", "latency_ms", "error_code"],
+  "properties": {
+    "timestamp": {"type": "string"},
+    "op_id": {"type": "string"},
+    "component": {"type": "string"},
+    "action": {"type": "string"},
+    "target": {"type": "string"},
+    "status": {"type": "string", "enum": ["ok", "warn", "error"]},
+    "latency_ms": {"type": "number", "minimum": 0},
+    "error_code": {"type": "string"}
+  }
+}

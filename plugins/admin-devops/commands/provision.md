@@ -31,6 +31,14 @@ if [[ $(echo "$result" | jq -r '.exists') != "true" ]]; then
     echo "HALT: No profile. Run /setup-profile first."
     exit 1
 fi
+
+# Strict schema preflight (admin-devops QA #2)
+preflight=$("${CLAUDE_PLUGIN_ROOT}/scripts/profile-preflight.sh" --json)
+if [[ $(echo "$preflight" | jq -r '.ok') != "true" ]]; then
+    echo "$preflight"
+    echo "HALT: profile preflight failed. Try: scripts/profile-preflight.sh --fix-suggestions"
+    exit 1
+fi
 ```
 
 ### Step 2: Provider Selection

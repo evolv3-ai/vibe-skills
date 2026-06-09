@@ -47,31 +47,6 @@ user: "Import MCP servers and deployment configs from my old backup profile"
 assistant: [Uses ops-bot to load backup, compare sections, let user cherry-pick, resolve conflicts, merge safely]
 </example>
 
-## SimpleMem Integration
-
-When the SimpleMem MCP server is available (`memory_add` / `memory_query` tools present), ops-bot logs operations and queries past outcomes.
-
-### Before Operations - Query History
-
-```
-memory_query: "What happened during the last profile migration on {DEVICE}?"
-memory_query: "Any known issues with {satellite} health checks?"
-```
-
-### After Operations - Store Results
-
-```
-memory_add:
-  speaker: "admin:ops-bot"
-  content: "Profile migration from {old_path} to {new_path} on {DEVICE}. Result: {success/failure}. {notes}"
-```
-
-### Graceful Degradation
-
-If `memory_query` / `memory_add` are not available, skip silently. **Never fail an operation because SimpleMem is unavailable.**
-
----
-
 ## Pre-Operation Checklist (MANDATORY)
 
 Before ANY operation:
@@ -243,7 +218,6 @@ Apply a configuration change across multiple files at once.
 ### Common Bulk Operations
 - Update SSH key path across all configs
 - Change ADMIN_ROOT (effectively a migration - delegate to Operation 1)
-- Update SimpleMem URL/token references
 - Rotate API tokens (update vault, verify connectivity)
 
 ### Safety Rules

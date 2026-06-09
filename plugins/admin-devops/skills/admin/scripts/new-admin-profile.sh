@@ -19,10 +19,14 @@
 #   -s, --shell-default SH   Default shell: bash/zsh/fish (default: $SHELL)
 #   -i, --run-inventory      Run tool inventory scan
 #   -f, --force              Overwrite existing profile
+#   --headless               Skip interactive prompts, use parameter defaults
+#   --consumer-type TYPE     Consumer type: workstation/runtime/customer-pc (default: workstation)
+#   --preset NAME            Apply preset defaults (valid: ubuntu)
 #   -h, --help               Show this help
 #
 # Examples:
 #   ./new-admin-profile.sh --run-inventory
+#   ./new-admin-profile.sh --headless --preset ubuntu --run-inventory
 #   ./new-admin-profile.sh --admin-root ~/Dropbox/.admin --multi-device --pkg-mgr brew
 #   ./new-admin-profile.sh --admin-root "N:\Dropbox\08_Admin" --multi-device --win-pkg-mgr winget
 # =============================================================================
@@ -95,6 +99,7 @@ RUN_INVENTORY=false
 FORCE=false
 HEADLESS=false
 CONSUMER_TYPE=""
+PRESET=""
 
 # Script paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -148,6 +153,10 @@ while [[ $# -gt 0 ]]; do
             CONSUMER_TYPE="$2"
             shift 2
             ;;
+        --preset)
+            PRESET="$2"
+            shift 2
+            ;;
         -h|--help)
             head -36 "$0" | tail -30
             exit 0
@@ -158,6 +167,39 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# --- Preset resolution ---
+# Presets provide sensible defaults that can be overridden by explicit flags.
+# Only applied when the corresponding value hasn't been set via CLI arguments.
+CAVEATS=()
+
+if [[ -n "$PRESET" ]]; then
+    case "$PRESET" in
+        ubuntu)
+            # Ubuntu container/server defaults
+            [[ -z "$PKG_MGR" ]] && PKG_MGR="apt"
+            if [[ "$PY_MGR" == "uv" ]] && ! command -v uv &>/dev/null; then
+                if command -v pip3 &>/dev/null || command -v pip &>/dev/null; then
+                    PY_MGR="pip"
+                    CAVEATS+=("py-mgr: uv not found, fell back to pip")
+                else
+                    PY_MGR="none"
+                    CAVEATS+=("py-mgr: neither uv nor pip found — install with: curl -LsSf https://astral.sh/uv/install.sh | sh")
+                fi
+            fi
+            [[ -z "$SHELL_DEFAULT" ]] && SHELL_DEFAULT="bash"
+            [[ -z "$CONSUMER_TYPE" ]] && CONSUMER_TYPE="runtime"
+            [[ -z "$ADMIN_ROOT" ]] && ADMIN_ROOT="/home/${USER}/.admin"
+            # Presets imply headless — no interactive prompts
+            HEADLESS=true
+            ;;
+        *)
+            err "Unknown preset: $PRESET"
+            echo "Valid presets: ubuntu"
+            exit 1
+            ;;
+    esac
+fi
 
 # Detect platform
 detect_platform() {
@@ -610,9 +652,9 @@ cat > "$PROFILE_PATH" <<EOF
       "date": "$TIMESTAMP",
       "action": "profile_create",
       "tool": "new-admin-profile.sh",
-      "method": "tui-driven",
+      "method": "$(if [[ -n "$PRESET" ]]; then echo "preset-${PRESET}"; elif [[ "$HEADLESS" == "true" ]]; then echo "headless"; else echo "tui-driven"; fi)",
       "status": "success",
-      "details": "Profile created via TUI interview"
+      "details": "Profile created$(if [[ -n \"$PRESET\" ]]; then echo \" via preset-${PRESET}\"; elif [[ \"$HEADLESS\" == \"true\" ]]; then echo \" headless\"; else echo \" via TUI interview\"; fi)"
     }
   ],
   "capabilities": $CAPABILITIES_JSON
@@ -693,7 +735,17 @@ if [[ "$HEADLESS" != "true" ]]; then
     echo ""
 fi
 
+# Report caveats from preset fallbacks
+if [[ ${#CAVEATS[@]} -gt 0 ]]; then
+    warn "Preset caveats:"
+    for caveat in "${CAVEATS[@]}"; do
+        warn "  - $caveat"
+    done
+fi
+
 # Output JSON for agent consumption
 WIN_PKG_JSON=""
 [[ -n "$WIN_PKG_MGR" ]] && WIN_PKG_JSON=',"winPackages":"'"$WIN_PKG_MGR"'"'
-echo '{"success":true,"path":"'"$PROFILE_PATH"'","adminRoot":"'"$ADMIN_ROOT"'","device":"'"$DEVICE_NAME"'","preferences":{"packages":"'"$PKG_MGR"'"'"$WIN_PKG_JSON"',"python":"'"$PY_MGR"'","node":"'"$NODE_MGR"'","shell":"'"$SHELL_DEFAULT"'"}}'
+PRESET_JSON=""
+[[ -n "$PRESET" ]] && PRESET_JSON=',"preset":"'"$PRESET"'"'
+echo '{"success":true,"path":"'"$PROFILE_PATH"'","adminRoot":"'"$ADMIN_ROOT"'","device":"'"$DEVICE_NAME"'"'"$PRESET_JSON"',"preferences":{"packages":"'"$PKG_MGR"'"'"$WIN_PKG_JSON"',"python":"'"$PY_MGR"'","node":"'"$NODE_MGR"'","shell":"'"$SHELL_DEFAULT"'"}}'

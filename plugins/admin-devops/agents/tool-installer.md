@@ -39,42 +39,6 @@ user: "Install Docker and Docker Compose"
 assistant: [Uses tool-installer agent to handle multi-step Docker installation]
 </example>
 
-## SimpleMem Integration
-
-When the SimpleMem MCP server is available (`memory_add` / `memory_query` tools present), tool-installer queries past experience before installing and stores outcomes after.
-
-### Before Install - Query Past Experience
-
-Before starting any installation, query SimpleMem:
-
-```
-memory_query: "What happened last time I installed {tool} on {platform}?"
-```
-
-This surfaces:
-- Past installation issues and their fixes
-- Version compatibility notes for this platform
-- Which package manager worked best
-- Known gotchas
-
-If no relevant memories exist, proceed normally.
-
-### After Install - Store Outcome
-
-After installation completes (success or failure):
-
-```
-memory_add:
-  speaker: "admin:tool-installer"
-  content: "Installed {tool} v{version} on {DEVICE} ({platform}) via {manager}. Result: {success/failure}. {notes about gotchas or issues}"
-```
-
-### Graceful Degradation
-
-If `memory_query` / `memory_add` are not available, skip silently. **Never fail an installation because SimpleMem is unavailable.**
-
----
-
 ## Pre-Installation Checklist
 
 Before ANY installation:

@@ -370,22 +370,6 @@ log_admin_event "Cancelled Contabo VPS $INSTANCE_ID" "OK"
 log_admin_event "Contabo deployment failed: $ERROR_MSG" "ERROR"
 ```
 
-## SimpleMem Integration
-
-Before provisioning, query for past experience:
-```
-memory_query: "What issues have occurred with Contabo provisioning?"
-```
-
-After provisioning (success or failure), store the outcome:
-```
-memory_add:
-  speaker: "devops:server-provisioner"
-  content: "Provisioned Contabo VPS {product_id} in {region}: {IP}. Purpose: {purpose}. Cost: {cost}/mo."
-```
-
----
-
 ## References
 
 - [Contabo Control Panel](https://my.contabo.com/)

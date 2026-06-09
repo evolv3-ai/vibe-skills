@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibe-skills.local/admin-devops/contract.schema.json",
+  "title": "AdminDevOpsContract",
+  "type": "object",
+  "required": ["version", "routing", "profile", "secrets", "logging", "commands"],
+  "properties": {
+    "version": {"type": "string"},
+    "routing": {"type": "object"},
+    "profile": {"type": "object"},
+    "secrets": {"type": "object"},
+    "logging": {"type": "object"},
+    "commands": {"type": "object"}
+  },
+  "additionalProperties": true
+}

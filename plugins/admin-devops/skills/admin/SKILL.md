@@ -93,8 +93,7 @@ admin (core)
   ├── 9 satellite skills: devops, oci, hetzner, contabo, digital-ocean, vultr, linode, coolify, kasm
   ├── 7 agents: profile-validator, docs-agent, verify-agent, tool-installer, ops-bot, server-provisioner, deployment-coordinator
   ├── Profile system: ~/.admin/.env (satellite) → $ADMIN_ROOT/profiles/*.json (+ GitHub sync)
-  ├── Secrets: 3 Infisical projects (operator/runtime/customer) → vault (fallback) → .env (legacy)
-  └── SimpleMem: Long-term memory across sessions (graceful degradation)
+  └── Secrets: 3 Infisical projects (operator/runtime/customer) → vault (fallback) → .env (legacy)
 ```
 
 ### Data Flow
@@ -102,8 +101,8 @@ admin (core)
 ```
 Satellite .env (bootstrap)  →  profile.json (device config)  →  Agent decisions
         ↓                              ↓                              ↓
-  ADMIN_ROOT, DEVICE,          tools, servers, prefs,          SimpleMem storage
-  PLATFORM, SECRETS_BACKEND    secretRefs, fileRefs            (speaker convention)
+  ADMIN_ROOT, DEVICE,          tools, servers, prefs,          Session logs
+  PLATFORM, SECRETS_BACKEND    secretRefs, fileRefs            (~/.admin/logs/)
         ↓                              ↓
   generated/.env (pre-rendered) → Infisical (3 projects) → vault.age → .env
 ```
@@ -126,8 +125,7 @@ Satellite .env (bootstrap)  →  profile.json (device config)  →  Agent decisi
 | server-provisioner | sonnet | Cloud VM provisioning across providers | Read, Write, Bash, AskUserQuestion |
 | deployment-coordinator | sonnet | End-to-end app deployments (Coolify, KASM) | Read, Write, Bash, AskUserQuestion |
 
-All agents use SimpleMem graceful degradation and profile gate as first step.
-Details: `references/agent-teams.md`, `references/memory-integration.md`
+All agents run the profile gate as their first step. See `references/agent-teams.md` for collaboration patterns.
 
 ### Satellite Dependency Graph
 
@@ -165,7 +163,6 @@ admin (core) ─── required by all satellites
 | macOS/Linux admin | references/unix.md |
 | MCP server management | references/mcp.md |
 | Skill registry | references/skills-registry.md |
-| Memory integration | references/memory-integration.md |
 | Secrets / Infisical setup | references/infisical.md |
 | Vault (age encryption) | references/vault-guide.md |
 | Profile sync (GitHub) | references/remote-profile.md |

@@ -838,7 +838,6 @@ Claude Desktop runs on Windows, so all config paths must be Windows paths:
 |--------|--------------|---------|
 | Desktop Commander | `@anthropic-ai/desktop-commander` | File ops + terminals |
 | Context7 | `context7-mcp` | Library documentation |
-| SimpleMem | Self-hosted (HTTP) | Persistent semantic memory |
 | Obsidian | Various | Notes integration |
 | Notion | Various | Notion integration |
 
@@ -1150,7 +1149,6 @@ Copy-Item $backups[0].FullName $configPath
 - @modelcontextprotocol/server-postgres
 - @modelcontextprotocol/server-sqlite
 - @modelcontextprotocol/server-redis
-- SimpleMem (self-hosted, HTTP transport) — persistent semantic memory
 - @pashvc/mcp-server-coolify
 - @pashvc/mcp-server-oci
 - @pashvc/mcp-server-hetzner
@@ -1207,7 +1205,7 @@ Cons: manual build and updates
 ```json
 { "type": "http", "url": "https://example.com/mcp", "headers": { "Authorization": "Bearer TOKEN" } }
 ```
-Used for: cloud-hosted or self-hosted MCP servers (e.g., SimpleMem, remote APIs)
+Used for: cloud-hosted or self-hosted MCP servers (remote APIs, HTTP-only services)
 Pros: no local process, shared across devices, centrally managed
 Cons: requires network, needs auth token
 

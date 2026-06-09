@@ -1,0 +1,12 @@
+{
+  "version": "1.0.0",
+  "components": [
+    {"id": "admin.profile-preflight", "deps": []},
+    {"id": "admin.error-format", "deps": []},
+    {"id": "admin.retry-lib", "deps": []},
+    {"id": "devops.provider-core", "deps": ["admin.profile-preflight"]},
+    {"id": "devops.provision", "deps": ["admin.profile-preflight", "devops.provider-core"]},
+    {"id": "devops.deploy", "deps": ["admin.profile-preflight", "devops.provider-core"]},
+    {"id": "admin.doctor", "deps": ["admin.profile-preflight"]}
+  ]
+}
