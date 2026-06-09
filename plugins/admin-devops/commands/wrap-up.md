@@ -333,8 +333,6 @@ Task: docs-agent
     tags: (best-effort keywords extracted from input; empty list is acceptable)
     device: <DEVICE>
     platform: <PLATFORM>
-→ If SimpleMem available: memory_add { speaker: "admin:docs-agent", content: "<input>", tags: ["lesson", ...extracted_keywords] }
-→ SimpleMem unavailable: skip memory_add silently — file creation always proceeds
 → Return: { "file": "<full_path>" }
 ```
 
@@ -389,8 +387,6 @@ Task: docs-agent
       Actions: <comma-separated list of actions taken, e.g. "closed issue #25, committed 2 files, pushed to origin/main, captured lesson">
       Outcome: success | partial | none
       Issues: <issue IDs or URLs if closed, otherwise "none">
-→ If SimpleMem available: memory_add { speaker: "admin:docs-agent", content: "Wrap-up on <DEVICE> (<date>): <actions>. Outcome: <outcome>." }
-→ SimpleMem unavailable: skip memory_add silently
 ```
 
 ---
@@ -407,7 +403,6 @@ Task: docs-agent
 | Git repo has no remote | Commit succeeds; push step skipped with: `(no remote configured — push skipped)` |
 | `operations.log` doesn't exist | Skip install log scan silently; still ask install question |
 | All steps skipped/empty | Print: `Session closed — nothing to track.` + still write sessions.log entry |
-| SimpleMem unavailable | Skip `memory_add` silently — flat file log always written |
 | User declines push | `Committed locally. Push when ready: git push` |
 | Lesson prompt — empty input | Step skipped silently; summary shows `Lesson: skipped` |
 | Lesson prompt — one-word input | docs-agent creates file; title = the word; resolution = the word |

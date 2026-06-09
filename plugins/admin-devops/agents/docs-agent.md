@@ -480,30 +480,3 @@ Outcome: success
 File: ~/.admin/logs/sessions.log
 ```
 
----
-
-## SimpleMem Integration
-
-When the SimpleMem MCP server is available (`memory_add` / `memory_query` tools present), docs-agent stores session summaries to persistent semantic memory in addition to flat file logging.
-
-### Session End - Store Summary
-
-After writing the session note to `sessions.log`, also store to SimpleMem:
-
-```
-memory_add:
-  speaker: "admin:docs-agent"
-  content: "Admin session on {DEVICE} ({date}): {summary}. Actions: {actions}. Outcome: {outcome}."
-```
-
-This enables semantic search over past sessions (e.g., "What did we do last time we set up Docker?") that flat logs cannot provide.
-
-### Graceful Degradation
-
-If `memory_add` is not available (server down, not configured), skip the memory operation silently. **Never fail a file operation because SimpleMem is unavailable.** Flat file logging always proceeds regardless.
-
-### Privacy Rules
-
-- Never store API keys, passwords, or tokens in memories
-- Use `~/.admin/` paths, not absolute paths with usernames
-- Device hostnames and tool versions are fine

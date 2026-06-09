@@ -54,10 +54,6 @@ SSH_CONFIG_PATH=                         # Default: ~/.ssh/config
 ADMIN_SYNC_ENABLED=                      # true | false
 ADMIN_SYNC_PATH=                         # Synced folder (e.g., ~/Dropbox/Admin)
 
-# --- SimpleMem ---
-SIMPLEMEM_URL=                           # e.g., https://mem.self-host.io/mcp
-SIMPLEMEM_TOKEN=                         # in vault
-
 # --- Cloud Providers (secrets in vault) ---
 OCI_CONFIG_PATH=                         # Default: ~/.oci/config
 OCI_TENANCY_OCID=                        # in vault

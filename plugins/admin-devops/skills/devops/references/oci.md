@@ -252,22 +252,6 @@ log_admin_event "Terminated OCI instance $INSTANCE_ID" "OK"
 log_admin_event "OCI deployment failed: OUT_OF_HOST_CAPACITY in $REGION" "ERROR"
 ```
 
-## SimpleMem Integration
-
-Before provisioning, query for past experience:
-```
-memory_query: "What issues have occurred with OCI provisioning? Any capacity problems?"
-```
-
-After provisioning (success or failure), store the outcome:
-```
-memory_add:
-  speaker: "devops:server-provisioner"
-  content: "Provisioned OCI {shape} in {region}: {IP}. Purpose: {purpose}. Always Free: {yes/no}."
-```
-
----
-
 ## Additional Documentation
 
 - [Installation Guide](docs/INSTALL.md) - Install OCI CLI on any OS

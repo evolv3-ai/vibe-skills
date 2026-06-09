@@ -401,22 +401,6 @@ log_admin_event "Deleted Linode $LINODE_ID" "OK"
 log_admin_event "Linode deployment failed: $ERROR_MSG" "ERROR"
 ```
 
-## SimpleMem Integration
-
-Before provisioning, query for past experience:
-```
-memory_query: "What issues have occurred with Linode provisioning?"
-```
-
-After provisioning (success or failure), store the outcome:
-```
-memory_add:
-  speaker: "devops:server-provisioner"
-  content: "Provisioned Linode {type} in {region}: {IP}. Purpose: {purpose}. Cost: {cost}/mo."
-```
-
----
-
 ## References
 
 - [Linode Cloud Manager](https://cloud.linode.com/)

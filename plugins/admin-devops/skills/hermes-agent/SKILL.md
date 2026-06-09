@@ -220,4 +220,3 @@ After deploying to a remote server, update the device profile:
 1. Add `hermes-agent` to `profile.servers[].apps[]`
 2. Record deployment in `profile.deployments{}`
 3. Log via `log_admin_event`
-4. Store outcome in SimpleMem with `devops:deployment-coordinator` speaker

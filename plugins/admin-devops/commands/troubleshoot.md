@@ -25,36 +25,7 @@ All issues are stored as markdown files with timestamp-based IDs:
 └── issue_20260202_155500_node_version_conflict.md
 ```
 
-## SimpleMem Integration
-
-When SimpleMem MCP tools are available, the troubleshoot command uses persistent memory for smarter issue handling:
-
-### On `/troubleshoot new` - Query Past Issues
-
-Before creating, check if a similar issue has been seen before:
-```
-memory_query: "What issues have occurred with {category} on {platform}?"
-```
-
-If relevant memories exist, surface them:
-```
-Memory recall: Similar issue found from 2026-02-10.
-  Previous solution: Added user to docker group and restarted daemon.
-  Consider: Is this the same root cause?
-```
-
-### On `/troubleshoot resolve` - Store Solution
-
-After resolving an issue, store the solution for future recall:
-```
-memory_add:
-  speaker: "admin:troubleshoot"
-  content: "Resolved issue '{title}' ({category}) on {DEVICE}: {resolution_description}. Resolution type: {fixed/workaround/etc}."
-```
-
-### Graceful Degradation
-
-If SimpleMem is unavailable, skip memory operations silently. Issue files in `~/.admin/issues/` are always the authoritative record.
+Issue files in `~/.admin/issues/` are the authoritative record. Cross-reference past issues by searching the directory (e.g., `grep -lri docker ~/.admin/issues/`).
 
 ---
 

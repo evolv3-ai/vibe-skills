@@ -97,39 +97,6 @@ Full details: `references/profile-gate.md`
 - If the task is **remote infrastructure**, continue.
 - If ambiguous, ask a clarifying question before proceeding.
 
-## SimpleMem Integration (Optional, Graceful Degradation)
-
-SimpleMem enhances provisioning decisions but never blocks operations. If unavailable, skip silently.
-
-**Query before provisioning:**
-```
-memory_query: "What issues have occurred provisioning on {provider} in {region}?"
-memory_query: "What happened last time I deployed {app} to {provider}?"
-```
-
-**Store after provisioning (success):**
-```
-memory_add:
-  speaker: "devops:server-provisioner"
-  content: "Provisioned {provider} {server_type} in {region}: {IP}. Purpose: {purpose}. Cost: {cost}/mo."
-```
-
-**Store after provisioning (failure):**
-```
-memory_add:
-  speaker: "devops:server-provisioner"
-  content: "{provider} provisioning failed in {region}: {error}. Workaround: {fix_if_any}."
-```
-
-**Store after deployment:**
-```
-memory_add:
-  speaker: "devops:deployment-coordinator"
-  content: "Deployed {app} to {server_id}: {outcome}. {notes}"
-```
-
----
-
 ## Task Routing
 
 | Task | Reference |
@@ -149,15 +116,13 @@ memory_add:
 
 Use `profile.servers[]` for inventory; do not maintain a separate list. Profile is the source of truth.
 
-## Provisioning Workflow (7 Steps)
+## Provisioning Workflow (5 Steps)
 
 1. Choose provider
 2. Load secrets via `secrets` CLI (provider API key)
-3. Query SimpleMem for past experience with this provider/region
-4. Run provider workflow (see provider reference)
-5. Update `profile.servers[]` and `profile.deployments{}`
-6. Log the operation via `log_admin_event`
-7. Store outcome in SimpleMem
+3. Run provider workflow (see provider reference)
+4. Update `profile.servers[]` and `profile.deployments{}`
+5. Log the operation via `log_admin_event`
 
 ## Logging (MANDATORY)
 
@@ -202,7 +167,7 @@ plugins/admin-devops/
 | server-provisioner | sonnet | Cloud VM provisioning via provider CLIs |
 | deployment-coordinator | sonnet | End-to-end app deployment (Coolify/KASM) |
 
-Both agents use SimpleMem graceful degradation and profile gate as first step.
+Both agents run the profile gate as their first step.
 
 ---
 

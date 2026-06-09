@@ -502,34 +502,6 @@ Some failures are expected to be temporary:
 
 ---
 
-## SimpleMem Integration
-
-When the SimpleMem MCP server is available (`memory_add` / `memory_query` tools present), verify-agent stores verification outcomes to persistent semantic memory.
-
-### After Verification - Store Results
-
-After completing any verification mode, store the outcome:
-
-```
-memory_add:
-  speaker: "admin:verify-agent"
-  content: "Verified {tool/server/deployment} on {DEVICE}: {PASS/FAIL}. {details}. {fix if applicable}"
-```
-
-**High-value memories** (always store):
-- Verification failures with error details and fixes
-- Unexpected findings (version mismatch, missing deps)
-- Successful verifications after previous failures (confirms fix worked)
-
-**Low-value** (skip):
-- Routine passes with no notable findings
-
-### Graceful Degradation
-
-If `memory_add` is not available, skip silently. Verification results are still reported to docs-agent for logging. **Never fail a verification because SimpleMem is unavailable.**
-
----
-
 ### Permanent Failures
 
 These indicate real problems:

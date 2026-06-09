@@ -382,22 +382,6 @@ log_admin_event "Deleted DigitalOcean droplet $DROPLET_ID" "OK"
 log_admin_event "DigitalOcean deployment failed: $ERROR_MSG" "ERROR"
 ```
 
-## SimpleMem Integration
-
-Before provisioning, query for past experience:
-```
-memory_query: "What issues have occurred with DigitalOcean provisioning?"
-```
-
-After provisioning (success or failure), store the outcome:
-```
-memory_add:
-  speaker: "devops:server-provisioner"
-  content: "Provisioned DigitalOcean droplet {size} in {region}: {IP}. Purpose: {purpose}. Cost: {cost}/mo."
-```
-
----
-
 ## References
 
 - [DigitalOcean Console](https://cloud.digitalocean.com/)

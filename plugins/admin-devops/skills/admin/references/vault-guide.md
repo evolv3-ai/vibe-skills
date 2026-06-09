@@ -250,7 +250,7 @@ $ADMIN_ROOT/.env (manifest - all keys visible, secrets empty)
 
 After vault migration, the `.env` file becomes a **manifest** rather than being deleted:
 
-- **Non-secret values** (ADMIN_ROOT, ADMIN_DEVICE, SIMPLEMEM_URL, etc.) stay populated and editable
+- **Non-secret values** (ADMIN_ROOT, ADMIN_DEVICE, OCI_REGION, etc.) stay populated and editable
 - **Secret values** (tokens, passwords, API keys) show empty with `# in vault` comment
 - Users can see all config keys at a glance without decrypting the vault
 - New non-secret keys can be added directly to the manifest
