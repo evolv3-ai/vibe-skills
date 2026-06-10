@@ -11,7 +11,7 @@ description: >-
   "sync skills to flywheels", "flywheel doctor".
 ---
 
-<!-- TOC: Mental Model | Fleet | Operator Loop | Skill Mirror | Provisioning | Quirks | References | Companions -->
+<!-- TOC: Mental Model | Fleet Resolution | Operator Loop | Skill Mirror | Provisioning | Quirks | References | Companions -->
 
 # Flywheel Admin — Drive the ACFS Fleet
 
@@ -19,10 +19,10 @@ description: >-
 > for ntm/agent-mail/cass/etc. — those have their own skills; this one tells you which to
 > reach for and in what order.
 
-> **Read first.** Always read the project's `CLAUDE.md` before acting — it is the source
-> of truth for the current fleet inventory, Tailscale hostnames, SSH config, and any
-> recent operational notes. This skill captures the *patterns*; CLAUDE.md captures
-> *today's state*.
+> **Read first.** Always resolve the fleet from your device profile before acting —
+> `profile.servers[]` (entries tagged `flywheel`) is the source of truth for the current
+> fleet inventory, SSH aliases, and per-host notes. This skill captures the *patterns*;
+> your profile captures *today's state*. See **Fleet Resolution** below.
 
 > **Found a bug or missing pattern in this skill? Do NOT try to fix it inline.**
 > File an issue at **https://github.com/evolv3-ai/vibe-skills/issues** with a clear title
@@ -45,18 +45,46 @@ Three layers, in dependency order:
 
 You operate at layer 3 most of the time. When something breaks, work down: probe transport, then check project state, then inspect panes.
 
-## Fleet
+## Fleet Resolution
 
-Read `CLAUDE.md` in this repo for the live inventory. The current fleet is small (2 hosts) and Tailscale-joined under the `dwelf-stork.ts.net` tailnet. SSH aliases on the Windows host (`C:\Users\Owner\.ssh\config`) and on wsl-hermes resolve `flywheel-1-oci` and `flywheel-2-oci` directly. Always prefer the alias over raw IPs — if Tailscale is up, MagicDNS Just Works.
+The fleet is defined in your device profile (`$ADMIN_ROOT/profiles/$ADMIN_DEVICE.json`),
+never in this skill. Each fleet host is a `servers[]` entry tagged `flywheel`:
 
-```bash
-# From any operator (Windows PowerShell, WSL, or any tailnet-joined client)
-ssh flywheel-1-oci 'acfs doctor'
-ssh flywheel-2-oci 'ntm list'
+```json
+{
+  "name": "flywheel-1",
+  "role": "swarm-host",
+  "sshAlias": "flywheel-1",
+  "provider": "oci",
+  "tags": ["flywheel"],
+  "notes": "Ubuntu 24.04 LTS; watch disk headroom"
+}
 ```
 
-For all connection paths (Windows / WSL / public-IP fallback) and SSH keys, see
-[references/connect.md](references/connect.md).
+Enumerate the fleet, then pick a host by `role` (or by `notes` when several qualify):
+
+```bash
+source ~/.admin/.env   # ADMIN_ROOT, ADMIN_DEVICE
+PROFILE="$ADMIN_ROOT/profiles/$ADMIN_DEVICE.json"
+
+# All flywheel hosts: name, role, sshAlias, notes
+jq -r '.servers[]? | select((.tags // []) | index("flywheel"))
+       | [.name, .role, .sshAlias, (.notes // "")] | @tsv' "$PROFILE"
+
+# One host by role
+HOST=$(jq -r '.servers[]? | select((.tags // []) | index("flywheel"))
+              | select(.role == "swarm-host") | .sshAlias' "$PROFILE" | head -n1)
+ssh "$HOST" 'acfs doctor'
+```
+
+**No matching entries? STOP.** Do not guess hostnames or fall back to hardcoded values —
+run the one-time migration in [references/connect.md](references/connect.md) to register
+your fleet, then retry.
+
+Connection is always `ssh <sshAlias>`; the alias→address mapping lives in your
+`~/.ssh/config` (see [references/connect.md](references/connect.md) for every operator
+surface and the public-IP fallback pattern). Throughout this skill, `flywheel-N` (and
+`flywheel-N-oci` in older examples) stands for a resolved `sshAlias` from *your* profile.
 
 ## The Operator Loop
 
@@ -66,19 +94,24 @@ Every Flywheel session follows this loop. Skip phases you've already done.
 
 ```bash
 # Health snapshot per host (run in parallel if you can)
-ssh flywheel-1-oci 'uptime; free -h | head -2; df -h / | tail -1; acfs doctor 2>&1 | tail -5; ntm list'
-ssh flywheel-2-oci 'uptime; free -h | head -2; df -h / | tail -1; acfs doctor 2>&1 | tail -5; ntm list'
+for h in $(jq -r '.servers[]? | select((.tags // []) | index("flywheel")) | .sshAlias' "$PROFILE"); do
+  ssh "$h" 'uptime; free -h | head -2; df -h / | tail -1; acfs doctor 2>&1 | tail -5; ntm list'
+done
 ```
 
 Red flags: load > #CPUs, memory >85 %, disk >75 %, `acfs doctor` red lines, dead `ntm list`.
 
 ### 2. Pick a target — which flywheel for this work?
 
+Pick by the `role` and `notes` fields of your `servers[]` entries — per-host facts
+(OS version, disk headroom, installed extras like PostgreSQL or beads_rust) belong in
+`notes`, not in this skill. Rules of thumb:
+
 | Need | Pick |
 |------|------|
-| Stable, mature Ubuntu 24.04 | flywheel-1 (lower disk headroom — watch it) |
-| Newest stack, PostgreSQL, beads_rust, meta_skill | flywheel-2 |
-| Two independent swarms in parallel | one each |
+| Stable base for a long-running swarm | the host whose `notes` mark it LTS/stable |
+| Newest stack features | the host whose `notes` mark the newer stack |
+| Two independent swarms in parallel | one host each |
 
 If both are loaded, prefer scaling on the host with the most free RAM rather than spinning a third VPS.
 
@@ -163,12 +196,13 @@ If a swarm is stuck and the panes won't respond, use the unstick ladder in
 
 ## Skill Mirror
 
-The local `.claude/skills/` bundle is the canonical source. After non-trivial changes here, push to both flywheels so all three remote agent families (Claude / Codex / Gemini) see the same set:
+The local `.claude/skills/` bundle is the canonical source. After non-trivial changes here, push to every flywheel so all three remote agent families (Claude / Codex / Gemini) see the same set:
 
 ```bash
 # Repeat per flywheel
 ssh flywheel-N-oci 'mkdir -p ~/skills-staging ~/.claude/skills ~/.codex/skills ~/.gemini/skills'
-scp -r "D:/flywheel/.claude/skills/." flywheel-N-oci:~/skills-staging/
+# SKILLS_SRC = your canonical local skills bundle (e.g. <repo>/.claude/skills)
+scp -r "$SKILLS_SRC/." flywheel-N-oci:~/skills-staging/
 ssh flywheel-N-oci 'cp -r ~/skills-staging/. ~/.claude/skills/ \
   && cp -r ~/skills-staging/. ~/.codex/skills/ \
   && cp -r ~/skills-staging/. ~/.gemini/skills/ \
@@ -185,16 +219,17 @@ This is the rare path. Don't reach for it unless the existing fleet can't absorb
 
 1. Pick a provider — `admin-devops:oci`, `admin-devops:hetzner`, `admin-devops:digital-ocean`, etc. (each has a dedicated skill). OCI ARM64 Always-Free is the current default.
 2. Bring the VM up via the provider's skill; install Ubuntu 24.04 LTS (LTS, not interim).
-3. Join the tailnet `dwelf-stork.ts.net` (`sudo tailscale up --authkey=...`).
+3. Join your tailnet (`sudo tailscale up --authkey=...`).
 4. Bootstrap ACFS: `curl -fsSL https://raw.githubusercontent.com/Dicklesworthstone/agentic_coding_flywheel_setup/main/install.sh | bash -s -- --easy-mode --skip-ubuntu-upgrade`.
 5. Verify with `acfs doctor`; expect ≥ 40/45 green.
 6. Patch known ACFS-v0.5.0/v0.6.0 quirks — see [references/known-quirks.md](references/known-quirks.md) (ARM64 DCG binary, agent-mail Rust vs Python, bubblewrap, SSH keepalive).
 7. Mirror the skills bundle (see above).
-8. Add the new host to `CLAUDE.md` and to `~/.ssh/config` on Windows and wsl-hermes.
+8. Add the new host to `profile.servers[]` (tagged `flywheel`) and a `Host` block to
+   `~/.ssh/config` on each operator surface (see [references/connect.md](references/connect.md)).
 
 ## Quirks (must-know)
 
-- ACFS v0.5.0 is the current pinned version on both hosts; v0.6.0 is upstream. Refresh `~/.acfs/checksums.yaml` before `acfs-update --stack` or it bails.
+- ACFS v0.5.0 is the current pinned version on existing fleet hosts; v0.6.0 is upstream. Refresh `~/.acfs/checksums.yaml` before `acfs-update --stack` or it bails.
 - DCG aarch64 release tarball ships the wrong-arch binary. Build from source.
 - Agent Mail comes in Python and Rust flavors; the Rust one is what ACFS actually wants. Don't trust `acfs doctor` recommending the Python repo.
 - `ntm send` excludes the operator pane by default. `--all` includes it. Don't blast a `--all` to a session you haven't checked.
