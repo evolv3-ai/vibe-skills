@@ -60,11 +60,11 @@
     },
     "kasm": {
       "name": "KASM Workspaces",
-      "skill": "devops",
+      "skill": "kasm",
       "requirements": [
         "docker"
       ],
-      "reference": "references/kasm.md"
+      "reference": "../kasm/SKILL.md"
     }
   },
   "servers": {},
