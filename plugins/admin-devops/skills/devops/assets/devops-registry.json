@@ -34,11 +34,11 @@
     },
     "digitalocean": {
       "name": "DigitalOcean",
-      "skill": "devops",
+      "skill": "digital-ocean",
       "configRequired": [
         "DO_TOKEN"
       ],
-      "reference": "references/digitalocean.md"
+      "reference": "../digital-ocean/SKILL.md"
     },
     "linode": {
       "name": "Linode (Akamai)",
