@@ -12,6 +12,12 @@ license: MIT
 
 # Oracle Cloud Infrastructure (OCI)
 
+## CRITICAL MUST: Secrets and .env
+
+- NEVER store live `.env` files or credentials inside any skill folder.
+- `.env.template` files belong only in `assets/` within a skill.
+- Store live secrets in `~/.admin/.env` (or another non-skill location you control) and reference them from there.
+
 **Status**: Production Ready | **Dependencies**: OCI CLI, SSH key pair
 
 ---
