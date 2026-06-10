@@ -173,7 +173,6 @@ Both agents run the profile gate as their first step.
 
 ## Scripts / References
 
-- Inventory scripts: `scripts/agentDevopsInventory.ts`, `scripts/agent_devops_inventory.py`
 - Provider references: `references/*.md` (per-provider deployment guides)
 - Provider skills: sibling skills under this plugin (oci, hetzner, coolify, etc.)
 - Inventory format spec: `references/INVENTORY_FORMAT.md`
