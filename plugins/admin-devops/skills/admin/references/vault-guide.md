@@ -81,7 +81,7 @@ age -e -r "$PUBLIC_KEY" -a -o $ADMIN_ROOT/vault.age $ADMIN_ROOT/.env
 Add to `~/.admin/.env`:
 ```bash
 ADMIN_VAULT=enabled
-AGE_KEY_PATH=/mnt/c/Users/Owner/.age/key.txt   # Explicit path (cross-platform)
+AGE_KEY_PATH=/mnt/c/Users/user/.age/key.txt   # Explicit path (cross-platform)
 ```
 
 `AGE_KEY_PATH` tells all scripts (bash, PowerShell, TypeScript) where to find the key. If omitted, defaults to `~/.age/key.txt`. Set it explicitly on WSL or multi-device setups where `$HOME` differs between shells.
@@ -225,11 +225,11 @@ Requires: `npm install age-encryption`
 
 ```
 ~/.admin/.env (satellite - per-device bootstrap, no secrets)
-  ADMIN_ROOT=/mnt/c/Users/Owner/.admin
-  ADMIN_DEVICE=WOPR3
+  ADMIN_ROOT=/mnt/c/Users/user/.admin
+  ADMIN_DEVICE=DEVICE01
   ADMIN_PLATFORM=wsl
   ADMIN_VAULT=enabled                                ← Feature flag
-  AGE_KEY_PATH=/mnt/c/Users/Owner/.age/key.txt       ← Explicit key location
+  AGE_KEY_PATH=/mnt/c/Users/user/.age/key.txt       ← Explicit key location
 
 $AGE_KEY_PATH (private key - NEVER commit/sync)
   AGE-SECRET-KEY-1...
@@ -240,7 +240,7 @@ $ADMIN_ROOT/vault.age (encrypted - git-safe, sync-safe)
   -----END AGE ENCRYPTED FILE-----
 
 $ADMIN_ROOT/.env (manifest - all keys visible, secrets empty)
-  ADMIN_ROOT=/mnt/c/Users/Owner/.admin               ← non-secret: populated
+  ADMIN_ROOT=/mnt/c/Users/user/.admin               ← non-secret: populated
   HCLOUD_TOKEN=                                       # in vault  ← secret: empty
   OCI_TENANCY_OCID=                                   # in vault
   ...
@@ -280,14 +280,14 @@ On WSL/Windows dual setups, `$HOME` differs between shells:
 | Shell | `$HOME` | Default key path |
 |-------|---------|-----------------|
 | Bash (WSL) | `/home/user` | `/home/user/.age/key.txt` |
-| PowerShell (Win) | `C:\Users\Owner` | `C:\Users\Owner\.age\key.txt` |
+| PowerShell (Win) | `C:\Users\user` | `C:\Users\user\.age\key.txt` |
 
 Store the key on the Windows filesystem so both sides can reach it:
 
 ```
-Physical:   C:\Users\Owner\.age\key.txt
-WSL sees:   /mnt/c/Users/Owner/.age/key.txt
-PowerShell: C:\Users\Owner\.age\key.txt  (via auto WSL path conversion)
+Physical:   C:\Users\user\.age\key.txt
+WSL sees:   /mnt/c/Users/user/.age/key.txt
+PowerShell: C:\Users\user\.age\key.txt  (via auto WSL path conversion)
 ```
 
 Set `AGE_KEY_PATH` in the satellite `.env` to the WSL-style path. PowerShell scripts automatically convert `/mnt/c/...` to `C:\...`.
@@ -329,7 +329,7 @@ The vault integrates naturally with the admin suite's multi-device sync feature 
 SYNCED ($ADMIN_ROOT on shared storage)       LOCAL (per-device, never synced)
 ══════════════════════════════════════       ═══════════════════════════════
 /mnt/n/Dropbox/Admin/                        ~/.admin/.env  (satellite)
-  ├── profiles/WOPR3.json                    ~/.age/key.txt (or AGE_KEY_PATH)
+  ├── profiles/DEVICE01.json                    ~/.age/key.txt (or AGE_KEY_PATH)
   ├── profiles/MACBOOK.json
   ├── logs/
   ├── issues/
@@ -342,7 +342,7 @@ SYNCED ($ADMIN_ROOT on shared storage)       LOCAL (per-device, never synced)
    ```bash
    # Device A (WSL)
    ADMIN_ROOT=/mnt/n/Dropbox/Admin
-   AGE_KEY_PATH=/mnt/c/Users/Owner/.age/key.txt
+   AGE_KEY_PATH=/mnt/c/Users/user/.age/key.txt
 
    # Device B (macOS)
    ADMIN_ROOT=/Users/jez/Dropbox/Admin

@@ -214,8 +214,8 @@ $env:PATH = [Environment]::GetEnvironmentVariable('PATH', 'User') + ";" + [Envir
 
 ```powershell
 # Key paths are in profile
-$AdminProfile.paths.sshKeys      # C:/Users/Owner/.ssh
-$AdminProfile.paths.npmGlobal    # C:/Users/Owner/AppData/Roaming/npm
+$AdminProfile.paths.sshKeys      # C:/Users/user/.ssh
+$AdminProfile.paths.npmGlobal    # C:/Users/user/AppData/Roaming/npm
 $AdminProfile.paths.projects     # D:/
 ```
 

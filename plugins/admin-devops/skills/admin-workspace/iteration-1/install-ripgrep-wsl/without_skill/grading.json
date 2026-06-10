@@ -9,7 +9,7 @@
       {
         "text": "Correctly identifies WSL environment",
         "passed": true,
-        "evidence": "The transcript header states 'Platform: WSL2 Ubuntu 24.04 on Windows 11 Pro (WOPR3)' and notes reference workspace preferences, indicating awareness of the WSL environment."
+        "evidence": "The transcript header states 'Platform: WSL2 Ubuntu 24.04 on Windows 11 Pro (DEVICE01)' and notes reference workspace preferences, indicating awareness of the WSL environment."
       },
       {
         "text": "Uses apt as the package manager (profile preference), not snap/brew/other",

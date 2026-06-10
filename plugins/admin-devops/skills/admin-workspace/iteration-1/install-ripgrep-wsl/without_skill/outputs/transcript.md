@@ -1,7 +1,7 @@
 # Install ripgrep on WSL — Transcript (Without Skill)
 
 **Date:** 2026-03-13
-**Platform:** WSL2 Ubuntu 24.04 on Windows 11 Pro (WOPR3)
+**Platform:** WSL2 Ubuntu 24.04 on Windows 11 Pro (DEVICE01)
 **Method:** General knowledge, no skill assistance
 
 ---

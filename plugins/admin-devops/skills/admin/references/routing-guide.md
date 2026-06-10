@@ -45,8 +45,8 @@ echo "Detected: ENV=$ENV, ADMIN_ROOT=$ADMIN_ROOT"
 
 | Session Started From | ENV Value | Key Indicator | Path Example |
 |---------------------|-----------|---------------|--------------|
-| WSL terminal | `wsl` | `/proc/version` has "microsoft" | `/mnt/c/Users/Owner/.admin` |
-| Windows (PowerShell/CMD/Terminal) | `windows-gitbash` | `$OS=Windows_NT` | `/c/Users/Owner/.admin` |
+| WSL terminal | `wsl` | `/proc/version` has "microsoft" | `/mnt/c/Users/user/.admin` |
+| Windows (PowerShell/CMD/Terminal) | `windows-gitbash` | `$OS=Windows_NT` | `/c/Users/user/.admin` |
 | Native Linux | `linux` | No Microsoft, no Windows_NT | `/home/user/.admin` |
 | macOS | `macos` | `uname -s` = "Darwin" | `/Users/user/.admin` |
 

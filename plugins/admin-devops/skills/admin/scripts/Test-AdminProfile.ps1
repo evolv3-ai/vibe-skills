@@ -7,7 +7,7 @@
     Returns JSON with profile path, existence status, and basic info if exists.
 .EXAMPLE
     .\Test-AdminProfile.ps1
-    Returns JSON: {"exists":true,"path":"C:\\Users\\Owner\\.admin\\profiles\\CASATEN.json","device":"CASATEN"}
+    Returns JSON: {"exists":true,"path":"C:\\Users\\user\\.admin\\profiles\\CASATEN.json","device":"CASATEN"}
 .EXAMPLE
     . .\Test-AdminProfile.ps1; Test-AdminProfile
     Dot-source and call the function directly

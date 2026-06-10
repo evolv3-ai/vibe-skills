@@ -37,8 +37,8 @@ All platforms use a **satellite .env** at `~/.admin/.env` to find the profile:
 
 | Platform | Satellite location | ADMIN_ROOT | Profile path |
 |----------|-------------------|------------|-------------|
-| Windows | `C:\Users\Owner\.admin\.env` | `C:\Users\Owner\.admin` | `...\profiles\WOPR3.json` |
-| WSL | `/home/user/.admin/.env` | `/mnt/c/Users/Owner/.admin` | `.../profiles/WOPR3.json` |
+| Windows | `C:\Users\user\.admin\.env` | `C:\Users\user\.admin` | `...\profiles\DEVICE01.json` |
+| WSL | `/home/user/.admin/.env` | `/mnt/c/Users/user/.admin` | `.../profiles/DEVICE01.json` |
 | Linux/macOS | `~/.admin/.env` | `~/.admin` | `.../profiles/myhost.json` |
 | Multi-device | `~/.admin/.env` | `/mnt/nas/.admin` | `.../profiles/myhost.json` |
 
@@ -118,7 +118,7 @@ Each tool has rich metadata for AI guidance:
     "present": true,
     "version": "0.9.5",
     "installedVia": "cargo",
-    "path": "C:/Users/Owner/.local/bin/uv.exe",
+    "path": "C:/Users/user/.local/bin/uv.exe",
     "shimPath": null,
     "configPath": null,
     "lastChecked": "2025-12-14T00:00:00Z",
@@ -140,11 +140,11 @@ Each tool has rich metadata for AI guidance:
   {
     "id": "cool-two",
     "name": "COOL_TWO",
-    "host": "85.239.242.228",
+    "host": "203.0.113.30",
     "port": 22,
     "username": "root",
     "authMethod": "key",
-    "keyPath": "C:/Users/Owner/.ssh/id_rsa_openssh",
+    "keyPath": "C:/Users/user/.ssh/id_rsa_openssh",
     "provider": "contabo",
     "role": "coolify",
     "status": "active"
@@ -227,7 +227,7 @@ $AdminProfile.tools["newtool"] = @{
     present = $true
     version = "1.0.0"
     installedVia = "scoop"
-    path = "C:/Users/Owner/scoop/apps/newtool/current/newtool.exe"
+    path = "C:/Users/user/scoop/apps/newtool/current/newtool.exe"
     installStatus = "working"
     lastChecked = (Get-Date).ToString("o")
 }

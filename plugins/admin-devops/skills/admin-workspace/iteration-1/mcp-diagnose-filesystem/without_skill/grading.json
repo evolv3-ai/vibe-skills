@@ -13,7 +13,7 @@
     {
       "text": "Examines Claude Desktop config JSON location and contents",
       "passed": true,
-      "evidence": "Step 1 identifies the correct Windows-side config path (/mnt/c/Users/Owner/AppData/Roaming/Claude/claude_desktop_config.json), lists what to look for in the mcpServers entry, and Step 2 validates JSON syntax with a python3 command."
+      "evidence": "Step 1 identifies the correct Windows-side config path (/mnt/c/Users/user/AppData/Roaming/Claude/claude_desktop_config.json), lists what to look for in the mcpServers entry, and Step 2 validates JSON syntax with a python3 command."
     },
     {
       "text": "Verifies Node.js version is 18+ as a prerequisite",

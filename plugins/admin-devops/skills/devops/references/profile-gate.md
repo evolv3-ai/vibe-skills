@@ -59,8 +59,8 @@ When running in WSL, the profile data lives on the Windows filesystem. A **satel
 
 ```env
 # ~/.admin/.env (created during setup)
-ADMIN_ROOT=/mnt/c/Users/Owner/.admin
-ADMIN_DEVICE=WOPR3
+ADMIN_ROOT=/mnt/c/Users/user/.admin
+ADMIN_DEVICE=DEVICE01
 ADMIN_PLATFORM=wsl
 ```
 

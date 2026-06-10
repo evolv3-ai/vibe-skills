@@ -161,7 +161,7 @@ For headless environments (runtimes, customer PCs), machine identities provide s
 
 | Identity | Projects | Scope |
 |---|---|---|
-| `wopr3-operator` | admin-operator (read), admin-runtime (read) | Full operator access |
+| `device01-operator` | admin-operator (read), admin-runtime (read) | Full operator access |
 | `runtime-kasm-hetzner-02` | admin-runtime | `/deployments/kasm-hetzner-02/` only |
 | `runtime-openclaw-contabo-01` | admin-runtime | `/agents/lia/`, `/agents/shane/`, `/agents/terra/` |
 | `customer-larrysinteriors-pc` | customer-larrysinteriors | Read all |

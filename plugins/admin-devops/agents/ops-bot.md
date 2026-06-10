@@ -203,7 +203,7 @@ Apply a configuration change across multiple files at once.
    Files to update (3):
      ~/.admin/.env:         SSH_KEY_PATH=~/.ssh/id_rsa → ~/.ssh/id_ed25519
      /mnt/c/.admin/.env:    SSH_KEY_PATH=~/.ssh/id_rsa → ~/.ssh/id_ed25519
-     profiles/WOPR3.json:   .servers[0].keyPath: update
+     profiles/DEVICE01.json:   .servers[0].keyPath: update
    ```
 4. **Ask for confirmation** via AskUserQuestion
 5. **Apply changes** with backup:
@@ -261,8 +261,8 @@ Selectively import configuration from a backup or old profile into the current p
 
 #### Step 1: Load Source Profile
 Ask user for the source profile path. Accept:
-- Direct path: `/mnt/c/Users/Owner/.admin/backups/WOPR3-2025-11.json`
-- Relative to ADMIN_ROOT: `backups/migration-20251115/profiles/WOPR3.json`
+- Direct path: `/mnt/c/Users/user/.admin/backups/DEVICE01-2025-11.json`
+- Relative to ADMIN_ROOT: `backups/migration-20251115/profiles/DEVICE01.json`
 - Another device's profile: `$ADMIN_ROOT/profiles/MACBOOK.json`
 
 ```bash

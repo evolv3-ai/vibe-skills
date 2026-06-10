@@ -15,7 +15,7 @@ How The Library, device profiles, and Infisical work together to distribute agen
 | Data | Owner | Example |
 |------|-------|---------|
 | "simplemem exists and needs SIMPLEMEM_TOKEN" | Library (`library.yaml`) | `requiredSecrets.SIMPLEMEM_TOKEN.defaultUri` |
-| "WOPR3 has simplemem configured, token is at this URI" | Profile (`bindings.mcp.simplemem`) | `secretRefs.SIMPLEMEM_TOKEN: "infisical://..."` |
+| "DEVICE01 has simplemem configured, token is at this URI" | Profile (`bindings.mcp.simplemem`) | `secretRefs.SIMPLEMEM_TOKEN: "infisical://..."` |
 | "The actual token value" | Infisical / vault | Resolved at render time |
 
 ## Bindings Model (v4.1)
