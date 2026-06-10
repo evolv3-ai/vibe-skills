@@ -24,7 +24,7 @@ echo ""
 
 # Validate required variables
 # API variables: must be set for script to function
-if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ZONE_ID" ] || [ -z "$DNS_RECORD_ID" ] || [ -z "$TUNNEL_ID" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ZONE_ID" ] || [ -z "$DNS_RECORD_ID" ] || [ -z "$TUNNEL_ID" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ] || [ -z "$TUNNEL_HOSTNAME" ]; then
     echo "❌ Missing required environment variables. Please run coolify-cloudflare-tunnel-setup.sh first."
     echo ""
     echo "Required variables:"
