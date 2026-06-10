@@ -13,7 +13,7 @@
         "OCI_KEY_FILE",
         "OCI_REGION"
       ],
-      "reference": "references/oci.md"
+      "reference": "../oci/SKILL.md"
     },
     "hetzner": {
       "name": "Hetzner Cloud",
