@@ -12,6 +12,12 @@ license: MIT
 
 # Hetzner Cloud Infrastructure
 
+## CRITICAL: Secrets and .env
+
+- NEVER store live `.env` files or credentials inside any skill folder.
+- `.env.template` files belong only in `assets/` within a skill.
+- Store live secrets in `~/.admin/.env` and reference from there.
+
 **Status**: Production Ready | **Dependencies**: hcloud CLI, SSH key pair
 
 ---
