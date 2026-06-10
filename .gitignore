@@ -44,3 +44,10 @@ SESSION.md
 
 # Packaged skills
 *.skill
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Windows shortcuts
+*.lnk
