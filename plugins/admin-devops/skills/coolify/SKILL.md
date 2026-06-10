@@ -12,6 +12,12 @@ license: MIT
 
 # Coolify - Self-Hosted PaaS
 
+## CRITICAL: Secrets and .env
+
+- NEVER store live `.env` files or credentials inside any skill folder.
+- `.env.template` files belong only in `assets/` within a skill.
+- Store live secrets in `~/.admin/.env` and reference from there.
+
 **Purpose**: Install and operate Coolify on a single server, then deploy apps via Nixpacks, Dockerfile, or Docker Compose.
 
 ## Step 0: Gather Required Information (MANDATORY)
