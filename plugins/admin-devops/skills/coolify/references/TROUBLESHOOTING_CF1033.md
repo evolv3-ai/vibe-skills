@@ -87,7 +87,7 @@ Cloudflare cannot reach the origin because there's no tunnel configured.
 
 #### Prerequisites
 - Cloudflare account with domain access
-- Cloudflare API token (from user's selection: `y^48ZTz3ZJ8J`)
+- Cloudflare API token (from user's selection: `<CLOUDFLARE_API_TOKEN>`)
 
 #### Installation Steps
 
@@ -276,7 +276,7 @@ ssh -i ~/.ssh/id_rsa ubuntu@<SERVER_IP>
 
 **Cloudflare API Token** (from user selection):
 ```
-y^48ZTz3ZJ8J
+<CLOUDFLARE_API_TOKEN>
 ```
 
 ---
