@@ -52,11 +52,11 @@
   "applications": {
     "coolify": {
       "name": "Coolify",
-      "skill": "devops",
+      "skill": "coolify",
       "requirements": [
         "docker"
       ],
-      "reference": "references/coolify.md"
+      "reference": "../coolify/SKILL.md"
     },
     "kasm": {
       "name": "KASM Workspaces",

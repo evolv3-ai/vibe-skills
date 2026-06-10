@@ -26,7 +26,6 @@ $required = @(
   (Join-Path -Path $AdminSkill -ChildPath "references/windows.md")
   (Join-Path -Path $AdminSkill -ChildPath "references/wsl.md")
   (Join-Path -Path $AdminSkill -ChildPath "references/mcp.md")
-  (Join-Path -Path $DevopsSkill -ChildPath "references/coolify.md")
 )
 if ($required | ForEach-Object { Test-Path $_ } | Where-Object { -not $_ } | Measure-Object | Select-Object -ExpandProperty Count | ForEach-Object { $_ -eq 0 }) {
   Write-Host "PASS"
