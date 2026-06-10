@@ -99,9 +99,10 @@ The default `ntm send <session> "msg"` excludes the user pane. `--all` includes 
 
 ## Tailscale / Networking
 
-### `dwelf-stork.ts.net` MagicDNS
+### MagicDNS resolution
 
-Tailnet name is `dwelf-stork.ts.net`. MagicDNS resolves `flywheel-1-oci` and `flywheel-2-oci` directly. If `ssh flywheel-N-oci` fails:
+On a working tailnet, MagicDNS resolves each flywheel's machine name directly — the
+`sshAlias` Host blocks point at `<host>.<tailnet>.ts.net`. If `ssh <alias>` fails:
 
 ```bash
 tailscale status                # is the operator on the tailnet?

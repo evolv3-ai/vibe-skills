@@ -40,7 +40,7 @@ scripts/test-admin-profile.sh
 
 If `exists: false`, run the TUI setup interview (see profile-gate.md) before proceeding.
 
-**WSL note**: The profile lives on the Windows side (`/mnt/c/Users/Owner/.admin`), not in WSL home. The satellite `.env` at `~/.admin/.env` points to the real location. See the "Shared Admin Root" section in profile-gate.md for details.
+**WSL note**: The profile lives on the Windows side (`/mnt/c/Users/user/.admin`), not in WSL home. The satellite `.env` at `~/.admin/.env` points to the real location. See the "Shared Admin Root" section in profile-gate.md for details.
 
 ---
 
@@ -170,8 +170,8 @@ docker-compose up -d        # Start compose stack
 Windows paths in profile need conversion:
 
 ```bash
-# Profile path: "C:/Users/Owner/.ssh"
-# WSL path:     "/mnt/c/Users/Owner/.ssh"
+# Profile path: "C:/Users/user/.ssh"
+# WSL path:     "/mnt/c/Users/user/.ssh"
 
 win_to_wsl() {
     local win_path="$1"
@@ -547,15 +547,15 @@ wslpath -w /home/username/file.txt
 # Returns: \\wsl$\Ubuntu-24.04\home\username\file.txt
 
 # Windows to WSL path
-wslpath -u 'C:\Users\Owner\Documents'
-# Returns: /mnt/c/Users/Owner/Documents
+wslpath -u 'C:\Users\user\Documents'
+# Returns: /mnt/c/Users/user/Documents
 ```
 
 ## Path Mapping Table
 
 | Windows Path | WSL Path |
 |--------------|----------|
-| `C:\Users\Owner` | `/mnt/c/Users/Owner` |
+| `C:\Users\user` | `/mnt/c/Users/user` |
 | `D:\projects` | `/mnt/d/projects` |
 | `N:\Dropbox` | `/mnt/n/Dropbox` |
 | `\\wsl$\Ubuntu\home\user` | `/home/user` |

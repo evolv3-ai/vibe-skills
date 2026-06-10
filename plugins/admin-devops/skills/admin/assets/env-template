@@ -14,7 +14,7 @@
 
 # --- Bootstrap (required) ---
 ADMIN_ROOT=                              # Central admin directory (e.g., ~/.admin)
-ADMIN_DEVICE=                            # Device name (e.g., WOPR3, macbook-pro)
+ADMIN_DEVICE=                            # Device name (e.g., DEVICE01, macbook-pro)
 ADMIN_PLATFORM=                          # Platform: windows | wsl | linux | macos
 
 # --- Vault ---

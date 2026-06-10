@@ -30,8 +30,8 @@ All scripts use a **satellite .env** pattern for profile discovery:
 ```env
 # Admin satellite config - points to centralized profile
 # Do not store secrets here. See $ADMIN_ROOT/.env for credentials.
-ADMIN_ROOT=/mnt/c/Users/Owner/.admin
-ADMIN_DEVICE=WOPR3
+ADMIN_ROOT=/mnt/c/Users/user/.admin
+ADMIN_DEVICE=DEVICE01
 ADMIN_PLATFORM=wsl
 
 # Secrets Backend (v4.0+)
@@ -39,7 +39,7 @@ ADMIN_SECRETS_BACKEND=infisical
 INFISICAL_ENVIRONMENT=prod
 INFISICAL_AUTH_METHOD=cli-login
 # Machine identity (headless/runtime environments):
-INFISICAL_MACHINE_IDENTITY=wopr3-operator
+INFISICAL_MACHINE_IDENTITY=device01-operator
 ```
 
 For the full secrets configuration including multi-project support, see `references/secrets-architecture.md`.
@@ -50,8 +50,8 @@ All variables read by `test-admin-profile.sh` and `load-profile.sh`. Required va
 
 | Variable | Required | Description | Example Values |
 |----------|----------|-------------|----------------|
-| `ADMIN_ROOT` | **Yes** | Path to the centralized admin directory | `/mnt/c/Users/Owner/.admin`, `~/.admin` |
-| `ADMIN_DEVICE` | **Yes** | Device hostname (constructs profile path) | `WOPR3`, `DELTABOT` |
+| `ADMIN_ROOT` | **Yes** | Path to the centralized admin directory | `/mnt/c/Users/user/.admin`, `~/.admin` |
+| `ADMIN_DEVICE` | **Yes** | Device hostname (constructs profile path) | `DEVICE01`, `DELTABOT` |
 | `ADMIN_PLATFORM` | **Yes** | Platform type | `wsl`, `linux`, `macos`, `windows` |
 | `ADMIN_PKG_MGR` | **Yes** | Linux-side package manager | `apt`, `brew`, `dnf` |
 | `ADMIN_WIN_PKG_MGR` | Yes* | Windows package manager (WSL only) | `winget`, `scoop`, `choco` |
@@ -73,7 +73,7 @@ This file is created automatically by `new-admin-profile.sh` during `/setup-prof
 
 ### Why Satellite?
 
-On WSL, the profile data lives on the Windows filesystem (e.g., `/mnt/c/Users/Owner/.admin`),
+On WSL, the profile data lives on the Windows filesystem (e.g., `/mnt/c/Users/user/.admin`),
 but agents check `$HOME` first. Without a satellite `.env` at `~/.admin/`, agents may:
 - Assume no setup exists (no `~/.admin/` folder)
 - Try to create a new profile in WSL's `$HOME`
@@ -242,7 +242,7 @@ This ensures one device profile (not duplicated), unified logs, and a single sou
 | Setup | Satellite .env location | ADMIN_ROOT points to |
 |-------|------------------------|---------------------|
 | Single device, native Linux | `~/.admin/.env` | `~/.admin` (same dir) |
-| Single device, WSL | `~/.admin/.env` | `/mnt/c/Users/Owner/.admin` |
+| Single device, WSL | `~/.admin/.env` | `/mnt/c/Users/user/.admin` |
 | Multi-device, any platform | `~/.admin/.env` | Network/cloud path |
 
 ---

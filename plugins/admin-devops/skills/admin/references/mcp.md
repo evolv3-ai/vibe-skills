@@ -106,7 +106,7 @@ Get-Content $registryPath | ConvertFrom-Json | Select-Object -ExpandProperty cli
 
 3) Install a server for a specific client (Claude Desktop example):
 ```powershell
-.\scripts\install-mcp-server.ps1 -Name "filesystem" -Command "npx" -Args @("-y","@modelcontextprotocol/server-filesystem","C:/Users/Owner/Documents")
+.\scripts\install-mcp-server.ps1 -Name "filesystem" -Command "npx" -Args @("-y","@modelcontextprotocol/server-filesystem","C:/Users/user/Documents")
 ```
 
 ---
@@ -153,7 +153,7 @@ MCP config and servers tracked in profile:
 ```powershell
 # Config file location
 $AdminProfile.mcp.configFile
-# "C:/Users/Owner/AppData/Roaming/Claude/claude_desktop_config.json"
+# "C:/Users/user/AppData/Roaming/Claude/claude_desktop_config.json"
 
 # Installed servers
 $AdminProfile.mcp.servers | Format-Table
@@ -1253,7 +1253,7 @@ $ADMIN_ROOT/registries/mcp-registry.json
   "version": "0.6.2",
   "installMethod": "npx",
   "command": "npx",
-  "args": ["-y", "@modelcontextprotocol/server-filesystem", "C:/Users/Owner/Documents"],
+  "args": ["-y", "@modelcontextprotocol/server-filesystem", "C:/Users/user/Documents"],
   "env": {},
   "clients": {
     "claude-desktop": { "installed": true, "status": "working", "toolCount": 8 }

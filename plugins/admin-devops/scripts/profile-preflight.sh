@@ -1,17 +1,26 @@
 #!/usr/bin/env bash
 # Strict profile preflight gate (QA #2). cwd-independent paths.
+# Flags and the profile path may appear in any order.
 set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BASE="$(cd "$SCRIPT_DIR/.." && pwd)"
-PROFILE_PATH="${1:-${ADMIN_PROFILE_PATH:-$BASE/tests/fixtures/profile/valid.json}}"
+PROFILE_PATH=""
 MODE="text"
 FIX=0
 for arg in "$@"; do
   case "$arg" in
     --json) MODE="json" ;;
     --fix-suggestions) FIX=1 ;;
+    --*)
+      printf '{"ok":false,"error_code":"UNKNOWN_FLAG","flag":"%s"}\n' "$arg"
+      exit 2
+      ;;
+    *)
+      if [[ -z "$PROFILE_PATH" ]]; then PROFILE_PATH="$arg"; fi
+      ;;
   esac
 done
+PROFILE_PATH="${PROFILE_PATH:-${ADMIN_PROFILE_PATH:-$BASE/tests/fixtures/profile/valid.json}}"
 if [[ ! -f "$PROFILE_PATH" ]]; then
   if [[ "$MODE" == "json" ]]; then
     printf '{"ok":false,"error_code":"PROFILE_MISSING","profile":"%s"}\n' "$PROFILE_PATH"

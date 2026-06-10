@@ -315,7 +315,7 @@ When running on Windows through Claude Code (Git Bash):
 
 | Windows Path | Git Bash Path |
 |--------------|---------------|
-| `C:/Users/Owner` | `/c/Users/Owner` |
+| `C:/Users/user` | `/c/Users/user` |
 | `D:/admin` | `/d/admin` |
 | `%USERPROFILE%` | `$HOME` |
 | `%COMPUTERNAME%` | `$(hostname)` (works) |

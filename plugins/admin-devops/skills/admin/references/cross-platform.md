@@ -83,7 +83,7 @@ function Convert-ToWslPath {
 **Bash (using wslpath):**
 ```bash
 wslpath -u 'C:/Users/<WIN_USER>/Documents'
-# Returns: /mnt/c/Users/Owner/Documents
+# Returns: /mnt/c/Users/user/Documents
 ```
 
 ### WSL → Windows

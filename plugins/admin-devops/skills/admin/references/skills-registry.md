@@ -45,7 +45,7 @@ Skills tracked in central registry:
 ```powershell
 # Registry location
 $AdminProfile.paths.skillsRegistry
-# "C:/Users/Owner/.admin/skills-registry.json"
+# "C:/Users/user/.admin/skills-registry.json"
 
 # Installed skills
 $Registry.installedSkills | Format-Table Name, Source, Clients, Status

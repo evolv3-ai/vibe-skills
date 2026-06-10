@@ -9,7 +9,7 @@
     posts via `gh issue create`. Updates the local file with the GitHub URL.
     Falls back gracefully if gh is unavailable.
 .PARAMETER IssuePath
-    Path to the local issue markdown file (e.g. C:\Users\Owner\.admin\issues\issue_20260401_bad_flag.md)
+    Path to the local issue markdown file (e.g. C:\Users\user\.admin\issues\issue_20260401_bad_flag.md)
 .EXAMPLE
     .\post-skill-issue.ps1 -IssuePath "$env:USERPROFILE\.admin\issues\issue_20260401_bad_flag.md"
 .EXAMPLE

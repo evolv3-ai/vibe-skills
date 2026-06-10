@@ -14,7 +14,7 @@ Per the skill's mandatory profile gate, run the profile check before any operati
 /home/wsladmin/dev/vibe-skills/plugins/admin-devops/skills/admin/scripts/test-admin-profile.sh
 ```
 
-**Expected output:** JSON like `{"exists":true,"device":"WOPR3","adminRoot":"/mnt/c/Users/Owner/.admin","platform":"linux"}`
+**Expected output:** JSON like `{"exists":true,"device":"DEVICE01","adminRoot":"/mnt/c/Users/user/.admin","platform":"linux"}`
 
 **If `exists: false`:** Stop. Run `/setup-profile` (the TUI setup interview) before proceeding. Do not continue with installation.
 
@@ -126,8 +126,8 @@ log_admin_event "Installed ripgrep via apt on WSL" "OK"
 ```
 
 This writes to:
-- `/mnt/c/Users/Owner/.admin/logs/central/operations.log`
-- `/mnt/c/Users/Owner/.admin/devices/WOPR3/logs.txt`
+- `/mnt/c/Users/user/.admin/logs/central/operations.log`
+- `/mnt/c/Users/user/.admin/devices/DEVICE01/logs.txt`
 
 ---
 
@@ -138,7 +138,7 @@ If SimpleMem is available, record the installation for future reference.
 ```
 memory_add(
   speaker: "admin:tool-installer",
-  text: "Installed ripgrep via apt on WSL Ubuntu 24.04 (WOPR3). Package: ripgrep. Version: <version from step 6>. No issues encountered."
+  text: "Installed ripgrep via apt on WSL Ubuntu 24.04 (DEVICE01). Package: ripgrep. Version: <version from step 6>. No issues encountered."
 )
 ```
 

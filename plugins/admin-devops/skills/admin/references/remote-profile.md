@@ -79,7 +79,7 @@ scripts/sync-profile.sh --init       # Initialize repo
 - Skips silently if `ADMIN_PROFILE_REPO` is not set
 - Pulls if last fetch was more than 1 hour ago
 - Commits and pushes if local changes exist
-- Commit messages include device name: `sync(WOPR3): profile update (WOPR3.json)`
+- Commit messages include device name: `sync(DEVICE01): profile update (DEVICE01.json)`
 
 ### PowerShell: Sync-DeviceProfile.ps1
 
@@ -98,8 +98,8 @@ The profile gate (`test-admin-profile.sh` / `Test-AdminProfile.ps1`) now include
 ```json
 {
   "exists": true,
-  "device": "WOPR3",
-  "adminRoot": "/mnt/c/Users/Owner/.admin",
+  "device": "DEVICE01",
+  "adminRoot": "/mnt/c/Users/user/.admin",
   "secretsBackend": "infisical",
   "profileRepo": "git@github.com:user/admin-profiles.git"
 }

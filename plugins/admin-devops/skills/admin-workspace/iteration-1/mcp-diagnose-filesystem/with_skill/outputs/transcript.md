@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-13
 **Issue:** MCP server `filesystem` not responding in Claude Desktop
-**Device:** WOPR3 (WSL2 Ubuntu 24.04 on Windows 11 Pro)
+**Device:** DEVICE01 (WSL2 Ubuntu 24.04 on Windows 11 Pro)
 **Skill consulted:** `/home/wsladmin/dev/vibe-skills/plugins/admin-devops/skills/admin/SKILL.md`
 **Reference consulted:** `references/mcp.md` (includes embedded CONFIGURATION.md, INSTALLATION.md, TROUBLESHOOTING.md, diagnostics.md, known-issues.md)
 
@@ -17,7 +17,7 @@ Per SKILL.md, every session must begin with a profile check. No exceptions.
 /home/wsladmin/dev/vibe-skills/plugins/admin-devops/skills/admin/scripts/test-admin-profile.sh
 ```
 
-**Expected output:** `{"exists":true,"device":"WOPR3","adminRoot":"/mnt/c/Users/Owner/.admin","platform":"linux"}`
+**Expected output:** `{"exists":true,"device":"DEVICE01","adminRoot":"/mnt/c/Users/user/.admin","platform":"linux"}`
 
 **If `exists: false`:** Stop and run `/setup-profile` before proceeding. Cannot diagnose without a profile.
 
@@ -60,8 +60,8 @@ ls -la "$CONFIG_PATH"
 
 **Also check profile for the config path:**
 ```bash
-ADMIN_ROOT="/mnt/c/Users/Owner/.admin"
-jq '.mcp.configFile' "$ADMIN_ROOT/profiles/WOPR3.json"
+ADMIN_ROOT="/mnt/c/Users/user/.admin"
+jq '.mcp.configFile' "$ADMIN_ROOT/profiles/DEVICE01.json"
 ```
 
 **What I'm looking for:** Confirm the config file exists and is readable from WSL.
@@ -104,7 +104,7 @@ cat "$CONFIG_PATH" | jq '.mcpServers.filesystem'
 **What I'm looking for:**
 - `command` field exists (should be `"npx"` or `"node"`)
 - `args` array is correct (should include `"-y"`, `"@modelcontextprotocol/server-filesystem"`, and an allowed directory path)
-- All paths are **absolute Windows paths** (e.g., `C:/Users/Owner/Documents`), not WSL paths
+- All paths are **absolute Windows paths** (e.g., `C:/Users/user/Documents`), not WSL paths
 - No `"disabled": true` flag
 - If using npx: `"command": "npx"` (not `"npx.cmd"` from WSL, but on Windows side it should resolve)
 
@@ -112,7 +112,7 @@ cat "$CONFIG_PATH" | jq '.mcpServers.filesystem'
 ```json
 {
   "command": "npx",
-  "args": ["-y", "@modelcontextprotocol/server-filesystem", "C:/Users/Owner/Documents"]
+  "args": ["-y", "@modelcontextprotocol/server-filesystem", "C:/Users/user/Documents"]
 }
 ```
 
@@ -215,7 +215,7 @@ Per `references/mcp.md` > Registry-First Approach:
 
 **Command I would run:**
 ```bash
-ADMIN_ROOT="/mnt/c/Users/Owner/.admin"
+ADMIN_ROOT="/mnt/c/Users/user/.admin"
 REGISTRY="$ADMIN_ROOT/registries/mcp-registry.json"
 if [ -f "$REGISTRY" ]; then
     jq '.servers.filesystem // .mcpServers.filesystem // "NOT_FOUND"' "$REGISTRY"
@@ -245,7 +245,7 @@ Based on the findings from Steps 4-11, I would present a diagnosis organized by 
    ```json
    {
      "command": "C:/Program Files/nodejs/node.exe",
-     "args": ["C:/Users/Owner/AppData/Roaming/npm/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js", "C:/Users/Owner/Documents"]
+     "args": ["C:/Users/user/AppData/Roaming/npm/node_modules/@modelcontextprotocol/server-filesystem/dist/index.js", "C:/Users/user/Documents"]
    }
    ```
    Or install globally: `npm install -g @modelcontextprotocol/server-filesystem`
@@ -296,7 +296,7 @@ Per CLAUDE.md memory integration: "Installation outcomes (success AND failure, w
 ```
 memory_add:
   speaker: "admin:mcp-bot"
-  text: "MCP filesystem server diagnosed on WOPR3: [root cause]. Fix: [fix applied]. Config path: [path]."
+  text: "MCP filesystem server diagnosed on DEVICE01: [root cause]. Fix: [fix applied]. Config path: [path]."
 ```
 
 ---
@@ -314,4 +314,4 @@ memory_add:
 | Embedded: `references/known-issues.md` | Prevention checklist (3 known issues) |
 | Embedded: `references/registry-schema.md` | Registry structure for tracking server status |
 | Embedded: `references/client-configs.md` | Client config file locations |
-| `CLAUDE.md` | Device profile (WOPR3), platform notes, SimpleMem conventions |
+| `CLAUDE.md` | Device profile (DEVICE01), platform notes, SimpleMem conventions |

@@ -304,7 +304,7 @@ The `--skip-unresolvable` flag allows bootstrap to complete before Infisical is 
 
 | Type | Trust Boundary | Gets | Example |
 |------|---------------|------|---------|
-| `workstation` | `operator` | All skills, all projects, full access | WOPR3 |
+| `workstation` | `operator` | All skills, all projects, full access | DEVICE01 |
 | `runtime` | `runtime` | admin skill, deployment-scoped secrets | kasm-hetzner-02 |
 | `customer-pc` | `customer` | admin + openclaw, customer project only | Larry's PC |
 

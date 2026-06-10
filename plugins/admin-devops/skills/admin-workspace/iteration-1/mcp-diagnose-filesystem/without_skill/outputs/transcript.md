@@ -17,13 +17,13 @@ The Claude Desktop config file holds all MCP server definitions. On different pl
 Since this is a WSL environment with Claude Desktop running on the Windows side, the config is likely at:
 
 ```
-/mnt/c/Users/Owner/AppData/Roaming/Claude/claude_desktop_config.json
+/mnt/c/Users/user/AppData/Roaming/Claude/claude_desktop_config.json
 ```
 
 **Command I would run:**
 
 ```bash
-cat "/mnt/c/Users/Owner/AppData/Roaming/Claude/claude_desktop_config.json"
+cat "/mnt/c/Users/user/AppData/Roaming/Claude/claude_desktop_config.json"
 ```
 
 **What I'm looking for:**
@@ -55,7 +55,7 @@ Malformed JSON is a common cause of MCP servers failing to load silently.
 **Command I would run:**
 
 ```bash
-python3 -c "import json; json.load(open('/mnt/c/Users/Owner/AppData/Roaming/Claude/claude_desktop_config.json'))" 2>&1
+python3 -c "import json; json.load(open('/mnt/c/Users/user/AppData/Roaming/Claude/claude_desktop_config.json'))" 2>&1
 ```
 
 **What I'm looking for:**
@@ -102,7 +102,7 @@ npx -y @modelcontextprotocol/server-filesystem /tmp/test-dir 2>&1
 Or on the Windows side:
 
 ```powershell
-npx -y @modelcontextprotocol/server-filesystem C:\Users\Owner\Documents
+npx -y @modelcontextprotocol/server-filesystem C:\Users\user\Documents
 ```
 
 **What I'm looking for:**
@@ -126,13 +126,13 @@ Claude Desktop writes MCP-related logs that show server startup attempts and fai
 
 ```bash
 # List available log files
-ls -la "/mnt/c/Users/Owner/AppData/Roaming/Claude/logs/"
+ls -la "/mnt/c/Users/user/AppData/Roaming/Claude/logs/"
 
 # Read the MCP-specific log (name may vary)
-cat "/mnt/c/Users/Owner/AppData/Roaming/Claude/logs/mcp.log"
+cat "/mnt/c/Users/user/AppData/Roaming/Claude/logs/mcp.log"
 
 # Or look for filesystem-specific log
-cat "/mnt/c/Users/Owner/AppData/Roaming/Claude/logs/mcp-server-filesystem.log"
+cat "/mnt/c/Users/user/AppData/Roaming/Claude/logs/mcp-server-filesystem.log"
 ```
 
 **What I'm looking for:**
@@ -249,6 +249,6 @@ After restart, check the MCP status in Claude Desktop:
 ## Key Insight for WSL Users
 
 Claude Desktop runs as a **Windows application**. The MCP server processes it spawns also run on Windows. This means:
-- Paths in the config must be **Windows paths** (e.g., `C:\Users\Owner\Documents`), not WSL paths.
+- Paths in the config must be **Windows paths** (e.g., `C:\Users\user\Documents`), not WSL paths.
 - The `command` (e.g., `npx`) must be resolvable from the **Windows PATH**, not the WSL PATH.
 - If you want the filesystem server to access WSL files, use the UNC path `\\wsl.localhost\Ubuntu\home\...` in the config.
