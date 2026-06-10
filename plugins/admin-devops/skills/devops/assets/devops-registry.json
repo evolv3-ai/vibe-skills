@@ -42,11 +42,11 @@
     },
     "linode": {
       "name": "Linode (Akamai)",
-      "skill": "devops",
+      "skill": "linode",
       "configRequired": [
         "LINODE_TOKEN"
       ],
-      "reference": "references/linode.md"
+      "reference": "../linode/SKILL.md"
     }
   },
   "applications": {
