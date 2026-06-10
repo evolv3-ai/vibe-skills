@@ -16,7 +16,7 @@ license: MIT
 
 - NEVER store live `.env` files or credentials inside any skill folder.
 - `.env.template` files belong only in `assets/` within a skill.
-- Store live secrets in `~/.admin/.env` (or another non-skill location you control) and reference them from there.
+- Store live secrets in `~/.admin/.env` and reference from there.
 
 **Status**: Production Ready | **Dependencies**: cntb CLI, SSH key pair
 
