@@ -18,6 +18,9 @@ expect_exit() {
 echo "Smoke test:"
 expect_exit "preflight valid -> 0"     0 "$BASE/scripts/profile-preflight.sh" "$BASE/tests/fixtures/profile/valid.json" --json
 expect_exit "preflight invalid -> 3"   3 "$BASE/scripts/profile-preflight.sh" "$BASE/tests/fixtures/profile/invalid.json" --json
+expect_exit "preflight flag-first valid -> 0"   0 "$BASE/scripts/profile-preflight.sh" --json "$BASE/tests/fixtures/profile/valid.json"
+expect_exit "preflight flag-first invalid -> 3" 3 "$BASE/scripts/profile-preflight.sh" --json "$BASE/tests/fixtures/profile/invalid.json"
+expect_exit "preflight unknown flag -> 2"       2 "$BASE/scripts/profile-preflight.sh" --bogus "$BASE/tests/fixtures/profile/valid.json"
 expect_exit "validate-contract -> 0"   0 "$BASE/scripts/validate-contract.sh"
 expect_exit "validate-dep-graph -> 0"  0 "$BASE/scripts/validate-dep-graph.sh"
 expect_exit "doctor -> 0"              0 "$BASE/scripts/doctor.sh" --json
