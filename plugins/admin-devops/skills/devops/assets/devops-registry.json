@@ -17,11 +17,11 @@
     },
     "hetzner": {
       "name": "Hetzner Cloud",
-      "skill": "devops",
+      "skill": "hetzner",
       "configRequired": [
         "HCLOUD_TOKEN"
       ],
-      "reference": "references/hetzner.md"
+      "reference": "../hetzner/SKILL.md"
     },
     "contabo": {
       "name": "Contabo",
