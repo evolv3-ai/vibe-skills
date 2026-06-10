@@ -7,39 +7,38 @@
 
 ---
 
-## Discover Available Provider References
+## Discover Installed Provider Skills
 
-`devops` stores provider guidance as reference files in `references/`.
+Provider guidance lives in dedicated sibling skills under the same plugin. List them:
 
 Bash:
 
 ```bash
-refs=(references/*.md)
-providers=$(printf '%s\n' "${refs[@]}" | sed 's|.*/||' | sed 's|\\.md$||' | grep -E '^(oci|hetzner|linode|digitalocean|contabo)$')
-echo "Available providers: $providers"
+ls -d "${SKILL_DIR}/../"{oci,hetzner,linode,digital-ocean,contabo,vultr} 2>/dev/null
 ```
 
 PowerShell:
 
 ```powershell
-$refs = Get-ChildItem 'references' -Filter *.md
-$providers = $refs | ForEach-Object { $_.BaseName } | Where-Object { $_ -in @('oci','hetzner','linode','digitalocean','contabo') }
-Write-Host \"Available providers: $($providers -join ', ')\"\n```
+Get-ChildItem (Split-Path $env:SKILL_DIR) -Directory |
+  Where-Object { $_.Name -in @('oci','hetzner','linode','digital-ocean','contabo','vultr') } |
+  Select-Object -ExpandProperty Name
+```
 
 ---
 
-## Known Providers (snapshot)
+## Known Provider Skills
 
-| Provider | Reference | Notes |
-|----------|-----------|-------|
-| Oracle Cloud | `references/oci.md` | Always Free ARM64 tier; capacity can be limited |
-| Hetzner | `references/hetzner.md` | EU‑centric, strong ARM value |
-| DigitalOcean | `references/digitalocean.md` | Good US availability; native Kasm autoscale |
-| Vultr | Not bundled | Optional provider; add your own reference if needed |
-| Linode | `references/linode.md` | Akamai edge integration |
-| Contabo | `references/contabo.md` | Best paid price/perf in many regions |
+| Provider | Skill | Notes |
+|----------|-------|-------|
+| Oracle Cloud | `oci` | Always Free ARM64 tier; capacity can be limited |
+| Hetzner | `hetzner` | EU-centric, strong ARM value |
+| DigitalOcean | `digital-ocean` | Good US availability; native Kasm autoscale |
+| Vultr | `vultr` | x86 cloud provider |
+| Linode | `linode` | Akamai edge integration |
+| Contabo | `contabo` | Best paid price/perf in many regions |
 
-Use the reference file for exact CLI steps.
+Use the dedicated provider skill for exact CLI steps.
 
 ---
 
