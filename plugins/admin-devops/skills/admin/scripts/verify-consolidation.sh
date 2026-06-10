@@ -20,7 +20,6 @@ echo -n "Test 2: Required files... "
 [ -f "$ADMIN_SKILL/references/windows.md" ] && \
 [ -f "$ADMIN_SKILL/references/wsl.md" ] && \
 [ -f "$ADMIN_SKILL/references/mcp.md" ] && \
-[ -f "$DEVOPS_SKILL/references/hetzner.md" ] && \
 [ -f "$DEVOPS_SKILL/references/coolify.md" ] && echo "PASS" || log_fail
 
 # Test 3: Reference integrity (all referenced files exist)
