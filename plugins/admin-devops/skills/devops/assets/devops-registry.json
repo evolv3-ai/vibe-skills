@@ -5,7 +5,7 @@
   "providers": {
     "oci": {
       "name": "Oracle Cloud Infrastructure",
-      "skill": "devops",
+      "skill": "oci",
       "configRequired": [
         "OCI_TENANCY_OCID",
         "OCI_USER_OCID",
