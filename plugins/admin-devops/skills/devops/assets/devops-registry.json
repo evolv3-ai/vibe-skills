@@ -25,12 +25,12 @@
     },
     "contabo": {
       "name": "Contabo",
-      "skill": "devops",
+      "skill": "contabo",
       "configRequired": [
         "CONTABO_CLIENT_ID",
         "CONTABO_CLIENT_SECRET"
       ],
-      "reference": "references/contabo.md"
+      "reference": "../contabo/SKILL.md"
     },
     "digitalocean": {
       "name": "DigitalOcean",
