@@ -70,19 +70,6 @@ Get-Content .agent-devops.env | ForEach-Object {
 
 ---
 
-## Provider Reference Not Found
+## Provider Skill Not Found
 
-Bash:
-
-```bash
-ls references/*.md
-# If missing, reinstall or resync devops
-```
-
-PowerShell:
-
-```powershell
-$refsPath = 'references'
-Get-ChildItem $refsPath -Filter *.md
-# If missing, reinstall or resync devops
-```
+Provider guidance lives in dedicated sibling skills (`oci`, `hetzner`, `linode`, `digital-ocean`, `contabo`, `vultr`). If a provider skill is missing, reinstall the admin-devops plugin.

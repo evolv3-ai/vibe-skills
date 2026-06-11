@@ -102,13 +102,13 @@ Full details: `references/profile-gate.md`
 | Task | Reference |
 |------|-----------|
 | Server inventory | Server Operations (use profile.servers) |
-| OCI provisioning | references/oci.md |
-| Hetzner provisioning | references/hetzner.md |
-| Linode provisioning | references/linode.md |
-| DigitalOcean provisioning | references/digitalocean.md |
-| Contabo provisioning | references/contabo.md |
-| Coolify deployment | references/coolify.md |
-| KASM deployment | references/kasm.md |
+| OCI provisioning | **→ Use oci skill** |
+| Hetzner provisioning | **→ Use hetzner skill** |
+| Linode provisioning | **→ Use linode skill** |
+| DigitalOcean provisioning | **→ Use digital-ocean skill** |
+| Contabo provisioning | **→ Use contabo skill** |
+| Coolify deployment | **→ Use coolify skill** |
+| KASM deployment | **→ Use kasm skill** |
 | Secrets / Infisical setup | **→ Use admin skill** |
 | **Local machine tasks** | **→ Use admin skill** |
 
@@ -120,7 +120,7 @@ Use `profile.servers[]` for inventory; do not maintain a separate list. Profile 
 
 1. Choose provider
 2. Load secrets via `secrets` CLI (provider API key)
-3. Run provider workflow (see provider reference)
+3. Run provider workflow (use the dedicated provider skill)
 4. Update `profile.servers[]` and `profile.deployments{}`
 5. Log the operation via `log_admin_event`
 
@@ -173,8 +173,6 @@ Both agents run the profile gate as their first step.
 
 ## Scripts / References
 
-- Inventory scripts: `scripts/agentDevopsInventory.ts`, `scripts/agent_devops_inventory.py`
-- Provider references: `references/*.md` (per-provider deployment guides)
 - Provider skills: sibling skills under this plugin (oci, hetzner, coolify, etc.)
 - Inventory format spec: `references/INVENTORY_FORMAT.md`
 - Deployment workflows: `references/DEPLOYMENT_WORKFLOWS.md`

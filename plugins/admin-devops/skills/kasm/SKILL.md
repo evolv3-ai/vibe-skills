@@ -13,6 +13,12 @@ license: MIT
 
 # KASM Workspaces
 
+## CRITICAL: Secrets and .env
+
+- NEVER store live `.env` files or credentials inside any skill folder.
+- `.env.template` files belong only in `assets/` within a skill.
+- Store live secrets in `~/.admin/.env` and reference from there.
+
 **Purpose**: Install, configure, manage, and troubleshoot KASM Workspaces on Linux servers.
 
 ## Step 0: Determine What the User Needs
