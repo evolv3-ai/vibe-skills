@@ -167,6 +167,7 @@ admin (core) ─── required by all satellites
 | Vault (age encryption) | references/vault-guide.md |
 | Profile sync (GitHub) | references/remote-profile.md |
 | **Remote servers/cloud** | **→ Use devops skill** |
+| devadmin onboarding / migration | references/devadmin-onboarding.md (`/adopt-devadmin`) |
 | Skill bug escalation | references/escalation-policy.md |
 
 ## Profile-Aware Adaptation (Always Check Preferences)
@@ -219,3 +220,4 @@ pwsh -NoProfile -File "scripts/Log-AdminEvent.ps1" -Message "Installed ripgrep" 
 - PowerShell tips: `references/powershell-commands.md`
 - Infisical secrets: `references/infisical.md`
 - Remote profile sync: `references/remote-profile.md`
+- devadmin onboarding/migration: `references/devadmin-onboarding.md` (run `/adopt-devadmin`)

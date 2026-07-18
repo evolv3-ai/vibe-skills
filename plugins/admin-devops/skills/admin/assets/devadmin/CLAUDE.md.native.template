@@ -1,0 +1,112 @@
+<!--
+  devadmin workspace CLAUDE.md — NATIVE template (Windows / macOS / bare Linux host).
+  Instantiated by `/admin-devops:adopt-devadmin` into the host's devadmin workspace
+  (Windows: D:\devadmin, macOS/Linux native: ~/dev/devadmin).
+
+  Placeholders are substituted from the admin profile at adoption time. If you see an
+  un-substituted double-brace placeholder below, this file was copied by hand — re-run
+  /adopt-devadmin to instantiate it properly. Keep the "Retired shapes" table in sync with the skill repo
+  copy: that table IS the migration spec the adopt command reads.
+
+  Template shape version: 1  (bump when the structure below changes so the adopt
+  command's CLAUDE.md shape-diff can flag stale workspaces).
+-->
+# devadmin — {{HOST}} ({{PLATFORM}})
+
+This is the **devadmin workspace** for `{{HOST}}`. A Claude Code session started here
+acts as the host-ops seat **`{{AGENT_CODE}}`** against the shared Open Engine
+`devadmin` backlog. Local machine admin (`/admin`) and remote infra (`/devops`) work
+for this host runs from here.
+
+- **Host:** `{{HOST}}`  ·  **Platform:** `{{PLATFORM}}`  ·  **Workspace:** `{{WORKSPACE_PATH}}`
+- **Agent code (dispatch key):** `{{AGENT_CODE}}`
+- **Host label:** `{{HOST_LABEL}}`
+- **Admin root:** `{{ADMIN_ROOT}}`  ·  **Local issue tracker:** `{{LOCAL_ISSUES_DIR}}`
+- **Template shape version:** 1  ·  **Instantiated:** {{GENERATED}}
+
+## Profile gate first
+
+Every session: confirm the admin profile before any operation. No profile → no
+preferences, no logging path, no state.
+
+```bash
+# bash hosts
+"${CLAUDE_PLUGIN_ROOT:-}"/skills/admin/scripts/test-admin-profile.sh 2>/dev/null \
+  || { echo "no profile — run /admin-devops:setup-profile"; }
+```
+
+```powershell
+# Windows hosts
+pwsh -NoProfile -File "$env:CLAUDE_PLUGIN_ROOT\skills\admin\scripts\Test-AdminProfile.ps1"
+```
+
+## Open Engine queue contract
+
+The `devadmin` Linear project is the queue; `{{LOCAL_ISSUES_DIR}}` stays the
+authoritative per-host tracker. Linear ⇄ local is reference-only — no mirroring
+obligation.
+
+| Surface | Where |
+| -- | -- |
+| Project | `devadmin` — https://linear.app/evolv3ai/project/devadmin-28dcbcd13f7b |
+| Team | `EVO` / Evolv3ai |
+| Queue label | `agent-instructions` (mandatory) |
+| Host filter | `{{HOST_LABEL}}` |
+| Status ledger | EVO-53 |
+| Routing map | EVO-54 (`Shared cross-host backlog: devadmin`) |
+| Access guide | EVO-58 |
+
+**Claim rule** (process exactly one issue per run): assigned to the operator, label
+`agent-instructions`, title contains `[agent instructions]`, second title bracket is
+`[{{AGENT_CODE}}]`, and state is `Agent Todo` (or a `Agent Needs Input` issue whose
+answer has arrived). Receipts: `AGENT CLAIMED` → `AGENT DONE`, move to `Agent Done`,
+update this seat's `AGENT STATUS` comment on EVO-53.
+
+**Safety:** human approval required for publishing, customer-facing changes,
+destructive ops, billing, credentials, and deploys. Never paste secrets into Linear.
+
+## Local issue tracking
+
+Host-authoritative issues live at `{{LOCAL_ISSUES_DIR}}` and are driven by
+`/admin-devops:troubleshoot`. A routable, still-open local issue may be mirrored up to
+the `devadmin` project (titled `[agent instructions][{{AGENT_CODE}}][task] ...`,
+labeled `agent-instructions` + `{{HOST_LABEL}}`, with a Linear ⇄ local back-reference)
+— the local file stays authoritative. Scrub `.env`-style secrets before mirroring.
+
+## Retired shapes — migration spec
+
+This host's workspace was consolidated to `{{WORKSPACE_PATH}}`. The folders below are
+**older admin-devops shapes**. If any still exist on this host, their host-grown
+content (`.env`, `.mcp.json`, `.infisical.json`, `.claude/`, `justfile`, `scripts/`,
+`tools/`) should be moved into this workspace, then the old folder retired manually
+(`rm -rf` / `Remove-Item` after you confirm the move — never automated).
+
+`/admin-devops:adopt-devadmin` reads this table to detect drift. Keep it current: a new
+retired shape added here teaches the adopt command to detect and migrate it.
+
+| Retired path | Platform | Shape it came from |
+| -- | -- | -- |
+| `D:\admin-native` | Windows | early native admin workspace |
+| `D:\devops-native` | Windows | early native devops workspace |
+| `D:\admin` | Windows | unprefixed admin workspace |
+| `D:\_admin` | Windows | underscore-prefixed admin workspace |
+| `D:\admin-test` | Windows | throwaway test workspace |
+| `~/dev/admin-wsl` | WSL | WSL admin workspace (pre-devadmin) |
+| `~/wsl-admin` | WSL | early WSL admin workspace |
+| `~/dev/admin-test*` | WSL/Linux | throwaway test workspaces |
+| `~/dev/devops-native` | macOS/Linux | early native devops workspace |
+
+Current canonical workspace: **`{{WORKSPACE_PATH}}`**. WSL counterpart (if this host
+also runs a WSL seat): `~/dev/devadmin` under that seat's own agent code
+(`{{AGENT_CODE}}-wsl` or the host's WSL code).
+
+## Day-to-day
+
+- `/admin-devops:admin` — local installs, MCP wiring, dev-env config for this host.
+- `/admin-devops:devops` — remote infra for servers this host owns.
+- `/admin-devops:troubleshoot` — track/diagnose/resolve host issues locally.
+- `/admin-devops:wrap-up` — end-of-session ritual (close issues, commit, log).
+- `/admin-devops:adopt-devadmin` — re-run to re-check drift after the skill shape evolves.
+
+Log notable changes with `log-admin-event.sh` / `Log-AdminEvent.ps1` (`OK` level for
+successful adoptions).

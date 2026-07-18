@@ -1,0 +1,114 @@
+<!--
+  devadmin workspace CLAUDE.md — WSL template (Claude Code running inside WSL, or a
+  Linux VPS seat). Instantiated by `/admin-devops:adopt-devadmin` into ~/dev/devadmin.
+
+  Placeholders are substituted from the admin profile at adoption time. If you see an
+  un-substituted double-brace placeholder below, this file was copied by hand — re-run
+  /adopt-devadmin to instantiate it properly. Keep the "Retired shapes" table in sync with the skill repo
+  copy: that table IS the migration spec the adopt command reads.
+
+  Template shape version: 1  (bump when the structure below changes so the adopt
+  command's CLAUDE.md shape-diff can flag stale workspaces).
+-->
+# devadmin — {{HOST}} (WSL)
+
+This is the **devadmin workspace** for the WSL/Linux seat on `{{HOST}}`. A Claude Code
+session started here acts as the host-ops seat **`{{AGENT_CODE}}`** against the shared
+Open Engine `devadmin` backlog. It is a **distinct seat** from the host's native
+Windows seat: MCP/OAuth is scoped to this WSL home, so this seat is wired and
+smoke-tested separately.
+
+- **Host:** `{{HOST}}`  ·  **Platform:** `{{PLATFORM}}`  ·  **Workspace:** `{{WORKSPACE_PATH}}`
+- **Agent code (dispatch key):** `{{AGENT_CODE}}`
+- **Host label:** `{{HOST_LABEL}}`
+- **Admin root:** `{{ADMIN_ROOT}}`  ·  **Local issue tracker:** `{{LOCAL_ISSUES_DIR}}`
+- **Template shape version:** 1  ·  **Instantiated:** {{GENERATED}}
+
+## Profile gate first
+
+Every session: confirm the admin profile before any operation. On WSL the profile data
+often lives on the Windows filesystem via a satellite `~/.admin/.env` — the gate
+resolves it.
+
+```bash
+"${CLAUDE_PLUGIN_ROOT:-}"/skills/admin/scripts/test-admin-profile.sh 2>/dev/null \
+  || { echo "no profile — run /admin-devops:setup-profile"; }
+```
+
+If the script is unavailable, read `~/.admin/.env` for `ADMIN_ROOT` / `ADMIN_DEVICE`
+and load `$ADMIN_ROOT/profiles/$ADMIN_DEVICE.json` directly.
+
+## Open Engine queue contract
+
+The `devadmin` Linear project is the queue; `{{LOCAL_ISSUES_DIR}}` stays the
+authoritative per-host tracker. Linear ⇄ local is reference-only — no mirroring
+obligation.
+
+| Surface | Where |
+| -- | -- |
+| Project | `devadmin` — https://linear.app/evolv3ai/project/devadmin-28dcbcd13f7b |
+| Team | `EVO` / Evolv3ai |
+| Queue label | `agent-instructions` (mandatory) |
+| Host filter | `{{HOST_LABEL}}` |
+| Status ledger | EVO-53 |
+| Routing map | EVO-54 (`Shared cross-host backlog: devadmin`) |
+| Access guide | EVO-58 |
+
+**Claim rule** (process exactly one issue per run): assigned to the operator, label
+`agent-instructions`, title contains `[agent instructions]`, second title bracket is
+`[{{AGENT_CODE}}]`, and state is `Agent Todo` (or a `Agent Needs Input` issue whose
+answer has arrived). Receipts: `AGENT CLAIMED` → `AGENT DONE`, move to `Agent Done`,
+update this seat's `AGENT STATUS` comment on EVO-53.
+
+**Safety:** human approval required for publishing, customer-facing changes,
+destructive ops, billing, credentials, and deploys. Never paste secrets into Linear.
+
+## WSL seat notes
+
+- This seat needs its **own** Linear MCP wiring (`claude mcp add --transport http
+  linear-server https://mcp.linear.app/mcp` then `/mcp` to log in) — the Windows-host
+  user-scope wiring does not cover this WSL home.
+- The smoke test must run **from inside this WSL seat** so OAuth/MCP and the profile
+  are exercised on the right home. It cannot be proxied from the native seat.
+- Keep WSL resources sane via `/admin-devops:admin` (`.wslconfig`, `wsl.conf` assets).
+
+## Local issue tracking
+
+Host-authoritative issues live at `{{LOCAL_ISSUES_DIR}}` and are driven by
+`/admin-devops:troubleshoot`. A routable, still-open local issue may be mirrored up to
+the `devadmin` project (titled `[agent instructions][{{AGENT_CODE}}][task] ...`,
+labeled `agent-instructions` + `{{HOST_LABEL}}`, with a Linear ⇄ local back-reference)
+— the local file stays authoritative. Scrub `.env`-style secrets before mirroring.
+
+## Retired shapes — migration spec
+
+This seat's workspace was consolidated to `{{WORKSPACE_PATH}}`. The folders below are
+**older admin-devops shapes**. If any still exist, move their host-grown content
+(`.env`, `.mcp.json`, `.infisical.json`, `.claude/`, `justfile`, `scripts/`, `tools/`)
+into this workspace, then retire the old folder manually (`rm -rf` after you confirm
+the move — never automated).
+
+`/admin-devops:adopt-devadmin` reads this table to detect drift. Keep it current.
+
+| Retired path | Platform | Shape it came from |
+| -- | -- | -- |
+| `~/dev/admin-wsl` | WSL | WSL admin workspace (pre-devadmin) |
+| `~/wsl-admin` | WSL | early WSL admin workspace |
+| `~/dev/admin-test*` | WSL/Linux | throwaway test workspaces |
+| `~/dev/admin-native` | Linux | early native admin workspace |
+| `~/dev/devops-native` | Linux | early native devops workspace |
+| `D:\admin-native` | Windows side | mirrored Windows admin workspace (if on /mnt/d) |
+| `D:\_admin` | Windows side | underscore-prefixed admin workspace |
+| `D:\admin-test` | Windows side | throwaway test workspace |
+
+Current canonical workspace: **`{{WORKSPACE_PATH}}`**.
+
+## Day-to-day
+
+- `/admin-devops:admin` — local installs, MCP wiring, dev-env config for this seat.
+- `/admin-devops:devops` — remote infra for servers this seat owns.
+- `/admin-devops:troubleshoot` — track/diagnose/resolve host issues locally.
+- `/admin-devops:wrap-up` — end-of-session ritual (close issues, commit, log).
+- `/admin-devops:adopt-devadmin` — re-run to re-check drift after the skill shape evolves.
+
+Log notable changes with `log-admin-event.sh` (`OK` level for successful adoptions).

@@ -332,6 +332,7 @@ Trust hierarchy: `operator` ≥ `runtime` ≥ `customer`. An operator device can
 | `/deploy` | Deploy application (Coolify, KASM) to server |
 | `/server-status` | Show server inventory from profile |
 | `/troubleshoot` | Track, diagnose, resolve issues |
+| `/adopt-devadmin` | Onboard/migrate this host onto the shared `devadmin` host-ops backlog (idempotent) |
 | `/library use` | Pull skill/agent/prompt/MCP from catalog |
 | `/library list` | Show catalog with install status |
 | `/library add` | Register new entry in catalog |
