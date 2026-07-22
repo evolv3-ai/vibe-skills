@@ -43,7 +43,7 @@
 
 | Source | Claimed Count | Skills Listed |
 |---|---|---|
-| `README.md` (lines 38-43) | 4 (table rows, partially corrupted formatting) | simplemem, session-scout, pi-agent-rust, iii |
+| `README.md` (lines 38-43) | 4 (table rows) | simplemem, session-scout, pi-agent-rust, iii |
 | `CLAUDE.md` ("4 skills") | 4 | Same 4 |
 | On-disk (`plugins/tools/skills/`) | **4 directories** | simplemem, session-scout, pi-agent-rust, iii |
 
@@ -78,26 +78,18 @@
 
 ---
 
-## 5. README Formatting Issue
-
-`README.md` lines 41-68 contain corrupted/truncated markdown. The tools skill table (lines 38-43) loses its table formatting after the first row, and subsequent sections (Install, Development) are missing column delimiters and have bare text fragments. This appears to be a rendering/commit artifact rather than intentional content.
-
-**Observation**: Lines 41-68 should be reviewed for correct markdown table and section formatting.
-
----
-
-## 6. Install Steps Comparison
+## 5. Install Steps Comparison
 
 | Source | Install Method |
 |---|---|
 | `README.md` (lines 48-53) | `/plugin` marketplace add, then `/plugin install admin-devops@vibe-skills` / `tools@vibe-skills` |
 | `CLAUDE.md` ("Installing from Marketplace") | Same two-step: marketplace add, then plugin install |
 
-**MATCH**: Install steps are consistent between README.md and CLAUDE.md (accounting for README formatting issues).
+**MATCH**: Install steps are consistent between README.md and CLAUDE.md.
 
 ---
 
-## 7. Marketplace Metadata Consistency
+## 6. Marketplace Metadata Consistency
 
 | Field | `marketplace.json` | `README.md` |
 |---|---|---|
@@ -108,7 +100,7 @@
 
 ---
 
-## 8. Version and Release Messaging
+## 7. Version and Release Messaging
 
 No version number, release tag, or release/version messaging was found in any repository file. There is no `CHANGELOG.md`, no version field in any `plugin.json`, and no release notes document.
 
@@ -116,13 +108,13 @@ No version number, release tag, or release/version messaging was found in any re
 
 ---
 
-## 9. Rename Notices
+## 8. Rename Notices
 
 No rename notices were found in any existing document. The only naming reference is the repository name `vibe-skills` which is consistent across all sources.
 
 ---
 
-## 10. Summary of Findings
+## 9. Summary of Findings
 
 | Finding | Type | Details |
 |---|---|---|
@@ -131,7 +123,6 @@ No rename notices were found in any existing document. The only naming reference
 | Command count | **Mismatch** | README/CLAUDE.md list 8; 11 on disk; 2 README entries have no file |
 | Agent count | **Mismatch** | README/CLAUDE.md list 8; 7 on disk; `mcp-bot` has no agent file |
 | Install steps | Verified match | Consistent between README and CLAUDE.md |
-| README formatting | **Issue** | Lines 41-68 have corrupted markdown |
 | Marketplace metadata | Observation | Descriptions differ in wording; inherit count mismatches |
 | Version/release info | **Missing** | No version, changelog, or release metadata anywhere |
 | `docs/SKILLS_CATALOG.md` | **Missing** | Document does not exist |
@@ -139,12 +130,11 @@ No rename notices were found in any existing document. The only naming reference
 
 ---
 
-## 11. Release-Readiness Checklist
+## 10. Release-Readiness Checklist
 
 - [ ] Resolve admin-devops skill count mismatch (add flywheel-admin, hermes-agent, kasm-admin to README/CLAUDE.md or explain omission)
 - [ ] Resolve command count mismatch (update README from 8 to actual count; add or remove stale entries)
 - [ ] Resolve agent count mismatch (add mcp-bot agent file or remove from README listing)
-- [ ] Fix README.md formatting corruption (lines 41-68)
 - [ ] Decide whether `docs/SKILLS_CATALOG.md` should be created or the reference removed
 - [ ] Decide whether `CHANGELOG.md` should be created for release tracking
 - [ ] Add version metadata to plugin.json files or establish a versioning strategy
